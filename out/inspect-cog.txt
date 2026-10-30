@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/mnt/data/liuzeyu/tri/scripts/inspect_model.py", line 10, in <module>
+    import torch
+  File "/mnt/data/liuzeyu/tri/.venv/lib/python3.12/site-packages/torch/__init__.py", line 2612, in <module>
+    _C._initExtension(_manager_path())  # pyrefly: ignore[bad-argument-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/data/liuzeyu/tri/.venv/lib/python3.12/site-packages/torch/cuda/__init__.py", line 32, in <module>
+    from . import _device_limits, gds
+  File "/mnt/data/liuzeyu/tri/.venv/lib/python3.12/site-packages/torch/cuda/gds.py", line 35, in <module>
+    if not is_available():
+           ^^^^^^^^^^^^^^
+  File "/mnt/data/liuzeyu/tri/.venv/lib/python3.12/site-packages/torch/cuda/gds.py", line 31, in is_available
+    return torch._C._has_gds
+           ^^^^^^^^^^^^^^^^^
+AttributeError: module 'torch._C' has no attribute '_has_gds'
+EXIT 1

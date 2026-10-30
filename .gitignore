@@ -1,0 +1,12 @@
+# model downloads
+.dldeps/
+
+# env
+.venv/
+
+# caches
+__pycache__/
+*.pyc
+
+# raw tensor dumps (regenerable via scripts/, too large for git)
+out/*-tensors.pt
