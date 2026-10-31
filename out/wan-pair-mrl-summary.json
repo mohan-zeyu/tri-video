@@ -1,0 +1,29 @@
+{
+  "model": "wan",
+  "source": "t_mid-zeros-s0 512-token subsamples, bf16",
+  "q_pair_mrl_mean_over_all": 0.7852,
+  "k_pair_mrl_mean_over_all": 0.8037,
+  "q_pair_mrl_median": 0.8678,
+  "q_frac>0.95_allpairs": 0.2689,
+  "q_frac>0.9_allpairs": 0.4251,
+  "dom_q_mrl_mean": 0.9724,
+  "dom_q_mrl_median": 0.9918,
+  "dom_q_frac>0.95": 0.7972,
+  "dom_q_frac>0.9": 0.925,
+  "dom_k_mrl_mean": 0.968,
+  "dom_k_frac>0.95": 0.7917,
+  "per_axis_mean": {
+    "t": {
+      "q": 0.7815,
+      "k": 0.8044
+    },
+    "h": {
+      "q": 0.7874,
+      "k": 0.805
+    },
+    "w": {
+      "q": 0.7868,
+      "k": 0.8016
+    }
+  }
+}
