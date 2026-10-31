@@ -1,95 +1,118 @@
 # Pre-RoPE Q/K geometry in video diffusion transformers
 
 Verification of the TriAttention paper's Observation 3.1 (arXiv 2604.04921:
-pre-RoPE Q/K vectors concentrate around non-zero centers — "point in similar
-directions" — stable across positions and contexts) on **video generation**
-DiTs, where self-attention uses 3D (t, h, w) RoPE instead of 1D positional
-RoPE. Run date: 2026-10-29.
+pre-RoPE Q/K vectors concentrate around non-zero centers, stable across
+positions and contexts) on **video generation** DiTs, where self-attention uses
+3D (t, h, w) RoPE instead of 1D positional RoPE. Run date: 2026-10-29;
+per-pair analysis added 2026-10-31.
 
 ## Verdict
 
-**The feature is present in video DiTs, at moderate strength, and it carries
-the paper's causal consequence.**
+**The feature is present in video DiTs, and on the paper's own metric
+(dominant-band MRL) it is close to LLM strength.**
 
-| # | paper claim (LLMs) | video DiT result |
+| # | claim | video DiT result |
 |---|---|---|
-| 1 | pre-RoPE Q/K concentrate (MRL → 1) | **Yes** — mean MRL 0.79–0.88 across all heads of all 3 models (LLMs: 0.98) |
-| 2 | centers stable across contexts | **Yes** — cross-noise-seed center cosine ≈ 0.999; MRL timestep-insensitive |
-| 3 | rotation destroys the shared direction | **Yes** — post-RoPE MRL drops to 0.63 (Wan) and 0.20 (LTX) |
-| 4 | Q and K point in similar directions | **Partially** — center-to-center cos 0.54 (Wan) / 0.64 (LTX), positive but weaker than LLMs |
-| 5 | centers predict attention logits (trig series, §3.3) | **Yes, strongly** — Pearson r of center-only prediction vs actual logits: **0.75 mean / 0.83 median (Wan), 0.72 / 0.81 (LTX)**; 69–70% of heads with r > 0.7 (paper's LLM range: mean > 0.5, peaks 0.6–0.9) |
+| 1 | pre-RoPE Q/K concentrate (paper metric: per-band MRL) | **Yes** — dominant-pair MRL mean 0.92–0.97, median 0.98–0.99; 76–80% of heads > 0.95 (paper, Qwen3-8B: mean 0.977, 84.7% > 0.95 per Table G). Over *all* bands, mean R_f = 0.69–0.82 |
+| 2 | centers stable | **Yes, with caveats** — split-half 0.85–0.99; cross-noise-seed ≈ 0.999 (weak test: two iid draws); real input change (text swap) moves Wan/LTX centers to cos 0.41–0.51 |
+| 3 | rotation destroys the shared direction *(our extension — not quantified in the paper)* | **Yes** — whole-vector MRL drops 0.86→0.63 (Wan), 0.81→0.20 (LTX) |
+| 4 | Q and K point in similar directions *(our extension — not claimed in the paper)* | **Partially** — center-to-center cos 0.54 (Wan) / 0.64 (LTX) / 0.22 (Cog), positive but moderate |
+| 5 | centers predict attention logits (trig series, §3.3) | **Yes** — r̄ = 0.75 mean / 0.83 median (Wan), 0.72 / 0.81 (LTX) over 4 layers. *Protocol differs from the paper* (all keys vs their log-spaced distance grid), so not directly comparable to their LLM numbers |
 
 ## Models
 
 | key | model | arch | positional mechanism | capture point |
 |---|---|---|---|---|
-| wan | Wan2.1-T2V-1.3B | 30L × 12H × 128d | 3-axis interleaved RoPE (t/h/w subspaces of head dim) | norm_q/norm_k (RMSNorm) |
-| ltx | LTX-Video (2B) | 28L × 32H × 64d | 3-axis interleaved RoPE over flattened stream | norm_q/norm_k (RMSNorm across heads) |
-| cog | CogVideoX-2b | 30L × 30H × 64d | **no RoPE** (sinusoidal pos-emb in patch embed; joint [text; video] stream) | norm_q/norm_k (LayerNorm), video tail only |
+| wan | Wan2.1-T2V-1.3B | 30L × 12H × 128d | 3-axis interleaved RoPE; pair split t 22 / h 21 / w 21 | norm_q/norm_k (RMSNorm) |
+| ltx | LTX-Video (2B) | 28L × 32H × 64d | 3-axis interleaved RoPE over flattened stream (1024 pairs: t/h/w blocks of 341 + 1 pad); each head owns a contiguous 32-pair slice | norm_q/norm_k (RMSNorm across heads) |
+| cog | CogVideoX-2b | 30L × 30H × 64d | **no RoPE** (sinusoidal pos-emb; joint [text; video] stream) | norm_q/norm_k (LayerNorm), video tail only |
 
-Probing setup: transformer-only forward passes (no text encoder / VAE), bf16,
-random-N(0,1) latents at native-resolution-class grids (T = 10,800 / 13,728 /
-21,600 video tokens), zero text conditioning (= the CFG-uncond branch), sweeps
-over timestep {high, mid, low}, text {zeros, randn}, noise seeds {0, 1}.
+Probing setup: transformer-only forwards (no text encoder / VAE), bf16,
+random-N(0,1) latents (T = 10,800 / 13,728 / 21,600 video tokens), zeros text
+embedding (= the true CFG-uncond input for **Wan only**; LTX masks padding and
+Cog's padding is not zero, so zeros are merely a fixed null-ish input there),
+sweeps over timestep {high, mid, low}, text {zeros, randn}, seeds {0, 1}.
 
 **Capture validation**: for 3 layers per model the attention output was
-recomputed from the captured pre-RoPE tensors + replicated rotation and
-compared with the module's real output — max relative error **0.0 (bit-exact)
-in all 9 checks**, so the statistics below are computed on exactly the tensors
-that enter the model's own `apply_rotary_emb`.
+recomputed from captured pre-RoPE tensors + replicated rotation and matched
+the module's real output **bit-exactly (rel_err 0.0, 9/9 checks)** — the stats
+below are on exactly the tensors entering the model's `apply_rotary_emb`.
 
-## Headline numbers (mid timestep, zeros text)
+## Headline numbers (mid timestep, zeros text; mean / median over layer×head)
 
-| model | q MRL pre | k MRL pre | q MRL post | k MRL post | cos(Q̄,K̄) | E cos(q_t,k_s) | % heads q-MRL>0.95 |
-|---|---|---|---|---|---|---|---|
-| Wan2.1-1.3B | 0.857 / 0.873 | 0.878 / 0.889 | 0.631 | 0.607 | 0.542 / 0.585 | 0.412 | 16% |
-| LTX-Video-2B | 0.810 / 0.834 | 0.793 / 0.822 | 0.204 | 0.167 | 0.642 / 0.758 | 0.444 | 4% |
-| CogVideoX-2b (no RoPE) | 0.854 / 0.914 | 0.879 / 0.940 | n/a | n/a | 0.224 / 0.393 | 0.136 | 32% |
-| *(paper, Qwen3-8B)* | *0.977–0.98* | *—* | *→~0* | *—* | *high* | *—* | *~90%* |
+Whole-vector MRL and cosines are from `out/<m>.json` (full-token, fp32):
 
-(cells are mean / median over all layer×head entries)
+| model | q MRL pre | k MRL pre | q MRL post | cos(Q̄,K̄) | E cos(q_t,k_s) |
+|---|---|---|---|---|---|
+| Wan2.1-1.3B | 0.857 / 0.873 | 0.878 / 0.889 | 0.631 | 0.542 / 0.585 | 0.412 |
+| LTX-Video-2B | 0.810 / 0.834 | 0.793 / 0.822 | 0.204 | 0.642 / 0.758 | 0.444 |
+| CogVideoX-2b (no RoPE) | 0.854 / 0.914 | 0.879 / 0.940 | n/a | 0.224 / 0.393 | 0.136 |
+
+Per-rotary-pair MRL (paper's metric; from 512-token bf16 subsamples,
+`out/<m>-pair-mrl.pt` via `scripts/pair_detail.py`):
+
+| model | mean R_f, all pairs | (head,pair) cells > 0.95 | dominant-pair MRL mean / median | heads dom > 0.95 |
+|---|---|---|---|---|
+| Wan2.1-1.3B | 0.785 | 27% | **0.972 / 0.992** | **80%** |
+| LTX-Video-2B | 0.694 | 24% | **0.922 / 0.987** | **78%** |
+| CogVideoX-2b | 0.819 | 40% | **0.921 / 0.984** | **76%** |
+| *(paper, Qwen3-8B)* | *—* | *—* | *0.977 mean* | *84.7% (Table G)* |
+
+Dominant pair = top band by ‖q_f‖·‖k_f‖ (the paper's selection rule); the
+statistic is by construction optimistic — the all-pairs row is the honest
+full distribution, the dominant row is the paper-comparable one.
 
 ## Notable observations
 
-- **Concentration is weaker than in LLMs but unambiguous and universal.** Every
-  model shows mean MRL 0.79–0.88 with split-half center stability 0.82–0.99;
-  Wan and Cog have >25% of heads above 0.95. Video tokens carry far more
-  content diversity than autoregressive text, which plausibly costs MRL.
-- **The no-RoPE control also concentrates** (CogVideoX, 0.85/0.88). So
-  concentration is not *caused* by RoPE; RoPE just rotates the concentrated
-  mass apart (claim 3). Cog's Q↔K alignment is however much weaker (0.22) —
-  the models that *do* use RoPE align Q and K more.
-- **Text conditioning moves the centers** in the RoPE models (zeros→randn
-  center cosine 0.41–0.51) while CogVideoX is text-insensitive (0.99). With
-  out-of-distribution randn text, Wan/LTX Q/K collapse onto a single direction
-  (MRL → 0.99): real conditioning adds diversity around the center, garbage
-  conditioning reveals the bare "default direction" of the weights.
-- **The trigonometric-series mechanism transfers unchanged** — replacing the
-  paper's 1D distance with the 3D rotation-angle difference (angles read
-  directly from the model's own rope tensors) yields logit predictions that
-  correlate at LLM-level strength (r̄ ≈ 0.72–0.75 mean, 0.81–0.83 median).
-  Attention in video DiTs is, to first order, a function of spatiotemporal
-  offset encoded in the Q/K centers.
+- **On the paper's dominant-band metric, video DiTs are near LLM strength**
+  (0.92–0.97 mean, 76–80% of heads > 0.95 vs Qwen3-8B's 84.7%). Concentration
+  lives primarily in the high-amplitude bands; low-amplitude bands spread.
+- **Axis structure (LTX)**: per-axis mean R_f is **w 0.77 > h 0.72 > t 0.60** —
+  temporal frequency bands are the least concentrated. Wan's t/h/w splits are
+  flat (0.78–0.79).
+- **The no-RoPE control also concentrates** (Cog 0.85/0.88 whole-vector,
+  0.92 dominant) — concentration is not *caused* by RoPE; RoPE just rotates
+  the concentrated mass apart. Cog's Q↔K alignment is weaker (0.22).
+- **Text conditioning moves the centers** in the RoPE models (zeros→randn cos
+  0.41–0.51); with OOD randn text, Wan/LTX Q/K collapse to MRL ≈ 0.99 — real
+  conditioning adds diversity around the center, garbage conditioning reveals
+  the weights' default direction.
+- **Trig-series prediction works** (r̄ ≈ 0.72–0.75 mean over all keys, 4
+  layers, noise inputs): to first order, video-DiT attention logits are a
+  function of spatiotemporal offset encoded in the Q/K centers.
+
+## Caveats & known issues
+
+- **Inputs are noise-only**: pure N(0,1) latents at every timestep (the model
+  expects partly-clean video at mid/low noise) and null-ish text. Timestep
+  insensitivity is therefore weakly tested. A real-prompt run inside a true
+  denoising loop (needs VAE + text encoder) remains future work.
+- **Two code bugs in `probe_video.py`** (found in review; numbers unaffected
+  since inputs are iid noise, but re-runs would fail):
+  the Wan freqs assert should be `freqs[0].shape[1] == T` (Wan freqs are
+  `[1,T,1,2D]`), and Cog latents must be laid out `[B,F,C,H,W]` (masked by
+  C=F=16 at 61 frames). `wan.json` was produced by the pre-final script
+  version with the correct assert.
+- Per-pair numbers come from 512-token bf16 subsamples, not full-T fp32.
+- Cog's `t_high=990` actually executes as 992 in bf16 (cosmetic).
 
 ## Files
 
-- `scripts/probe_video.py` — main probe (hooks, MRL/cosine stats pre/post RoPE,
-  capture validation, sweeps). `--model {wan,ltx,cog} --out ../out/<m>.json`
-- `scripts/analysis_series.py` — paper §3.3 causal check adapted to 3D RoPE
-  (center-only logit prediction, per-head Pearson r, offset marginals).
-- `scripts/inspect_model.py` — structure/signature dump per adapter.
-- `scripts/plots.py` — figures + `out/summary.md` (dataviz palette).
-- `scripts/multidl.py` — multi-range HF mirror downloader used here.
+- `scripts/probe_video.py` — main probe (hooks, MRL/cosine stats pre/post
+  RoPE, capture validation, sweeps). `--model {wan,ltx,cog} --out ../out/<m>.json`
+- `scripts/pair_detail.py` — full per-pair MRL / dominant-pair / per-axis
+  analysis from stored subsamples → `out/<m>-pair-mrl.pt` + summary JSON.
+- `scripts/analysis_series.py` — §3.3 causal check adapted to 3D RoPE.
+- `scripts/inspect_model.py`, `scripts/plots.py`, `scripts/multidl.py` —
+  structure dump, figures, mirror downloader.
 - `out/` — `<m>.json` (per-head stats), `<m>-tensors.pt` (centers + 512-token
-  subsamples per layer), `<m>-series.json` (causal check), figures, summary.
+  subsamples), `<m>-pair-mrl.pt` (full [L,H,P] R_f + norms + dominant idx),
+  `<m>-pair-mrl-summary.json`, `<m>-series.json`, figures, `summary.md`.
 
 ## Reproducibility
 
-- env: torch 2.11.0+cu128, diffusers 0.42.1 (venv in /dev/shm/trivenv —
-  volatile; recreate with `uv pip install torch --index-url
-  https://download.pytorch.org/whl/cu128` + `diffusers transformers
-  accelerate safetensors matplotlib`)
-- weights: HF cache `/mnt/data/liuzeyu/hf-cache` (transformer subfolders only,
+- env: torch 2.11.0+cu128, diffusers 0.42.1 (venv at `/dev/shm/trivenv` is
+  volatile; recreate via the uv cache on /mnt/data — wheels fully cached)
+- weights: HF cache `/mnt/data/liuzeyu/hf-cache` (transformer subfolders,
   sha256-verified)
-- seeds fixed (torch.manual_seed(0), per-input generators); every run's config
-  recorded in the JSON headers.
+- seeds fixed; run configs recorded in each JSON header.
