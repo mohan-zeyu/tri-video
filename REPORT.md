@@ -54,6 +54,10 @@ Noise-input runs, mean over all layer×head (dominant band in bold):
 and all-band depths in 2 of 3 models). On the paper's dominant-band metric,
 all three video DiTs sit within ~0.05 of Qwen3-8B.
 
+![Per-band MRL distributions: all rotary pairs vs the dominant pair, per model](out/pair-mrl-distributions.png)
+
+![Share of heads whose queries concentrate, per model, pre- vs post-RoPE](out/frac-concentrated.png)
+
 ## 4. Where concentration lives (`out/q-band-report-*.png`, `out/k-band-report-*.png`, `out/*-mrl-heatmap.png`)
 
 Per-(layer × head × band) maps for **both Q and K** (top panel: every cell,
@@ -68,6 +72,14 @@ and head-averaged band profiles:
   least concentrated; Wan's t/h/w split is flat (0.78–0.79).
 - High-R_f bands and high-amplitude bands coincide (§6).
 
+![Q: every (layer × head × band) MRL cell, dominant-band map, band profile — Wan](out/q-band-report-wan.png)
+
+![K: every (layer × head × band) MRL cell, dominant-band map, band profile — Wan](out/k-band-report-wan.png)
+
+*(LTX and CogVideoX equivalents: `out/q-band-report-{ltx,cog}.png`,
+`out/k-band-report-{ltx,cog}.png`; whole-vector layer×head heatmaps:
+`out/{wan,ltx,cog}-mrl-heatmap.png`.)*
+
 ## 5. The RoPE contrast
 
 Post-RoPE MRL (rotation applied to the same captured tensors): Wan
@@ -76,6 +88,8 @@ rotation — concentration is specifically a **pre**-RoPE property, which is
 the paper's premise for moving importance estimation there. The no-RoPE
 control concentrates *without* any rotation to contrast, showing
 concentration is not caused by RoPE — but see §8 for what realism reveals.
+
+![Pre- vs post-RoPE MRL distributions, queries and keys pooled across models](out/mrl-pre-vs-post.png)
 
 ## 6. Concentration ⇒ predictable logits
 
@@ -92,6 +106,8 @@ Three chained statistics tie the geometry to actual attention logits
    and K centers (angles from the model's own rope tensors) predicts actual
    pre-softmax logits at Pearson r̄ = **0.75 mean / 0.83 median** (Wan) and
    0.72 / 0.81 (LTX); random-weight control gives r ≈ 0.
+
+![Band amplitude concentration vs band concentration, and Q/K dominant-band comparison](out/band-logit-stats.png)
 
 ## 7. Real prompts, real trajectories (`out/{wan,cog}-pipeline.json`)
 
@@ -140,6 +156,8 @@ concentrate strongly (their own centers are stable), and in the RoPE models
 those centers also *approach each other* as generation proceeds — but
 Q≈K parallelism is weaker in video DiTs than the intra-Q/intra-K
 concentration itself.
+
+![Q↔K directional alignment measures, pre-RoPE, pooled across models](out/qk-alignment.png)
 
 ## 10. Stability (honest version)
 
