@@ -1,5 +1,10 @@
 # Pre-RoPE Q/K geometry in video diffusion transformers
 
+The concise illustrated report is [REPORT.md](REPORT.md), with a
+[three-page PDF](output/pdf/triattention-video-report.pdf). Redrawn figures,
+editable SVG/PDF exports, fresh geometry captures, and source hashes are in
+[`out/report/`](out/report/); regenerate with `scripts/build_report.py`.
+
 Verification of the TriAttention paper's Observation 3.1 (arXiv 2604.04921:
 pre-RoPE Q/K vectors concentrate around non-zero centers, stable across
 positions and contexts) on **video generation** DiTs, where self-attention uses
