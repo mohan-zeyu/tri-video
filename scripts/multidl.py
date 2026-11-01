@@ -102,29 +102,35 @@ def download_file(repo, rev, fname, size, sha):
     return f"got  {fname}  {size/1e9:.2f}GB in {dt:.0f}s = {size/dt/1e6:.1f}MB/s"
 
 
-def download_repo(repo):
+def download_repo(repo, patterns):
+    """patterns: file prefixes (dirs with trailing /) or exact filenames."""
+    def wanted(name):
+        return any(name == p or name.startswith(p) for p in patterns)
+
     info = api(f"{ENDPOINT}/api/models/{repo}?blobs=true")
     rev = info["sha"]
     model_dir = os.path.join(CACHE, f"models--{repo.replace('/', '--')}")
     os.makedirs(os.path.join(model_dir, "refs"), exist_ok=True)
     with open(os.path.join(model_dir, "refs", "main"), "w") as f:
         f.write(rev)
-    siblings = [f for f in info["siblings"]
-                if f["rfilename"].startswith("transformer/")
-                and f["rfilename"].endswith((".safetensors", ".json"))]
+    siblings = [f for f in info["siblings"] if wanted(f["rfilename"])]
     big = [f for f in siblings if (f.get("size") or 0) >= 8 << 20 and f.get("lfs")]
     small = [f for f in siblings if f not in big]
-    print(f"[{repo}] rev {rev[:12]} big={len(big)} small={len(small)}", flush=True)
+    print(f"[{repo}] rev {rev[:12]} big={len(big)} small={len(small)} patterns={patterns}", flush=True)
     for f in big:  # sequential files, STREAMS ranges each
         oid = f["lfs"]["sha256"]
         print(f"[{repo}] {download_file(repo, rev, f['rfilename'], f['size'], oid)}", flush=True)
-    if small:  # correct git-blob names via the hub library itself
-        from huggingface_hub import snapshot_download
-        snapshot_download(repo, allow_patterns=["transformer/*.json"],
-                          revision=rev, max_workers=4)
+    if small:  # correct git-blob names, short timeouts (hub snapshot_download hangs)
+        from fetch_small import fetch
+        for f in small:
+            print(f"[{repo}] {fetch(repo, rev, f['rfilename'])}", flush=True)
     print(f"[{repo}] COMPLETE", flush=True)
 
 
 if __name__ == "__main__":
-    for repo in sys.argv[1:]:
-        download_repo(repo)
+    # usage: multidl.py <repo> <prefix-or-file> [...]   (defaults to transformer/)
+    args = sys.argv[1:]
+    if len(args) == 1:
+        download_repo(args[0], ["transformer/"])
+    else:
+        download_repo(args[0], args[1:])

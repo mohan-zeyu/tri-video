@@ -1,0 +1,47 @@
+{
+  "wan": {
+    "k_dom_mean": 0.968,
+    "q_dom_mean": 0.9724,
+    "k_all_band_mean": 0.8037,
+    "q_all_band_mean": 0.7852,
+    "k_frac_bands_gt095": 0.3103,
+    "top4_amp_share_mean": 0.2664,
+    "top4_amp_share_median": 0.2081,
+    "kdom_by_layer_first_last": [
+      0.8262,
+      0.9927
+    ],
+    "corr_mean": 0.4017,
+    "corr_median": 0.4122
+  },
+  "ltx": {
+    "k_dom_mean": 0.8699,
+    "q_dom_mean": 0.9215,
+    "k_all_band_mean": 0.6938,
+    "q_all_band_mean": 0.694,
+    "k_frac_bands_gt095": 0.2436,
+    "top4_amp_share_mean": 0.4825,
+    "top4_amp_share_median": 0.4476,
+    "kdom_by_layer_first_last": [
+      0.7973,
+      0.8168
+    ],
+    "corr_mean": 0.2432,
+    "corr_median": 0.2865
+  },
+  "cog": {
+    "k_dom_mean": 0.9305,
+    "q_dom_mean": 0.9212,
+    "k_all_band_mean": 0.8587,
+    "q_all_band_mean": 0.8188,
+    "k_frac_bands_gt095": 0.5355,
+    "top4_amp_share_mean": 0.3014,
+    "top4_amp_share_median": 0.291,
+    "kdom_by_layer_first_last": [
+      0.7834,
+      0.9988
+    ],
+    "corr_mean": 0.4028,
+    "corr_median": 0.4435
+  }
+}

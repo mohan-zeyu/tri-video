@@ -62,6 +62,49 @@ Dominant pair = top band by ‖q_f‖·‖k_f‖ (the paper's selection rule); t
 statistic is by construction optimistic — the all-pairs row is the honest
 full distribution, the dominant row is the paper-comparable one.
 
+## Real-prompt pipeline verification (2026-10-31)
+
+Full pipelines (real T5/UMT5 text encoding, real scheduler trajectories, CFG
+positive branch, validation again bit-exact 0.0 in all checks):
+
+**Wan2.1-1.3B** ("A stylish woman walks down a Tokyo street…", 45f 480², 20
+steps, `out/wan-pipeline.json`):
+
+| step | q MRL | k MRL | q MRL post | cos(Q̄,K̄) | E cos(q,k) |
+|---|---|---|---|---|---|
+| 0 (pure noise) | 0.776 | 0.861 | 0.539 | 0.452 | 0.315 |
+| 10 | 0.754 | 0.747 | 0.477 | 0.685 | 0.397 |
+| 19 (nearly clean) | 0.816 | 0.778 | 0.513 | 0.720 | 0.467 |
+
+- Concentration **survives real generation** — q MRL stays 0.74–0.82 across
+  the whole trajectory (noise-input run said 0.857: noise inputs overestimate
+  concentration by ~0.08, but the phenomenon is not an artifact).
+- Post-RoPE collapse intact (0.48–0.54 vs pre 0.74–0.82 at every step).
+- **Q↔K alignment grows as video content emerges**: cos(Q̄,K̄) rises
+  0.45→0.72 and all-pairs cos 0.32→0.47 along the trajectory — the "Q and K
+  point in similar directions" aspect strengthens with real content.
+- Centers transfer moderately from noise inputs to real prompts
+  (cos ≈ 0.59–0.65 per head).
+- **Dominant-band MRL (paper metric) on the real trajectory**: mean 0.954
+  over all steps, **73% of heads > 0.95, rising to 0.968 / 87% at the last
+  step** — close to Qwen3-8B (0.977, 84.7% > 0.95) at full realism.
+
+**CogVideoX-2b** (panda-dancing prompt, 49f 480×720, 30 steps,
+`out/cog-pipeline.json`): q MRL flat at 0.71–0.73 across all 30 steps, k
+0.79–0.84, per-pair 0.67–0.69 — the no-RoPE control keeps its concentration
+under real inputs too, while its weak Q↔K alignment mostly disappears with
+real text (all-pairs cos ≈ 0). Its dominant-band MRL however drops to 0.831
+(39% of heads > 0.95) versus 0.921 (76%) under noise inputs — unlike Wan,
+the no-RoPE model does **not** maintain dominant-band concentration under
+real conditioning, which sharpens the association between strong band-level
+concentration and RoPE-trained models.
+
+Conclusions the real-prompt runs change: the earlier noise-only caveat is now
+resolved directionally (everything holds, with modestly smaller magnitudes);
+and the honest statement about "stable across contexts" becomes: centers are
+*the same kind of object* across inputs (cos 0.6 transfer) but not identical —
+input content rotates/refines them, concentration level stays within a band.
+
 ## Notable observations
 
 - **On the paper's dominant-band metric, video DiTs are near LLM strength**
@@ -83,16 +126,18 @@ full distribution, the dominant row is the paper-comparable one.
 
 ## Caveats & known issues
 
-- **Inputs are noise-only**: pure N(0,1) latents at every timestep (the model
-  expects partly-clean video at mid/low noise) and null-ish text. Timestep
-  insensitivity is therefore weakly tested. A real-prompt run inside a true
-  denoising loop (needs VAE + text encoder) remains future work.
+- Noise-input results overestimate concentration by roughly 0.06–0.14 MRL
+  relative to real prompts (see the real-prompt section above); direction of
+  every conclusion is unchanged.
+- The real-prompt legs use one prompt per model, one seed, CFG positive
+  branch, and skip VAE decode (`output_type="latent"`); single-prompt scope.
 - **Two code bugs in `probe_video.py`** (found in review; numbers unaffected
   since inputs are iid noise, but re-runs would fail):
   the Wan freqs assert should be `freqs[0].shape[1] == T` (Wan freqs are
   `[1,T,1,2D]`), and Cog latents must be laid out `[B,F,C,H,W]` (masked by
   C=F=16 at 61 frames). `wan.json` was produced by the pre-final script
-  version with the correct assert.
+  version with the correct assert. (`pipeline_probe.py` feeds latents via the
+  real pipeline and is unaffected.)
 - Per-pair numbers come from 512-token bf16 subsamples, not full-T fp32.
 - Cog's `t_high=990` actually executes as 992 in bf16 (cosmetic).
 
@@ -103,11 +148,17 @@ full distribution, the dominant row is the paper-comparable one.
 - `scripts/pair_detail.py` — full per-pair MRL / dominant-pair / per-axis
   analysis from stored subsamples → `out/<m>-pair-mrl.pt` + summary JSON.
 - `scripts/analysis_series.py` — §3.3 causal check adapted to 3D RoPE.
+- `scripts/pipeline_probe.py` — real-prompt full-pipeline probe (T5/UMT5
+  encoding, denoising-trajectory stats via callback, latent output) →
+  `out/<m>-pipeline.json` + `-centers.pt`.
+- `scripts/fetch_small.py` — git-blob-accurate small-file fetcher (hub's
+  snapshot_download hangs on this network).
 - `scripts/inspect_model.py`, `scripts/plots.py`, `scripts/multidl.py` —
   structure dump, figures, mirror downloader.
 - `out/` — `<m>.json` (per-head stats), `<m>-tensors.pt` (centers + 512-token
   subsamples), `<m>-pair-mrl.pt` (full [L,H,P] R_f + norms + dominant idx),
-  `<m>-pair-mrl-summary.json`, `<m>-series.json`, figures, `summary.md`.
+  `<m>-pair-mrl-summary.json`, `<m>-series.json`, `<m>-pipeline.json`
+  (real-prompt trajectories), figures, `summary.md`.
 
 ## Reproducibility
 
