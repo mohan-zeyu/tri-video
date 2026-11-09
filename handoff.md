@@ -392,7 +392,7 @@ For future PDF edits, read the available PDF skill and follow its authoring mark
 1. Start with sections 11-14 for the latest benchmark results and implementation limitations.
 2. Reuse saved result arrays for follow-up statistics. Match each number to its token/pair/prompt/layer/head/step scope.
 3. Preserve the first-transition correction in neighboring-step correlation summaries.
-4. The latest user request stops performance work. Further profiling or optimization requires a subsequent request to resume it.
+4. Performance work is stopped at the user's request. Resume profiling or optimization after a subsequent instruction to do so.
 5. Committed source is sanitized for portable deployment. Historical generation hashes identify the versions actually executed before path/configuration cleanup.
 
 ## 11. Completed Q/K center-replacement benchmark, 9 November
@@ -552,3 +552,11 @@ Autoregressive generation can reuse historical K/V and amortize compression over
 The RoPE relative-position identity also holds for bidirectional attention. At one layer/head/step/CFG branch, all 10,800 queries attending to 5,400 retained keys require half as many query-key interactions as full attention, before counting selection/projection overhead. Applicability to full-video attention remains open.
 
 The current experiments do not isolate causality as the cause of quality loss. Official LongLive uses a different causal generator/LoRA checkpoint and a four-step schedule. Our base Wan uses 20 steps. The adaptation additionally uses static Q calibration pooled across four prompts/all steps, spatial-zero ranking offsets and live-query-block protection. Their separate effects require controlled comparisons. The user stopped profiling and requested interpretation only, followed by this source/handoff publication.
+
+## 15. Source publication and deployment configuration
+
+The source checkout includes the research handoff, geometry report, experiment plans, configurations, generation/evaluation code and report/site builders. Generated bulk archives, deployment metadata, credentials and shared access URLs are excluded from version control.
+
+Private machine paths in documentation and cache defaults were replaced with repository-relative paths or configurable cache locations. Atlas startup now requires an explicit interface through `--bind`; SSH tunnel recovery requires explicit `--host` and `--repo` values. These portability changes follow the completed experiments. Recorded generation hashes continue to describe the original executed source versions.
+
+Python syntax compilation, JavaScript syntax validation, CLI argument checks and all eight existing CPU/access-control tests pass. Publication checks compare every tracked blob against the locally stored access secret, private endpoint/personal-path patterns and common credential formats. Research numerical results were carried forward from the completed verified studies. Performance profiling remains stopped.
