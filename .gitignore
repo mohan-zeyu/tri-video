@@ -3,6 +3,8 @@
 
 # env
 .venv/
+.report-venv/
+tmp/
 
 # caches
 __pycache__/
@@ -10,3 +12,18 @@ __pycache__/
 
 # raw tensor dumps (regenerable via scripts/, too large for git)
 out/*-tensors.pt
+
+# Complete sweeps retain hundreds of GB of raw captures and figure atlases.
+# Keep reproducible scripts/configs in git; generated archives are external.
+out/full-sweep-*/
+out/*benchmark*/
+out/triattention-pruning-*/
+out/pruning-performance-*/
+output/
+.DS_Store
+**/.DS_Store
+/.atlas-private-key
+/.atlas-private-link.txt
+.env
+.env.*
+!.env.example

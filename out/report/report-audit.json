@@ -1,0 +1,89 @@
+{
+  "statistics": {
+    "wan": {
+      "q_all": 0.7851518639113945,
+      "k_all": 0.803677412091929,
+      "q_dom": 0.9724195063114166,
+      "k_dom": 0.9680427360865805,
+      "q_gt95": 79.72222222222223,
+      "k_gt95": 79.16666666666666,
+      "q_whole": 0.8574803805555555,
+      "k_whole": 0.8778303777777777
+    },
+    "ltx": {
+      "q_all": 0.6939751220357084,
+      "k_all": 0.6938089018571426,
+      "q_dom": 0.9214896074034706,
+      "k_dom": 0.8699102626508518,
+      "q_gt95": 77.56696428571429,
+      "k_gt95": 62.61160714285714,
+      "q_whole": 0.8104607868303572,
+      "k_whole": 0.7927337444196428
+    },
+    "cog": {
+      "q_all": 0.8187934023103379,
+      "k_all": 0.8586823733766666,
+      "q_dom": 0.9212429587791363,
+      "k_dom": 0.9304827242354966,
+      "q_gt95": 75.88888888888889,
+      "k_gt95": 78.0,
+      "q_whole": 0.8543180400000001,
+      "k_whole": 0.8785924711111112
+    }
+  },
+  "pair_sources_sha256": {
+    "wan-pair-mrl.pt": "d7825f3bf0eefd93afee52fcba7786b78ca5d7083cf23a35aa09fb3675f5d2d4",
+    "ltx-pair-mrl.pt": "cccecca546eeb9061742ded88e3ed0d87f0bc917a344e0fe595c59976caebb0d",
+    "cog-pair-mrl.pt": "0f16d373863e90bdf06bc8349f4b1be33795ab508163faac6a33dc4b2330f61e"
+  },
+  "sources_sha256": {
+    "wan.json": "589e7248f91f7e7befd3c873733785c5ecec8d8a565582e7c08bede29cac1a65",
+    "ltx.json": "56ee347ec550416ec02659004b893964eca39bf421e7d6efe6b75a1f9c970560",
+    "cog.json": "005d5228ba88b76d5fbaafaefe26b2f0f8010597da5a9280ead61c77c4d7e081",
+    "wan-series.json": "18af1ccd5abcf734b4b312fed301eba2a9c5fa7cd866ea51265594a012c5f966",
+    "ltx-series.json": "31041a6e12ef2544c57e8950d177d3fba4be1e8f47e69be965ee00e9e74dd1c6",
+    "wan-pipeline.json": "4eb2f4bd357efc208360d69b4c980da3087b010cffba147d29edeed5ee0b5a73",
+    "cog-pipeline.json": "af8dabba9f3a69631847cc23f339c60dd010589bbc87bc6b39390446e14ded25",
+    "wan-visual-capture.json": "b31892ac1043fbe74c0fd31942036d9a365e05c6f93fae93757789e05b8293df",
+    "ltx-visual-capture.json": "736c59661558a0d883f66ba924d24fca066f2b698c2e49aa696ad7196449a5b0"
+  },
+  "figure_protocol": {
+    "wan": {
+      "layer": 0,
+      "head": 0,
+      "band": 4,
+      "tokens": 10800,
+      "input": "t_mid-zeros-s0",
+      "selection": "argmax E||q_f|| E||k_f||, fixed layer 0 / head 0",
+      "torch": "2.15.0+cu132",
+      "diffusers": "0.42.1",
+      "snapshot": "0fad780a534b6463e45facd96134c9f345acfa5b",
+      "dtype": "bfloat16"
+    },
+    "ltx": {
+      "layer": 0,
+      "head": 0,
+      "band": 31,
+      "tokens": 13728,
+      "input": "t_mid-zeros-s0",
+      "selection": "argmax E||q_f|| E||k_f||, fixed layer 0 / head 0",
+      "torch": "2.15.0+cu132",
+      "diffusers": "0.42.1",
+      "snapshot": "8984fa25007f376c1a299016d0957a37a2f797bb",
+      "dtype": "bfloat16"
+    }
+  },
+  "reconstruction_statistics": {
+    "wan": {
+      "mean": 0.7522000000000001,
+      "median": 0.8476,
+      "heads": 48
+    },
+    "ltx": {
+      "mean": 0.72362421875,
+      "median": 0.8158,
+      "heads": 128
+    }
+  },
+  "median_convention": "Midpoint of the two central observations for even counts; original series summaries used torch's lower median."
+}

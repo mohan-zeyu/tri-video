@@ -15,6 +15,7 @@ Usage: python pipeline_probe.py --model wan --prompt "..." --out ../out/wan-pipe
 import argparse
 import gc
 import json
+import os
 import platform
 import time
 from pathlib import Path
@@ -148,7 +149,7 @@ PIPES = {"wan": PipeWan, "cog": PipeCog}
 
 def local_snapshot(repo_id):
     """Resolve repo id to its cached snapshot dir (bypasses hub metadata)."""
-    root = Path("/mnt/data/liuzeyu/hf-cache/hub") / f"models--{repo_id.replace('/', '--')}"
+    root = (Path(os.environ.get("HF_HOME", str(Path.home() / ".cache" / "huggingface"))) / "hub") / f"models--{repo_id.replace('/', '--')}"
     rev = (root / "refs" / "main").read_text().strip()
     snap = root / "snapshots" / rev
     assert (snap / "model_index.json").exists(), snap

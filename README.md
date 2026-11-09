@@ -1,5 +1,68 @@
 # Pre-RoPE Q/K geometry in video diffusion transformers
 
+**Complete verified Wan experiment:** [report](REPORT.md),
+[PDF report](output/pdf/wan-full-sweep-report.pdf), and
+[full interactive atlas](http://127.0.0.1:17841/index.html).
+Four real prompts × 20 denoising steps × 30 layers × 12 heads × t/h/w,
+with every video token included. There are 86,400 head figures, 7,200
+all-head sheets and 7,200 concentration distributions. All 144 checked
+attention-output recomputations are bit-exact.
+
+Pair scatters and MRL use an axis-specific selected 2D pair per head,
+computed over all 10,800 tokens at one prompt/step/layer. Logit predictions
+use the full 128D head and same-condition full-token Q/K centers; every
+query is compared with all same-axis-line keys. Primary plots do not pool
+prompts or denoising steps.
+
+Chapter 4 now shows complete A/B/C/D composites, including the concentration
+distribution across the 12 heads, and additional best examples ranked separately
+by full-head reconstruction and selected-2D-pair concentration.
+See the [nine-figure gallery](http://127.0.0.1:17841/report-figures/index.html).
+
+The [complete atlas](http://127.0.0.1:17841/index.html) browses every prompt,
+step, layer, head and axis. It also displays all-head metrics, all 64 pairs,
+every signed-offset curve value, the single origin-query logits and all 128
+Q/K center dimensions, with links to full tensors and step/prompt archives.
+These primary measurements use one condition at a time; their token and
+head averaging is stated beside each view.
+
+The layer-by-head MRL component covers all 80 prompt/step conditions, with
+separate Q/K maps for t/h/w and pre/post-RoPE. High/middle/low groups average
+2D-pair MRL values within explicit frequency thirds. Each pair uses all 10,800
+tokens at one condition. Individual-pair views, cell readouts and PNG export
+are available in the site. The [complete heatmap appendix](output/pdf/wan-mrl-heatmaps-complete.pdf)
+contains 160 landscape A3 pages. Section 5 of the main report contains the
+fixed p03/step-20 examples and explicitly pooled summary tables.
+
+## Deployment configuration
+
+Generated reports and the full result archive are kept outside git. Rebuild them from the saved data using `scripts/` and the configurations listed below. Read [handoff.md](handoff.md) for the completed replacement/pruning benchmarks, exact aggregation scopes and latest limitations.
+
+Supply SSH connection settings explicitly when opening an atlas tunnel.
+
+```sh
+python3 scripts/open_full_sweep_atlas.py --host "$TRI_REMOTE_HOST" --repo "$TRI_REMOTE_REPO"
+```
+
+On the data host, start the authenticated server on an explicitly configured interface.
+
+```sh
+python3 scripts/start_private_atlas.py --bind "$TRI_ATLAS_BIND"
+```
+
+The server issues a one-day HttpOnly session from a generated shared link. Credentials and links are stored outside the served archive and excluded from git. Model downloads use `HF_HOME`, evaluator checkpoints use `VBENCH_CACHE_DIR`, and generation workers support `WAN_SNAPSHOT`.
+
+The full geometry archive uses repository-relative `out/full-sweep-wan-20261101/`.
+See [FULL_SWEEP_PLAN.md](FULL_SWEEP_PLAN.md), `configs/full_sweep_wan.json`,
+`scripts/launch_full_sweep.py` and `scripts/summarize_full_sweep.py`.
+The earlier limited report is preserved at
+[`out/report/limited-report-superseded.md`](out/report/limited-report-superseded.md).
+Its older Wan trajectory was incorrectly labelled conditional; the new
+verified conditional-branch sweep supersedes that interpretation.
+
+The notes below describe the earlier synthetic-input investigation; use
+[REPORT.md](REPORT.md) for the complete real-prompt results.
+
 Verification of the TriAttention paper's Observation 3.1 (arXiv 2604.04921:
 pre-RoPE Q/K vectors concentrate around non-zero centers, stable across
 positions and contexts) on **video generation** DiTs, where self-attention uses
@@ -164,6 +227,6 @@ input content rotates/refines them, concentration level stays within a band.
 
 - env: torch 2.11.0+cu128, diffusers 0.42.1 (venv at `/dev/shm/trivenv` is
   volatile; recreate via the uv cache on /mnt/data — wheels fully cached)
-- weights: HF cache `/mnt/data/liuzeyu/hf-cache` (transformer subfolders,
+- weights: HF cache configured through `HF_HOME` (transformer subfolders,
   sha256-verified)
 - seeds fixed; run configs recorded in each JSON header.

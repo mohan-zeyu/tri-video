@@ -1,199 +1,205 @@
-# Pre-RoPE Q/K geometry in video diffusion transformers
+# Complete Wan 3D RoPE experiment
 
-**A full investigation of TriAttention's Observation 3.1 (arXiv 2604.04921) on
-video DiTs — queries and keys, geometry → structure → logits → real
-generation.** Run dates: 2026-10-29 → 11-01.
+[PDF report](output/pdf/wan-full-sweep-report.pdf) · [Browse every figure](http://127.0.0.1:17841/index.html) · [Per-head CSV](out/full-sweep-wan-20261101/per-head-results.csv)
 
----
+Four real prompts · 20 denoising steps per prompt · every layer/head/axis · all tokens
 
-## 1. Question
+## Scope and provenance
 
-TriAttention observes that in causal LLMs, **pre-RoPE Q and K concentrate
-around non-zero centers** (mean resultant length R → 1), stably across
-positions and contexts, and that this concentration is what turns RoPE
-attention into a *trigonometric series* in token distance. We test whether
-the same geometry exists in **video generation** transformers, where
-self-attention uses 3D (t, h, w) RoPE over ~10–22k spatiotemporal tokens —
-for **both Q and K**, at three depths of the metric:
+Wan2.1-T2V-1.3B, 45 frames at 480×480, CFG 5.0 and seed 0. Four prompts share the same initial noise, isolating prompt changes at this seed. Each step has a 12×30×30 grid of 10,800 video tokens. Video time and diffusion timestep are distinct coordinates. Every conditional transformer input was matched exactly to its supplied positive text embedding; unconditional CFG forwards were excluded from captures.
 
-- **whole-vector MRL**: ‖E_t[x]‖ / E_t‖x‖ for x = one head's Q (or K) across tokens
-- **all-band mean**: mean over rotary pairs of the per-band R_f
-- **dominant-band MRL**: R_f of the top band by amplitude a_f = ‖q̄_f‖·‖k̄_f‖ — the paper's own selection, and the bands the logits are made of
+## Measurement definitions
 
-## 2. Setup
+Each primary figure belongs to one prompt, one denoising step, one layer, one head and one axis. No step/prompt pooling occurs there. The 2D scatter uses every token in the strongest frequency pair belonging to that axis, selected by mean_token(||q_f||) × mean_token(||k_f||). Pre/post plots use the identical pair and tokens. Pair R = ||mean_token(x_f)|| / mean_token(||x_f||). Distributions contain the 12 heads of this one layer/step/prompt/axis, separately for Q/K and pre/post.
 
-| model | arch | positional mechanism | text entry |
-|---|---|---|---|
-| Wan2.1-T2V-1.3B | 30L×12H×128d | 3-axis interleaved RoPE (band split t 22 / h 21 / w 21) | separate cross-attn |
-| LTX-Video-2B | 28L×32H×64d | 3-axis interleaved RoPE over flattened stream (1024 bands: t/h/w blocks) | separate cross-attn |
-| CogVideoX-2b | 30L×30H×64d | **no RoPE** (sinusoidal pos-emb) — the control | joint [text; video] self-attn |
+Logit reconstruction uses the entire 128D head, summing all 64 pairs. Measured logits are recomputed with fp32 dot products from the captured Q/K after native bf16 RoPE rounding. The prediction rotates fp32 centers without bf16 rounding. Those Q/K centers are fp32 averages over all 10,800 video tokens at this same prompt/step/layer/head. Every token acts as a query; keys range over its whole axis line, fixing the other two coordinates. This evaluates 129,600 temporal and 324,000 height or width logits per head/layer/step/prompt. Both signed offset directions and self are included. These are pre-softmax logits, not attention probabilities.
 
-Capture: forward hooks on `norm_q`/`norm_k` outputs — the exact tensors
-entering each model's own `apply_rotary_emb`. **Validation: recomputing the
-attention output from captures + replicated rotation matched the module's
-real output bit-exactly (rel_err 0.0) in every check, noise and real-prompt
-runs alike** — all numbers below are on true tensors, not approximations.
+Primary reconstruction curves average the measured and predicted logits over all query–key pairs at each signed offset. Shading is the population standard deviation of individual measured logits at that offset. The head reconstruction score first correlates each individual query's measured and predicted logit vectors over its same-axis keys, then averages the valid query correlations. This differs from correlating the two already-averaged curves; both statistics and valid-query counts are retained. The single origin-query curves are also retained separately.
 
-Two protocols: **(a) noise probing** — transformer-only, random latents,
-zero/random text, sweeps over timestep/seed (fast, controlled); **(b) real
-pipelines** — full text encoder + scheduler trajectory + CFG positive
-branch, stats drained at every denoising step (`output_type="latent"`).
+## Coverage and validation
 
-## 3. The feature exists — for Q *and* K
+Completed: 2,400 layer captures, 7,200 all-head sheets, 86,400 individual head figures and 7,200 concentration distributions. Each individual head figure has pre/post scatter plus logit reconstruction. Full bf16 Q/K are retained for every layer/step/prompt (159.3 GB). All outputs are indexed by prompt, step, layer, axis and head.
 
-Noise-input runs, mean over all layer×head (dominant band in bold):
+Attention-output recomputation checks: 144, covering all 30 layers at the first step of each prompt and layers 0/15/29 at steps 10/20. 144 checks are bit-exact; maximum relative error is 0. First-step, first-layer Q centers are identical across all prompts, as expected before cross-attention when initial noise and timestep are identical. Numerical tests independently compare axis logit matrices, signed-offset counts and per-query correlations against explicit calculations.
 
-| model | Q whole / all-band / **dom** | K whole / all-band / **dom** | Q dom > 0.95 | K dom > 0.95 |
-|---|---|---|---|---|
-| Wan2.1 | 0.857 / 0.785 / **0.972** | 0.878 / 0.804 / **0.968** | 80% | 79% |
-| LTX | 0.810 / 0.694 / **0.922** | 0.793 / 0.694 / **0.870** | 78% | 63% |
-| CogVideoX | 0.854 / 0.819 / **0.921** | 0.879 / 0.859 / **0.931** | 76% | 78% |
-| *Qwen3-8B (paper)* | *— / — / 0.977* | *—* | *84.7%* | *—* |
+## Results
 
-**K follows the feature as strongly as Q** (slightly stronger at whole-vector
-and all-band depths in 2 of 3 models). On the paper's dominant-band metric,
-all three video DiTs sit within ~0.05 of Qwen3-8B.
+Across the six Q/K-by-axis summaries, mean selected-2D-pair concentration ranges from 0.850 to 0.927. Mean full-128D-head per-query reconstruction correlation is 0.569 / 0.728 / 0.612 for t / h / w. Each axis summary pools 4 prompts × 20 steps × 30 layers × 12 heads; every underlying pair concentration or query evaluation uses all 10,800 video tokens at its individual prompt/step/layer/head.
 
-![Per-band MRL distributions: all rotary pairs vs the dominant pair, per model](out/pair-mrl-distributions.png)
+The following table pools **4 prompts × 20 steps × 30 layers × 12 heads = 28,800 cells per axis**. R columns average selected-2D-pair MRL values. The r column averages each cell's mean over its valid token-query correlations, using full-head logits. It does not use the correlation of the plotted mean curves. These are descriptive pooled summaries; primary per-step/per-head data remain separate.
 
-![Share of heads whose queries concentrate, per model, pre- vs post-RoPE](out/frac-concentrated.png)
+| Axis | Q pair R, pre | K pair R, pre | Q pair R, post | K pair R, post | Mean query r |
+|---|---:|---:|---:|---:|---:|
+| t | 0.8950 | 0.8495 | 0.5334 | 0.4815 | 0.5689 |
+| h | 0.9271 | 0.9070 | 0.3562 | 0.3259 | 0.7284 |
+| w | 0.9114 | 0.8915 | 0.5278 | 0.5001 | 0.6117 |
 
-## 4. Where concentration lives (`out/q-band-report-*.png`, `out/k-band-report-*.png`, `out/*-mrl-heatmap.png`)
+![Concentration trajectories](out/full-sweep-wan-20261101/summary/concentration-trajectories.png)
 
-Per-(layer × head × band) maps for **both Q and K** (top panel: every cell,
-23,040 for Wan; heads ruled off) plus per-(layer × head) dominant-band maps
-and head-averaged band profiles:
+Each colored line is one prompt. Each point averages selected-pair R over 30 layers and 12 heads at one denoising step; Q and K and the three axes are separated. Every underlying pair R uses all 10,800 tokens. The dominant pair is reselected separately at each prompt/step/layer/head/axis; these curves do not track one fixed band through the trajectory.
 
-- Concentration is **banded, not per-head**: the same frequency bands run
-  concentrated (dark) across all heads and layers, for Q and K alike.
-- It **deepens with depth**: Wan K dominant-band rises 0.826 (layer 0) →
-  **0.993** (layer 29).
-- **Axis structure** (LTX): w 0.77 > h 0.72 > t 0.60 — temporal bands are the
-  least concentrated; Wan's t/h/w split is flat (0.78–0.79).
-- High-R_f bands and high-amplitude bands coincide (§6).
+![Reconstruction trajectories](out/full-sweep-wan-20261101/summary/reconstruction-trajectories.png)
 
-![Q: every (layer × head × band) MRL cell, dominant-band map, band profile — Wan](out/q-band-report-wan.png)
+Each colored line is one prompt. Each point averages the full-head per-query reconstruction score over 30 layers and 12 heads, at one step and one axis. Its underlying query correlations use every token as a query and all same-axis-line keys.
 
-![K: every (layer × head × band) MRL cell, dominant-band map, band profile — Wan](out/k-band-report-wan.png)
+## 4. Complete A/B/C/D examples
 
-*(LTX and CogVideoX equivalents: `out/q-band-report-{ltx,cog}.png`,
-`out/k-band-report-{ltx,cog}.png`; whole-vector layer×head heatmaps:
-`out/{wan,ltx,cog}-mrl-heatmap.png`.)*
+Following TriAttention Figure 2: **A = pre-RoPE pairs, B = post-RoPE pairs, C = across-head concentration, D = logit prediction**. Each example combines all four panels at one prompt, denoising step, layer and axis.
 
-## 5. The RoPE contrast
+A/B plot every token's Q/K in one axis-dominant 2D pair, with the same pair, token IDs and scale. C shows the pre-RoPE pair-MRL distribution over the 12 heads at this one prompt, step, layer and axis: **each head chooses its own dominant pair by C_f**; each R uses all 10,800 tokens. Q and K each contribute 12 values, so one head is 8.33%. C does not pool layers, steps or prompts. The archive also retains post-RoPE distributions.
 
-Post-RoPE MRL (rotation applied to the same captured tensors): Wan
-0.86 → 0.63, LTX 0.81 → **0.20**. The shared direction is destroyed by
-rotation — concentration is specifically a **pre**-RoPE property, which is
-the paper's premise for moving importance estimation there. The no-RoPE
-control concentrates *without* any rotation to contrast, showing
-concentration is not caused by RoPE — but see §8 for what realism reveals.
+D uses the **full 128D head, all 64 pairs**, with Q/K centers averaged over all 10,800 tokens at this same prompt/step/layer/head. Curves average all same-axis-line query-key logits per signed offset; shading is measured population standard deviation. The displayed r first correlates each query over its axis-line keys and then averages all 10,800 valid queries. It is not the correlation between the two plotted mean curves.
 
-![Pre- vs post-RoPE MRL distributions, queries and keys pooled across models](out/mrl-pre-vs-post.png)
+### 4.1 Fixed examples
 
-## 6. Concentration ⇒ predictable logits
+Retained from the previous report: p03, denoising step 20, layer 15, head 0, separately for t/h/w. Layer, head and pair indices are zero-based; denoising steps are numbered 1-20.
 
-Three chained statistics tie the geometry to actual attention logits
-(`out/band-logit-stats.*`, `out/{wan,ltx}-series.json`):
+![Fixed t example with A/B/C/D](output/full-sweep-wan-20261101/report-figures/fixed-t-abcd.png)
 
-1. **Logits are carried by few bands** — top-4 bands hold 27% (Wan),
-   **48%** (LTX), 30% (Cog) of total amplitude Σ a_f.
-2. **The loud bands are the frozen ones** — per-head Pearson
-   r( R_f , a_f ): **+0.40** (Wan), +0.24 (LTX), **+0.40** (Cog), positive
-   everywhere: the bands that synthesize logits are exactly those whose Q
-   and K barely move across 10–22k tokens.
-3. **Centers alone reproduce the logits** — replacing every token by its Q
-   and K centers (angles from the model's own rope tensors) predicts actual
-   pre-softmax logits at Pearson r̄ = **0.75 mean / 0.83 median** (Wan) and
-   0.72 / 0.81 (LTX); random-weight control gives r ≈ 0.
+t: pair 12; pair R_Q=0.791980, R_K=0.802809; full-head mean query r=0.695480.
 
-![Band amplitude concentration vs band concentration, and Q/K dominant-band comparison](out/band-logit-stats.png)
+![Fixed h example with A/B/C/D](output/full-sweep-wan-20261101/report-figures/fixed-h-abcd.png)
 
-## 7. Real prompts, real trajectories (`out/{wan,cog}-pipeline.json`)
+h: pair 39; pair R_Q=0.938053, R_K=0.025757; full-head mean query r=0.725007.
 
-Full pipelines, real T5/UMT5 conditioning, 20/30-step denoising, validation
-bit-exact again:
+![Fixed w example with A/B/C/D](output/full-sweep-wan-20261101/report-figures/fixed-w-abcd.png)
 
-**Wan2.1-1.3B** (dominant-band MRL, CFG positive branch):
+w: pair 53; pair R_Q=0.721710, R_K=0.615983; full-head mean query r=0.492262.
 
-| step | Q dom | K dom | Q whole | post-RoPE | cos(Q̄,K̄) | Q dom > 0.95 |
-|---|---|---|---|---|---|---|
-| 0 (pure noise) | 0.938 | 0.963 | 0.776 | 0.539 | 0.452 | 69% |
-| 10 | 0.954 | 0.934 | 0.754 | 0.477 | 0.685 | 72% |
-| 19 (nearly clean) | **0.968** | 0.944 | 0.816 | 0.513 | **0.720** | **87%** |
-| all steps | **0.954** | **0.940** | — | — | — | **73%** |
+The fixed examples underestimate the zero-offset peak. Pearson r measures shape agreement, not matching logit magnitudes. Concentration in one selected 2D pair and reconstruction using the full head are different measurements.
 
-The feature survives full realism at near-LLM strength — for K (0.940) as
-much as Q (0.954) — and **strengthens as video content emerges**.
+### 4.2 Additional best reconstruction examples
 
-**CogVideoX-2b** (no-RoPE control): Q whole flat at 0.71–0.73 over 30 steps,
-but dominant-band drops to **0.831** (39% of heads > 0.95) vs 0.921 (76%)
-under noise inputs; K dominant declines 0.914 → 0.871.
+For 'best performance', rank **full-head mean per-query r**, separately for each axis, over 4 prompts x 20 steps x 30 layers x 12 heads = **28,800 cells per axis**, requiring all 10,800 queries to have defined correlations. The displayed pair is this winning head's C_f-selected axis-dominant pair; r evaluates the full head, not that isolated pair. These are maxima selected after the sweep, not representative performance.
 
-## 8. Why Wan holds and Cog does not (deduction)
+| Axis | Prompt | Step | Layer | Head | Selected pair | Pair R_Q | Pair R_K | Full-head mean query r |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| t | p01 | 17 | 0 | 5 | 0 | 0.999739 | 0.999935 | 0.998670 |
+| h | p01 | 12 | 29 | 9 | 24 | 0.999989 | 0.999990 | 0.999360 |
+| w | p03 | 2 | 29 | 9 | 47 | 0.999999 | 0.999989 | 0.999973 |
 
-- **Functional vs incidental concentration.** In a RoPE model, band-level
-  concentration is the *mechanism* that gives attention its spatiotemporal
-  distance preferences (§6): training preserves it because breaking it
-  breaks the model's addressing. In a no-RoPE model, positional addressing
-  must live *inside* content — Q/K must vary with position/content, so the
-  noise-input concentration was largely incidental (interchangeable tokens
-  collapse onto the default direction; real inputs break the symmetry).
-- **Step-0 evidence**: with pure-noise latents in both runs, real text alone
-  costs Wan 0.034 dominant-band MRL but Cog 0.091 — text enters Cog's
-  self-attention stream directly (joint [text; video]) while Wan's is
-  isolated cross-attention.
-- **Trajectory dynamics**: Wan's concentration *rises* with content
-  coherence (0.938→0.968; Q↔K center cosine 0.45→0.72); Cog stays flat /
-  declines.
+![Best full-head reconstruction along t](output/full-sweep-wan-20261101/report-figures/best_reconstruction-t-abcd.png)
 
-## 9. Q↔K directional alignment (the "similar directions" reading)
+![Best full-head reconstruction along h](output/full-sweep-wan-20261101/report-figures/best_reconstruction-h-abcd.png)
 
-Center-to-center cos(E[q], E[k]) — how much Q's direction and K's direction
-coincide: Wan 0.54 (noise) growing to **0.72** on the real trajectory; LTX
-0.64; Cog 0.22 collapsing to ≈0 under real text. So: Q and K each
-concentrate strongly (their own centers are stable), and in the RoPE models
-those centers also *approach each other* as generation proceeds — but
-Q≈K parallelism is weaker in video DiTs than the intra-Q/intra-K
-concentration itself.
+![Best full-head reconstruction along w](output/full-sweep-wan-20261101/report-figures/best_reconstruction-w-abcd.png)
 
-![Q↔K directional alignment measures, pre-RoPE, pooled across models](out/qk-alignment.png)
+### 4.3 Best concentrated pair, ranked separately
 
-## 10. Stability (honest version)
+If 'best pair' means both 2D Q and K are concentrated, maximize min(R_Q,R_K) among the same 28,800 **axis-dominant selected pairs** per axis. This does not search every non-dominant band. Each R is pre-RoPE and averages all tokens within one condition. The winners differ from the best full-head predictions:
 
-- Cross-noise-seed center cosine ≈ 0.999 — rules out draw-specific
-  artifacts (a weak test: two iid draws).
-- Real context changes move centers: zeros→randn text gives cos 0.41–0.51
-  (Wan/LTX); real-prompt centers sit ≈ 0.6 from noise-input centers.
-- Concentration *level* is timestep-insensitive on real trajectories
-  (Wan 0.74–0.82 whole-vector across all 20 steps; Cog 0.71–0.73 across 30).
+| Axis | Prompt | Step | Layer | Head | Pair | Pair R_Q | Pair R_K |
+|---|---|---:|---:|---:|---:|---:|---:|
+| t | p01 | 20 | 0 | 5 | 0 | 0.999806 | 0.999908 |
+| h | p01 | 4 | 29 | 9 | 24 | 0.999992 | 0.999991 |
+| w | p03 | 3 | 28 | 11 | 48 | 1.000000 | 0.999998 |
 
-## 11. Caveats
+[All nine A/B/C/D figures, including the strongest-pair examples](output/full-sweep-wan-20261101/report-figures/index.html). [Exact selection definitions, source hashes and values](output/full-sweep-wan-20261101/report-figures/selection.json). No denoising-step or prompt averaging enters any selected example.
 
-- Dominant-band statistics are by construction optimistic (the paper's own
-  selection); all-band means are the pessimistic view — both reported.
-- Noise inputs overestimate concentration by ~0.06–0.14 MRL (§7 quantifies).
-- Real-prompt legs: one prompt, one seed per model; LTX not yet run.
-- Per-band numbers from 512-token bf16 subsamples; whole-vector from full-T.
-- Two known code bugs in `probe_video.py` (Wan freqs assert; Cog latent
-  layout) — numbers unaffected (iid inputs), re-runs would fail; documented
-  in README.
+## 5. Layer-by-head MRL across frequency bands
 
-## 12. Files
+Each heatmap has layer on the y-axis and head on the x-axis. Q and K have separate panels. Each underlying pair MRL uses all 10,800 tokens at one prompt, denoising step, layer and head. Band cells are arithmetic means of these 2D-pair MRL values over the explicitly listed pair IDs.
 
-- `out/{wan,ltx,cog}.json`, `-tensors.pt` — noise-probe per-head stats, centers, subsamples
-- `out/{wan,ltx,cog}-pair-mrl.pt` + `-pair-mrl-summary.json` — full [L,H,P] per-band MRL/norms
-- `out/{wan,cog}-pipeline.json` + `-centers.pt` — real-prompt trajectories (incl. `q/k_dom_mrl` per step)
-- `out/{wan,ltx}-series.json` — center-only logit reconstruction
-- figures: `q-band-report-*.png`, `k-band-report-*.png`, `*-mrl-heatmap.png`,
-  `pair-mrl-distributions.png`, `band-logit-stats.png`, `mrl-pre-vs-post.png`,
-  `qk-alignment.png`, `frac-concentrated.png`
-- scripts: `probe_video.py`, `pair_detail.py`, `analysis_series.py`,
-  `pipeline_probe.py`, `report_k.py`, `plots.py`
+High, middle and low frequencies are nearly equal-count thirds sorted by the actual saved RoPE angular frequency, separately within t/h/w. Temporal groups contain 8/7/7 pairs, and height/width groups contain 7/7/7 pairs. The color scale is fixed at 0-1 across all views. The website also exposes individual-pair values, pre/post stages and click-to-select layer/head cells for all 80 prompt/step conditions.
 
-**Bottom line.** Pre-RoPE concentration, the geometric feature TriAttention
-exploits, is present in video DiTs for both Q and K — band-organized,
-depth-deepening, strongest exactly in the bands that carry the logits, and
-robust to real prompts in the RoPE-trained model at close to LLM strength.
-K, the memory being addressed, is at least as static as Q — the favorable
-case for KV-side methods.
+[Complete heatmap appendix](output/full-sweep-wan-20261101/wan-mrl-heatmaps-complete.pdf). All 160 landscape A3 pages are indexed by prompt, step and stage. Each page contains all three axes, both Q/K, all 30 layers and 12 heads, and the three frequency groups.
+
+The following figures retain the fixed p03, step 20 example. Each cell preserves layer/head identity and averages only its stated frequency pairs. The accompanying tables pool 4 prompts x 20 steps x 30 layers x 12 heads = 28,800 band-mean cells per entry, separately by axis, Q/K and stage.
+
+![t-axis layer-by-head pair MRL](output/full-sweep-wan-20261101/mrl-heatmaps/figures/p03-step-020-t-pre.png)
+
+| Axis | Band | Pair IDs | Q pre | K pre | Q post | K post |
+|---|---|---|---:|---:|---:|---:|
+| t | high | 0-7 | 0.7187 | 0.7476 | 0.3910 | 0.4061 |
+| t | middle | 8-14 | 0.5448 | 0.5361 | 0.5443 | 0.5353 |
+| t | low | 15-21 | 0.5684 | 0.5436 | 0.5684 | 0.5436 |
+
+![h-axis layer-by-head pair MRL](output/full-sweep-wan-20261101/mrl-heatmaps/figures/p03-step-020-h-pre.png)
+
+| Axis | Band | Pair IDs | Q pre | K pre | Q post | K post |
+|---|---|---|---:|---:|---:|---:|
+| h | high | 22-28 | 0.8587 | 0.8587 | 0.2251 | 0.2194 |
+| h | middle | 29-35 | 0.5417 | 0.5342 | 0.5284 | 0.5181 |
+| h | low | 36-42 | 0.5725 | 0.5478 | 0.5724 | 0.5478 |
+
+![w-axis layer-by-head pair MRL](output/full-sweep-wan-20261101/mrl-heatmaps/figures/p03-step-020-w-pre.png)
+
+| Axis | Band | Pair IDs | Q pre | K pre | Q post | K post |
+|---|---|---|---:|---:|---:|---:|
+| w | high | 43-49 | 0.8513 | 0.8474 | 0.2459 | 0.2432 |
+| w | middle | 50-56 | 0.5145 | 0.5193 | 0.5017 | 0.5047 |
+| w | low | 57-63 | 0.5678 | 0.5443 | 0.5678 | 0.5442 |
+
+[Exact frequency groups, summary definitions and source hashes](output/full-sweep-wan-20261101/mrl-heatmaps/manifest.json). Every prompt/step's full 30 x 12 x 64 pair-MRL array is retained under `output/full-sweep-wan-20261101/mrl-heatmaps/data/`.
+
+## 5.4 Heatmap patterns and averaging scopes
+
+Each pair R_f uses all 10,800 conditional video-token Q or K vectors in one 2D frequency pair at one prompt/step/layer/head. R_f = ||mean_tokens(x_f)|| / mean_tokens(||x_f||). A band cell equally averages its listed pair R_f values. Q/K and t/h/w remain separate. Layer/head IDs are zero-based and denoising steps are numbered 1-20.
+
+| Axis | High pair IDs | Middle pair IDs | Low pair IDs |
+| --- | --- | --- | --- |
+| t | 0-7 | 8-14 | 15-21 |
+| h | 22-28 | 29-35 | 36-42 |
+| w | 43-49 | 50-56 | 57-63 |
+
+**Frequency selectivity**
+
+High frequencies have the greatest pre-RoPE mean in all 80 prompt/step conditions for Q and K on every axis. Pooled high-band Q/K means are 0.719/0.748 (t), 0.859/0.859 (h), 0.851/0.847 (w).
+
+*Rank bands after averaging 30 layers x 12 heads within each prompt/step. Pooled means average 4 prompts x 20 steps x 30 layers x 12 heads = 28,800 cells per axis/side.*
+
+**Positional dispersion**
+
+After RoPE, high-band Q/K means fall to 0.391/0.406 (t), 0.225/0.219 (h), 0.246/0.243 (w). Low-band mean absolute changes stay below 0.00043. The low-band phase span reaches only 0.021 radians temporally and 0.062 spatially, supporting weak positional dispersion there.
+
+*Compare pre/post at matched cells, then average 28,800 cells per axis/side. Phase spans use the highest low-band frequency times 11 temporal or 29 spatial coordinate increments.*
+
+**Depth**
+
+Low-band Q rises from 0.52-0.53 in layers 1-9 to 0.619-0.624 in layers 20-29 across axes. High bands show a middle-layer dip. Height high-Q means are 0.847, 0.829, 0.887 for layers 1-9, 10-19, 20-29.
+
+*Average all 4 prompts, all 20 steps, all 12 heads and the stated layer block, separately by axis, band and Q/K, before RoPE.*
+
+**Head heterogeneity and Q/K**
+
+Mean within-layer head ranges are 0.19-0.33. Head-index means across layers span 0.03-0.06. One illustrative asymmetry is layer 0/head 3, whose width high-band Q/K means are 0.960/0.307.
+
+*First average 80 prompt/step conditions at each layer/head. Within-layer max-minus-min spans 12 heads, then averages 30 layers. Head-index means also average layers. The example holds layer 0/head 3 and width pairs 43-49 fixed. All values are pre-RoPE.*
+
+**Denoising**
+
+Middle/low K means decrease from step 1 to 20 for every prompt. Pooled middle/low Q dips around steps 8-9 and recovers late. Spatial high bands strengthen, while temporal high-K falls from 0.822 to 0.750.
+
+| Step | High Q | High K | Low Q | Low K |
+| --- | --- | --- | --- | --- |
+| 1 | 0.843 | 0.841 | 0.611 | 0.736 |
+| 10 | 0.854 | 0.854 | 0.558 | 0.524 |
+| 20 | 0.894 | 0.893 | 0.613 | 0.512 |
+
+*The table gives pre-RoPE height-axis means over 4 prompts x 30 layers x 12 heads = 1,440 cells at each stated step, using high pairs 22-28 and low pairs 36-42. Per-prompt decline checks average 30 layers x 12 heads at steps 1 and 20.*
+
+**First-layer exception**
+
+Layer 0 low-band K grows from 0.46-0.52 at step 1 to 0.68-0.70 at step 20 across axes. Later layers drive the pooled decline.
+
+*Hold layer 0 and each endpoint step fixed. Average 4 prompts x 12 heads = 48 cells, separately by axis, before RoPE.*
+
+**Gradual map reorganization**
+
+Neighboring steps have median MRL-map correlations of 0.996-0.998. First/last low-Q maps correlate only 0.13-0.23.
+
+*At each step, average 4 prompts, then correlate the 360 layer/head MRL cells. Neighbor values are medians of 19 adjacent-step comparisons, separately for 18 axis/band/QK views. Endpoint values span the three low-Q axis views. All are pre-RoPE.*
+
+[Computed profiles and source definitions](output/full-sweep-wan-20261101/mrl-heatmaps/pattern-analysis.json).
+
+## Interpretation limits
+
+These predictions use centers estimated from the same input being reconstructed. They establish within-input approximation quality, not cross-prompt calibration transfer. A selected strong band does not imply that every band or the whole head is equally concentrated. Axis-line evaluation covers all three directions but not arbitrary mixed-axis query–key offsets. Four prompts and one shared seed do not establish robustness across seeds or a broad prompt population. No KV pruning, generated-video quality comparison, memory saving or inference speedup is claimed.
+
+## Navigation and reproducibility
+
+Open `index.html` to select prompt, denoising step, layer, axis and individual head, or view all heads together and the corresponding concentration distribution. `per-head-results.csv` has one row per prompt/step/layer/axis/head. `coverage.json` records coverage, validation and hashes of every numeric layer record. Full Q/K tensors and full pair-level metrics are stored under `pXX/step-XXX/layer-XXX.{pt,json}`. `rope.pt` stores the exact model rotary angles and grid. Per-prompt metadata includes the literal prompt, seed, model snapshot, environment, GPU and code hashes. Step metadata records both the sequential denoising index and actual scheduler timestep.
+
+Figure subjects and pair-ranking/MRL definitions follow [TriAttention §3 and Appendix B](https://arxiv.org/abs/2604.04921). The original LLM experiment uses positive, logarithmically spaced 1D text distances and calibration centers. Our video experiment uses three coordinate axes, same-input centers, both signed directions and self, evaluating every same-axis-line query/key. Its correlations are not a matched LLM benchmark.
+
+The old Wan `pipeline_probe.py` trajectory was incorrectly labelled conditional: its hooks retained the final, unconditional CFG forward. This verified conditional sweep supersedes that interpretation. The earlier synthetic-input plots are separate measurements and are not relabelled by this correction.

@@ -15,7 +15,7 @@ import time
 import urllib.request
 
 ENDPOINT = "https://hf-mirror.com"
-CACHE = "/mnt/data/liuzeyu/hf-cache/hub"
+CACHE = os.path.join(os.environ.get("HF_HOME", os.path.expanduser("~/.cache/huggingface")), "hub")
 STREAMS = 14          # concurrent range requests per file
 CHUNK = 1 << 20
 

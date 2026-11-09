@@ -1,0 +1,28 @@
+{
+  "experiment": "wan-full-20261101",
+  "model": "Wan-AI/Wan2.1-T2V-1.3B-Diffusers",
+  "frames": 45,
+  "height": 480,
+  "width": 480,
+  "steps": 20,
+  "guidance_scale": 5.0,
+  "seed": 0,
+  "negative_prompt": "",
+  "prompts": [
+    {"id": "p00", "text": "A stylish woman walks down a Tokyo street filled with warm neon lighting, cinematic, 35mm film"},
+    {"id": "p01", "text": "A wide waterfall cascades into a clear mountain lake surrounded by green forest. Mist drifts above the water. A stationary camera records the natural scene in daylight."},
+    {"id": "p02", "text": "A fluffy giant panda dances playfully on a wooden stage, swaying its body and waving its paws. The camera slowly moves closer. Soft warm lighting, detailed fur."},
+    {"id": "p03", "text": "A small red toy car drives from left to right across a white tabletop, passing blue and yellow blocks. A close-up stationary camera shows the moving wheels and reflections."}
+  ],
+  "axes": ["t", "h", "w"],
+  "capture_branch": "conditional, verified against actual text embeddings",
+  "dominant_pair": "argmax_f E_tokens(norm(q_f)) * E_tokens(norm(k_f)), restricted to the requested RoPE axis, recomputed separately per prompt/step/layer/head",
+  "scatter": "every video token, one selected 2D pair per head and axis, pre/post RoPE on identical token positions",
+  "centers": "float32 mean of full normalized pre-RoPE Q/K over all video tokens, separately per prompt/step/layer/head",
+  "logits": "full 128D head, all 64 pairs, every query and every key sharing the other two coordinates, both signed offset directions, including self",
+  "logit_plot": "mean and population standard deviation of measured logits across all query/key pairs at each signed offset; mean center prediction on the same pairs",
+  "correlation": "Pearson across all same-axis-line keys for each individual query; distribution and mean across all queries; constant rows undefined, not zero",
+  "concentration_distribution": "12 heads of this one layer/prompt/step/axis; Q/K selected-pair pre/post MRL; all pair values also retained",
+  "pooling": "no prompt/step/layer/head pooling in primary figures; any later summary states its aggregation explicitly",
+  "retain_full_qk": true
+}

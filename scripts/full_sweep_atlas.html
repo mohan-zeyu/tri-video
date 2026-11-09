@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wan · complete experiment atlas</title>
+<style>
+:root{--ink:#202a36;--muted:#566374;--blue:#355f91;--line:#dce2e8;--paper:#fff;--wash:#f3f5f8}
+*{box-sizing:border-box}body{font:16px/1.55 Georgia,serif;color:var(--ink);background:var(--wash);margin:0}main{max-width:1540px;margin:auto;padding:30px 28px 70px}h1{font-size:32px;line-height:1.2;margin:8px 0 12px}h2{font-size:23px;margin:26px 0 10px}h3{font-size:18px}a{color:var(--blue);text-underline-offset:3px}p{margin:10px 0}.eyebrow,nav,label,.status,th,.counts{font-family:system-ui,sans-serif}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}.counts{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.counts span{background:#e5ebf2;border-radius:5px;padding:6px 12px;font-size:13px}nav{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;margin:18px 0}section,.controls{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:20px 24px;margin-top:18px}.controls{position:relative}fieldset{display:flex;gap:14px;flex-wrap:wrap;border:0;padding:0;margin:0}label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}select{max-width:520px;padding:9px;border:1px solid #bfc9d4;border-radius:4px;background:white;font:14px system-ui,sans-serif;color:var(--ink)}.status{font-size:13px;color:var(--muted);margin-top:14px}.error{color:#a13426}.note{color:var(--muted);font-size:14px}.context{background:#edf1f6;padding:14px 18px;border-left:3px solid #6d88a6}.figure{display:block;width:100%;height:auto;margin:18px auto}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:right;white-space:nowrap}th{font-size:12px;color:var(--muted);background:#f5f7fa}th:first-child,td:first-child{text-align:left}.selected{background:#edf3fa}details{margin-top:16px}summary{cursor:pointer;font-family:system-ui,sans-serif;font-weight:600;font-size:14px}.links{display:flex;gap:8px 22px;flex-wrap:wrap}.small{font-size:13px}code{font-size:12px;overflow-wrap:anywhere}img[hidden]{display:none}@media(max-width:650px){main{padding:18px 12px 45px}section,.controls{padding:16px}h1{font-size:27px}select{max-width:100%;width:100%}label:first-child{width:100%}}
+.mrl-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:18px 0}.mrl-panels.single-pair{grid-template-columns:repeat(2,minmax(0,1fr))}.mrl-panels canvas{display:block;width:100%;height:auto;cursor:crosshair}.mrl-panels h3{margin:0 0 5px}.mrl-panels>div{border:1px solid var(--line);padding:12px;border-radius:5px}.mrl-scale{display:flex;align-items:center;gap:12px;font:13px system-ui,sans-serif}.mrl-scale>div{height:15px;width:300px;border-radius:3px}#mrl-export{font:14px system-ui,sans-serif;padding:8px 12px;background:#edf1f6;border:1px solid #bfc9d4;border-radius:4px;color:var(--ink);cursor:pointer}@media(max-width:750px){.mrl-panels{grid-template-columns:1fr}.mrl-panels.single-pair{grid-template-columns:1fr}}
+</style></head><body><main>
+<div class="eyebrow">Wan2.1-T2V-1.3B · verified conditional branch</div>
+<h1>Complete experiment atlas</h1>
+<p>Browse the full sweep here. The <a href="report-figures/index.html">nine A/B/C/D report examples</a> are a separate selection.</p>
+<div class="counts"><span>4 real prompts</span><span>20 denoising steps each</span><span>30 layers</span><span>12 heads</span><span>3 axes</span><span>10,800 tokens per condition</span></div>
+<nav><a href="triattention-pruning/index.html">TriAttention pruning benchmark</a><a href="center-benchmark/index.html">Q/K replacement benchmark</a><a href="#mrl-heatmaps">Layer × head heatmaps</a><a href="#mrl-analysis">Heatmap analysis</a><a href="#figures">Figures</a><a href="#metrics">All-head measurements</a><a href="#details">Pairs, curves &amp; centers</a><a href="#downloads">Source data</a><a href="report.pdf">PDF report</a><a href="wan-mrl-heatmaps-complete.pdf">Complete heatmap appendix</a></nav>
+<div class="controls"><fieldset>
+<label>Prompt<select id="prompt">OPTIONS</select></label>
+<label>Denoising step<select id="step"></select></label>
+<label>Layer (zero-based)<select id="layer"></select></label>
+<label>Axis<select id="axis"><option>t</option><option>h</option><option>w</option></select></label>
+<label>Head / sheet<select id="head"></select></label>
+</fieldset><div id="status" class="status" role="status" aria-live="polite">Loading source measurements…</div></div>
+<p id="context" class="context"></p>
+<section id="mrl-heatmaps"><h2>Layer × head MRL across frequency bands</h2>
+<p class="note">Each map contains all 30 layers on the y-axis and all 12 heads on the x-axis for the prompt, denoising step and t/h/w axis selected above. Q and K have separate panels. Each pair MRL uses all 10,800 token vectors at that one condition. Band cells average the MRL values of the explicitly listed pairs. Every map uses the same 0–1 color scale.</p>
+<fieldset><label>RoPE stage<select id="mrl-stage"><option value="pre">Pre-RoPE</option><option value="post">Post-RoPE</option></select></label>
+<label>Frequency view<select id="mrl-band"><option value="bands">High / middle / low frequency means</option></select></label></fieldset>
+<p id="mrl-status" class="status" role="status">Loading layer-by-head heatmaps…</p>
+<p id="mrl-definition" class="note"></p>
+<div class="mrl-scale"><span>0</span><div id="mrl-gradient"></div><span>1</span><span>MRL</span></div>
+<div id="mrl-panels" class="mrl-panels"></div>
+<p id="mrl-readout" class="context small" aria-live="polite">Hover over a cell for its value. Click a cell to select that layer and head in the figures below.</p>
+<div class="links"><button id="mrl-export" type="button">Download current heatmaps (PNG)</button><a id="mrl-data">All pair values and source hashes for this prompt/step</a><a href="mrl-heatmaps/manifest.json">Frequency groups and provenance</a><a href="wan-mrl-heatmaps-complete.pdf">All prompts and steps in the PDF appendix</a></div>
+</section>
+<!-- MRL_ANALYSIS -->
+<section id="figures"><h2>A / B / D · token geometry and logit prediction</h2>
+<p class="note">A/B: every token's Q and K in one selected 2D pair. D: full 128D head, all 64 pairs; Q/K centers average all 10,800 tokens within this one prompt/step/layer/head. Curves average all same-axis-line query–key logits at each signed offset; shading is measured population SD. No averaging over prompts or denoising steps.</p>
+<p class="small"><a id="figure-link">Open original figure</a></p><img id="figure" class="figure" alt="Selected pre/post-RoPE pair scatters and full-head logit prediction">
+<h2>C · concentration across all 12 heads</h2>
+<p class="note">One prompt, one step, one layer, one axis. Each head contributes its own C_f-selected dominant pair. Each pair MRL uses all 10,800 tokens. Q/K and pre/post-RoPE distributions are separate; one head is 8.33% of a distribution.</p>
+<p class="small"><a id="distribution-link">Open original concentration distribution</a></p><img id="distribution" class="figure" alt="Pre/post-RoPE selected-pair concentration across 12 heads">
+</section>
+<section id="metrics"><h2>All-head measurements · selected axis</h2>
+<p class="note">Pair R is ||mean_tokens(x_f)|| / mean_tokens(||x_f||), using one dominant 2D pair per head. “Whole R” uses the entire 128D Q/K vector. Mean query r uses full-head logits: correlate actual/predicted values over each query's same-axis-line keys, then average valid queries. Curve r correlates the two offset-mean curves and is a different statistic. Blank/undefined correlations display as “undefined”.</p>
+<div class="scroll"><table id="head-table"><thead><tr><th>Head</th><th>Pair</th><th>Q R pre</th><th>K R pre</th><th>Q R post</th><th>K R post</th><th>Q whole R</th><th>K whole R</th><th>Mean query r</th><th>Query r p10</th><th>Query r median</th><th>Query r p90</th><th>Curve r</th><th>Valid queries</th></tr></thead><tbody></tbody></table></div>
+</section>
+<section id="details"><h2>Pair, curve and center data · selected head</h2>
+<p id="detail-context" class="note"></p>
+<details><summary>All 64 frequency pairs: contribution and concentration</summary>
+<p class="note">Every pair is shown, including non-dominant pairs. C_f = mean_tokens(||q_f||) × mean_tokens(||k_f||). Pair R values are over all 10,800 tokens at this single condition. Highlighted rows are the selected head's dominant pair for each axis.</p>
+<div class="scroll"><table id="pair-table"><thead><tr><th>Pair</th><th>RoPE axis</th><th>C_f</th><th>Q R pre</th><th>K R pre</th><th>Q R post</th><th>K R post</th></tr></thead><tbody></tbody></table></div></details>
+<details><summary>Every signed-offset logit-curve value</summary>
+<p class="note">Each row pools same-offset query–key pairs within one head, axis, prompt, step and layer. These are scaled, pre-softmax full-head logits; SD is population SD. Signed offset = query coordinate − key coordinate.</p>
+<div class="scroll"><table id="curve-table"><thead><tr><th>Signed offset</th><th>Query–key pairs</th><th>Measured mean</th><th>Measured SD</th><th>Predicted mean</th></tr></thead><tbody></tbody></table></div></details>
+<details><summary>Single origin-query logits, without token-pair averaging</summary>
+<p class="note">One query at (t,h,w)=(0,0,0), all keys on its selected-axis line, holding the other two coordinates at zero. Prediction still uses the all-token Q/K centers from this same condition.</p>
+<div class="scroll"><table id="origin-table"><thead><tr><th>Signed offset</th><th>Actual logit</th><th>Predicted logit</th></tr></thead><tbody></tbody></table></div></details>
+<details><summary>All 128 dimensions of the Q/K centers</summary>
+<p class="note">Each scalar is a fp32 mean over all 10,800 pre-RoPE token vectors, for this one head/prompt/step/layer. Adjacent dimensions form a 2D frequency pair.</p>
+<div class="scroll"><table id="center-table"><thead><tr><th>Dimension</th><th>Q center</th><th>K center</th></tr></thead><tbody></tbody></table></div></details>
+</section>
+<section id="downloads"><h2>Full source data and reproducibility</h2>
+<p>All 2,400 captured layers, 86,400 head figures, 7,200 all-head sheets and 7,200 concentration distributions are available. Full bf16 Q/K total 159.3 GB; tensors are linked per layer (about 66.4 MB each), and are downloaded rather than drawn as whole tensors in the browser.</p>
+<h3>Current condition</h3><div class="links"><a id="numeric">Complete layer JSON</a><a id="raw">Full bf16 Q/K tensor</a><a id="step-folder">Browse all files in this step</a><a id="step-meta">Step and CFG verification</a><a id="latents">Step input latents</a><a id="prompt-meta">Prompt/model/environment metadata</a><a id="prompt-folder">Browse this prompt's archive</a><a id="final-latents">Final latents</a></div>
+<h3>Whole sweep</h3><div class="links"><a href="per-head-results.csv">All 86,400 numerical rows (CSV)</a><a href="coverage.json">Coverage and validation</a><a href="config.json">Exact configuration and definitions</a><a href="rope.pt">Exact RoPE angles and grid</a><a href="real-tensor-spot-checks.json">Independent tensor checks</a><a href="delivery.json">Delivery/source hashes</a><a href="REPORT.md">Markdown report</a><a href="report-figures/selection.json">Best-case selection rules and source hashes</a></div>
+<details><summary>Aggregate trajectories, with averaging stated</summary><p class="note">Each line is one prompt. Each point averages 30 layers × 12 heads at one denoising step, separately for each axis (and Q/K for concentration). Pair R uses all tokens within each underlying cell; the dominant pair is reselected at each condition. Reconstruction averages cell-level full-head mean per-query r. These plots do not average prompts together.</p><img class="figure" loading="lazy" src="summary/concentration-trajectories.png" alt="Pair concentration averaged over layers and heads at each step"><img class="figure" loading="lazy" src="summary/reconstruction-trajectories.png" alt="Full-head mean query correlations averaged over layers and heads at each step"></details>
+<p class="note">All data here come from the completed Wan sweep. This experiment retained latents; decoded videos and KV-pruning performance measurements were not generated. Available through the private server address or the local SSH tunnel.</p>
+</section>
+<script src="mrl-heatmaps.js"></script>
+<script>
+'use strict';
+const el=id=>document.getElementById(id), ids=['prompt','step','layer','axis','head'];
+for(let i=1;i<=20;i++)el('step').add(new Option(i,i));
+for(let i=0;i<30;i++)el('layer').add(new Option(i,i));
+for(let i=0;i<12;i++)el('head').add(new Option('Head '+i,i));el('head').add(new Option('All 12 heads','all'));
+const qs=new URLSearchParams(location.search);
+for(const id of ids)if([...el(id).options].some(o=>o.value===qs.get(id)))el(id).value=qs.get(id);
+const pad=(x,n)=>String(x).padStart(n,'0'), fmt=x=>x===null||x===undefined||!Number.isFinite(x)?'undefined':x.toFixed(6);
+const link=(id,path)=>el(id).href=path;
+const cache=new Map();let revision=0;
+function rows(id,values,selected=-1){const body=el(id).tBodies[0];body.replaceChildren(...values.map((v,i)=>{const tr=document.createElement('tr');if(i===selected)tr.className='selected';for(const x of v){const td=document.createElement('td');td.textContent=String(x);tr.append(td)}return tr}));}
+async function update(){
+ const rev=++revision,p=el('prompt').value,s=Number(el('step').value),l=Number(el('layer').value),axis=el('axis').value,h=el('head').value,head=h==='all'?0:Number(h);
+ const step=p+'/step-'+pad(s,3),base=step+'/layer-'+pad(l,3),figure=base+'/'+axis+'/'+(h==='all'?'all-heads.png':'heads/head-'+pad(h,2)+'.png'),dist=base+'/'+axis+'/concentration-distribution.png';
+ const state=new URLSearchParams(Object.fromEntries(ids.map(id=>[id,el(id).value])));history.replaceState(null,'','?'+state+location.hash);
+ el('status').className='status';el('status').textContent='Loading source measurements…';
+ for(const id of ['head-table','pair-table','curve-table','origin-table','center-table'])el(id).tBodies[0].replaceChildren();
+ el('context').textContent=p+' · denoising step '+s+' · layer '+l+' · '+axis+' axis · '+(h==='all'?'all 12 heads':'head '+h)+'. One condition; no prompt/step averaging.';
+ MrlHeatmaps.load(p,s,axis,l,h);
+ el('figure').src=figure;el('distribution').src=dist;link('figure-link',figure);link('distribution-link',dist);
+ link('numeric',base+'.json');link('raw',base+'.pt');link('step-folder',step+'/');link('step-meta',step+'/step.json');link('latents',step+'/input-latents.pt');link('prompt-meta',p+'/metadata.json');link('prompt-folder',p+'/');link('final-latents',p+'/final-latents.pt');
+ try{
+  let d=cache.get(base);if(!d){const res=await fetch(base+'.json');if(!res.ok)throw new Error('Source JSON returned HTTP '+res.status);d=await res.json();cache.set(base,d);if(cache.size>8)cache.delete(cache.keys().next().value)}if(rev!==revision)return;
+  const a=d.axes[axis];
+  rows('head-table',Array.from({length:d.heads},(_,i)=>[i,a.dominant_pair[i],...['q_dom_mrl_pre','k_dom_mrl_pre','q_dom_mrl_post','k_dom_mrl_post'].map(k=>fmt(a[k][i])),fmt(d.q_whole_mrl[i]),fmt(d.k_whole_mrl[i]),...['per_query_r_mean','per_query_r_p10','per_query_r_median','per_query_r_p90','curve_r'].map(k=>fmt(a[k][i])),a.valid_queries[i]+'/'+d.tokens]),h==='all'?-1:head);
+  const pairAxis={},dominant=new Set();for(const [name,z] of Object.entries(d.axes)){for(const f of z.pair_indices)pairAxis[f]=name;dominant.add(z.dominant_pair[head]);}
+  rows('pair-table',d.band_score[head].map((v,f)=>[f,pairAxis[f]+(dominant.has(f)?' · dominant':''),fmt(v),...['q_pair_mrl_pre','k_pair_mrl_pre','q_pair_mrl_post','k_pair_mrl_post'].map(k=>fmt(d[k][head][f]))]));
+  for(const tr of el('pair-table').tBodies[0].rows)if(dominant.has(Number(tr.cells[0].textContent)))tr.className='selected';
+  rows('curve-table',a.offsets.map((x,i)=>[x,a.pairs_per_offset[i],fmt(a.measured_mean[head][i]),fmt(a.measured_std[head][i]),fmt(a.predicted_mean[head][i])]));
+  rows('origin-table',a.origin_query_offsets.map((x,i)=>[x,fmt(a.origin_query_measured[head][i]),fmt(a.origin_query_predicted[head][i])]));
+  rows('center-table',d.center_q[head].map((x,i)=>[i,fmt(x),fmt(d.center_k[head][i])]));
+  el('detail-context').textContent=p+' · step '+s+' · layer '+l+' · head '+head+' · '+axis+' axis.'+(h==='all'?' The figures show all heads; the detailed tables below use head 0. Choose an individual head to inspect another.':'');
+  el('status').textContent='Source loaded · '+d.tokens.toLocaleString()+' tokens · scheduler timestep '+d.model_timestep+' · '+d.branch+' branch · all 12 heads available';
+ }catch(error){if(rev===revision){el('status').className='status error';el('status').textContent='Could not load this condition: '+error.message+'. Check the source link or reconnect the SSH tunnel.'}}
+}
+MrlHeatmaps.init((layer,head)=>{el('layer').value=String(layer);el('head').value=String(head);update()});
+for(const id of ids)el(id).addEventListener('change',update);update();
+</script></main></body></html>

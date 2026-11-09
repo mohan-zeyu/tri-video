@@ -11,7 +11,7 @@ import sys
 import urllib.request
 
 ENDPOINT = "https://hf-mirror.com"
-CACHE = "/mnt/data/liuzeyu/hf-cache/hub"
+CACHE = os.path.join(os.environ.get("HF_HOME", os.path.expanduser("~/.cache/huggingface")), "hub")
 OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
 
