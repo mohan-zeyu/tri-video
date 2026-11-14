@@ -1,6 +1,6 @@
 # Wan2.1 mean-vector distillation
 
-Status: real-model pilots, the calibration pool, and both held-out velocity references are complete. The training trajectory dump is running on GPUs 3, 5, and 6. Full training and the paired benchmark are pending. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
+Status: real-model pilots, the calibration pool, and both held-out velocity references are complete. The training trajectory dump resumed on idle GPUs after a worker interruption. The static-versus-teacher VBench evaluation is running. Full training and the paired benchmark are pending. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
 
 ## Question and setup
 
@@ -41,6 +41,10 @@ The single GPU means-only pilot predates the fix to use the specified fixed 1e-3
 Stage 1 now backpropagates each independent attention loss immediately, preserving the sum without retaining 30 backward graphs. NCCL scalar reductions use CUDA tensors. FSDP leaves fp32 RoPE inputs and schedule timesteps intact, fixing the forward/recompute dtype mismatch. Validation pads distributed work without counting repeated cells, preserving all prompt-step observations. Stage 3 uses EMA for rollouts and final export, including the means. Checkpoint publication is atomic and resume preserves the per-rank data sampler. Frozen prior benchmark source, outputs and model protocol remain intact.
 
 Stage 0 measures precision/current-mean velocity references over the 32 validation prompts, both branches and all 20 denoise steps. Full Stage 1/2/3, dense and deletion controls, and the six-arm paired VBench results are pending. The run will pause at the Stage 2 gate if the guided held-out error plateaus above half the measured training-free reference by step 2,500. The planned final summary uses 10,000 paired prompt resamples (NumPy seed 20261109) and same-seed final latent relative L2 and frame PSNR.
+
+During capture, two workers and the static video generator exited with status 137. The source of the kill was unconfirmed. Capture retained 236 training prompts plus all 64 calibration and 32 validation prompts. Static generation retained 33 of the planned 100 evaluation videos. Workers resumed from the last completed prompt, clearing only empty claims from exited workers.
+
+Keeping the text encoder on GPU gave bit-for-bit identical conditional and unconditional embeddings, all 20 entering latents, and the final latent for `d0096`, `d0097`, and `d0098` with their original prompt seeds. Capture wall time per prompt, including text encoding and file writes with no video decode, was 19.18–19.34 s with offload and 12.42–12.74 s with the resident encoder. The resumed training capture uses the resident mode. Short worker invocations return to the scheduler at prompt boundaries.
 
 ## Long-run results
 
