@@ -1,6 +1,6 @@
 # Wan2.1 mean-vector distillation
 
-Status: real-model pilots, the calibration pool, and both held-out velocity references are complete. The training trajectory dump resumed on idle GPUs after a worker interruption. The static-versus-teacher benchmark is complete on 100 matched prompts. Full training and the six-arm benchmark are pending. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
+Status: real-model pilots, the calibration pool, and both held-out velocity references are complete. Stage 0 captured all 3,641 teacher trajectories. The static-versus-teacher benchmark is complete on 100 matched prompts, and Stage 1 training is underway. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
 
 ## Question and setup
 
@@ -8,7 +8,7 @@ Can Wan2.1-T2V-1.3B recover video quality after replacing the high-frequency par
 
 The student replaces 22 pairs (44 coordinates: t 0–7, h 22–28, w 43–49) of **both** Q and K after QK-RMSNorm and before 3D RoPE. A separate 44-coordinate vector applies to every token at a fixed layer, step, CFG branch and head. The 42 other pairs and V stay content-dependent. Layer 0 and denoising step 1 are exempt. There is no attention kernel or inference speedup claim.
 
-The manifests contain 3,641 distinct text prompts: 1,641 VBench prompts and 2,000 OpenVid captions, divided into 64 calibration, 32 validation and 3,545 additional training prompts. Rechecked normalized text uniqueness and disjointness from benchmark prompts and p00–p03; the six-arm evaluation manifest preserves every original benchmark prompt and seed. These are manifest counts, not completed data coverage.
+The manifests contain 3,641 distinct text prompts: 1,641 VBench prompts and 2,000 OpenVid captions, divided into 64 calibration, 32 validation and 3,545 additional training prompts. Rechecked normalized text uniqueness and disjointness from benchmark prompts and p00–p03; the six-arm evaluation manifest preserves every original benchmark prompt and seed. All 3,641 trajectory records passed the prompt and seed check and contain 20 entering states of shape `[16,12,60,60]`.
 
 ## Real-model pilots
 
@@ -68,6 +68,14 @@ Stage 0 velocity references: 32 held-out prompts × 20 entering teacher states, 
 | Teacher bf16 vs. fp32 | 0.000140878 | 0.0001488545 | 0.002731035 |
 | Current high-pair means vs. native bf16 | 0.1008203 | 0.1012649 | 0.3499369 |
 
+Complete teacher capture, including prompt encoding, 20 denoising steps with both CFG branches and artifact writes; excludes VAE decode. The sum is across prompt wall times and does not denote elapsed wall time when workers run concurrently.
+
+| Split | Trajectories | Median seconds | Sum of prompt seconds |
+|---|---:|---:|---:|
+| calib | 64 | 21.09 | 1392.7 |
+| val | 32 | 20.85 | 698.7 |
+| train | 3545 | 12.48 | 48793.3 |
+
 The completed comparison below pairs the static calibration arm with the frozen teacher. The trained arms and full six-arm evaluation are reported when their outputs are available.
 
 VBench measures the benchmark's single video per seed and prompt. Aesthetic/imaging use all 45 frames (with their official normalizations); subject/background compare first/previous-frame embeddings over 44 transitions; motion smoothness uses AMT over 22 reconstructions; dynamic degree uses RAFT over 22 flow transitions after subsampling to 23 frames; text-video consistency uses ViCLIP on eight midpoint frames and the caption. See `handoff.md` §11 for the pinned evaluator and exact scopes.
@@ -100,6 +108,4 @@ Same prompt and seed in each arm vs frozen baseline. L2 ratio over all final pos
 |---|---:|---:|---:|---:|---:|
 | static | 100 | 4500 | 1.142688 | 8.869 | 0 |
 
-The static centers reduced dynamic degree from 0.33 to 0.00. VBench found no dynamic videos in the static arm across these 100 prompts. Text–video consistency and aesthetic quality both fell on all 100 prompt-and-seed pairs. The rise in subject and background consistency coincided with a drop in motion, text alignment, and visual quality. These results measure pooled centers applied to the frozen model. The learned weights and trained controls are pending.
-
-All 200 videos passed the 45-frame, 480×480, 16 fps and checksum checks. Every static record has finite latents for all 20 sampler steps and 2,204 replacement calls, covering 29 nonexempt layers, 19 nonexempt denoising steps, both CFG branches, and Q and K. The static generation and seven VBench runs total 4,787 worker seconds (1.33 GPU-hours) across the interrupted and resumed attempts. The GPU window includes process setup and video writes. The paired per-prompt evidence is in `distill-results/static-paired/`.
+Calibration, the held-out velocity references, and trajectory capture used 15.8067 GPU-hours from observed worker launch-to-exit times, including setup, retries, and the encoder parity probe. The allocator used up to four idle devices. The workload retains 136.60 GB of trajectory data, measured across the complete capture directory.
