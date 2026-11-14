@@ -20,6 +20,7 @@ import argparse
 import hashlib
 import json
 import os
+import signal
 import socket
 import time
 from pathlib import Path
@@ -133,7 +134,16 @@ def main():
     parser.add_argument("--ids", nargs="*")
     parser.add_argument("--max-prompts", type=int)
     parser.add_argument("--steps", type=int, default=20)
+    parser.add_argument("--resident-text-encoder", action="store_true",
+                        help="keep the text encoder on GPU between prompts")
     args = parser.parse_args()
+    stop_requested = False
+
+    def stop_after_prompt(signum, frame):
+        nonlocal stop_requested
+        stop_requested = True
+
+    signal.signal(signal.SIGTERM, stop_after_prompt)
     config_path = ROOT / args.config
     config = json.loads(config_path.read_text())
     traj = ROOT / args.out
@@ -150,9 +160,12 @@ def main():
     pipe.set_progress_bar_config(disable=True)
     environment = {"torch": torch.__version__, "diffusers": diffusers.__version__, "transformers": transformers.__version__,
                    "snapshot": revision, "gpu": torch.cuda.get_device_name(0), "hostname": socket.gethostname(), "pid": os.getpid(),
+                   "resident_text_encoder": args.resident_text_encoder,
                    "config_sha256": digest(config_path), "code_sha256": {n: digest(ROOT / "scripts" / n) for n in ("dump_teacher_trajectories.py", "learned_center.py")}}
     done = 0
     for prompt in config["prompts"]:
+        if stop_requested:
+            break
         if args.split and prompt["split"] not in args.split:
             continue
         if args.ids and prompt["id"] not in args.ids:
@@ -170,11 +183,13 @@ def main():
             if (pdir / "meta.json").exists():
                 continue
             started = time.time()
-            pipe.text_encoder.to("cuda")
+            if not args.resident_text_encoder:
+                pipe.text_encoder.to("cuda")
             positive, negative = pipe.encode_prompt(prompt=prompt["text"], negative_prompt="", do_classifier_free_guidance=True,
                                                     device="cuda", num_videos_per_prompt=1, max_sequence_length=512)
-            pipe.text_encoder.to("cpu")
-            torch.cuda.empty_cache()
+            if not args.resident_text_encoder:
+                pipe.text_encoder.to("cpu")
+                torch.cuda.empty_cache()
             if torch.equal(positive, negative):
                 raise RuntimeError("CFG embeddings identical")
             capture = Capture(pipe.transformer, positive, negative, args.steps, prompt["split"] == "calib")
@@ -207,7 +222,7 @@ def main():
         if args.max_prompts and done >= args.max_prompts:
             break
     finalize_calibration(traj, config)
-    print("WORKER COMPLETE", done, flush=True)
+    print("WORKER PAUSED" if stop_requested else "WORKER COMPLETE", done, flush=True)
 
 
 if __name__ == "__main__":
