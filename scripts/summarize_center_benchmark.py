@@ -25,14 +25,24 @@ def main():
     parser.add_argument("--config", required=True)
     parser.add_argument("--extra-dimension", action="append", default=[])
     parser.add_argument("--baseline-config", help="original config for a hard-linked legacy teacher baseline")
+    parser.add_argument("--generation-config", help="original generation config when reporting a subset of its arms")
     args = parser.parse_args()
     root = Path(args.root)
     config_path = Path(args.config)
     config = json.loads(config_path.read_text())
-    expected_hash = hashlib.sha256(config_path.read_bytes()).hexdigest()
+    generation_path = Path(args.generation_config) if args.generation_config else config_path
+    generation_bytes = generation_path.read_bytes()
+    expected_hash = hashlib.sha256(generation_bytes).hexdigest()
     arms = config["modes"]
     if "baseline" not in arms or len(set(arms)) != len(arms):
         raise RuntimeError("Expected unique modes including baseline")
+    if args.generation_config:
+        generation = json.loads(generation_bytes)
+        if not set(arms).issubset(generation["modes"]):
+            raise RuntimeError("Evaluation requests arms absent from the generation config")
+        generation["modes"] = arms
+        if generation != config:
+            raise RuntimeError("Evaluation config must match the generation config except for the arm list")
     legacy = tuple(arms) == LEGACY_ARMS
     baseline_hash = expected_hash
     if args.baseline_config:

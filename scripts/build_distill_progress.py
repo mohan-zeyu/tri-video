@@ -60,8 +60,15 @@ def main():
             lines.append(f"| {step} | {a:.6f} | {b:.6f} | {c:.6f} |")
         lines.append("")
 
-    summary = load("out/learned-center-wan/summary.json")
-    agreement = load("out/learned-center-wan/agreement/complete.json")
+    full_root = "out/learned-center-wan"
+    static_root = "out/learned-center-wan-static"
+    summary = load(f"{full_root}/summary.json")
+    agreement = load(f"{full_root}/agreement/complete.json")
+    if not summary:
+        summary = load(f"{static_root}/summary.json")
+        agreement = load(f"{static_root}/agreement/complete.json")
+        if summary:
+            lines += ["The completed comparison below pairs the static calibration arm with the frozen teacher. The trained arms and full six-arm evaluation are reported when their outputs are available.", ""]
     if summary:
         arms = summary['config']['modes']
         lines += ["VBench measures the benchmark's single video per seed and prompt. Aesthetic/imaging use all 45 frames (with their official normalizations); subject/background compare first/previous-frame embeddings over 44 transitions; motion smoothness uses AMT over 22 reconstructions; dynamic degree uses RAFT over 22 flow transitions after subsampling to 23 frames; text-video consistency uses ViCLIP on eight midpoint frames and the caption. See `handoff.md` §11 for the pinned evaluator and exact scopes.", "", "Each comparison uses the same 100 prompt/seed units across arms, 10,000 paired prompt resamples and percentile 95% intervals (NumPy 20261109).", "", "| Dimension | " + " | ".join(arms) + " |", "|---|" + "---:|"*len(arms)]
