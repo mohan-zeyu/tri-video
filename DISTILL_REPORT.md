@@ -1,6 +1,6 @@
 # Wan2.1 mean-vector distillation
 
-Status: real-model pilots, the calibration pool, and both held-out velocity references are complete. Stage 0 captured all 3,641 teacher trajectories. The static-versus-teacher benchmark is complete on 100 matched prompts, and Stage 1 has completed its 2,000 optimizer steps. Stage 2 is running toward the validation gate. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
+Status: real-model pilots, the calibration pool, and both held-out velocity references are complete. Stage 0 captured all 3,641 teacher trajectories. The static-versus-teacher benchmark is complete on 100 matched prompts, and Stage 1 has completed its 2,000 optimizer steps. Stage 2 passed the validation gate and resumed training. The Stage 1 paired benchmark is complete. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
 
 ## Question and setup
 
@@ -115,3 +115,39 @@ Calibration, the held-out velocity references, and trajectory capture used 15.80
 The median layer-local relative squared error fell from 0.280204 to 0.218263, a 22.10% reduction against the runbook’s 20% threshold. Each layer’s error compares its complete attention output over all video tokens and output coordinates, using the same frozen teacher inputs. The comparison averages the conditional and unconditional errors over 32 held-out prompts and 19 nonexempt denoising steps, then takes the median over the 29 nonexempt layers. Layer 0 and the first step are exempt. The perturbation replaces only the selected 22 normalized pre-RoPE pairs in both Q and K.
 
 Stage 1 ran 2,000 updates at a fixed learning rate of 0.001 on GPUs 3 and 1. Each update used two independently sampled prompt-and-step states, one per rank, with both CFG branches. Elapsed time from the worker launch through exit was 5,549 s, equivalent to 3.08 GPU-hours across both ranks. Peak PyTorch allocation was 7.39 GiB on each rank. The initial Stage 2 attempt ended after 29 s when another lab process had allocated 11.49 GiB on one of its GPUs. Stage 2 restarted from the completed Stage 1 means on idle GPUs 3 and 6. Per-layer scores, the training log samples, and the configuration are in `distill-results/stage1/`.
+
+### Stage 2 held-out validation
+
+At optimizer step 2,500, the guided relative squared velocity error was 0.035898, clearing the 0.174968 threshold. Validation averages ratios over 32 held-out prompts and 20 cached entering teacher states per prompt. Each ratio covers all latent velocity coordinates. The guided column combines conditional and unconditional velocities at CFG 5 before computing the ratio. `distill-results/stage2/validation.jsonl` also retains the 20 denoising-step means for each checkpoint.
+
+| Optimizer step | Conditional | Unconditional | Guided |
+|---:|---:|---:|---:|
+| 250 | 0.014305 | 0.017708 | 0.054301 |
+| 500 | 0.012941 | 0.012885 | 0.043466 |
+| 750 | 0.014037 | 0.013656 | 0.047797 |
+| 1000 | 0.012497 | 0.012011 | 0.045220 |
+| 1250 | 0.010652 | 0.010337 | 0.039658 |
+| 1500 | 0.010823 | 0.010566 | 0.039968 |
+| 1750 | 0.010055 | 0.009906 | 0.039741 |
+| 2000 | 0.010034 | 0.010003 | 0.039204 |
+| 2250 | 0.009077 | 0.009055 | 0.036135 |
+| 2500 | 0.008831 | 0.009028 | 0.035898 |
+| 2750 | 0.008438 | 0.008743 | 0.034415 |
+
+### Stage 1 paired video benchmark
+
+The means-only student and teacher each generated 100 videos with the same prompt and seed manifest. Each VBench score uses the dimension-specific frame sampling described above. The paired columns use 10,000 prompt resamples with NumPy seed 20261109. Each static and Stage 1 result uses the same frozen transformer and replaces the selected high pre-RoPE pairs in both Q and K.
+
+| Dimension | Teacher | Stage 1 | Stage 1 − teacher [95% CI] | Stage 1 − static [95% CI] |
+|---|---:|---:|---:|---:|
+| subject_consistency | 0.963999 | 0.987142 | +0.023143 [+0.014815, +0.031980] | -0.004078 [-0.004653, -0.003521] |
+| background_consistency | 0.976466 | 0.989032 | +0.012566 [+0.008151, +0.016980] | -0.002401 [-0.003512, -0.001311] |
+| motion_smoothness | 0.984463 | 0.989720 | +0.005258 [+0.002434, +0.008548] | -0.002242 [-0.002469, -0.002031] |
+| dynamic_degree | 0.330000 | 0.000000 | -0.330000 [-0.420000, -0.240000] | +0.000000 [+0.000000, +0.000000] |
+| aesthetic_quality | 0.588595 | 0.271410 | -0.317185 [-0.334832, -0.299144] | +0.000006 [-0.004341, +0.004224] |
+| imaging_quality | 0.660679 | 0.484571 | -0.176108 [-0.200114, -0.150651] | -0.001564 [-0.007275, +0.004107] |
+| overall_consistency | 0.232555 | 0.023345 | -0.209210 [-0.223406, -0.195191] | -0.003039 [-0.005935, -0.000241] |
+
+The mean final latent relative L2 was 1.171124 against the teacher, taking one full post-step latent ratio per prompt. Mean decoded-frame PSNR was 8.701 dB across all 4,500 matched frames from the 100 prompt-and-seed pairs, with 0 identical frames. All 200 videos passed the 45-frame, 480×480, 16 fps and checksum checks. Each Stage 1 video has 20 finite steps and 2,204 replacements across 29 active layers, 19 active denoising steps, both branches and Q and K.
+
+The Stage 1 improvement in isolated attention output error did not carry over to restored video motion or text alignment. Dynamic degree remained zero in both means-only arms, and Stage 1 text–video consistency fell by 0.00304 versus static means. The interval for the aesthetic change spans zero. The paired scores and agreement records are in `distill-results/s1-paired/`.
