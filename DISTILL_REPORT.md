@@ -1,6 +1,6 @@
 # Wan2.1 mean-vector distillation
 
-Status: real-model pilots, the calibration pool, and both held-out velocity references are complete. The training trajectory dump resumed on idle GPUs after a worker interruption. The static-versus-teacher VBench evaluation is running. Full training and the paired benchmark are pending. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
+Status: real-model pilots, the calibration pool, and both held-out velocity references are complete. The training trajectory dump resumed on idle GPUs after a worker interruption. The static-versus-teacher benchmark is complete on 100 matched prompts. Full training and the six-arm benchmark are pending. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
 
 ## Question and setup
 
@@ -68,4 +68,38 @@ Stage 0 velocity references: 32 held-out prompts × 20 entering teacher states, 
 | Teacher bf16 vs. fp32 | 0.000140878 | 0.0001488545 | 0.002731035 |
 | Current high-pair means vs. native bf16 | 0.1008203 | 0.1012649 | 0.3499369 |
 
-The Stage 2 gate is half the guided current-mean reference, or 0.17496846 under the same held-out prompt, step, and CFG aggregation.
+The completed comparison below pairs the static calibration arm with the frozen teacher. The trained arms and full six-arm evaluation are reported when their outputs are available.
+
+VBench measures the benchmark's single video per seed and prompt. Aesthetic/imaging use all 45 frames (with their official normalizations); subject/background compare first/previous-frame embeddings over 44 transitions; motion smoothness uses AMT over 22 reconstructions; dynamic degree uses RAFT over 22 flow transitions after subsampling to 23 frames; text-video consistency uses ViCLIP on eight midpoint frames and the caption. See `handoff.md` §11 for the pinned evaluator and exact scopes.
+
+Each comparison uses the same 100 prompt/seed units across arms, 10,000 paired prompt resamples and percentile 95% intervals (NumPy 20261109).
+
+| Dimension | baseline | static |
+|---|---:|---:|
+| subject_consistency | 0.963999 | 0.991220 |
+| background_consistency | 0.976466 | 0.991434 |
+| motion_smoothness | 0.984463 | 0.991962 |
+| dynamic_degree | 0.330000 | 0.000000 |
+| aesthetic_quality | 0.588595 | 0.271404 |
+| imaging_quality | 0.660679 | 0.486135 |
+| overall_consistency | 0.232555 | 0.026384 |
+
+| Dimension | Comparison | Paired mean difference | 95% CI |
+|---|---|---:|---|
+| subject_consistency | static_minus_baseline | +0.027221 | [+0.018944, +0.036092] |
+| background_consistency | static_minus_baseline | +0.014968 | [+0.010736, +0.019253] |
+| motion_smoothness | static_minus_baseline | +0.007499 | [+0.004637, +0.010788] |
+| dynamic_degree | static_minus_baseline | -0.330000 | [-0.420000, -0.240000] |
+| aesthetic_quality | static_minus_baseline | -0.317191 | [-0.334745, -0.299354] |
+| imaging_quality | static_minus_baseline | -0.174544 | [-0.199351, -0.148707] |
+| overall_consistency | static_minus_baseline | -0.206171 | [-0.220326, -0.192148] |
+
+Same prompt and seed in each arm vs frozen baseline. L2 ratio over all final post-step latent coordinates, then average over prompts. Frame PSNR is 10log10(255^2/RGB MSE) over all channels/pixels of each aligned decoded MP4 frame; average finite dB values over all frames/prompts, count infinite identical frames separately.
+
+| Arm | Prompt pairs | Aligned frames | Latent relative L2 | Mean finite frame PSNR (dB) | Identical frames |
+|---|---:|---:|---:|---:|---:|
+| static | 100 | 4500 | 1.142688 | 8.869 | 0 |
+
+The static centers reduced dynamic degree from 0.33 to 0.00. VBench found no dynamic videos in the static arm across these 100 prompts. Text–video consistency and aesthetic quality both fell on all 100 prompt-and-seed pairs. The rise in subject and background consistency coincided with a drop in motion, text alignment, and visual quality. These results measure pooled centers applied to the frozen model. The learned weights and trained controls are pending.
+
+All 200 videos passed the 45-frame, 480×480, 16 fps and checksum checks. Every static record has finite latents for all 20 sampler steps and 2,204 replacement calls, covering 29 nonexempt layers, 19 nonexempt denoising steps, both CFG branches, and Q and K. The static generation and seven VBench runs total 4,787 worker seconds (1.33 GPU-hours) across the interrupted and resumed attempts. The GPU window includes process setup and video writes. The paired per-prompt evidence is in `distill-results/static-paired/`.
