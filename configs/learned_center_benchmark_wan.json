@@ -1,0 +1,766 @@
+{
+ "experiment": "wan-learned-center-20261114",
+ "model": "Wan-AI/Wan2.1-T2V-1.3B-Diffusers",
+ "frames": 45,
+ "height": 480,
+ "width": 480,
+ "steps": 20,
+ "guidance_scale": 5.0,
+ "negative_prompt": "",
+ "fps": 16,
+ "center_policy": "learned constant HIGH-pair Q/K per layer/step/CFG branch/head (LearnedCenter); baseline hard-linked from out/center-benchmark-wan-20261109",
+ "high_pairs": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28,
+  43,
+  44,
+  45,
+  46,
+  47,
+  48,
+  49
+ ],
+ "modes": [
+  "baseline",
+  "static",
+  "student_s1",
+  "student",
+  "dense_control",
+  "deletion"
+ ],
+ "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+ "sampling_seed": 20261109,
+ "prompt_scope": "100 prompts sampled without replacement within eight official VBench content-category lists, 13 each animal/architecture/food/human and 12 each lifestyle/plant/scenery/vehicles. One independent deterministic seed per prompt, shared across three arms.",
+ "dimensions": [
+  "subject_consistency",
+  "background_consistency",
+  "motion_smoothness",
+  "dynamic_degree",
+  "aesthetic_quality",
+  "imaging_quality"
+ ],
+ "prompts": [
+  {
+   "id": "v000",
+   "text": "lemur eating grass leaves",
+   "category": "animal",
+   "seed": 2026110900,
+   "audit": true
+  },
+  {
+   "id": "v013",
+   "text": "a miniature house",
+   "category": "architecture",
+   "seed": 2026110913,
+   "audit": true
+  },
+  {
+   "id": "v026",
+   "text": "a broccoli soup on wooden table",
+   "category": "food",
+   "seed": 2026110926,
+   "audit": true
+  },
+  {
+   "id": "v039",
+   "text": "a girl pushing the chair while her sister is on the chair",
+   "category": "human",
+   "seed": 2026110939,
+   "audit": true
+  },
+  {
+   "id": "v052",
+   "text": "modern office waiting room",
+   "category": "lifestyle",
+   "seed": 2026110952,
+   "audit": true
+  },
+  {
+   "id": "v064",
+   "text": "a man holding leaves looking at the camera",
+   "category": "plant",
+   "seed": 2026110964,
+   "audit": true
+  },
+  {
+   "id": "v076",
+   "text": "fireworks display in the sky at night",
+   "category": "scenery",
+   "seed": 2026110976,
+   "audit": true
+  },
+  {
+   "id": "v088",
+   "text": "video of passengers riding a double decker bus during night",
+   "category": "vehicles",
+   "seed": 2026110988,
+   "audit": true
+  },
+  {
+   "id": "v001",
+   "text": "chameleon eating ant",
+   "category": "animal",
+   "seed": 2026110901,
+   "audit": false
+  },
+  {
+   "id": "v014",
+   "text": "red paper lantern decorations hanging outside a building",
+   "category": "architecture",
+   "seed": 2026110914,
+   "audit": false
+  },
+  {
+   "id": "v027",
+   "text": "a mother preparing food with her kids",
+   "category": "food",
+   "seed": 2026110927,
+   "audit": false
+  },
+  {
+   "id": "v040",
+   "text": "cab driver talking to passenger",
+   "category": "human",
+   "seed": 2026110940,
+   "audit": false
+  },
+  {
+   "id": "v053",
+   "text": "woman painting at home",
+   "category": "lifestyle",
+   "seed": 2026110953,
+   "audit": false
+  },
+  {
+   "id": "v065",
+   "text": "green moss in forest nature",
+   "category": "plant",
+   "seed": 2026110965,
+   "audit": false
+  },
+  {
+   "id": "v077",
+   "text": "video of ocean during daytime",
+   "category": "scenery",
+   "seed": 2026110977,
+   "audit": false
+  },
+  {
+   "id": "v089",
+   "text": "cargo train traveling on the mountainside",
+   "category": "vehicles",
+   "seed": 2026110989,
+   "audit": false
+  },
+  {
+   "id": "v002",
+   "text": "a raccoon climbing a tree",
+   "category": "animal",
+   "seed": 2026110902,
+   "audit": false
+  },
+  {
+   "id": "v015",
+   "text": "modern wooden house interior",
+   "category": "architecture",
+   "seed": 2026110915,
+   "audit": false
+  },
+  {
+   "id": "v028",
+   "text": "boy getting a dumpling using chopsticks",
+   "category": "food",
+   "seed": 2026110928,
+   "audit": false
+  },
+  {
+   "id": "v041",
+   "text": "friends talking while on the basketball court",
+   "category": "human",
+   "seed": 2026110941,
+   "audit": false
+  },
+  {
+   "id": "v054",
+   "text": "woman and man in pajamas working from home",
+   "category": "lifestyle",
+   "seed": 2026110954,
+   "audit": false
+  },
+  {
+   "id": "v066",
+   "text": "a shadow of a swaying plant",
+   "category": "plant",
+   "seed": 2026110966,
+   "audit": false
+  },
+  {
+   "id": "v078",
+   "text": "scenery of desert landscape",
+   "category": "scenery",
+   "seed": 2026110978,
+   "audit": false
+  },
+  {
+   "id": "v090",
+   "text": "video of blinking traffic lights",
+   "category": "vehicles",
+   "seed": 2026110990,
+   "audit": false
+  },
+  {
+   "id": "v003",
+   "text": "koala eating leaves from a branch",
+   "category": "animal",
+   "seed": 2026110903,
+   "audit": false
+  },
+  {
+   "id": "v016",
+   "text": "silhouette of a building",
+   "category": "architecture",
+   "seed": 2026110916,
+   "audit": false
+  },
+  {
+   "id": "v029",
+   "text": "fresh dim sum set up on a bamboo steam tray for cooking",
+   "category": "food",
+   "seed": 2026110929,
+   "audit": false
+  },
+  {
+   "id": "v042",
+   "text": "brother and sister using hammock",
+   "category": "human",
+   "seed": 2026110942,
+   "audit": false
+  },
+  {
+   "id": "v055",
+   "text": "a toolbox and a paint roller beside a huge package in a room",
+   "category": "lifestyle",
+   "seed": 2026110955,
+   "audit": false
+  },
+  {
+   "id": "v067",
+   "text": "tree with golden leaves",
+   "category": "plant",
+   "seed": 2026110967,
+   "audit": false
+  },
+  {
+   "id": "v079",
+   "text": "sun view through a spider web",
+   "category": "scenery",
+   "seed": 2026110979,
+   "audit": false
+  },
+  {
+   "id": "v091",
+   "text": "a modern railway station in malaysia use for public transportation",
+   "category": "vehicles",
+   "seed": 2026110991,
+   "audit": false
+  },
+  {
+   "id": "v004",
+   "text": "paper cut out of a pair of hands a whale and a heart",
+   "category": "animal",
+   "seed": 2026110904,
+   "audit": false
+  },
+  {
+   "id": "v017",
+   "text": "candle on a jar and a house figurine on a surface",
+   "category": "architecture",
+   "seed": 2026110917,
+   "audit": false
+  },
+  {
+   "id": "v030",
+   "text": "a man eating a donut",
+   "category": "food",
+   "seed": 2026110930,
+   "audit": false
+  },
+  {
+   "id": "v043",
+   "text": "couple dancing with body paint",
+   "category": "human",
+   "seed": 2026110943,
+   "audit": false
+  },
+  {
+   "id": "v056",
+   "text": "video of a bathroom interior",
+   "category": "lifestyle",
+   "seed": 2026110956,
+   "audit": false
+  },
+  {
+   "id": "v068",
+   "text": "forest trees and a medieval castle at sunset",
+   "category": "plant",
+   "seed": 2026110968,
+   "audit": false
+  },
+  {
+   "id": "v080",
+   "text": "scenic view from wooden pathway",
+   "category": "scenery",
+   "seed": 2026110980,
+   "audit": false
+  },
+  {
+   "id": "v092",
+   "text": "drone view of an illuminated bridge across a river",
+   "category": "vehicles",
+   "seed": 2026110992,
+   "audit": false
+  },
+  {
+   "id": "v005",
+   "text": "a frog eating an ant",
+   "category": "animal",
+   "seed": 2026110905,
+   "audit": false
+  },
+  {
+   "id": "v018",
+   "text": "house in village",
+   "category": "architecture",
+   "seed": 2026110918,
+   "audit": false
+  },
+  {
+   "id": "v031",
+   "text": "preparing a cocktail drink",
+   "category": "food",
+   "seed": 2026110931,
+   "audit": false
+  },
+  {
+   "id": "v044",
+   "text": "teacher writing on her notebook",
+   "category": "human",
+   "seed": 2026110944,
+   "audit": false
+  },
+  {
+   "id": "v057",
+   "text": "a woman in a locker room",
+   "category": "lifestyle",
+   "seed": 2026110957,
+   "audit": false
+  },
+  {
+   "id": "v069",
+   "text": "flower field near the waterfall",
+   "category": "plant",
+   "seed": 2026110969,
+   "audit": false
+  },
+  {
+   "id": "v081",
+   "text": "close up view of swaying white flowers and leaves",
+   "category": "scenery",
+   "seed": 2026110981,
+   "audit": false
+  },
+  {
+   "id": "v093",
+   "text": "man wearing motorcycle helmet looking at the camera",
+   "category": "vehicles",
+   "seed": 2026110993,
+   "audit": false
+  },
+  {
+   "id": "v006",
+   "text": "a tortoise covered with algae",
+   "category": "animal",
+   "seed": 2026110906,
+   "audit": false
+  },
+  {
+   "id": "v019",
+   "text": "view of the sky through a building",
+   "category": "architecture",
+   "seed": 2026110919,
+   "audit": false
+  },
+  {
+   "id": "v032",
+   "text": "grilling a meat on a charcoal grill",
+   "category": "food",
+   "seed": 2026110932,
+   "audit": false
+  },
+  {
+   "id": "v045",
+   "text": "a group of campers with a cute dog",
+   "category": "human",
+   "seed": 2026110945,
+   "audit": false
+  },
+  {
+   "id": "v058",
+   "text": "aerial shot of interior of the warehouse",
+   "category": "lifestyle",
+   "seed": 2026110958,
+   "audit": false
+  },
+  {
+   "id": "v070",
+   "text": "a mossy fountain and green plants in a botanical garden",
+   "category": "plant",
+   "seed": 2026110970,
+   "audit": false
+  },
+  {
+   "id": "v082",
+   "text": "a bonfire near river",
+   "category": "scenery",
+   "seed": 2026110982,
+   "audit": false
+  },
+  {
+   "id": "v094",
+   "text": "a woman in a halloween costume posing on a motorcycle",
+   "category": "vehicles",
+   "seed": 2026110994,
+   "audit": false
+  },
+  {
+   "id": "v007",
+   "text": "a pig wallowing in mud",
+   "category": "animal",
+   "seed": 2026110907,
+   "audit": false
+  },
+  {
+   "id": "v020",
+   "text": "aerial view of the highway and building in a city",
+   "category": "architecture",
+   "seed": 2026110920,
+   "audit": false
+  },
+  {
+   "id": "v033",
+   "text": "an orange fruit cut in half",
+   "category": "food",
+   "seed": 2026110933,
+   "audit": false
+  },
+  {
+   "id": "v046",
+   "text": "a man video recording the movie in theater",
+   "category": "human",
+   "seed": 2026110946,
+   "audit": false
+  },
+  {
+   "id": "v059",
+   "text": "sunlight inside a room",
+   "category": "lifestyle",
+   "seed": 2026110959,
+   "audit": false
+  },
+  {
+   "id": "v071",
+   "text": "a woman opening a book with a flower inside",
+   "category": "plant",
+   "seed": 2026110971,
+   "audit": false
+  },
+  {
+   "id": "v083",
+   "text": "view of the sea from an abandoned building",
+   "category": "scenery",
+   "seed": 2026110983,
+   "audit": false
+  },
+  {
+   "id": "v095",
+   "text": "drone footage of a wreck ship on shore",
+   "category": "vehicles",
+   "seed": 2026110995,
+   "audit": false
+  },
+  {
+   "id": "v008",
+   "text": "spider making a web",
+   "category": "animal",
+   "seed": 2026110908,
+   "audit": false
+  },
+  {
+   "id": "v021",
+   "text": "city view reflected on a glass building",
+   "category": "architecture",
+   "seed": 2026110921,
+   "audit": false
+  },
+  {
+   "id": "v034",
+   "text": "grilling a steak on a pan grill",
+   "category": "food",
+   "seed": 2026110934,
+   "audit": false
+  },
+  {
+   "id": "v047",
+   "text": "pregnant woman exercising with trainer",
+   "category": "human",
+   "seed": 2026110947,
+   "audit": false
+  },
+  {
+   "id": "v060",
+   "text": "a person sanitizing an office space using smoke machine",
+   "category": "lifestyle",
+   "seed": 2026110960,
+   "audit": false
+  },
+  {
+   "id": "v072",
+   "text": "trees in the forest during sunny day",
+   "category": "plant",
+   "seed": 2026110972,
+   "audit": false
+  },
+  {
+   "id": "v084",
+   "text": "view of golden domed church",
+   "category": "scenery",
+   "seed": 2026110984,
+   "audit": false
+  },
+  {
+   "id": "v096",
+   "text": "boat sailing in the middle of the ocean",
+   "category": "vehicles",
+   "seed": 2026110996,
+   "audit": false
+  },
+  {
+   "id": "v009",
+   "text": "an american crocodile",
+   "category": "animal",
+   "seed": 2026110909,
+   "audit": false
+  },
+  {
+   "id": "v022",
+   "text": "time lapse footage of the sun light in front of a small house porch",
+   "category": "architecture",
+   "seed": 2026110922,
+   "audit": false
+  },
+  {
+   "id": "v035",
+   "text": "girl peeling a banana",
+   "category": "food",
+   "seed": 2026110935,
+   "audit": false
+  },
+  {
+   "id": "v048",
+   "text": "a family wearing paper bag masks",
+   "category": "human",
+   "seed": 2026110948,
+   "audit": false
+  },
+  {
+   "id": "v061",
+   "text": "a woman recording herself while exercising at home",
+   "category": "lifestyle",
+   "seed": 2026110961,
+   "audit": false
+  },
+  {
+   "id": "v073",
+   "text": "plucking leaves from plant",
+   "category": "plant",
+   "seed": 2026110973,
+   "audit": false
+  },
+  {
+   "id": "v085",
+   "text": "waterfalls in between mountain",
+   "category": "scenery",
+   "seed": 2026110985,
+   "audit": false
+  },
+  {
+   "id": "v097",
+   "text": "people in queue to military ship",
+   "category": "vehicles",
+   "seed": 2026110997,
+   "audit": false
+  },
+  {
+   "id": "v010",
+   "text": "cat licking another cat",
+   "category": "animal",
+   "seed": 2026110910,
+   "audit": false
+  },
+  {
+   "id": "v023",
+   "text": "waterfall and house",
+   "category": "architecture",
+   "seed": 2026110923,
+   "audit": false
+  },
+  {
+   "id": "v036",
+   "text": "pancake with blueberry on the top",
+   "category": "food",
+   "seed": 2026110936,
+   "audit": false
+  },
+  {
+   "id": "v049",
+   "text": "woman adding honey to the cinnamon rolls",
+   "category": "human",
+   "seed": 2026110949,
+   "audit": false
+  },
+  {
+   "id": "v062",
+   "text": "a family stacking cardboard boxes in a room",
+   "category": "lifestyle",
+   "seed": 2026110962,
+   "audit": false
+  },
+  {
+   "id": "v074",
+   "text": "reflection of tree branches",
+   "category": "plant",
+   "seed": 2026110974,
+   "audit": false
+  },
+  {
+   "id": "v086",
+   "text": "close up view of lighted candles",
+   "category": "scenery",
+   "seed": 2026110986,
+   "audit": false
+  },
+  {
+   "id": "v098",
+   "text": "video of a kayak boat in a river",
+   "category": "vehicles",
+   "seed": 2026110998,
+   "audit": false
+  },
+  {
+   "id": "v011",
+   "text": "brown chicken hunting for its food",
+   "category": "animal",
+   "seed": 2026110911,
+   "audit": false
+  },
+  {
+   "id": "v024",
+   "text": "a beach house built over a seawall protected from the sea waves",
+   "category": "architecture",
+   "seed": 2026110924,
+   "audit": false
+  },
+  {
+   "id": "v037",
+   "text": "a chef cutting sushi rolls",
+   "category": "food",
+   "seed": 2026110937,
+   "audit": false
+  },
+  {
+   "id": "v050",
+   "text": "a child playing with water",
+   "category": "human",
+   "seed": 2026110950,
+   "audit": false
+  },
+  {
+   "id": "v063",
+   "text": "man doing handstand in indoor garden",
+   "category": "lifestyle",
+   "seed": 2026110963,
+   "audit": false
+  },
+  {
+   "id": "v075",
+   "text": "a coconut tree by the house",
+   "category": "plant",
+   "seed": 2026110975,
+   "audit": false
+  },
+  {
+   "id": "v087",
+   "text": "a dark clouds over shadowing the full moon",
+   "category": "scenery",
+   "seed": 2026110987,
+   "audit": false
+  },
+  {
+   "id": "v099",
+   "text": "a white yacht traveling on a river and passing under the bridge",
+   "category": "vehicles",
+   "seed": 2026110999,
+   "audit": false
+  },
+  {
+   "id": "v012",
+   "text": "wild rabbit in a green meadow",
+   "category": "animal",
+   "seed": 2026110912,
+   "audit": false
+  },
+  {
+   "id": "v025",
+   "text": "water tower on the desert",
+   "category": "architecture",
+   "seed": 2026110925,
+   "audit": false
+  },
+  {
+   "id": "v038",
+   "text": "little boy pretending to eat the watermelon",
+   "category": "food",
+   "seed": 2026110938,
+   "audit": false
+  },
+  {
+   "id": "v051",
+   "text": "a man in a hoodie and woman with a red bandana talking to each other and smiling",
+   "category": "human",
+   "seed": 2026110951,
+   "audit": false
+  }
+ ],
+ "arms": {
+  "baseline": "teacher, replacement off (reused from the completed benchmark)",
+  "static": "teacher weights + calibrated per-step means, no training (stage 0)",
+  "student_s1": "teacher weights + stage-1 trained means",
+  "student": "stage-3 distilled weights + trained means",
+  "dense_control": "stage-2/3 recipe without replacement (center mode off)",
+  "deletion": "stage-2/3 recipe with HIGH coordinates zeroed (center mode delete)"
+ },
+ "note": "Same 100 prompts and seeds as center_benchmark_wan.json so every arm pairs with the existing baseline/all/high videos."
+}

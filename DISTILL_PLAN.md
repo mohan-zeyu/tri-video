@@ -4,8 +4,13 @@ Plan for the senior's proposal: a student with Wan's architecture in which the h
 rotary pairs in every self-attention head is replaced by learned constant ("mean") vectors, one set per
 denoising step, trained by distillation from the frozen Wan teacher. All weights may be updated.
 
-Status: plan. Nothing in this document has been run. Compute estimates are analytic and state their
-assumptions. Repo numbers carry their scope per `AGENTS.md`.
+Status: plan plus implementation. The code (section 11) is written and tested on CPU with a tiny random Wan,
+including the FSDP2 multi-process path; nothing has been run on the real model yet. Compute estimates are
+analytic and state their assumptions. Repo numbers carry their scope per `AGENTS.md`.
+
+Decisions taken (14 November): means per (step, CFG branch); full fine-tuning; layer 0 and denoising step 1
+exempt from the replacement by default; training prompts from the VBench suite plus OpenVid-1M captions
+(`configs/distill_prompts.json`); hardware is 7x RTX 5090 (32 GB each).
 
 ## 1. The student, stated exactly
 
@@ -248,10 +253,85 @@ reported but never interpreted alone.
   this project's scratch notes). Full fine-tuning may or may not absorb that. The gates and the dense control
   make the outcome interpretable either way.
 
-## 10. Open decisions for the senior
+## 10. Decisions and their consequences
 
-1. Means per (step, branch) as planned, or per step only?
-2. Full fine-tuning (default) or LoRA, given the GPU memory on the lab host?
-3. Keep layer 0 and step 1 in scope for the first run, or exempt them from the start?
-4. Source of the 2,000 training prompts.
-5. Whether a timestep-conditioned mean (A2) is wanted so that the student can run at other step counts.
+1. **Means per (step, branch).** `mu` has shape `[30, 20, 2, 12, 44]` per side. Branch-shared is ablation A1.
+2. **Full fine-tuning on 7x RTX 5090 (32 GB).** fp32 master weights, fp32 gradients and Adam state for 1.3B
+   parameters are about 21 GB before sharding, so the student is sharded with FSDP2 (per block, mixed
+   precision bf16 compute / fp32 reduce). Per GPU that leaves roughly 3 GB of sharded state, 2.6 GB for the
+   replicated bf16 teacher, the unsharded bf16 parameters of one block at a time, and activations for
+   10,800 tokens x 2 branches with gradient checkpointing. Expect under 20 GB per GPU; if not, lower
+   `--accum` has no effect on memory, so switch the FFN to LoRA (not implemented) or reduce to one branch per
+   sample. The 5090 is sm_120: FlashAttention-3 kernels are unavailable, PyTorch SDPA falls back to its
+   flash/efficient kernels, which is fine for training. Sustained bf16 throughput is unknown; assume about
+   100 TFLOP/s per GPU, so the section 4 estimate becomes about 1.5x longer (roughly 1.5-2 days for all stages).
+3. **Layer 0 and step 1 exempt.** Both are the regimes the repo's measurements single out (layer-0 drift over
+   denoising; largest profile change at step 1->2). The student still trains on step-1 states and layer-0
+   weights, so they stay consistent with the fine-tuned network; only the replacement is skipped there.
+   `--include-layer0 --include-step1` lift the exemptions (ablation A3).
+4. **Prompts.** `configs/distill_prompts.json`: 3,641 prompts = 1,641 VBench-suite prompts (short, object/scene
+   style) + 2,000 OpenVid-1M captions (long, descriptive; 8-120 words), all text-disjoint from the 100
+   evaluation prompts and p00-p03. 64 are calibration prompts (also trained on), 32 are validation (never
+   trained on). Selection seed 20261114; per-prompt seed = sha256(id) mod 2^31.
+5. **Timestep-MLP means (A2):** not implemented; the step table is the spec.
+
+## 11. Implementation and runbook
+
+Code on branch `claude/magical-goodall-dmq9i1`:
+
+| File | Role |
+|---|---|
+| `scripts/learned_center.py` | `LearnedCenter`: the per-(layer, step, branch, head) constants, hooks on `attn1.norm_q/norm_k`, modes mean/delete/off, exemptions, rollout branch/step inference |
+| `scripts/build_distill_prompts.py` | builds `configs/distill_prompts.json` from the VBench suite and OpenVid captions |
+| `scripts/dump_teacher_trajectories.py` | teacher trajectories (20 entering latents + embeddings per prompt) and the stage-0 calibration means |
+| `scripts/train_learned_center.py` | stages 1-3, FSDP2, EMA, validation, on-policy buffer, checkpoints, controls |
+| `scripts/generate_learned_center.py` | the evaluation arms in the `run_center_benchmark.py` layout |
+| `scripts/test_learned_center.py` | CPU tests (exactness vs `replace_with_center`, stages 1-3 end to end) |
+| `configs/learned_center_benchmark_wan.json` | the 100 evaluation prompts/seeds with the six arms |
+
+Tested on CPU: `python scripts/test_learned_center.py` (tiny random Wan, --no-fsdp) and the same tiny model
+under `torchrun --nproc_per_node 2` for stages 2 and 3 including save, resume and rollouts. Not tested: the
+real model, GPUs, NCCL, memory.
+
+Runbook on the lab host (`WAN_SNAPSHOT` set as for the earlier benchmarks; run from the repo root with the
+inference runtime that has torch >= 2.11, diffusers 0.42):
+
+```sh
+# 0. teacher trajectories + calibration (one worker per GPU; calib first so stage 1 can start early)
+for g in 0 1 2 3 4 5 6; do CUDA_VISIBLE_DEVICES=$g python scripts/dump_teacher_trajectories.py --split calib val & done; wait
+for g in 0 1 2 3 4 5 6; do CUDA_VISIBLE_DEVICES=$g python scripts/dump_teacher_trajectories.py --split train & done; wait
+# -> out/distill-traj-wan/<id>/..., out/distill-traj-wan/calibration.pt, calibration-spread.json
+
+# 1. means only, layer-local (teacher frozen)
+torchrun --nproc_per_node 7 scripts/train_learned_center.py --stage 1 --out out/distill-s1 --steps 2000 --lr-center 1e-3
+
+# 2. off-policy, full fine-tuning
+torchrun --nproc_per_node 7 scripts/train_learned_center.py --stage 2 --out out/distill-s2 --steps 5000 \
+    --init-student out/distill-s1/student
+
+# 3. on-policy
+torchrun --nproc_per_node 7 scripts/train_learned_center.py --stage 3 --out out/distill-s3 --steps 5000 \
+    --init-student out/distill-s2/student --rollout-every 200 --rollouts-per-rank 9
+
+# controls (same recipe): dense and deletion
+torchrun --nproc_per_node 7 scripts/train_learned_center.py --stage 2 --out out/distill-dense --steps 5000 --center-mode off
+torchrun --nproc_per_node 7 scripts/train_learned_center.py --stage 2 --out out/distill-delete --steps 5000 --center-mode delete
+
+# evaluation arms on the 100 benchmark prompts (one GPU per worker, as before)
+python scripts/generate_learned_center.py --config configs/learned_center_benchmark_wan.json --out out/learned-center-wan --arm baseline --link-baseline out/center-benchmark-wan-20261109
+python scripts/generate_learned_center.py --config configs/learned_center_benchmark_wan.json --out out/learned-center-wan --arm static --student out/distill-static --center-mode mean
+python scripts/generate_learned_center.py --config configs/learned_center_benchmark_wan.json --out out/learned-center-wan --arm student_s1 --student out/distill-s1/student
+python scripts/generate_learned_center.py --config configs/learned_center_benchmark_wan.json --out out/learned-center-wan --arm student --student out/distill-s3/student
+python scripts/generate_learned_center.py --config configs/learned_center_benchmark_wan.json --out out/learned-center-wan --arm dense_control --student out/distill-dense/student --center-mode off
+python scripts/generate_learned_center.py --config configs/learned_center_benchmark_wan.json --out out/learned-center-wan --arm deletion --student out/distill-delete/student --center-mode delete
+```
+
+The `static` arm needs a directory holding only `learned_center.pt` built from `calibration.pt`
+(`LearnedCenter().init_from_calibration(...)` then `torch.save({"state_dict": ..., "mode": "mean"}, ...)`).
+The VBench evaluator and summarizer (`evaluate_center_benchmark.py`, `summarize_center_benchmark.py`) read
+`config["modes"]`, but the summarizer still assumes 3 arms x 100 videos; it needs its 300-video constants
+generalized before use.
+
+Before the long runs: a one-GPU pilot of each stage with `--steps 20 --val-every 10 --save-every 20
+--no-fsdp` (or 2 GPUs with FSDP) to record peak memory, seconds per step and that the validation numbers
+are finite. Record `torch.cuda.get_device_name` and the SDPA backend in the run metadata.
