@@ -1,6 +1,6 @@
 # Wan2.1 mean-vector distillation
 
-Status: real-model pilots and the 64-prompt calibration pool are complete. Full training and the paired benchmark are pending. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
+Status: real-model pilots, the calibration pool, and both held-out velocity references are complete. The training trajectory dump is running on GPUs 3, 5, and 6. Full training and the paired benchmark are pending. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
 
 ## Question and setup
 
@@ -55,4 +55,13 @@ Calibration pooled 64 prompts. At each layer, denoising step, CFG branch and hea
 | K | h | 0.993214 | 0.969184 |
 | K | w | 0.993446 | 0.967174 |
 
-Temporal centers are less directionally stable across prompts than spatial centers, especially in the lower tail. This compares across-prompt directions of means; it does not measure how much information is lost by substituting those means for individual tokens.
+Temporal centers are less directionally stable across prompts than spatial centers, especially in the lower tail. This measures the direction of token averages across prompts.
+
+Stage 0 velocity references: 32 held-out prompts × 20 entering teacher states, with one seed per prompt. Relative squared velocity error over all latent elements for one prompt, teacher entering state, denoise step and branch or guided combination. Average each step across prompts and overall equally across all prompt-step cells. High current means replace both normalized pre-RoPE Q/K on 22 high pairs across all 10800 tokens, all heads/layers, each branch/step independently, no exemptions (matches the earlier benchmark). FP32 teacher uses the same cached BF16 inputs upcast to FP32.
+
+| Reference | Conditional | Unconditional | CFG 5 |
+|---|---:|---:|---:|
+| Teacher bf16 vs. fp32 | 0.000140878 | 0.0001488545 | 0.002731035 |
+| Current high-pair means vs. native bf16 | 0.1008203 | 0.1012649 | 0.3499369 |
+
+The Stage 2 gate is half the guided current-mean reference, or 0.17496846 under the same held-out prompt, step, and CFG aggregation.
