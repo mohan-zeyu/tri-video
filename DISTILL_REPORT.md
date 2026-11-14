@@ -1,6 +1,6 @@
 # Wan2.1 mean-vector distillation
 
-Status: real-model pilots complete; the full training and paired benchmark have not completed. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
+Status: real-model pilots and the 64-prompt calibration pool are complete. Full training and the paired benchmark are pending. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
 
 ## Question and setup
 
@@ -40,4 +40,19 @@ The single GPU means-only pilot predates the fix to use the specified fixed 1e-3
 
 Stage 1 now backpropagates each independent attention loss immediately, preserving the sum without retaining 30 backward graphs. NCCL scalar reductions use CUDA tensors. FSDP leaves fp32 RoPE inputs and schedule timesteps intact, fixing the forward/recompute dtype mismatch. Validation pads distributed work without counting repeated cells, preserving all prompt-step observations. Stage 3 uses EMA for rollouts and final export, including the means. Checkpoint publication is atomic and resume preserves the per-rank data sampler. Frozen prior benchmark source, outputs and model protocol remain intact.
 
-Stage 0 will report calibration direction spread over the 64 prompts and precision/current-mean velocity references over the 32 validation prompts, both branches and all 20 denoise steps. Full Stage 1/2/3, dense and deletion controls, and the six-arm paired VBench results are pending. The run will pause at the Stage 2 gate if the guided held-out error plateaus above half the measured training-free reference by step 2,500. The planned final summary uses 10,000 paired prompt resamples (NumPy seed 20261109) and same-seed final latent relative L2 and frame PSNR.
+Stage 0 measures precision/current-mean velocity references over the 32 validation prompts, both branches and all 20 denoise steps. Full Stage 1/2/3, dense and deletion controls, and the six-arm paired VBench results are pending. The run will pause at the Stage 2 gate if the guided held-out error plateaus above half the measured training-free reference by step 2,500. The planned final summary uses 10,000 paired prompt resamples (NumPy seed 20261109) and same-seed final latent relative L2 and frame PSNR.
+
+## Long-run results
+
+Calibration pooled 64 prompts. At each layer, denoising step, CFG branch and head, each prompt contributes the coordinate mean across all 10,800 normalized pre-RoPE tokens. Compare its concatenated 2D high-pair coordinates with the pool for that same cell. Medians and tenth percentiles are over prompts, all 30 layers, 20 steps, both branches and 12 heads; group boundaries are t 0–7, h 22–28 and w 43–49. Q and K are separate.
+
+| Side | Pair group | Median cosine | P10 cosine |
+|---|---|---:|---:|
+| Q | t | 0.970994 | 0.875884 |
+| Q | h | 0.992557 | 0.969481 |
+| Q | w | 0.992834 | 0.966834 |
+| K | t | 0.978754 | 0.895643 |
+| K | h | 0.993214 | 0.969184 |
+| K | w | 0.993446 | 0.967174 |
+
+Temporal centers are less directionally stable across prompts than spatial centers, especially in the lower tail. This compares across-prompt directions of means; it does not measure how much information is lost by substituting those means for individual tokens.
