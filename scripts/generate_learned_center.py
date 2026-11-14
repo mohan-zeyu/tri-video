@@ -56,14 +56,22 @@ def main():
     dest = ROOT / args.out
     dest.mkdir(parents=True, exist_ok=True)
 
+    if args.arm not in config["modes"]:
+        raise ValueError(f"Unknown benchmark mode {args.arm}")
     if args.link_baseline:
+        if args.arm != "baseline":
+            raise ValueError("--link-baseline requires --arm baseline")
         source = ROOT / args.link_baseline
+        if source.resolve() == dest.resolve():
+            raise ValueError("Baseline and destination must be different directories")
         linked = 0
         for prompt in config["prompts"]:
             video = source / "videos" / "baseline" / (prompt["id"] + ".mp4")
             record = source / "records" / prompt["id"] / "baseline"
             if not video.exists() or not (record / "complete.json").exists():
                 raise RuntimeError(f"missing baseline for {prompt['id']}")
+            if json.loads((record / "complete.json").read_text())["prompt"] != prompt:
+                raise RuntimeError(f"frozen baseline prompt or seed differs for {prompt['id']}")
             (dest / "videos" / args.arm).mkdir(parents=True, exist_ok=True)
             (dest / "records" / prompt["id"] / args.arm).mkdir(parents=True, exist_ok=True)
             target_video = dest / "videos" / args.arm / (prompt["id"] + ".mp4")
@@ -141,12 +149,14 @@ def main():
             center.calls = 0
             started = time.time()
             latents_holder = {}
+            checked_steps = []
 
             def end_step(p, i, t, kw):
                 lat = kw["latents"].float()
                 if not torch.isfinite(lat).all():
                     raise RuntimeError("nonfinite latents")
-                latents_holder["final"] = kw["latents"].detach()
+                latents_holder["final"] = lat.detach()
+                checked_steps.append(i)
                 return kw
             frames = pipe(prompt_embeds=positive, negative_prompt_embeds=negative, height=config["height"], width=config["width"],
                           num_frames=config["frames"], num_inference_steps=config["steps"], guidance_scale=config["guidance_scale"],
@@ -154,8 +164,10 @@ def main():
                           callback_on_step_end=end_step).frames[0]
             torch.cuda.synchronize()
             seconds = time.time() - started
+            if checked_steps != list(range(config["steps"])) or center.rollout["step"] != config["steps"] - 1:
+                raise RuntimeError("incomplete denoising trajectory")
             center.clear_rollout()
-            if center.rollout is None and center.calls != expected_calls:
+            if center.calls != expected_calls:
                 raise RuntimeError(f"replacement calls {center.calls} != expected {expected_calls}")
             if not np.isfinite(frames).all() or frames.shape != (config["frames"], config["height"], config["width"], 3):
                 raise RuntimeError(f"bad frames {frames.shape}")
@@ -167,7 +179,7 @@ def main():
             tmp.replace(video)
             save_torch(arm / "final-latents.pt", latents_holder["final"].cpu())
             write_json(arm / "complete.json", {"prompt": prompt, "mode": args.arm, "environment": environment,
-                "inference_decode_seconds": seconds, "intervention_calls": center.calls, "expected_intervention_calls": expected_calls,
+                "inference_decode_seconds": seconds, "finite_step_latents": len(checked_steps), "intervention_calls": center.calls, "expected_intervention_calls": expected_calls,
                 "video_sha256": digest(video), "video_bytes": video.stat().st_size, "frames": list(frames.shape),
                 "center_scope": "learned constants per layer/step/branch/head on HIGH 44 coords; exempt " + json.dumps(exempt),
                 "peak_gpu_memory_bytes": torch.cuda.max_memory_allocated()})

@@ -17,6 +17,8 @@ out/*-tensors.pt
 # Keep reproducible scripts/configs in git; generated archives are external.
 out/full-sweep-*/
 out/*benchmark*/
+out/distill-*/
+out/learned-center-*/
 out/triattention-pruning-*/
 out/pruning-performance-*/
 output/

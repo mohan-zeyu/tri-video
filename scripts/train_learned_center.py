@@ -21,6 +21,7 @@ the deletion control. --include-layer0 / --include-step1 lift the default exempt
 """
 
 import argparse
+from contextlib import contextmanager
 import json
 import math
 import os
@@ -33,6 +34,7 @@ import torch
 import torch.distributed as dist
 from torch import nn
 
+from full_sweep import save_torch, write_json
 from learned_center import LearnedCenter
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -55,7 +57,9 @@ def dist_init(no_fsdp):
 
 
 def all_reduce_mean(value, world):
-    tensor = torch.as_tensor(value, dtype=torch.float64)
+    tensor = torch.as_tensor(value, dtype=torch.float64,
+                             device=torch.device("cuda", torch.cuda.current_device())
+                             if world > 1 and dist.get_backend() == "nccl" else "cpu")
     if world > 1:
         tensor = tensor.clone()
         dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
@@ -145,10 +149,9 @@ def load_models(args, device):
     from diffusers import WanTransformer3DModel
     snapshot = Path(args.snapshot)
     teacher = WanTransformer3DModel.from_pretrained(snapshot, subfolder="transformer", torch_dtype=torch.bfloat16, local_files_only=True)
-    student = WanTransformer3DModel.from_pretrained(snapshot, subfolder="transformer", torch_dtype=torch.float32, local_files_only=True)
     teacher = teacher.to(device).eval().requires_grad_(False)
-    if args.stage == 1:
-        student.requires_grad_(False).eval()
+    student = None if args.stage == 1 else WanTransformer3DModel.from_pretrained(
+        snapshot, subfolder="transformer", torch_dtype=torch.float32, local_files_only=True)
     return teacher, student, snapshot
 
 
@@ -158,7 +161,18 @@ def shard_student(student, device, world, no_fsdp):
     from torch.distributed.device_mesh import init_device_mesh
     from torch.distributed.fsdp import MixedPrecisionPolicy, fully_shard
     mesh = init_device_mesh(device.type, (world,))
-    policy = MixedPrecisionPolicy(param_dtype=torch.bfloat16, reduce_dtype=torch.float32)
+    # A block's RoPE tables are fp32. FSDP casting them during the first
+    # forward but not during checkpoint recompute changes both dtype and math.
+    # Hidden states and text reach the blocks in bf16 already.
+    policy = MixedPrecisionPolicy(param_dtype=torch.bfloat16, reduce_dtype=torch.float32, cast_forward_inputs=False)
+
+    def cast_model_inputs(module, args, kwargs):
+        # Pipeline rollouts see fp32 master parameters outside the FSDP forward.
+        # Keep timestep untouched; casting it to bf16 rounds large schedule values.
+        return args, {k: (v.to(torch.bfloat16) if k in ("hidden_states", "encoder_hidden_states")
+                          and v is not None else v) for k, v in kwargs.items()}
+
+    student.register_forward_pre_hook(cast_model_inputs, with_kwargs=True)
     student = student.to(device)
     for block in student.blocks:
         fully_shard(block, mesh=mesh, mp_policy=policy)
@@ -249,7 +263,7 @@ class AttentionTap:
             h.remove()
 
 
-def stage1_loss(teacher, center, item, device):
+def stage1_loss(teacher, center, item, device, backward_scale=None):
     """Layer-local mean training. The teacher's own attn1 modules are used as the student attention, with the
     replacement hooks active; the network weights are frozen."""
     tap = AttentionTap(teacher)
@@ -260,15 +274,19 @@ def stage1_loss(teacher, center, item, device):
     tap_inputs, tap_outputs = tap.inputs, tap.outputs
     tap.close()
     center.set_context(torch.tensor([item["step"]] * 2), torch.tensor([0, 1]))
-    total, per_layer = 0.0, []
+    per_layer = []
     for l, block in enumerate(teacher.blocks):
-        args, kwargs = tap_inputs[l]
-        with torch.enable_grad():
+        args, kwargs = tap_inputs.pop(l)
+        target = tap_outputs.pop(l)
+        with torch.set_grad_enabled(backward_scale is not None):
             out = block.attn1(*args, **kwargs)
-            loss_l = rel_sq(out, tap_outputs[l]).mean()
-        total = total + loss_l
+            loss_l = rel_sq(out, target).mean()
+            # The inputs are detached teacher states. Each layer's gradient can be
+            # accumulated immediately without retaining 30 attention graphs.
+            if backward_scale is not None and loss_l.requires_grad:
+                (loss_l * backward_scale).backward()
         per_layer.append(loss_l.item())
-    return total, per_layer
+    return sum(per_layer), per_layer
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -343,61 +361,100 @@ def full_student_state(student, world, no_fsdp):
     return get_model_state_dict(student, options=StateDictOptions(full_state_dict=True, cpu_offload=True))
 
 
-def save_student(student, center, out_dir, snapshot, rank, world, no_fsdp, ema=None, tag="student"):
-    """Writes <out>/<tag>/transformer/{config.json, diffusion_pytorch_model.safetensors} (bf16) and
-    <out>/<tag>/learned_center.pt. With ema, the EMA weights are swapped in for the save."""
+def ema_parameters(student, center):
+    return [*student.parameters(), *center.parameters()]
+
+
+@contextmanager
+def use_ema(student, center, ema):
     reshard(student)
-    params = [p for p in student.parameters()]
-    if ema is not None:
-        backup = [p.detach().clone() for p in params]
-        with torch.no_grad():
-            for i, (p, e) in enumerate(zip(params, ema)):
-                try:
-                    p.copy_(e)
-                except RuntimeError as error:
-                    raise RuntimeError(f"EMA swap failed at param {i}: p {type(p).__name__} {tuple(p.shape)} e {type(e).__name__} {tuple(e.shape)}") from error
-    state = full_student_state(student, world, no_fsdp)
-    if ema is not None:
+    if ema is None:
+        yield
+        return
+    params = ema_parameters(student, center)
+    # Move the backup off GPU: during export/rollouts it serves no compute.
+    backup = [p.detach().to_local().cpu() if hasattr(p, "to_local") else p.detach().to("cpu", copy=True)
+              for p in params]
+    with torch.no_grad():
+        for p, e in zip(params, ema):
+            p.copy_(e)
+    try:
+        yield
+    finally:
+        reshard(student)
         with torch.no_grad():
             for p, b in zip(params, backup):
-                p.copy_(b)
-    if rank == 0:
-        from safetensors.torch import save_file
-        target = Path(out_dir) / tag / "transformer"
-        target.mkdir(parents=True, exist_ok=True)
-        tensors = {k: v.to(torch.bfloat16).contiguous() for k, v in state.items()}
-        save_file(tensors, str(target / "diffusion_pytorch_model.safetensors"), metadata={"format": "pt"})
-        shutil.copy(Path(snapshot) / "transformer" / "config.json", target / "config.json")
-        torch.save({"state_dict": center.state_dict(), "mode": center.mode}, Path(out_dir) / tag / "learned_center.pt")
+                local = p.to_local() if hasattr(p, "to_local") else p
+                local.copy_(b)
+
+
+def save_student(student, center, out_dir, snapshot, rank, world, no_fsdp, ema=None, tag="student"):
+    """Export paired transformer and center EMA weights, with manifest written last."""
+    with use_ema(student, center, ema):
+        state = full_student_state(student, world, no_fsdp)
+        if rank == 0:
+            from safetensors.torch import save_file
+            target = Path(out_dir) / tag / "transformer"
+            target.mkdir(parents=True, exist_ok=True)
+            # Diffusers intentionally keeps these parameter groups fp32 at
+            # inference; don't round their learned weights on the way to disk.
+            keep_fp32 = student._keep_in_fp32_modules or []
+            tensors = {k: v.to(torch.float32 if any(part in keep_fp32 for part in k.split("."))
+                               else torch.bfloat16).contiguous() for k, v in state.items()}
+            pending = target / "diffusion_pytorch_model.pending.safetensors"
+            save_file(tensors, str(pending), metadata={"format": "pt"})
+            pending.replace(target / "diffusion_pytorch_model.safetensors")
+            write_json(target / "config.json", json.loads((Path(snapshot) / "transformer" / "config.json").read_text()))
+            save_torch(target.parent / "learned_center.pt", {"state_dict": center.state_dict(), "mode": center.mode})
     if world > 1:
         dist.barrier()
 
 
-def save_training_state(student, opt_model, center, opt_center, step, out_dir, rank, world, no_fsdp, ema):
-    ckpt = Path(out_dir) / "checkpoint"
+def save_training_state(student, opt_model, center, opt_center, step, out_dir, rank, world, no_fsdp, ema, rng):
+    root = Path(out_dir) / "checkpoint"
+    ckpt = root / f"step-{step:06d}"
     reshard(student)
     if rank == 0:
         ckpt.mkdir(parents=True, exist_ok=True)
-        torch.save({"step": step, "center": center.state_dict(), "opt_center": opt_center.state_dict()}, ckpt / "center.pt")
-    if no_fsdp or world == 1:
-        if rank == 0 and opt_model is not None:
-            torch.save({"model": student.state_dict(), "opt": opt_model.state_dict(),
-                        "ema": [e.cpu() for e in ema] if ema else None}, ckpt / "model.pt")
-        return
-    import torch.distributed.checkpoint as dcp
-    from torch.distributed.checkpoint.state_dict import get_state_dict
-    msd, osd = get_state_dict(student, opt_model)
-    dcp.save({"model": msd, "optim": osd, "ema": {str(i): e for i, e in enumerate(ema)} if ema else {}}, checkpoint_id=str(ckpt / "model"))
-    dist.barrier()
+        save_torch(ckpt / "center.pt", {"step": step, "center": center.state_dict(), "opt_center": opt_center.state_dict()})
+    ckpt.mkdir(parents=True, exist_ok=True)
+    save_torch(ckpt / f"rng-rank{rank:02d}.pt", rng.getstate())
+    if opt_model is not None:
+        if no_fsdp or world == 1:
+            if rank == 0:
+                save_torch(ckpt / "model.pt", {"model": student.state_dict(), "opt": opt_model.state_dict(),
+                           "ema": [e.cpu() for e in ema] if ema else None})
+        else:
+            import torch.distributed.checkpoint as dcp
+            from torch.distributed.checkpoint.state_dict import get_state_dict
+            msd, osd = get_state_dict(student, opt_model)
+            dcp.save({"model": msd, "optim": osd, "ema": {str(i): e for i, e in enumerate(ema)} if ema else {}},
+                     checkpoint_id=str(ckpt / "model"))
+    if world > 1:
+        dist.barrier()
+    if rank == 0:
+        latest = root / "latest.json"
+        previous = json.loads(latest.read_text())["directory"] if latest.exists() else None
+        write_json(latest, {"directory": ckpt.name, "step": step})
+        if previous and previous != ckpt.name:
+            shutil.rmtree(root / previous)
+    if world > 1:
+        dist.barrier()
 
 
-def load_training_state(student, opt_model, center, opt_center, out_dir, world, no_fsdp, ema, device):
+def load_training_state(student, opt_model, center, opt_center, out_dir, world, no_fsdp, ema, rank, rng):
     ckpt = Path(out_dir) / "checkpoint"
+    latest = ckpt / "latest.json"
+    if latest.exists():
+        ckpt /= json.loads(latest.read_text())["directory"]
     if not (ckpt / "center.pt").exists():
-        return 0
+        raise FileNotFoundError(f"No complete checkpoint under {ckpt}")
     saved = torch.load(ckpt / "center.pt", map_location="cpu")
     center.load_state_dict(saved["center"])
     opt_center.load_state_dict(saved["opt_center"])
+    rng_state = ckpt / f"rng-rank{rank:02d}.pt"
+    if rng_state.exists():
+        rng.setstate(torch.load(rng_state, map_location="cpu"))
     if opt_model is None:
         return saved["step"]
     if no_fsdp or world == 1:
@@ -424,16 +481,35 @@ def load_training_state(student, opt_model, center, opt_center, out_dir, world, 
 # validation
 # ----------------------------------------------------------------------------------------------------------
 @torch.no_grad()
+def validate_attention(teacher, center, store, val_ids, device, rank, world):
+    """Layer-local error on paired held-out teacher inputs, for active steps only."""
+    items = [(pid, s) for pid in val_ids for s in range(store.steps) if bool(center.step_active[s])]
+    sums = torch.zeros(center.layers, dtype=torch.float64, device=device)
+    for pid, s in items[rank::world]:
+        _, per_layer = stage1_loss(teacher, center, store.item(pid, s), device)
+        sums += torch.tensor(per_layer, dtype=sums.dtype, device=device)
+    if world > 1:
+        dist.all_reduce(sums)
+    means = sums.cpu() / len(items)
+    return {"per_layer": means.tolist(), "median_active_layer": float(means[center.layer_active.cpu()].quantile(0.5)),
+            "items": len(items), "prompt_ids": val_ids,
+            "scope": "Arithmetic mean over held-out prompts, nonexempt steps and both CFG branches of each layer's relative squared attention output error over all tokens and output coordinates. Uses identical frozen teacher inputs per layer; only normalized pre-RoPE high Q/K pairs are changed. Median over nonexempt layers."}
+
+
+@torch.no_grad()
 def validate(student, teacher, center, store, val_ids, args, device, rank, world, cache):
     """Per-step relative velocity errors (cond, uncond, guided) on held-out teacher states. Each rank evaluates
     an equal share of (prompt, step) items; teacher velocities are cached after the first call."""
     items = [(pid, s) for pid in val_ids for s in range(store.steps)]
-    per_rank = len(items) // world
-    mine = items[rank * per_rank:(rank + 1) * per_rank]
+    per_rank = math.ceil(len(items) / world)
+    # FSDP ranks need the same forward count; padded items participate in
+    # collectives without contributing to the metric.
+    mine = [items[i] if i < len(items) else items[-1]
+            for i in range(rank * per_rank, (rank + 1) * per_rank)]
     student.eval()
     sums = torch.zeros(store.steps, 3, dtype=torch.float64, device=device)
     counts = torch.zeros(store.steps, dtype=torch.float64, device=device)
-    for pid, s in mine:
+    for i, (pid, s) in enumerate(mine, rank * per_rank):
         item = store.item(pid, s)
         key = (pid, s)
         if key not in cache:
@@ -444,8 +520,9 @@ def validate(student, teacher, center, store, val_ids, args, device, rank, world
         g_t = v_t[1] + args.guidance * (v_t[0] - v_t[1])
         g_s = v_s[1] + args.guidance * (v_s[0] - v_s[1])
         l_cfg = rel_sq(g_s.unsqueeze(0), g_t.unsqueeze(0))[0]
-        sums[s] += torch.stack([l_vel[0], l_vel[1], l_cfg]).double()
-        counts[s] += 1
+        if i < len(items):
+            sums[s] += torch.stack([l_vel[0], l_vel[1], l_cfg]).double()
+            counts[s] += 1
     if world > 1:
         dist.all_reduce(sums)
         dist.all_reduce(counts)
@@ -475,7 +552,7 @@ def main():
     parser.add_argument("--steps", type=int, default=5000, help="optimizer steps")
     parser.add_argument("--accum", type=int, default=1, help="samples per rank per optimizer step")
     parser.add_argument("--lr", type=float, default=1e-5)
-    parser.add_argument("--lr-center", type=float, default=2e-4)
+    parser.add_argument("--lr-center", type=float, help="default: 1e-3 for stage 1, 2e-4 otherwise")
     parser.add_argument("--warmup", type=int, default=500)
     parser.add_argument("--lambda-cfg", type=float, default=1.0)
     parser.add_argument("--lambda-feat", type=float, default=0.1)
@@ -495,7 +572,15 @@ def main():
     parser.add_argument("--no-fsdp", action="store_true")
     parser.add_argument("--no-checkpointing", action="store_true", help="disable gradient checkpointing")
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--stop-after", type=int, help="checkpoint and stop at this optimizer step, retaining the full-run LR schedule")
+    parser.add_argument("--budget-seconds", type=float, help="wall-time budget for this invocation; stop at a checkpoint before it is spent")
     args = parser.parse_args()
+    if args.stop_after is not None and not 1 <= args.stop_after <= args.steps:
+        parser.error("--stop-after must be between 1 and --steps")
+    if args.budget_seconds is not None and args.budget_seconds <= 0:
+        parser.error("--budget-seconds must be positive")
+    if args.lr_center is None:
+        args.lr_center = 1e-3 if args.stage == 1 else 2e-4
 
     rank, world, device = dist_init(args.no_fsdp)
     global STUDENT_AUTOCAST
@@ -514,14 +599,14 @@ def main():
     log(rank, f"trajectories: train {len(store.ids)}, val {len(val_store_ids)}, steps {store.steps}")
 
     teacher, student, snapshot = load_models(args, device)
-    layers, heads = len(student.blocks), student.config.num_attention_heads
-    center = LearnedCenter(layers=layers, steps=store.steps, heads=heads, head_dim=student.config.attention_head_dim,
+    layers, heads = len(teacher.blocks), teacher.config.num_attention_heads
+    center = LearnedCenter(layers=layers, steps=store.steps, heads=heads, head_dim=teacher.config.attention_head_dim,
                            exempt_layers=() if args.include_layer0 else (0,), exempt_steps=() if args.include_step1 else (0,),
                            mode=args.center_mode).to(device)
     if args.init_student:
         init_dir = Path(args.init_student)
         weights_file = init_dir / "transformer" / "diffusion_pytorch_model.safetensors"
-        if weights_file.exists():
+        if weights_file.exists() and student is not None:
             from safetensors.torch import load_file
             weights = load_file(str(weights_file))
             missing, unexpected = student.load_state_dict({k: v.float() for k, v in weights.items()}, strict=False)
@@ -552,13 +637,14 @@ def main():
         student = shard_student(student, device, world, args.no_fsdp)
         student.train()
         center.attach(student)
-        opt_model = torch.optim.AdamW(student.parameters(), lr=args.lr, betas=(0.9, 0.99), weight_decay=0.0)
-        ema = [p.detach().clone() for p in student.parameters()] if args.ema > 0 else None
+        opt_model = torch.optim.AdamW(student.parameters(), lr=args.lr, betas=(0.9, 0.99), weight_decay=0.0, foreach=False)
+        ema = [p.detach().clone() for p in ema_parameters(student, center)] if args.ema > 0 else None
         taps = {"teacher": FeatureTap(teacher, args.feat_layers if args.lambda_feat > 0 else []),
                 "student": FeatureTap(student, args.feat_layers if args.lambda_feat > 0 else [])}
-    opt_center = torch.optim.Adam(center.parameters(), lr=args.lr_center if args.stage != 1 else max(args.lr_center, 1e-3))
+    opt_center = torch.optim.Adam(center.parameters(), lr=args.lr_center)
 
-    start = load_training_state(student, opt_model, center, opt_center, out, world, args.no_fsdp, ema, device) if args.resume else 0
+    start = load_training_state(student, opt_model, center, opt_center, out, world, args.no_fsdp, ema, rank, rng) if args.resume else 0
+    log(rank, "START_OPTIMIZER_STEP", start + 1)
     buffer = OnPolicyBuffer(out / "onpolicy", args.buffer_files, store) if args.stage == 3 else None
     active_steps = [s for s in range(store.steps) if bool(center.step_active[s])]
     if not active_steps:
@@ -569,18 +655,29 @@ def main():
         (out / "args.json").write_text(json.dumps(vars(args), indent=1))
 
     def lr_scale(step):
+        if args.stage == 1:
+            return 1.0
         if step < args.warmup:
             return (step + 1) / args.warmup
         progress = (step - args.warmup) / max(1, args.steps - args.warmup)
         return 0.1 + 0.9 * 0.5 * (1 + math.cos(math.pi * min(1.0, progress)))
 
-    t0 = time.time()
-    for step in range(start, args.steps):
+    t0 = time.monotonic()
+    if args.stage == 1 and val_store_ids and not args.resume:
+        result = validate_attention(teacher, center, store, val_store_ids, device, rank, world)
+        if rank == 0:
+            write_json(out / "attention-before.json", result)
+    stop_at = args.stop_after or args.steps
+    last_step = start
+    budget_stop = False
+    for step in range(start, stop_at):
         if args.stage == 3 and step % args.rollout_every == 0:
-            rollouts(student, center, store, buffer, args, device, rank, world, step // args.rollout_every, rng)
+            with use_ema(student, center, ema):
+                rollouts(student, center, store, buffer, args, device, rank, world, step // args.rollout_every, rng)
+        step_started = time.monotonic()
         scale = lr_scale(step)
         for group in opt_center.param_groups:
-            group["lr"] = (args.lr_center if args.stage != 1 else max(args.lr_center, 1e-3)) * scale
+            group["lr"] = args.lr_center * scale
         if opt_model is not None:
             for group in opt_model.param_groups:
                 group["lr"] = args.lr * scale
@@ -590,18 +687,20 @@ def main():
         metrics_acc = {}
         for _ in range(args.accum):
             use_onpolicy = (args.stage == 3 and buffer is not None and
-                            rng.random() < args.onpolicy_frac * min(1.0, (step - start + 1) / max(1, args.onpolicy_ramp)))
+                            rng.random() < args.onpolicy_frac * min(1.0, (step + 1) / max(1, args.onpolicy_ramp)))
             item = buffer.sample(rng) if use_onpolicy else None
             if item is None:
                 item = store.sample(rng)
             if args.stage == 1:
                 item = store.item(item["pid"], rng.choice(active_steps))
             if args.stage == 1:
-                loss, per_layer = stage1_loss(teacher, center, item, device)
-                metrics = {"attn_total": loss.item(), "attn_layer_median": float(torch.tensor(per_layer).median())}
+                loss, per_layer = stage1_loss(teacher, center, item, device, backward_scale=1 / args.accum)
+                metrics = {"attn_total": loss, "attn_layer_median": float(torch.tensor(per_layer).median())}
             else:
                 loss, metrics = distillation_loss(student, teacher, center, item, device, args, taps)
-            (loss / args.accum).backward()
+                (loss / args.accum).backward()
+            if not all(math.isfinite(v) for v in metrics.values()):
+                raise FloatingPointError(f"nonfinite loss at step {step + 1}: {metrics}")
             metrics["onpolicy"] = float(item["source"] == "student")
             for k, v in metrics.items():
                 metrics_acc[k] = metrics_acc.get(k, 0.0) + v / args.accum
@@ -620,16 +719,20 @@ def main():
         opt_center.step()
         if opt_model is not None:
             opt_model.step()
-            if ema is not None:
-                reshard(student)
-                with torch.no_grad():
-                    for e, p in zip(ema, student.parameters()):
-                        e.lerp_(p.detach(), 1 - args.ema)
+        if ema is not None:
+            reshard(student)
+            with torch.no_grad():
+                for e, p in zip(ema, ema_parameters(student, center)):
+                    e.lerp_(p.detach(), 1 - args.ema)
         metrics_acc["mu_norm_q"] = float(center.mu_q.detach().norm(dim=-1).mean())
         metrics_acc["mu_norm_k"] = float(center.mu_k.detach().norm(dim=-1).mean())
-        if (step + 1) % args.log_every == 0 or step == start:
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+        metrics_acc["optimizer_step_seconds"] = time.monotonic() - step_started
+        last_step = step + 1
+        if (step + 1) % args.log_every == 0 or step in (start, args.steps - 1):
             reduced = {k: float(all_reduce_mean(v, world)) for k, v in sorted(metrics_acc.items())}
-            reduced.update({"step": step + 1, "lr_scale": scale, "elapsed_s": round(time.time() - t0, 1)})
+            reduced.update({"step": step + 1, "lr_scale": scale, "elapsed_s": round(time.monotonic() - t0, 1)})
             history.append(reduced)
             log(rank, json.dumps(reduced))
         if (step + 1) % args.val_every == 0 and val_store_ids and args.stage != 1:
@@ -639,20 +742,38 @@ def main():
             if rank == 0:
                 with open(out / "validation.jsonl", "a") as f:
                     f.write(json.dumps(result) + "\n")
-        if (step + 1) % args.save_every == 0 or step + 1 == args.steps:
+        if args.budget_seconds:
+            # Reserve the larger of 5 minutes or 10 recent optimizer steps for
+            # validation/checkpoint I/O and for workers to exit together.
+            budget_stop = time.monotonic() - t0 >= args.budget_seconds - max(300, 10 * metrics_acc["optimizer_step_seconds"])
+            if world > 1:
+                stop_tensor = torch.tensor(int(budget_stop), device=device)
+                dist.all_reduce(stop_tensor, op=dist.ReduceOp.MAX)
+                budget_stop = bool(stop_tensor.item())
+        if (step + 1) % args.save_every == 0 or step + 1 == stop_at or budget_stop:
             if args.stage == 1:
                 if rank == 0:
                     (out / "student").mkdir(exist_ok=True)
-                    torch.save({"state_dict": center.state_dict(), "mode": center.mode}, out / "student" / "learned_center.pt")
+                    save_torch(out / "student" / "learned_center.pt", {"state_dict": center.state_dict(), "mode": center.mode})
             else:
-                save_student(student, center, out, snapshot, rank, world, args.no_fsdp, ema=ema, tag="student")
-            save_training_state(student, opt_model, center, opt_center, step + 1, out, rank, world, args.no_fsdp, ema)
+                if step + 1 == args.steps:
+                    save_student(student, center, out, snapshot, rank, world, args.no_fsdp, ema=ema, tag="student")
+            save_training_state(student, opt_model, center, opt_center, step + 1, out, rank, world, args.no_fsdp, ema, rng)
             if rank == 0:
                 with open(out / "history.jsonl", "a") as f:
                     for h in history:
                         f.write(json.dumps(h) + "\n")
                 history.clear()
-    log(rank, "TRAINING COMPLETE", args.stage, args.steps)
+        if budget_stop:
+            break
+    if args.stage == 1 and val_store_ids:
+        result = validate_attention(teacher, center, store, val_store_ids, device, rank, world)
+        if rank == 0:
+            write_json(out / "attention-after.json", result)
+    if device.type == "cuda":
+        print(json.dumps({"rank": rank, "peak_cuda_allocated_bytes": torch.cuda.max_memory_allocated(device),
+                          "wall_seconds": time.monotonic() - t0}), flush=True)
+    log(rank, "TRAINING COMPLETE" if last_step == args.steps else "TRAINING PAUSED", args.stage, last_step)
     if world > 1:
         dist.destroy_process_group()
 

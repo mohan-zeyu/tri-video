@@ -91,29 +91,38 @@ class Capture:
 def finalize_calibration(traj, config):
     calib_ids = [p["id"] for p in config["prompts"] if p["split"] == "calib"]
     files = [traj / pid / "center-means.pt" for pid in calib_ids]
-    if not all(f.exists() for f in files) or (traj / "calibration.pt").exists():
+    if not all((traj / pid / "meta.json").exists() for pid in calib_ids) or (traj / "calibration.pt").exists():
         return
-    means = [torch.load(f) for f in files]
-    mean_q = torch.stack([m["mean_q"] for m in means]).float()                 # [P, 30, 20, 2, 12, 44]
-    mean_k = torch.stack([m["mean_k"] for m in means]).float()
-    pooled_q, pooled_k = mean_q.mean(0), mean_k.mean(0)
-    pairs = HIGH_DIMS.view(22, 2)
-    groups = {"t": slice(0, 8), "h": slice(8, 15), "w": slice(15, 22)}
-    spread = {}
-    for side, per, pooled in (("q", mean_q, pooled_q), ("k", mean_k, pooled_k)):
-        for name, sl in groups.items():
-            a = per.view(*per.shape[:-1], 22, 2)[..., sl, :].flatten(-2)
-            b = pooled.view(*pooled.shape[:-1], 22, 2)[..., sl, :].flatten(-2)
-            cos = torch.nn.functional.cosine_similarity(a, b.unsqueeze(0).expand_as(a), dim=-1)
-            spread[f"{side}_{name}_cos_prompt_vs_pooled_median"] = float(cos.median())
-            spread[f"{side}_{name}_cos_prompt_vs_pooled_p10"] = float(cos.flatten().quantile(0.1))
-            ratio = b.norm(dim=-1) / a.norm(dim=-1).mean(0).clamp_min(1e-12)
-            spread[f"{side}_{name}_pooled_norm_over_mean_prompt_norm_median"] = float(ratio.median())
-    save_torch(traj / "calibration.pt", {"mean_q": pooled_q, "mean_k": pooled_k, "prompts": calib_ids,
-        "scope": "mean over calib prompts of per-prompt all-token means; separate layer/step/branch/head; HIGH 44 coords"})
-    write_json(traj / "calibration-spread.json", {"prompts": len(calib_ids), "spread": spread,
-        "scope": "cosine between each prompt's all-token mean and the pooled mean, per layer/step/branch/head, within pair group; median and 10th percentile over all cells"})
-    print("CALIBRATION COMPLETE", len(calib_ids), json.dumps(spread)[:400], flush=True)
+    claim = traj / "calibration.claim"
+    try:
+        claim.mkdir()
+    except FileExistsError:
+        return
+    try:
+        if (traj / "calibration.pt").exists():
+            return
+        means = [torch.load(f) for f in files]
+        mean_q = torch.stack([m["mean_q"] for m in means]).float()                 # [P, 30, 20, 2, 12, 44]
+        mean_k = torch.stack([m["mean_k"] for m in means]).float()
+        pooled_q, pooled_k = mean_q.mean(0), mean_k.mean(0)
+        groups = {"t": slice(0, 8), "h": slice(8, 15), "w": slice(15, 22)}
+        spread = {}
+        for side, per, pooled in (("q", mean_q, pooled_q), ("k", mean_k, pooled_k)):
+            for name, sl in groups.items():
+                a = per.view(*per.shape[:-1], 22, 2)[..., sl, :].flatten(-2)
+                b = pooled.view(*pooled.shape[:-1], 22, 2)[..., sl, :].flatten(-2)
+                cos = torch.nn.functional.cosine_similarity(a, b.unsqueeze(0).expand_as(a), dim=-1)
+                spread[f"{side}_{name}_cos_prompt_vs_pooled_median"] = float(cos.median())
+                spread[f"{side}_{name}_cos_prompt_vs_pooled_p10"] = float(cos.flatten().quantile(0.1))
+                ratio = b.norm(dim=-1) / a.norm(dim=-1).mean(0).clamp_min(1e-12)
+                spread[f"{side}_{name}_pooled_norm_over_mean_prompt_norm_median"] = float(ratio.median())
+        write_json(traj / "calibration-spread.json", {"prompts": len(calib_ids), "spread": spread,
+            "scope": "cosine between each prompt's all-token mean and the pooled mean, per layer/step/branch/head, within pair group; median and 10th percentile over all cells"})
+        save_torch(traj / "calibration.pt", {"mean_q": pooled_q, "mean_k": pooled_k, "prompts": calib_ids,
+            "scope": "mean over calib prompts of per-prompt all-token means; separate layer/step/branch/head; HIGH 44 coords"})
+        print("CALIBRATION COMPLETE", len(calib_ids), json.dumps(spread)[:400], flush=True)
+    finally:
+        claim.rmdir()
 
 
 def main():
@@ -158,6 +167,8 @@ def main():
         except FileExistsError:
             continue
         try:
+            if (pdir / "meta.json").exists():
+                continue
             started = time.time()
             pipe.text_encoder.to("cuda")
             positive, negative = pipe.encode_prompt(prompt=prompt["text"], negative_prompt="", do_classifier_free_guidance=True,

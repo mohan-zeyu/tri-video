@@ -43,7 +43,7 @@
  ],
  "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
  "sampling_seed": 20261109,
- "prompt_scope": "100 prompts sampled without replacement within eight official VBench content-category lists, 13 each animal/architecture/food/human and 12 each lifestyle/plant/scenery/vehicles. One independent deterministic seed per prompt, shared across three arms.",
+ "prompt_scope": "100 prompts sampled without replacement within eight official VBench content-category lists, 13 each animal/architecture/food/human and 12 each lifestyle/plant/scenery/vehicles. One independent deterministic seed per prompt, shared across six arms.",
  "dimensions": [
   "subject_consistency",
   "background_consistency",
