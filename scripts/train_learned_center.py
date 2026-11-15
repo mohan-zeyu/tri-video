@@ -301,38 +301,63 @@ def make_pipeline(student, args):
 
 
 @torch.no_grad()
+def capture_rollout(pipe, center, store, prompt_id, seed, device, guidance, autocast=False):
+    """Capture the latent entering each conditional forward of one rollout."""
+    shape = store.item(prompt_id, 0)["x"].shape
+    frames = (shape[1] - 1) * 4 + 1
+    height, width = shape[2] * 8, shape[3] * 8
+    emb = store.embeddings(prompt_id)
+    positive = emb["positive"].to(device, torch.bfloat16)
+    negative = emb["negative"].to(device, torch.bfloat16)
+    captured = []
+
+    def pre(module, args, kwargs):
+        text = kwargs["encoder_hidden_states"].to(positive.dtype)
+        if torch.equal(text, positive):
+            captured.append(kwargs["hidden_states"][0].detach().to(torch.bfloat16).cpu())
+
+    center.set_rollout(positive, negative)
+    handle = pipe.transformer.register_forward_pre_hook(pre, with_kwargs=True)
+    try:
+        with torch.autocast(device.type, dtype=torch.bfloat16, enabled=autocast):
+            pipe(prompt_embeds=positive, negative_prompt_embeds=negative, height=height, width=width,
+                 num_frames=frames, num_inference_steps=store.steps, guidance_scale=guidance,
+                 output_type="latent", generator=torch.Generator(device=device.type).manual_seed(seed))
+    finally:
+        handle.remove()
+        center.clear_rollout()
+    if len(captured) != store.steps:
+        raise RuntimeError(f"rollout captured {len(captured)} states")
+    return torch.stack(captured)
+
+
+@torch.no_grad()
 def rollouts(student, center, store, buffer, args, device, rank, world, refresh, rng):
     student.eval()
     pipe = make_pipeline(student, args)
-    shape = store.item(store.ids[0], 0)["x"].shape                                  # [16, T, H, W]
-    frames = (shape[1] - 1) * 4 + 1
-    height, width = shape[2] * 8, shape[3] * 8
-    captured = []
+    jobs = [
+        {"prompt_id": rng.choice(store.ids), "seed": args.seed + 1_000_003 * refresh + 1000 * rank + i,
+         "name": f"r{refresh:04d}_{rank:02d}_{i:02d}"}
+        for i in range(args.rollouts_per_rank)
+    ]
 
-    def pre(module, a, kw):
-        if torch.equal(kw["encoder_hidden_states"].to(center.rollout["positive"].dtype), center.rollout["positive"]):
-            captured.append(kw["hidden_states"][0].detach().to(torch.bfloat16).cpu())
-    for i in range(args.rollouts_per_rank):
-        pid = rng.choice(store.ids)
-        emb = store.embeddings(pid)
-        positive, negative = emb["positive"].to(device, torch.bfloat16), emb["negative"].to(device, torch.bfloat16)
-        center.set_rollout(positive, negative)
-        captured.clear()
-        handle = student.register_forward_pre_hook(pre, with_kwargs=True)
-        seed = args.seed + 1_000_003 * refresh + 1000 * rank + i
-        try:
-            with torch.autocast(device.type, dtype=torch.bfloat16, enabled=STUDENT_AUTOCAST):
-                pipe(prompt_embeds=positive, negative_prompt_embeds=negative, height=height, width=width, num_frames=frames,
-                     num_inference_steps=store.steps, guidance_scale=args.guidance, output_type="latent",
-                     generator=torch.Generator(device=device.type).manual_seed(seed))
-        finally:
-            handle.remove()
-            center.clear_rollout()
-        if len(captured) != store.steps:
-            raise RuntimeError(f"rollout captured {len(captured)} states")
-        states = torch.stack(captured, 0)
-        if torch.isfinite(states.float()).all():
-            buffer.add(f"r{refresh:04d}_{rank:02d}_{i:02d}", states, pid)
+    def run_local(batch):
+        for job in batch:
+            pid = job["prompt_id"]
+            states = capture_rollout(pipe, center, store, pid, job["seed"], device, args.guidance, STUDENT_AUTOCAST)
+            if torch.isfinite(states.float()).all():
+                buffer.add(job["name"], states, pid)
+
+    if args.rollout_worker_budget and device.type == "cuda":
+        from parallel_distill_rollouts import split_rollout_jobs
+
+        def export_snapshot(staging):
+            # The caller has already swapped the model and centers to EMA.
+            save_student(student, center, staging, args.snapshot, rank, world, args.no_fsdp)
+
+        split_rollout_jobs(jobs, args, rank, world, refresh, buffer.dir.parent, run_local, export_snapshot)
+    else:
+        run_local(jobs)
     if world > 1:
         dist.barrier()
     if rank == 0:
@@ -564,6 +589,10 @@ def main():
     parser.add_argument("--onpolicy-ramp", type=int, default=1000)
     parser.add_argument("--rollout-every", type=int, default=200)
     parser.add_argument("--rollouts-per-rank", type=int, default=9)
+    parser.add_argument("--rollout-worker-budget", type=int, default=0,
+                        help="total additional GPU seconds reserved for splitting refreshes onto two spare GPUs")
+    parser.add_argument("--rollout-lock-dir", type=Path,
+                        help="existing experiment directory containing device lock files")
     parser.add_argument("--buffer-files", type=int, default=500, help="FIFO capacity in rollout files (x steps states)")
     parser.add_argument("--val-every", type=int, default=250)
     parser.add_argument("--save-every", type=int, default=500)
@@ -579,6 +608,9 @@ def main():
         parser.error("--stop-after must be between 1 and --steps")
     if args.budget_seconds is not None and args.budget_seconds <= 0:
         parser.error("--budget-seconds must be positive")
+    if args.rollout_worker_budget < 0 or (args.rollout_worker_budget and (
+            args.stage != 3 or args.rollout_lock_dir is None or not args.rollout_lock_dir.is_dir())):
+        parser.error("--rollout-worker-budget requires stage 3 and an existing --rollout-lock-dir")
     if args.lr_center is None:
         args.lr_center = 1e-3 if args.stage == 1 else 2e-4
 
@@ -652,7 +684,7 @@ def main():
     val_cache = {}
     history = []
     if rank == 0:
-        (out / "args.json").write_text(json.dumps(vars(args), indent=1))
+        (out / "args.json").write_text(json.dumps(vars(args), indent=1, default=str))
 
     def lr_scale(step):
         if args.stage == 1:
