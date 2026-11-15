@@ -1,6 +1,6 @@
 # Wan2.1 mean-vector distillation
 
-Status: real-model pilots, the calibration pool, and both held-out velocity references are complete. Stage 0 captured all 3,641 teacher trajectories. The static-versus-teacher benchmark is complete on 100 matched prompts, and Stage 1 has completed its 2,000 optimizer steps. Stage 2 completed 5,000 off-policy updates and exported EMA weights. Stage 3 on-policy training is underway. The Stage 1 paired benchmark is complete. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
+Status: real-model pilots, the calibration pool, and both held-out velocity references are complete. Stage 0 captured all 3,641 teacher trajectories. The static-versus-teacher benchmark is complete on 100 matched prompts, and Stage 1 has completed its 2,000 optimizer steps. Stage 2 completed 5,000 off-policy updates and exported EMA weights. Stage 3 completed 5,000 on-policy updates and exported the final EMA student. The paired benchmark for that export and the dense control run are in progress. The Stage 1 paired benchmark is complete. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
 
 ## Question and setup
 
@@ -162,3 +162,40 @@ The means-only student and teacher each generated 100 videos with the same promp
 The mean final latent relative L2 was 1.171124 against the teacher, taking one full post-step latent ratio per prompt. Mean decoded-frame PSNR was 8.701 dB across all 4,500 matched frames from the 100 prompt-and-seed pairs, with 0 identical frames. All 200 videos passed the 45-frame, 480×480, 16 fps and checksum checks. Each Stage 1 video has 20 finite steps and 2,204 replacements across 29 active layers, 19 active denoising steps, both branches and Q and K.
 
 The Stage 1 improvement in isolated attention output error did not carry over to restored video motion or text alignment. Dynamic degree remained zero in both means-only arms, and Stage 1 text–video consistency fell by 0.00304 versus static means. The interval for the aesthetic change spans zero. The paired scores and agreement records are in `distill-results/s1-paired/`.
+
+### Stage 2 held-out video agreement
+
+Seven of eight scheduled validation prompts completed before the device timeouts. For the seven completed prompt-and-seed pairs, the Stage 2 EMA student had a mean final latent relative L2 of 0.588189 over all final latent coordinates per pair. Mean decoded-frame PSNR was 13.464 dB over all 315 aligned frames. This diagnostic uses the validation split and its teacher renderings. The VBench arms use the separate 100-prompt benchmark.
+
+### Stage 3 on-policy training
+
+Stage 3 completed 5,000 updates on two ranks, using the Stage 2 EMA export as initialization. The loss, base learning rates, warmup and cosine schedule were the same as Stage 2. Each rollout refresh proposed 64 prompt-and-seed trajectories, each with 20 entering latents. Over 401 logged optimizer steps after step 1,000, 48.0% of the two sampled states per logged update came from student rollouts. The target still used the frozen teacher at the sampled state.
+
+After checkpoint 2,000, the rollout split used GPUs 1 and 5 for part of two refreshes while GPUs 3 and 6 continued as training ranks. The replica test matched all 20 entering latents bit for bit on three fixed prompt-and-seed rollouts from the same Stage 2 EMA snapshot. The first split finished in 267.85 s after the export, and the second timed out at 330 s when the spare devices were contested. Both training ranks regenerated that refresh’s remaining jobs using the same prompt and seed lists. The run charged 1,340 GPU-seconds for the two spare-worker allocations.
+
+The two trainer ranks ran roughly 9.77 hours between Stage 3 launch and final checkpoint, including rollouts, validation and restart. This is roughly 19.54 GPU-hours before the separate spare-worker charge. The resumed run used at most 19.58 GiB of PyTorch allocations per rank. The median logged optimizer step took 3.66 s, excluding time before each optimizer step such as rollout refreshes. The mean Euclidean norm of the 44 selected high-pair coordinates, averaged across all layers, denoising steps, CFG branches and heads, changed from 10.72936 to 10.72580 for Q and 11.76144 to 11.75797 for K. These are table vector norms, including exempt slots, with no token averaging at measurement time.
+
+The table uses the same 640 held-out teacher states and CFG-5 relative squared velocity errors as Stage 2.
+
+| Optimizer step | Conditional | Unconditional | Guided |
+|---:|---:|---:|---:|
+| 250 | 0.006817 | 0.006565 | 0.029448 |
+| 500 | 0.010304 | 0.009766 | 0.035846 |
+| 750 | 0.008976 | 0.008637 | 0.036808 |
+| 1000 | 0.009967 | 0.009901 | 0.037512 |
+| 1250 | 0.009617 | 0.009222 | 0.037400 |
+| 1500 | 0.009435 | 0.009461 | 0.036514 |
+| 1750 | 0.009647 | 0.009608 | 0.037056 |
+| 2000 | 0.008668 | 0.008507 | 0.037017 |
+| 2250 | 0.009690 | 0.009199 | 0.035845 |
+| 2500 | 0.008514 | 0.008356 | 0.037032 |
+| 2750 | 0.007459 | 0.007278 | 0.032017 |
+| 3000 | 0.007650 | 0.007718 | 0.033970 |
+| 3250 | 0.006815 | 0.006648 | 0.030924 |
+| 3500 | 0.006885 | 0.006860 | 0.031200 |
+| 3750 | 0.006556 | 0.006341 | 0.029898 |
+| 4000 | 0.006435 | 0.006190 | 0.029437 |
+| 4250 | 0.006202 | 0.006050 | 0.028711 |
+| 4500 | 0.006131 | 0.005947 | 0.029119 |
+| 4750 | 0.006097 | 0.005917 | 0.028629 |
+| 5000 | 0.005997 | 0.005781 | 0.028238 |
