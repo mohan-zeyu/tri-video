@@ -1,6 +1,6 @@
 # Wan2.1 mean-vector distillation
 
-Stage 0 captured all 3,641 teacher trajectories. Stages 1, 2 and 3 completed their 2,000, 5,000 and 5,000 updates, respectively. The paired benchmark is complete for the static means, Stage 1 and final Stage 3 arms against the frozen teacher, covering all 100 prompts and seven dimensions. Dense-control training is in progress. The deletion control has yet to run. The approved limits were four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. During the final student benchmark, the user reduced our active device set to GPUs 1, 3 and 6.
+Stage 0 captured all 3,641 teacher trajectories. Stages 1, 2 and 3 completed their 2,000, 5,000 and 5,000 updates, respectively. The dense control completed 5,000 off-policy updates. Five arms have audited results for all 100 matched prompts and seven dimensions: the frozen teacher, static means, Stage 1, final Stage 3 and dense control. The run stopped before the deletion control at the resource decision point. The approved limits were four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. During the final student benchmark, the user reduced the active device set to GPUs 1, 3 and 6.
 
 ## Question and setup
 
@@ -219,3 +219,57 @@ The final student exceeded both static means and Stage 1 on motion incidence, ae
 Across the 100 seed-matched pairs, the mean final latent relative L2 was 0.586365, taking the norm ratio across all coordinates of each final latent and then averaging over prompts. Mean decoded-frame PSNR was 13.773 dB over all 4,500 aligned frames, with zero identical frames. The video audit confirmed 45 frames, 480×480, 16 fps and matching checksums for all 200 videos. Each Stage 3 video had 20 finite denoising states and 2,204 replacement calls across 29 active layers, 19 active steps, both CFG branches and Q and K. Median student render-and-decode time was 15.71 seconds per prompt, excluding text encoding and MP4 export.
 
 The main resumed GPU 1 worker used 4,166 seconds for rendering and VBench. The first attempt on GPU 5 used 271 seconds and saved four completed videos before a shared-host out-of-memory failure. A later GPU 5 worker saved one more video before being stopped at the user's request, after 51 seconds. Total charged accelerator time was 4,488 GPU-seconds, or 1.25 GPU-hours. The CPU finished the video audit and agreement analysis after the scorer released the GPU. Artifacts are in `distill-results/student-paired/`. The lab's prompt-level videos are under `out/learned-center-wan-student/videos/`.
+
+### Dense control training
+
+The dense control started from the Wan2.1 teacher checkpoint and used full Q and K with every rotary pair active, including layer 0 and the first denoising step. It ran the Stage 2 objective for 5,000 off-policy updates, using two prompt-and-step samples per optimizer update, each with both CFG branches. Its transformer learning rate was `1e-5` with 500 warmup updates and cosine decay to 10% of the base rate. The two RTX 5090 ranks ran for 22,637 elapsed seconds including setup, validation, checkpoints and EMA export, or 12.58 GPU-hours. Peak PyTorch allocation was 19.58 GiB per rank.
+
+This curve uses the same 640 held-out teacher states and CFG-5 relative squared velocity errors as Stages 2 and 3. Every 250-update checkpoint, including its 20 per-denoise-step values, is in `distill-results/dense/validation.jsonl`.
+
+| Optimizer step | Conditional | Unconditional | Guided |
+|---:|---:|---:|---:|
+| 250 | 0.003609 | 0.006080 | 0.027740 |
+| 1000 | 0.006606 | 0.006540 | 0.034220 |
+| 2000 | 0.004874 | 0.005090 | 0.027256 |
+| 2500 | 0.003757 | 0.003967 | 0.023889 |
+| 3000 | 0.002944 | 0.003052 | 0.021911 |
+| 4000 | 0.002008 | 0.001898 | 0.018360 |
+| 5000 | 0.001458 | 0.001334 | 0.015493 |
+
+### Dense control paired video benchmark
+
+Each mean covers one video per prompt on the same 100 prompt-and-seed pairs and the VBench frame sampling specified above. The direct Stage 3 comparison uses the same prompt indices, teacher video checksums and 10,000 paired prompt resamples with NumPy seed 20261109.
+
+| Dimension | Teacher | Dense | Dense − teacher [95% CI] | Stage 3 − dense [95% CI] |
+|---|---:|---:|---:|---:|
+| subject_consistency | 0.963999 | 0.964285 | +0.000286 [-0.004789, +0.005414] | -0.005342 [-0.010979, +0.000146] |
+| background_consistency | 0.976466 | 0.977676 | +0.001210 [-0.001541, +0.004178] | -0.002808 [-0.005425, -0.000076] |
+| motion_smoothness | 0.984463 | 0.985506 | +0.001043 [-0.000675, +0.002753] | -0.000386 [-0.001586, +0.000865] |
+| dynamic_degree | 0.330000 | 0.250000 | -0.080000 [-0.150000, -0.020000] | -0.040000 [-0.120000, +0.040000] |
+| aesthetic_quality | 0.588595 | 0.578063 | -0.010532 [-0.022586, +0.001557] | -0.060149 [-0.075305, -0.044672] |
+| imaging_quality | 0.660679 | 0.670020 | +0.009341 [-0.007529, +0.026302] | -0.017272 [-0.034703, -0.000962] |
+| overall_consistency | 0.232555 | 0.234363 | +0.001808 [-0.005027, +0.008694] | -0.014701 [-0.023318, -0.006229] |
+
+Stage 3 trailed dense in background consistency, aesthetics, imaging quality and text–video consistency with paired intervals below zero. The other three intervals spanned zero. Dense and Stage 3 both registered less motion than the teacher, with paired intervals below zero for motion incidence. The dense-control and Stage 3 training histories differ in Q/K coverage, initialization and on-policy sampling, so this comparison measures the complete recipes.
+
+Dense mean final latent relative L2 was 0.566338 across the 100 teacher pairs, using all final latent coordinates per pair. It achieved 14.202 dB mean PSNR across all 4,500 temporally aligned decoded frames, with zero identical frames. The audit verified 45 frames at 480×480 and 16 fps plus matching checksums for all 200 videos. Each dense video had 20 finite denoising steps and zero Q/K replacements. Rendering and all seven VBench dimensions used 3,978 GPU-seconds (1.11 GPU-hours) on GPU 3. The summary, direct paired intervals and agreement are in `distill-results/dense-paired/`. The lab videos are under `out/learned-center-wan-dense/videos/`.
+
+### Resource stop and remaining control
+
+The conservative allocation ledger totals 257,395 GPU-seconds (71.50 GPU-hours) through the dense paired benchmark. It charges worker elapsed time per allocated device, including retries, an hour reserved for early pilots and a timing margin. Calibration, references and trajectory capture account for 56,905 GPU-seconds. The total leaves about 0.50 approved GPU-hours. The lab scratch and pilot directories occupied 260.07 GB at the final check. The driver's deletion preflight projected roughly 49 GB of additional checkpoint and export headroom, so it stopped before allocating devices. A 5,000-update deletion run and 100-prompt VBench comparison are estimated to take about 14 GPU-hours based on the dense control's measured allocation. The claim that learned replacement beats deletion remains untested. Full EMA exports, validation curves and the completed paired benchmark outputs were preserved.
+
+| Allocation | GPU-seconds charged |
+|---|---:|
+| Calibration, references and capture | 56,905 |
+| Stage 1 training | 11,098 |
+| Stage 2 training and early restart | 47,380 |
+| Stage 3 training, restart and spare rollout workers | 71,648 |
+| Dense training | 45,274 |
+| Static benchmark | 4,787 |
+| Stage 1 benchmark | 7,264 |
+| Stage 3 benchmark | 4,488 |
+| Dense benchmark | 3,978 |
+| Stage 2 held-out videos and timeout grace | 721 |
+| Stage 3 rollout parity probe | 72 |
+| Early pilot allowance and scheduling margin | 3,780 |
+| Total | 257,395 |
