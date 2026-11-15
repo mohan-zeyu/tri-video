@@ -1,6 +1,6 @@
 # Wan2.1 mean-vector distillation
 
-Status: real-model pilots, the calibration pool, and both held-out velocity references are complete. Stage 0 captured all 3,641 teacher trajectories. The static-versus-teacher benchmark is complete on 100 matched prompts, and Stage 1 has completed its 2,000 optimizer steps. Stage 2 passed the validation gate and resumed training. The Stage 1 paired benchmark is complete. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
+Status: real-model pilots, the calibration pool, and both held-out velocity references are complete. Stage 0 captured all 3,641 teacher trajectories. The static-versus-teacher benchmark is complete on 100 matched prompts, and Stage 1 has completed its 2,000 optimizer steps. Stage 2 completed 5,000 off-policy updates and exported EMA weights. Stage 3 on-policy training is underway. The Stage 1 paired benchmark is complete. The run is limited to four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. Only idle devices are used.
 
 ## Question and setup
 
@@ -133,6 +133,17 @@ At optimizer step 2,500, the guided relative squared velocity error was 0.035898
 | 2250 | 0.009077 | 0.009055 | 0.036135 |
 | 2500 | 0.008831 | 0.009028 | 0.035898 |
 | 2750 | 0.008438 | 0.008743 | 0.034415 |
+| 3000 | 0.007776 | 0.007680 | 0.031819 |
+| 3250 | 0.007532 | 0.007311 | 0.032380 |
+| 3500 | 0.007674 | 0.007778 | 0.031138 |
+| 3750 | 0.006960 | 0.006908 | 0.030547 |
+| 4000 | 0.006680 | 0.006483 | 0.029268 |
+| 4250 | 0.006494 | 0.006181 | 0.028811 |
+| 4500 | 0.006414 | 0.006166 | 0.028006 |
+| 4750 | 0.006289 | 0.006056 | 0.027869 |
+| 5000 | 0.006186 | 0.005931 | 0.027649 |
+
+The Stage 2 final guided error was 0.027649 over the same 640 held-out prompt-and-step states. Training used two prompt-and-step samples per update, each with both CFG branches. The base transformer learning rate was `1e-5`, and the mean learning rate was `2e-4`. They warmed up over 500 updates and used cosine decay to 10% of their base rates. Across the successful runs before and after the gate, the two ranks used 23,661 elapsed seconds, or 13.15 GPU-hours, including validation, checkpoints and final EMA export. Peak PyTorch allocation was 19.58 GiB per rank.
 
 ### Stage 1 paired video benchmark
 
