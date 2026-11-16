@@ -419,3 +419,58 @@ To measure mean-vector drift from initialization to update 500, the calculation 
 | K | 3.32870444 | 3.32869009 | -0.00001435 |
 
 The logged whole-table norms include all 128 coordinates and the exempt cells. From the first logged update to update 500, Q moved from 12.271144 to 12.271112 and K from 12.714284 to 12.714255. The requested arguments, history and validation curves are in `distill-results/fast-shared22/`. The lab EMA and optimizer state are under `out/distill-fast-shared22/` in the selection checkout. The work stopped after reporting the requested short run.
+
+### Training-free shared22 and shared32 video benchmark
+
+Both shared arms used the frozen Wan2.1 teacher transformer and pooled static means, evaluated on the first 30 prompts in the benchmark manifest with one original seed per prompt. For each layer, denoising step, CFG branch, head and side, each pair mean pools all 10,800 video tokens within each of 64 calibration prompts and then averages the prompt means. Shared22 and shared32 rank pairs by summed Q and K damage, select 22 or 32 pairs respectively, and use the same selected pairs on both sides of each cell. The constant replacement is after QK-RMSNorm and before RoPE.
+
+Each of the 60 generated videos passed the checksum, finite-latent and frame audit at 45 frames, 480×480 and 16 fps. Every new video recorded 2,204 interventions, matching 29 active self-attention layers × 19 active denoising steps × two CFG branches × two sides. Each video’s selection block records equal Q, K and Q–K intersection counts of 22 or 32 pairs per cell, averaged over the full mask tables. Layer 0 and denoising step 1 are exempt from replacement. The audited selection blocks are in `distill-results/static-shared30/selection-records.json`.
+
+Each VBench mean uses one video per prompt and that dimension’s frame sampling specified above. Teacher, trained fixed-high (the final 5,000-update Stage 3 EMA), dense Stage 2, and static fixed-high scores are the audited per-prompt values from their existing 100-prompt benchmarks, restricted to the same first 30 prompt-and-seed pairs. Each difference is candidate minus reference and uses 10,000 paired prompt resamples with NumPy seed 20261109. Differences below about 0.02 in aesthetics are not resolvable with this 30-prompt screen.
+
+| Dimension | Teacher | Trained fixed-high | Dense | Static fixed-high | Shared22 | Shared32 |
+|---|---:|---:|---:|---:|---:|---:|
+| subject_consistency | 0.961865 | 0.947142 | 0.962550 | 0.991295 | 0.952154 | 0.942813 |
+| background_consistency | 0.976412 | 0.969787 | 0.976944 | 0.991485 | 0.971805 | 0.969995 |
+| motion_smoothness | 0.982059 | 0.981423 | 0.982006 | 0.991790 | 0.985126 | 0.987243 |
+| dynamic_degree | 0.333333 | 0.333333 | 0.200000 | 0.000000 | 0.200000 | 0.066667 |
+| aesthetic_quality | 0.580512 | 0.517949 | 0.568441 | 0.267319 | 0.539369 | 0.398174 |
+| imaging_quality | 0.662574 | 0.639815 | 0.658788 | 0.485986 | 0.615462 | 0.414821 |
+| overall_consistency | 0.228075 | 0.225531 | 0.234424 | 0.030281 | 0.227472 | 0.172105 |
+
+**Shared22 paired differences with 95% intervals**
+
+| Dimension | vs. teacher | vs. trained fixed-high | vs. dense | vs. static fixed-high |
+|---|---:|---:|---:|---:|
+| subject_consistency | -0.00971 [-0.01991, -0.00029] | +0.00501 [-0.01067, +0.02100] | -0.01040 [-0.02455, +0.00182] | -0.03914 [-0.06232, -0.01959] |
+| background_consistency | -0.00461 [-0.00998, +0.00014] | +0.00202 [-0.00556, +0.00943] | -0.00514 [-0.01210, +0.00146] | -0.01968 [-0.03003, -0.01083] |
+| motion_smoothness | +0.00307 [-0.00110, +0.00824] | +0.00370 [-0.00103, +0.01012] | +0.00312 [-0.00202, +0.00959] | -0.00666 [-0.01046, -0.00334] |
+| dynamic_degree | -0.13333 [-0.26667, -0.03333] | -0.13333 [-0.30000, +0.03333] | +0.00000 [-0.13333, +0.13333] | +0.20000 [+0.06667, +0.36667] |
+| aesthetic_quality | -0.04114 [-0.07217, -0.01192] | +0.02142 [-0.01437, +0.05811] | -0.02907 [-0.06469, +0.00694] | +0.27205 [+0.24027, +0.30509] |
+| imaging_quality | -0.04711 [-0.08084, -0.01284] | -0.02435 [-0.05412, +0.00433] | -0.04333 [-0.07579, -0.01304] | +0.12948 [+0.07235, +0.18142] |
+| overall_consistency | -0.00060 [-0.01241, +0.01091] | +0.00194 [-0.01304, +0.01519] | -0.00695 [-0.02030, +0.00476] | +0.19719 [+0.17209, +0.22324] |
+
+**Shared32 paired differences with 95% intervals**
+
+| Dimension | vs. teacher | vs. trained fixed-high | vs. dense | vs. static fixed-high |
+|---|---:|---:|---:|---:|
+| subject_consistency | -0.01905 [-0.03084, -0.00666] | -0.00433 [-0.01853, +0.01144] | -0.01974 [-0.03218, -0.00751] | -0.04848 [-0.06555, -0.03287] |
+| background_consistency | -0.00642 [-0.01217, -0.00068] | +0.00021 [-0.00599, +0.00708] | -0.00695 [-0.01279, -0.00098] | -0.02149 [-0.02857, -0.01503] |
+| motion_smoothness | +0.00518 [-0.00117, +0.01310] | +0.00582 [-0.00056, +0.01355] | +0.00524 [-0.00144, +0.01309] | -0.00455 [-0.00749, -0.00192] |
+| dynamic_degree | -0.26667 [-0.43333, -0.13333] | -0.26667 [-0.43333, -0.13333] | -0.13333 [-0.26667, -0.03333] | +0.06667 [+0.00000, +0.16667] |
+| aesthetic_quality | -0.18234 [-0.21683, -0.14925] | -0.11978 [-0.14911, -0.08986] | -0.17027 [-0.20781, -0.13214] | +0.13085 [+0.09351, +0.17053] |
+| imaging_quality | -0.24775 [-0.31082, -0.18428] | -0.22499 [-0.28047, -0.17028] | -0.24397 [-0.30584, -0.18302] | -0.07116 [-0.13585, -0.00303] |
+| overall_consistency | -0.05597 [-0.07698, -0.03636] | -0.05343 [-0.07599, -0.03245] | -0.06232 [-0.08340, -0.04269] | +0.14182 [+0.11275, +0.16983] |
+
+Shared22 had lower aesthetics, imaging quality, subject consistency and motion incidence than the teacher on the paired intervals. Its text–video consistency was 0.22747 versus 0.22807 for the teacher, with the difference interval spanning zero. All seven shared22 differences versus the trained fixed-high student had intervals spanning zero. Against dense, shared22 had lower imaging quality by 0.04333 (95% CI −0.07579 to −0.01304). Its point estimates for aesthetics and text–video consistency also trailed dense, with both intervals spanning zero.
+
+Shared22 exceeded the static fixed-high arm on aesthetics, imaging quality, text–video consistency, and motion incidence. Shared32 had lower aesthetics, imaging quality, text–video consistency, and motion incidence than the teacher, the trained fixed-high student, and the dense control, with the paired intervals below zero.
+
+For each candidate, final-latent L2 takes the Euclidean norm of the difference over all coordinates of the final latent for one prompt and seed. Relative L2 divides by the teacher latent norm before averaging over prompts. Mean PSNR averages the decoded-frame RGB PSNR over 1,350 matched frames per arm (30 prompts × 45 frames).
+
+| Arm | Mean final latent L2 | Mean relative L2 | Mean frame PSNR (dB) | Identical frames |
+|---|---:|---:|---:|---:|
+| Shared22 | 467.270 | 0.525782 | 14.949 | 0 |
+| Shared32 | 546.265 | 0.614498 | 13.653 | 0 |
+
+Render workers on GPUs 4 and 2 hit their initial time limit. The run resumed from their 51 completed videos and preserved the interrupted files. The 60 videos charged 1,760 GPU-seconds, counting the partial attempts and their continuations. Scoring all seven dimensions on the 60 new videos with audited teacher scores reused charged 431 GPU-seconds on GPU 4. Total GPU use was 2,191 GPU-seconds (0.609 GPU-hours). The lab videos and full records are in `out/learned-center-wan-static-shared30/` in the selection checkout.
