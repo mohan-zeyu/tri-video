@@ -48,9 +48,12 @@ def main():
     if args.baseline_config:
         original = Path(args.baseline_config).read_bytes()
         original_config = json.loads(original)
-        for key in ("prompts", "model", "frames", "height", "width", "steps", "guidance_scale", "negative_prompt", "fps"):
+        for key in ("model", "frames", "height", "width", "steps", "guidance_scale", "negative_prompt", "fps"):
             if original_config[key] != config[key]:
                 raise RuntimeError(f"Baseline protocol differs: {key}")
+        original_prompts = {p["id"]: p for p in original_config["prompts"]}
+        if any(original_prompts.get(p["id"]) != p for p in config["prompts"]):
+            raise RuntimeError("Baseline prompt or seed metadata differs")
         baseline_hash = hashlib.sha256(original).hexdigest()
     comparisons = [(arm, "baseline") for arm in arms if arm != "baseline"]
     if legacy:
@@ -58,8 +61,10 @@ def main():
     elif {"student", "static", "deletion", "dense_control"}.issubset(arms):
         comparisons.extend(("student", a) for a in ("static", "deletion", "dense_control"))
     config_ids = [p["id"] for p in config["prompts"]]
-    if len(set(config_ids)) != 100 or len({p["text"] for p in config["prompts"]}) != 100:
-        raise RuntimeError("Expected 100 distinct prompts")
+    if not config_ids or len(set(config_ids)) != len(config_ids) or len({p["text"] for p in config["prompts"]}) != len(config_ids):
+        raise RuntimeError("Expected a nonempty manifest of distinct prompts")
+    if legacy and len(config_ids) != 100:
+        raise RuntimeError("Legacy arms require the original 100 prompts")
     records = {}
     code_hashes = {}
     video_checks = []

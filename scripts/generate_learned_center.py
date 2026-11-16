@@ -130,7 +130,7 @@ def main():
     active_steps = int(center.step_active.sum()) if args.center_mode != "off" else 0
     expected_calls = active_layers * 2 * 2 * active_steps if args.center_mode != "off" else 0   # layers x (q,k) x branches x steps
     scope = {
-        "mean": "learned constants on 22 high Q/K pairs after RMSNorm, per layer/step/branch/head",
+        "mean": "constant vectors on selected Q/K pairs after RMSNorm, per layer/step/branch/head",
         "delete": "zeros on 22 high Q/K pairs after RMSNorm",
         "narrow": "zeros on 22 high Q/K pairs before RMSNorm at every step",
         "off": "full Q/K with no replacements",

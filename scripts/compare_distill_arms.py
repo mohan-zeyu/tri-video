@@ -34,15 +34,17 @@ def main():
     prompts = candidate["config"]["prompts"]
     ids = [p["id"] for p in prompts]
     teacher = teacher_checksums(candidate)
-    if len(ids) != 100 or len(set(ids)) != len(ids) or len(teacher) != len(ids):
-        raise ValueError("Expected 100 unique audited teacher prompt-and-seed pairs")
+    if not ids or len(set(ids)) != len(ids) or set(teacher) != {f"videos/baseline/{pid}.mp4" for pid in ids}:
+        raise ValueError("Expected distinct audited teacher prompt-and-seed pairs")
     dimensions = candidate["dimensions"]
     indices = np.random.default_rng(20261109).integers(0, len(ids), size=(10000, len(ids)))
     results = {"candidate": candidate_name, "prompts": len(ids), "replicates": len(indices), "seed": 20261109,
                "dimensions": {d: {} for d in dimensions}}
     for name, path in args.reference:
         reference = read_arm(name, path)
-        if reference["config"]["prompts"] != prompts or teacher_checksums(reference) != teacher:
+        reference_prompts = {p["id"]: p for p in reference["config"]["prompts"]}
+        reference_teacher = teacher_checksums(reference)
+        if any(reference_prompts.get(p["id"]) != p for p in prompts) or any(reference_teacher.get(path) != digest for path, digest in teacher.items()):
             raise ValueError(f"{name} has different prompts, seeds or teacher video checksums")
         if reference["config"]["vbench_commit"] != candidate["config"]["vbench_commit"]:
             raise ValueError(f"{name} has a different evaluator revision")

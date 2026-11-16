@@ -15,9 +15,11 @@ from full_sweep import write_json
 def read_audited_baseline(previous, root, config, dimension, source_hash):
     """Reuse frozen teacher scores after matching every prompt, video and scorer."""
     audited = json.loads((previous / "summary.json").read_text())
-    for key in ("prompts", "vbench_commit"):
-        if audited["config"][key] != config[key]:
-            raise RuntimeError(f"Audited baseline differs on {key}")
+    if audited["config"]["vbench_commit"] != config["vbench_commit"]:
+        raise RuntimeError("Audited baseline has a different VBench commit")
+    audited_prompts = {p["id"]: p for p in audited["config"]["prompts"]}
+    if any(audited_prompts.get(p["id"]) != p for p in config["prompts"]):
+        raise RuntimeError("Audited baseline has different prompt or seed metadata")
     checksums = {v["path"]: v["sha256"] for v in audited["videos"]}
     evaluation = previous / "evaluation" / dimension
     batches = list(evaluation.glob("batch-*-results.json"))
@@ -30,8 +32,7 @@ def read_audited_baseline(previous, root, config, dimension, source_hash):
     complete = json.loads((evaluation / "complete.json").read_text())
     rows = [row for row in complete["per_video"] if row["arm"] == "baseline"]
     by_prompt = {row["prompt_id"]: row for row in rows}
-    ids = {p["id"] for p in config["prompts"]}
-    if set(by_prompt) != ids or len(rows) != len(ids):
+    if set(by_prompt) != set(audited_prompts) or len(rows) != len(audited_prompts):
         raise RuntimeError(f"Incomplete audited baseline scores for {dimension}")
     scale = 100 if dimension == "imaging_quality" else 1
     for prompt in config["prompts"]:
@@ -44,7 +45,7 @@ def read_audited_baseline(previous, root, config, dimension, source_hash):
         if row["video_results"] / scale != audited["dimensions"][dimension]["per_prompt"][pid]["baseline"]:
             raise RuntimeError(f"Raw score differs from the audit for {dimension}/{pid}")
         by_prompt[pid] = {**row, "video_path": str(root / video_path)}
-    return by_prompt
+    return {p["id"]: by_prompt[p["id"]] for p in config["prompts"]}
 
 
 def main():
@@ -131,7 +132,7 @@ def main():
         if len(seen) == len(config["prompts"]):
             write_json(output / "complete.json", {"dimension": args.dimension,
                 "prompts": len(seen), "videos": len(summaries), "per_video": summaries,
-                "aggregation": "Original VBench frame aggregation within each video, paired means over 100 prompts separately per arm. MUSIQ per-video raw scores require division by 100 for official scale."})
+                "aggregation": f"Original VBench frame aggregation within each video, paired means over {len(seen)} prompts separately per arm. MUSIQ per-video raw scores require division by 100 for official scale."})
             return
         if not args.watch:
             return
