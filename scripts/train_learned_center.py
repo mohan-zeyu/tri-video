@@ -599,6 +599,7 @@ def main():
     parser.add_argument("--buffer-files", type=int, default=500, help="FIFO capacity in rollout files (x steps states)")
     parser.add_argument("--val-every", type=int, default=250)
     parser.add_argument("--val-prompts", type=int, help="validate on the first N validation prompts only (default: all)")
+    parser.add_argument("--val-at-start", action="store_true", help="also validate the untrained student (step 0) through the same code path")
     parser.add_argument("--save-every", type=int, default=500)
     parser.add_argument("--log-every", type=int, default=10)
     parser.add_argument("--seed", type=int, default=20261114)
@@ -709,6 +710,13 @@ def main():
         result = validate_attention(teacher, center, store, val_store_ids, device, rank, world)
         if rank == 0:
             write_json(out / "attention-before.json", result)
+    if args.val_at_start and val_store_ids and args.stage != 1 and not args.resume:
+        result = validate(student, teacher, center, store, val_store_ids, args, device, rank, world, val_cache)
+        result["step"] = 0
+        log(rank, "VAL", json.dumps({"step": 0, "mean_cond_uncond_guided": result["mean"]}))
+        if rank == 0:
+            with open(out / "validation.jsonl", "a") as f:
+                f.write(json.dumps(result) + "\n")
     stop_at = args.stop_after or args.steps
     last_step = start
     budget_stop = False
