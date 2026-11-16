@@ -273,3 +273,13 @@ The conservative allocation ledger totals 257,395 GPU-seconds (71.50 GPU-hours) 
 | Stage 3 rollout parity probe | 72 |
 | Early pilot allowance and scheduling margin | 3,780 |
 | Total | 257,395 |
+
+## Narrow and deletion controls
+
+The follow-up brief calls for two 5,000-update Stage 2 controls, narrow first and deletion second, using teacher initialization, two ranks and the dense loss, optimizer and sampling recipe. Both controls use off-policy teacher states throughout. The Stage 3 student also trained on its own rollouts, so that comparison includes a training-history difference.
+
+Narrow zeroes the 44 coordinates of the selected 22 rotary pairs per head in each token's Q and K projection output before native QK-RMSNorm and RoPE. It applies to all 20 denoising steps in 29 of 30 self-attention layers, with layer 0 exempt. Across the 12 heads, 528 of the 1,536 Q and K outputs are masked in each active layer. The effective removal is 1,623,072 projection weight and bias parameters per active layer, or 47,069,088 across 29 layers, from `2 × 528 × (1,536 + 1)` per layer. The implementation masks the rows' outputs and still stores the dense matrices.
+
+Native Wan RMSNorm takes its mean square across all 1,536 features for one token and projection. Under narrow, only 1,008 live features contribute to the numerator, corresponding to 84 per head, while the denominator remains 1,536. Deletion zeroes the same pairs after RMSNorm, so all projected features participate in the norm statistic. Deletion also retains the first-step exemption. The difference between these controls includes both the norm statistic and first-step coverage.
+
+On CPU, the narrow hooks matched the manual zero-padded RMSNorm calculation on a tiny Wan model. The same test checked exact zero Q/K projection outputs and exact zero gradients in the masked Q/K weight and bias rows, nonzero gradients in kept rows, the layer-0 exemption, and masking with no step or branch context. The existing learned-center tests also passed on the pinned lab runtime.
