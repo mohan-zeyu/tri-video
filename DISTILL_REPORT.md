@@ -390,3 +390,32 @@ The second replay applies the same hooks in all 30 layers and all 20 steps. The 
 | Separate pooled means vs. native bf16 | 0.010646 | 0.010964 | 0.040984 |
 
 Stage B used 3,072 GPU-seconds for the six-arm screen and 1,288 GPU-seconds for the all-layer, all-step replay on GPU 4. A+B used 5,346 GPU-seconds (1.485 GPU-hours), including model loads. Both runs finished all required prompts and steps without lingering claims. The complete scores, per-step means, scopes and arm manifests are committed under `distill-results/selection/`.
+
+### Shared 22-pair short training
+
+The single shared-mask run used commit `1550308`, two RTX 5090 ranks on GPUs 4 and 2, and teacher initialization. It completed 500 off-policy updates with learning rate 3e-5, a 50-update warmup, no feature loss, and the shared 22-pair mask on both Q and K. Each update used two sampled teacher prompt–state items, one per rank and both CFG branches per item. The run completed in one launch with finite losses and saved both the final EMA export and a resumable optimizer checkpoint.
+
+From launch through exit, the run took 2,026 seconds across the two GPUs (4,052 GPU-seconds, 1.126 GPU-hours). The median logged optimizer step took 3.566 seconds across the 50 logged steps from updates 10 through 500, excluding held-out validation and checkpoint writes. Peak PyTorch-allocated memory was 19.013 GiB on rank 0 and 19.010 GiB on rank 1.
+
+The table reports guided relative squared velocity error over all latent coordinates at each cached teacher entering state, after combining both CFG branches at guidance 5. Every prompt contributes its 20 entering states. The short-run validation uses the live weights and the first 8 held-out prompts, d0064–d0071. The historical comparisons shown with 32 prompts average over the full validation set.
+
+| Condition | Held-out prompts | Guided error |
+|---|---:|---:|
+| Shared short training, update 250 | 8 | 0.057455 |
+| Shared short training, update 500 | 8 | 0.035533 |
+| Shared pooled means, frozen teacher weights, matched subset | 8 | 0.029888 |
+| Shared pooled means, frozen teacher weights, full screen | 32 | 0.032195 |
+| Fixed-high Stage 2, update 5,000 | 32 | 0.027649 |
+| Dense Stage 2, update 5,000 | 32 | 0.015493 |
+| Native teacher bf16 vs. fp32 | 32 | 0.002731 |
+
+The guided error fell by 38.2% from update 250 to 500 on the eight-prompt set. At update 500, error was +0.005645 above the training-free result on those same prompts and states. This run has no update-zero validation through the trainer, so the exact source of the gap remains unresolved.
+
+To measure mean-vector drift from initialization to update 500, the calculation takes one Euclidean norm over the 44 selected coordinates per active layer, step, branch and head. It averages over 29 layers × 19 steps × 2 branches × 12 heads for each side, using the final live center checkpoint. The vectors are token-independent.
+
+| Side | Initial selected norm | Update-500 selected norm | Mean change |
+|---|---:|---:|---:|
+| Q | 3.65641945 | 3.65638529 | -0.00003416 |
+| K | 3.32870444 | 3.32869009 | -0.00001435 |
+
+The logged whole-table norms include all 128 coordinates and the exempt cells. From the first logged update to update 500, Q moved from 12.271144 to 12.271112 and K from 12.714284 to 12.714255. The requested arguments, history and validation curves are in `distill-results/fast-shared22/`. The lab EMA and optimizer state are under `out/distill-fast-shared22/` in the selection checkout. The work stopped after reporting the requested short run.
