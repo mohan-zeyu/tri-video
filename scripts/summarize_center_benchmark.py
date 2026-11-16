@@ -26,6 +26,8 @@ def main():
     parser.add_argument("--extra-dimension", action="append", default=[])
     parser.add_argument("--baseline-config", help="original config for a hard-linked legacy teacher baseline")
     parser.add_argument("--generation-config", help="original generation config when reporting a subset of its arms")
+    parser.add_argument("--reused-generation-config", type=Path,
+                        help="original config of earlier renders for a matching prompt subset")
     args = parser.parse_args()
     root = Path(args.root)
     config_path = Path(args.config)
@@ -43,6 +45,20 @@ def main():
         generation["modes"] = arms
         if generation != config:
             raise RuntimeError("Evaluation config must match the generation config except for the arm list")
+    reused_hash = None
+    reused_ids = set()
+    if args.reused_generation_config:
+        source_bytes = args.reused_generation_config.read_bytes()
+        source = json.loads(source_bytes)
+        current = json.loads(generation_bytes)
+        source_prompts = source.pop("prompts")
+        current_prompts = {p["id"]: p for p in current.pop("prompts")}
+        source.pop("prompt_scope", None)
+        current.pop("prompt_scope", None)
+        if source != current or any(current_prompts.get(p["id"]) != p for p in source_prompts):
+            raise RuntimeError("Reused generations have different protocol or prompt metadata")
+        reused_ids = {p["id"] for p in source_prompts}
+        reused_hash = hashlib.sha256(source_bytes).hexdigest()
     legacy = tuple(arms) == LEGACY_ARMS
     baseline_hash = expected_hash
     if args.baseline_config:
@@ -73,7 +89,10 @@ def main():
         for arm in arms:
             directory = root / "records" / prompt["id"] / arm
             data = json.loads((directory / "complete.json").read_text())
-            if data["environment"]["config_sha256"] != (baseline_hash if arm == "baseline" else expected_hash):
+            allowed_hashes = {baseline_hash if arm == "baseline" else expected_hash}
+            if arm != "baseline" and prompt["id"] in reused_ids:
+                allowed_hashes.add(reused_hash)
+            if data["environment"]["config_sha256"] not in allowed_hashes:
                 raise RuntimeError("Generation config mismatch")
             code_hashes.setdefault(arm, set()).add(json.dumps(data["environment"]["code_sha256"], sort_keys=True))
             if data["prompt"] != prompt or data["mode"] != arm:
@@ -113,6 +132,8 @@ def main():
                    {arm: json.loads(next(iter(hashes))) for arm, hashes in code_hashes.items()},
                "bootstrap": {"replicates": 10000, "seed": 20261109, "unit": "paired prompt with its one fixed seed; retain all arms together", "interval": "2.5th and 97.5th percentiles of resampled mean paired difference"},
                "timing": {}, "audit": {}}
+    if reused_hash is not None:
+        summary["reused_generation_config_sha256"] = reused_hash
     for arm in arms:
         values = [records[p["id"], arm]["inference_decode_seconds"] for p in config["prompts"]]
         summary["timing"][arm] = {"mean_seconds": statistics.mean(values), "median_seconds": statistics.median(values), "min_seconds": min(values), "max_seconds": max(values)}
