@@ -17,7 +17,8 @@ LearnedCenter module is replicated and its gradients are all-reduced manually. -
 with fp32 weights and bf16 autocast (CPU tests, or one large GPU).
 
 Controls: --center-mode off trains the dense control (same recipe, no replacement); --center-mode delete trains
-the deletion control. --include-layer0 / --include-step1 lift the default exemptions.
+the post-norm deletion control; --center-mode narrow masks the projection before RMSNorm at every step.
+--include-layer0 / --include-step1 lift the default exemptions in modes that use them.
 """
 
 import argparse
@@ -571,7 +572,7 @@ def main():
     parser.add_argument("--snapshot", default=os.environ.get("WAN_SNAPSHOT"), help="Wan snapshot dir with transformer/ and scheduler/")
     parser.add_argument("--init-student", help="directory with transformer/ + learned_center.pt from a previous stage")
     parser.add_argument("--calibration", help="traj/calibration.pt for mu init (default: <traj>/calibration.pt)")
-    parser.add_argument("--center-mode", choices=("mean", "delete", "off"), default="mean")
+    parser.add_argument("--center-mode", choices=("mean", "delete", "narrow", "off"), default="mean")
     parser.add_argument("--include-layer0", action="store_true")
     parser.add_argument("--include-step1", action="store_true")
     parser.add_argument("--steps", type=int, default=5000, help="optimizer steps")

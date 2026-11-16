@@ -5,6 +5,7 @@
    gradients reach mu_q/mu_k only.
 2. Fake trajectories + stages 1, 2 and 3 of train_learned_center.py run end to end (--no-fsdp), the student
    checkpoint loads back, and stage 3 fills the on-policy buffer.
+3. Narrow masks the projection before native RMSNorm at every step and blocks gradient to the masked rows.
 
 Run from the repository root:  python scripts/test_learned_center.py
 """
@@ -98,6 +99,46 @@ def test_replacement_exact():
     print("test_replacement_exact OK")
 
 
+def test_narrow_projection():
+    model = build_tiny()
+    center = LearnedCenter(layers=2, steps=STEPS, heads=2, mode="narrow").attach(model)
+    high = (torch.arange(2)[:, None] * 128 + HIGH_DIMS).flatten()
+    kept = torch.ones(256, dtype=torch.bool)
+    kept[high] = False
+    assert center.step_active.all()
+    x = torch.randn(2, 8, 256)
+    for side in ("q", "k"):
+        projection = getattr(model.blocks[1].attn1, "to_" + side)
+        norm = getattr(model.blocks[1].attn1, "norm_" + side)
+        raw = torch.nn.functional.linear(x, projection.weight, projection.bias)
+        projected = projection(x)  # No step or branch context is set.
+        assert torch.count_nonzero(projected[..., high]) == 0
+        torch.testing.assert_close(projected[..., kept], raw[..., kept], rtol=0, atol=0)
+        padded = raw.clone()
+        padded[..., high] = 0
+        # The native reduction still divides by the full, zero-padded projection width.
+        manual = padded * torch.rsqrt(padded.square().mean(-1, keepdim=True) + norm.eps) * norm.weight
+        normalized = norm(projected)
+        assert torch.count_nonzero(normalized[..., high]) == 0
+        torch.testing.assert_close(normalized[..., kept], manual[..., kept])
+        exempt = getattr(model.blocks[0].attn1, "to_" + side)
+        torch.testing.assert_close(exempt(x), torch.nn.functional.linear(x, exempt.weight, exempt.bias))
+    assert center.calls == 2
+
+    center.set_context([0, 1], [0, 1])
+    y = model(hidden_states=torch.randn(2, 16, 2, 4, 4), timestep=torch.tensor([500.0, 500.0]),
+              encoder_hidden_states=torch.randn(2, 8, 64), return_dict=False)[0]
+    y.square().mean().backward()
+    for projection in (model.blocks[1].attn1.to_q, model.blocks[1].attn1.to_k):
+        assert torch.count_nonzero(projection.weight.grad[high]) == 0
+        assert torch.count_nonzero(projection.bias.grad[high]) == 0
+        assert torch.count_nonzero(projection.weight.grad[kept]) > 0
+    assert center.mu_q.grad is None and center.mu_k.grad is None
+    assert center.calls == 4
+    center.detach()
+    print("test_narrow_projection OK")
+
+
 def write_fake_trajectories(root):
     from diffusers import UniPCMultistepScheduler
     sched = UniPCMultistepScheduler(num_train_timesteps=1000, prediction_type="flow_prediction", use_flow_sigmas=True, flow_shift=3.0, solver_order=2)
@@ -180,6 +221,7 @@ def test_stage1_checkpoint_only_mu_differs():
 if __name__ == "__main__":
     os.environ.setdefault("OMP_NUM_THREADS", "4")
     test_replacement_exact()
+    test_narrow_projection()
     test_stage1_checkpoint_only_mu_differs()
     test_training_stages()
     print("ALL TESTS OK")

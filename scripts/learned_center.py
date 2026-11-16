@@ -8,11 +8,11 @@ exempt layers/steps): after Wan's QK-RMSNorm and before 3D RoPE,
 HIGH is the 44 coordinates of rotary pairs t 0-7, h 22-28, w 43-49 (22 pairs), the same set as the repo's
 training-free high-pair arm. mu_q/mu_k are fp32 parameters of shape [layers, steps, branches, heads, 44].
 
-Modes: "mean" (learned constants), "delete" (zeros; the control that tests whether the mean carries anything),
-"off" (teacher behaviour; the dense control).
+Modes: "mean" (learned constants), "delete" (post-norm zeros), "narrow" (pre-norm zeros at every step),
+and "off" (dense attention).
 
-The module is attached with forward hooks on each block's attn1.norm_q / attn1.norm_k, exactly the hook points
-of scripts/run_center_benchmark.py. The step/branch context is set explicitly by the training loop
+Mean and deletion hook attn1.norm_q / attn1.norm_k. Narrow hooks attn1.to_q / attn1.to_k on non-exempt
+layers and leaves native RMSNorm and RoPE in place. The step/branch context is set explicitly by the training loop
 (set_context) or inferred during pipeline rollouts (set_rollout + a transformer pre-hook that compares the
 text embeddings to the registered conditional/unconditional embeddings and counts conditional forwards).
 """
@@ -36,10 +36,13 @@ class LearnedCenter(nn.Module):
         layer_active = torch.ones(layers, dtype=torch.bool)
         layer_active[list(exempt_layers)] = False
         step_active = torch.ones(steps, dtype=torch.bool)
-        step_active[list(exempt_steps)] = False
+        if mode != "narrow":
+            step_active[list(exempt_steps)] = False
         self.register_buffer("layer_active", layer_active)
         self.register_buffer("step_active", step_active)
         self.register_buffer("high_dims", HIGH_DIMS.clone())
+        projection_high_dims = (torch.arange(heads)[:, None] * head_dim + HIGH_DIMS).flatten()
+        self.register_buffer("projection_high_dims", projection_high_dims, persistent=False)
         self.mode = mode
         self.step = None      # LongTensor [B], zero-based denoising step per batch element
         self.branch = None    # LongTensor [B], 0 = conditional, 1 = unconditional
@@ -75,9 +78,12 @@ class LearnedCenter(nn.Module):
 
     # ---- replacement -----------------------------------------------------------------------------------
     def replace(self, x, layer, side):
-        """x: [B, tokens, heads*head_dim] normalized pre-RoPE Q or K. Returns the student tensor."""
+        """Replace selected pre-RoPE Q/K entries at the mode's projection or norm hook."""
         if self.mode == "off" or not bool(self.layer_active[layer]):
             return x
+        if self.mode == "narrow":
+            self.calls += 1
+            return x.index_fill(-1, self.projection_high_dims, 0)
         if self.step is None or self.branch is None:
             raise RuntimeError("LearnedCenter context not set")
         batch, tokens, width = x.shape
@@ -109,9 +115,12 @@ class LearnedCenter(nn.Module):
         self.detach()
         if len(transformer.blocks) != self.layers:
             raise ValueError(f"model has {len(transformer.blocks)} blocks, module has {self.layers}")
+        hook_prefix = "to_" if self.mode == "narrow" else "norm_"
         for layer, block in enumerate(transformer.blocks):
+            if self.mode == "narrow" and not bool(self.layer_active[layer]):
+                continue
             for side in ("q", "k"):
-                module = getattr(block.attn1, "norm_" + side)
+                module = getattr(block.attn1, hook_prefix + side)
                 self.handles.append(module.register_forward_hook(self._hook(layer, side)))
         self.handles.append(transformer.register_forward_pre_hook(self._transformer_pre_hook, with_kwargs=True))
         return self

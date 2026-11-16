@@ -10,6 +10,7 @@ Arms (--arm NAME, with --student DIR and --center-mode):
   student_s1     teacher weights + stage-1 trained means
   student        stage-3 student weights + trained means (mode mean)
   dense_control  fine-tuned weights trained with --center-mode off, replacement off
+  narrow         weights trained with --center-mode narrow, pre-norm HIGH zeros at every step
   deletion       weights trained with --center-mode delete, mode delete
 The arm name is free; the weights/means/mode come from the arguments. Every record stores the
 LearnedCenter state hash, the mode, exempt layers/steps and the number of replacement hook calls.
@@ -46,7 +47,7 @@ def main():
     parser.add_argument("--out", required=True)
     parser.add_argument("--arm", required=True)
     parser.add_argument("--student", help="directory with learned_center.pt and optionally transformer/ (bf16 safetensors)")
-    parser.add_argument("--center-mode", choices=("mean", "delete", "off"), default="mean")
+    parser.add_argument("--center-mode", choices=("mean", "delete", "narrow", "off"), default="mean")
     parser.add_argument("--link-baseline", help="existing benchmark root whose videos/baseline and records/*/baseline are hard-linked as this arm")
     parser.add_argument("--prompts", nargs="*")
     parser.add_argument("--max-prompts", type=int)
@@ -124,6 +125,12 @@ def main():
     active_layers = int(center.layer_active.sum()) if args.center_mode != "off" else 0
     active_steps = int(center.step_active.sum()) if args.center_mode != "off" else 0
     expected_calls = active_layers * 2 * 2 * active_steps if args.center_mode != "off" else 0   # layers x (q,k) x branches x steps
+    scope = {
+        "mean": "learned constants on 22 high Q/K pairs after RMSNorm, per layer/step/branch/head",
+        "delete": "zeros on 22 high Q/K pairs after RMSNorm",
+        "narrow": "zeros on 22 high Q/K pairs before RMSNorm at every step",
+        "off": "full Q/K with no replacements",
+    }[args.center_mode]
 
     completed = 0
     for prompt in config["prompts"]:
@@ -181,7 +188,7 @@ def main():
             write_json(arm / "complete.json", {"prompt": prompt, "mode": args.arm, "environment": environment,
                 "inference_decode_seconds": seconds, "finite_step_latents": len(checked_steps), "intervention_calls": center.calls, "expected_intervention_calls": expected_calls,
                 "video_sha256": digest(video), "video_bytes": video.stat().st_size, "frames": list(frames.shape),
-                "center_scope": "learned constants per layer/step/branch/head on HIGH 44 coords; exempt " + json.dumps(exempt),
+                "center_scope": scope,
                 "peak_gpu_memory_bytes": torch.cuda.max_memory_allocated()})
             completed += 1
             print("COMPLETE", prompt["id"], args.arm, round(seconds, 1), flush=True)
