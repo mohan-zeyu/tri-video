@@ -1,0 +1,13 @@
+{
+  "arms": {
+    "shared22": {
+      "prompts": 30,
+      "frames": 1350,
+      "mean_final_latent_relative_l2": 0.5597029288609823,
+      "mean_finite_frame_psnr_db": 14.121622973034924,
+      "identical_frames": 0,
+      "mean_final_latent_l2": 495.21453755696615
+    }
+  },
+  "scope": "Same prompt and seed in each arm vs frozen baseline. L2 ratio over all final post-step latent coordinates, then average over prompts. Frame PSNR is 10log10(255^2/RGB MSE) over all channels/pixels of each aligned decoded MP4 frame; average finite dB values over all frames/prompts, count infinite identical frames separately. Absolute L2 averages full final latent norm differences over the 30 prompt pairs."
+}

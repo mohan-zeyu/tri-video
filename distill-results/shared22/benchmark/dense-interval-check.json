@@ -1,0 +1,40 @@
+{
+  "prompts": 30,
+  "replicates": 10000,
+  "seed": 20261109,
+  "dense": {
+    "aesthetic_quality": {
+      "mean": 0.5684406052033106,
+      "ci95": [
+        0.5319541798035304,
+        0.5998487903177738
+      ],
+      "shared22_mean": 0.5694690744082133,
+      "within_dense_interval": true,
+      "paired_shared22_minus_dense": {
+        "mean": 0.0010284692049026488,
+        "ci95": [
+          -0.02541856750845909,
+          0.02674681405226389
+        ]
+      }
+    },
+    "imaging_quality": {
+      "mean": 0.6587875426680954,
+      "ci95": [
+        0.607711448467749,
+        0.7030158825697722
+      ],
+      "shared22_mean": 0.6828224170967385,
+      "within_dense_interval": true,
+      "paired_shared22_minus_dense": {
+        "mean": 0.024034874428643136,
+        "ci95": [
+          -0.010711860845000637,
+          0.06152610793608208
+        ]
+      }
+    }
+  },
+  "both_shared22_means_within_dense_intervals": true
+}

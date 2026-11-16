@@ -474,3 +474,70 @@ For each candidate, final-latent L2 takes the Euclidean norm of the difference o
 | Shared32 | 546.265 | 0.614498 | 13.653 | 0 |
 
 Render workers on GPUs 4 and 2 hit their initial time limit. The run resumed from their 51 completed videos and preserved the interrupted files. The 60 videos charged 1,760 GPU-seconds, counting the partial attempts and their continuations. Scoring all seven dimensions on the 60 new videos with audited teacher scores reused charged 431 GPU-seconds on GPU 4. Total GPU use was 2,191 GPU-seconds (0.609 GPU-hours). The lab videos and full records are in `out/learned-center-wan-static-shared30/` in the selection checkout.
+
+### Shared22 full fine-tuning
+
+Shared22 started from the frozen Wan2.1 teacher checkpoint with the pooled static shared 22-pair means. The teacher supplied cached states and velocity targets, and the student transformer and means were trainable. No earlier student weights were used. The run used two FSDP ranks on RTX 5090 GPUs 4 and 5, with two prompt-and-state samples per rank per optimizer update, for four samples with both CFG branches each. It completed 2,500 off-policy updates at a base transformer learning rate of 1e-5 with 250 warmup updates, feature-loss weight 0.1 and EMA decay 0.999.
+
+Training used 36,204 GPU-seconds (10.057 GPU-hours) over 18,102 elapsed seconds, including data loading, validations and EMA saves. The median was 6.902 seconds over the 250 logged optimizer updates from 10 through 2,500. Peak PyTorch allocations were 21.538 GiB on rank 0 and 21.535 GiB on rank 1. All optimizer updates completed in one invocation with finite losses.
+
+Validation measures relative squared velocity error over all latent coordinates at 20 cached teacher states for each of the first eight held-out prompts, d0064–d0071. These 160 states are the same at every checkpoint. The guided column combines both CFG branches at guidance 5 before computing the error. Step zero uses the same training code path as the later live-weight checkpoints.
+
+| Update | Conditional | Unconditional | Guided CFG 5 |
+|---:|---:|---:|---:|
+| 0 | 0.005625 | 0.005600 | 0.030147 |
+| 250 | 0.004925 | 0.005003 | 0.032010 |
+| 500 | 0.005119 | 0.005698 | 0.029735 |
+| 750 | 0.005403 | 0.004786 | 0.035191 |
+| 1,000 | 0.004765 | 0.005181 | 0.029822 |
+| 1,250 | 0.003689 | 0.003504 | 0.026262 |
+| 1,500 | 0.003692 | 0.003579 | 0.026239 |
+| 1,750 | 0.003041 | 0.002914 | 0.024334 |
+| 2,000 | 0.002788 | 0.002541 | 0.022687 |
+| 2,250 | 0.002478 | 0.002279 | 0.021209 |
+| 2,500 | 0.002378 | 0.002143 | 0.020696 |
+
+Both gates passed. At update 1,000, guided error 0.029822 beat step zero (0.030147). At update 1,500, guided error 0.026239 beat update 500 (0.029735). The final live checkpoint reached 0.020696, a 31.3% reduction versus the comparable step-zero result.
+
+Each validation row was appended and committed separately under `distill-results/shared22/`. Each 500-update save kept its EMA transformer and means to fit the storage budget without deleting checkpoints. These exports contain model parameters and masks. The final EMA was used for generation.
+
+#### Matched 30-prompt video benchmark
+
+The final shared22 EMA generated the first 30 manifest prompts with one original seed per prompt. For each fixed layer, denoising step, CFG branch and head, the model replaces the same 22 normalized pre-RoPE pairs in Q and K for every token. All 30 new videos recorded 2,204 calls (29 active layers × 19 active steps × two CFG branches × Q and K), finite latents at all 20 steps, and 45 frames at 480×480 and 16 fps. Per-video selection blocks and checksums are retained with the benchmark artifacts.
+
+Each VBench score averages 30 per-video measurements. Aesthetics and imaging use all 45 frames and text–video consistency samples eight midpoint frames per video. The other dimensions use the same VBench frame sampling as above. The teacher, training-free shared22, trained fixed-high Stage 3 student and dense scores reuse their audited rows on the same prompts and seeds. Paired 95% percentile intervals resample the 30 matched prompts 10,000 times using NumPy seed 20261109.
+
+| Dimension | Teacher | Static shared22 | Trained fixed-high | Dense | Tuned shared22 |
+|---|---:|---:|---:|---:|---:|
+| subject_consistency | 0.961865 | 0.952154 | 0.947142 | 0.962550 | 0.961931 |
+| background_consistency | 0.976412 | 0.971805 | 0.969787 | 0.976944 | 0.976160 |
+| motion_smoothness | 0.982059 | 0.985126 | 0.981423 | 0.982006 | 0.983828 |
+| dynamic_degree | 0.333333 | 0.200000 | 0.333333 | 0.200000 | 0.266667 |
+| aesthetic_quality | 0.580512 | 0.539369 | 0.517949 | 0.568441 | 0.569469 |
+| imaging_quality | 0.662574 | 0.615462 | 0.639815 | 0.658788 | 0.682822 |
+| overall_consistency | 0.228075 | 0.227472 | 0.225531 | 0.234424 | 0.230451 |
+
+| Dimension | Shared22 − teacher | Shared22 − static shared22 | Shared22 − trained fixed-high | Shared22 − dense |
+|---|---:|---:|---:|---:|
+| subject_consistency | +0.00007 [-0.00699, +0.00817] | +0.00978 [-0.00266, +0.02199] | +0.01479 [+0.00424, +0.02570] | -0.00062 [-0.00681, +0.00573] |
+| background_consistency | -0.00025 [-0.00507, +0.00413] | +0.00435 [-0.00326, +0.01184] | +0.00637 [+0.00302, +0.00959] | -0.00078 [-0.00384, +0.00228] |
+| motion_smoothness | +0.00177 [-0.00039, +0.00429] | -0.00130 [-0.00501, +0.00197] | +0.00241 [-0.00097, +0.00659] | +0.00182 [-0.00153, +0.00622] |
+| dynamic_degree | -0.06667 [-0.16667, +0.00000] | +0.06667 [-0.06667, +0.20000] | -0.06667 [-0.26667, +0.13333] | +0.06667 [+0.00000, +0.16667] |
+| aesthetic_quality | -0.01104 [-0.03190, +0.00899] | +0.03010 [+0.00048, +0.06158] | +0.05152 [+0.02654, +0.07752] | +0.00103 [-0.02542, +0.02675] |
+| imaging_quality | +0.02025 [-0.00823, +0.05365] | +0.06736 [+0.02923, +0.11079] | +0.04301 [+0.00240, +0.08456] | +0.02403 [-0.01071, +0.06153] |
+| overall_consistency | +0.00238 [-0.00913, +0.01424] | +0.00298 [-0.00835, +0.01579] | +0.00492 [-0.00458, +0.01418] | -0.00397 [-0.01052, +0.00242] |
+
+Fine-tuning lifted aesthetics by 0.03010 and imaging quality by 0.06736 versus static shared22, with both paired intervals above zero. The corresponding gains over trained fixed-high were 0.05152 and 0.04301. The text–video differences versus static shared22 and trained fixed-high had intervals spanning zero. The 30-prompt screen has limited resolution for aesthetic differences below about 0.02.
+
+The dense-interval condition for requesting a full benchmark was met on both dimensions. These are percentile bootstrap intervals for the dense arm mean across 30 videos, with the same 10,000 resamples. The paired difference intervals versus dense also include zero.
+
+| Dimension | Tuned shared22 mean | Dense mean [95% interval] | Shared22 − dense [paired 95% interval] |
+|---|---:|---:|---:|
+| aesthetic_quality | 0.569469 | 0.568441 [0.531954, 0.599849] | +0.00103 [-0.02542, +0.02675] |
+| imaging_quality | 0.682822 | 0.658788 [0.607711, 0.703016] | +0.02403 [-0.01071, +0.06153] |
+
+Same-seed agreement with the teacher gave mean final-latent L2 495.215 and relative L2 0.559703, computed over all final latent coordinates per pair and averaged across 30 prompts. The relative ratio divides by the teacher norm per pair. Mean decoded RGB PSNR was 14.122 dB over the 1,350 aligned frames, with zero identical frames.
+
+The benchmark used 1,170 GPU-seconds on GPU 4, for 37,374 GPU-seconds (10.382 GPU-hours) including training. Training outputs, final EMA backup and benchmark records occupied about 17.51 GB, including linked teacher files in the benchmark count. All EMA milestones were retained. The lab checkpoint is `out/distill-shared22/student/`, and its checksum-verified durable copy is `out/distill-shared22-export/student/` in the selection checkout. Videos and source records are in `out/learned-center-wan-shared22/`. The curve and benchmark artifacts are under `distill-results/shared22/`.
+
+The 100-prompt benchmark awaits approval. Narrow remains paused at update 4,000, and the deletion control is still pending.
