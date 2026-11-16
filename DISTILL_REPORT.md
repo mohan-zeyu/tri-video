@@ -2,6 +2,40 @@
 
 Stage 0 captured all 3,641 teacher trajectories. Stages 1, 2 and 3 completed their 2,000, 5,000 and 5,000 updates, respectively. The dense control completed 5,000 off-policy updates. Five arms have audited results for all 100 matched prompts and seven dimensions: the frozen teacher, static means, Stage 1, final Stage 3 and dense control. The run stopped before the deletion control at the resource decision point. The approved limits were four concurrent GPUs, 72 total GPU-hours and 300 GB of incremental disk. During the final student benchmark, the user reduced the active device set to GPUs 1, 3 and 6.
 
+## Headline benchmark — tuned shared22 on 100 matched prompts
+
+The tuned shared22 Stage 2 EMA was evaluated on all 100 original benchmark prompts with one fixed seed per prompt. The first 30 previously audited renders, seven scores per render, and agreement records match the same EMA and generation protocol. The other 70 were generated from the checksum-verified durable EMA at `out/distill-shared22-export/student/`. Reference rows come from the audited teacher, dense, trained fixed-high Stage 3 EMA, and static fixed-high benchmarks on the same prompt and seed manifest.
+
+Each VBench mean averages 100 per-video scores. Aesthetics and imaging use all 45 frames. Text–video consistency uses eight midpoint frames and the prompt. The other dimensions use the sampling described below. Tuned shared22 uses 22 shared normalized pre-RoPE pairs per layer, denoising step, CFG branch and head. Each selected pair has a token-independent value in both Q and K. All 100 generated videos passed the checksum and 45-frame, 480×480, 16 fps audits, with finite latents at all 20 steps and 2,204 replacement calls each. Those calls count both Q and K and both branches over 29 active layers and 19 active steps.
+
+| Dimension | Tuned shared22 | Teacher | Dense | Trained fixed-high | Static fixed-high |
+|---|---:|---:|---:|---:|---:|
+| subject_consistency | 0.967490 | 0.963999 | 0.964285 | 0.958942 | 0.991220 |
+| background_consistency | 0.978377 | 0.976466 | 0.977676 | 0.974867 | 0.991434 |
+| motion_smoothness | 0.986384 | 0.984463 | 0.985506 | 0.985119 | 0.991962 |
+| dynamic_degree | 0.280000 | 0.330000 | 0.250000 | 0.210000 | 0.000000 |
+| aesthetic_quality | 0.583495 | 0.588595 | 0.578063 | 0.517914 | 0.271404 |
+| imaging_quality | 0.678854 | 0.660679 | 0.670020 | 0.652749 | 0.486135 |
+| overall_consistency | 0.234047 | 0.232555 | 0.234363 | 0.219662 | 0.026384 |
+
+Differences are tuned shared22 minus the reference. The 95% percentile intervals use 10,000 paired resamples of the 100 prompt-and-seed units with NumPy seed 20261109.
+
+| Dimension | vs. teacher | vs. dense | vs. trained fixed-high | vs. static fixed-high |
+|---|---:|---:|---:|---:|
+| subject_consistency | +0.00349 [-0.00316, +0.01014] | +0.00321 [-0.00105, +0.00765] | +0.00855 [+0.00371, +0.01348] | -0.02373 [-0.03218, -0.01623] |
+| background_consistency | +0.00191 [-0.00177, +0.00566] | +0.00070 [-0.00207, +0.00354] | +0.00351 [+0.00116, +0.00580] | -0.01306 [-0.01754, -0.00894] |
+| motion_smoothness | +0.00192 [+0.00057, +0.00333] | +0.00088 [-0.00047, +0.00244] | +0.00126 [-0.00006, +0.00277] | -0.00558 [-0.00812, -0.00340] |
+| dynamic_degree | -0.05000 [-0.12000, +0.02000] | +0.03000 [-0.03000, +0.09000] | +0.07000 [-0.01000, +0.15025] | +0.28000 [+0.19000, +0.37000] |
+| aesthetic_quality | -0.00510 [-0.01689, +0.00685] | +0.00543 [-0.00756, +0.01809] | +0.06558 [+0.04867, +0.08249] | +0.31209 [+0.29338, +0.33010] |
+| imaging_quality | +0.01817 [+0.00011, +0.03586] | +0.00883 [-0.00737, +0.02504] | +0.02611 [+0.00732, +0.04508] | +0.19272 [+0.16839, +0.21567] |
+| overall_consistency | +0.00149 [-0.00484, +0.00792] | -0.00032 [-0.00576, +0.00503] | +0.01439 [+0.00659, +0.02226] | +0.20766 [+0.19395, +0.22232] |
+
+All seven paired intervals against dense span zero. Against the trained fixed-high student, tuned shared22 had higher aesthetics by 0.06558, imaging quality by 0.02611 and text–video consistency by 0.01439, with paired intervals above zero. Against the teacher, imaging quality and motion smoothness had paired intervals above zero. The paired aesthetic, text–video and motion-incidence intervals versus the teacher span zero.
+
+Same-seed teacher agreement averaged final-latent L2 491.224 and relative L2 0.559077 across 100 pairs. Each L2 uses every final latent coordinate. The relative L2 divides each difference norm by its teacher norm before averaging. Mean decoded-frame PSNR was 14.194 dB over 4,500 aligned RGB frames.
+
+Expansion to 100 prompts used 2,971 GPU-seconds (0.825 GPU-hours) on GPU 2. The report inputs, per-video selection records and agreement are in `distill-results/shared22/full100/`. Lab videos and source records are in `out/learned-center-wan-shared22-full100/` in the selection checkout.
+
 ## Question and setup
 
 Can Wan2.1-T2V-1.3B recover video quality after replacing the high-frequency parts of self-attention Q and K with learned, token-independent vectors? Frozen teacher: `Wan-AI/Wan2.1-T2V-1.3B-Diffusers` at `0fad780a534b6463e45facd96134c9f345acfa5b`. Generation uses 45 frames at 480×480, 20 UniPC steps (flow shift 3), CFG 5 with an empty negative prompt, a bf16 transformer and a tiled fp32 VAE. Each step on each CFG branch evaluates 10,800 tokens and full native attention across all 64 rotary pairs.
