@@ -362,3 +362,31 @@ Each layer ratio divides the total fixed-high Q + K damage by the total separate
 | 29 | 9,932.877 | 17.86 |
 
 Collection on one RTX 5090 used 986 GPU-seconds (0.274 GPU-hours), including model loading and all 64 prompt files. CPU selection verified that every Q and K mask picks exactly 22 pairs in every cell and that all 64 statistics records completed. Lab artifacts are under `out/distill-pair-stats/` and `out/distill-selection/` in the selection checkout. The tracked numeric artifact is `distill-results/selection/selection-report.json`.
+
+### B. Training-free velocity screen
+
+Each value is the mean over 32 held-out prompts and all 20 cached teacher entering states per prompt. The error at one state is the squared L2 velocity difference divided by the reference velocity energy, using every latent coordinate. For guided error, conditional and unconditional predictions are combined at CFG 5 before computing the ratio. The frozen bf16 teacher is the reference for the static-mean and deletion arms. The selected 22 pairs per side are replaced in normalized pre-RoPE Q and K for every token. This six-arm screen exempts layer 0 and step 1.
+
+| Selection / mode | Conditional | Unconditional | Guided CFG 5 |
+|---|---:|---:|---:|
+| fixed_high/mean | 0.099291 | 0.098567 | 0.283408 |
+| fixed_high/delete | 0.308276 | 0.307376 | 0.414549 |
+| separate/mean | 0.010352 | 0.010486 | 0.036740 |
+| separate/delete | 0.015286 | 0.014815 | 0.051309 |
+| shared/mean | 0.006686 | 0.006748 | 0.032195 |
+| shared/delete | 0.009840 | 0.009837 | 0.037419 |
+
+The gate passes. Separate and shared pooled means reduce guided error by 7.71× and 8.80×, respectively, relative to fixed-high pooled means on the 640 states. Shared has the lowest guided error and is the first comparison arm for Stage C.
+
+With a mask held fixed, mean minus deletion in guided error was −0.01457 for separate (95% CI −0.01858 to −0.01134) and −0.00522 for shared (−0.00649 to −0.00413). Each interval resamples 32 matched prompts 10,000 times with NumPy seed 20261109, retaining all 20 states of each sampled prompt. The pooled means improve velocity matching relative to zeros in this training-free screen. The result measures the frozen model on cached states.
+
+The second replay applies the same hooks in all 30 layers and all 20 steps. The Stage 0 current-mean reference recomputes the 22 fixed-high pair means per prompt, state, layer, branch and head from the tokens in that forward. The precision reference compares the dense native bf16 and fp32 teacher velocities. All rows use the same 640 held-out prompt–state cells.
+
+| All-layer, all-step condition | Conditional | Unconditional | Guided CFG 5 |
+|---|---:|---:|---:|
+| Native teacher bf16 vs. fp32 | 0.000141 | 0.000149 | 0.002731 |
+| Fixed-high current-token means vs. native bf16 | 0.100820 | 0.101265 | 0.349937 |
+| Fixed-high pooled means vs. native bf16 | 0.132161 | 0.132640 | 0.398662 |
+| Separate pooled means vs. native bf16 | 0.010646 | 0.010964 | 0.040984 |
+
+Stage B used 3,072 GPU-seconds for the six-arm screen and 1,288 GPU-seconds for the all-layer, all-step replay on GPU 4. A+B used 5,346 GPU-seconds (1.485 GPU-hours), including model loads. Both runs finished all required prompts and steps without lingering claims. The complete scores, per-step means, scopes and arm manifests are committed under `distill-results/selection/`.
