@@ -598,6 +598,7 @@ def main():
                         help="existing experiment directory containing device lock files")
     parser.add_argument("--buffer-files", type=int, default=500, help="FIFO capacity in rollout files (x steps states)")
     parser.add_argument("--val-every", type=int, default=250)
+    parser.add_argument("--val-prompts", type=int, help="validate on the first N validation prompts only (default: all)")
     parser.add_argument("--save-every", type=int, default=500)
     parser.add_argument("--log-every", type=int, default=10)
     parser.add_argument("--seed", type=int, default=20261114)
@@ -631,6 +632,8 @@ def main():
     traj_root = ROOT / args.traj if not os.path.isabs(args.traj) else Path(args.traj)
     store = TrajectoryStore(traj_root, train_ids)
     val_store_ids = [pid for pid in val_ids if (traj_root / pid / "meta.json").exists()]
+    if args.val_prompts:
+        val_store_ids = val_store_ids[: args.val_prompts]
     log(rank, f"trajectories: train {len(store.ids)}, val {len(val_store_ids)}, steps {store.steps}")
 
     teacher, student, snapshot = load_models(args, device)
