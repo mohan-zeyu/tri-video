@@ -310,13 +310,29 @@ The conservative allocation ledger totals 257,395 GPU-seconds (71.50 GPU-hours) 
 
 ## Narrow and deletion controls
 
-The follow-up brief calls for two 5,000-update Stage 2 controls, narrow first and deletion second, using teacher initialization, two ranks and the dense loss, optimizer and sampling recipe. Both controls use off-policy teacher states throughout. The Stage 3 student also trained on its own rollouts, so that comparison includes a training-history difference.
+Narrow uses the dense control’s 5,000-update Stage 2 loss, optimizer and sampling recipe, with teacher initialization and two ranks. It trains on cached teacher states throughout. The Stage 3 student also trained on its own rollouts, so the comparison with narrow includes a training-history difference. The requested shared22 deletion control supersedes the original fixed-high deletion experiment. It uses the tuned shared22 masks and 2,500-update recipe.
 
 Narrow zeroes the 44 coordinates of the selected 22 rotary pairs per head in each token's Q and K projection output before native QK-RMSNorm and RoPE. It applies to all 20 denoising steps in 29 of 30 self-attention layers, with layer 0 exempt. Across the 12 heads, 528 of the 1,536 Q and K outputs are masked in each active layer. The effective removal is 1,623,072 projection weight and bias parameters per active layer, or 47,069,088 across 29 layers, from `2 × 528 × (1,536 + 1)` per layer. The implementation masks the rows' outputs and still stores the dense matrices.
 
-Native Wan RMSNorm takes its mean square across all 1,536 features for one token and projection. Under narrow, only 1,008 live features contribute to the numerator, corresponding to 84 per head, while the denominator remains 1,536. Deletion zeroes the same pairs after RMSNorm, so all projected features participate in the norm statistic. Deletion also retains the first-step exemption. The difference between these controls includes both the norm statistic and first-step coverage.
+Native Wan RMSNorm takes its mean square across all 1,536 features for one token and projection. Under narrow, only 1,008 live features contribute to the numerator, corresponding to 84 per head, while the denominator remains 1,536. Shared22 deletion zeroes the tuned shared22 pair selection after RMSNorm, so all projected features contribute to the norm statistic. It retains the first-step exemption. Comparing shared22 deletion with narrow would combine changes in the masks, training recipe, norm statistic and first-step coverage.
 
 On CPU, the narrow hooks matched the manual zero-padded RMSNorm calculation on a tiny Wan model. The same test checked exact zero Q/K projection outputs and exact zero gradients in the masked Q/K weight and bias rows, nonzero gradients in kept rows, the layer-0 exemption, and masking with no step or branch context. The existing learned-center tests also passed on the pinned lab runtime.
+
+### Narrow training and continuation
+
+Narrow resumed its update-4,000 optimizer, sampler and EMA checkpoint under code `f51d494`, then completed update 5,000 on two idle RTX 5090s (4 and 2). The continuation took 4,776 wall seconds on two ranks, or 9,552 GPU-seconds (2.653 GPU-hours). Median optimizer-update time was 3.529 s across 101 logged updates in the continuation, averaging the two ranks for each logged update and excluding validation and saving. Peak PyTorch allocation was 19.578 and 19.575 GiB by rank.
+
+Validation measures each branch's squared velocity error normalized by teacher velocity energy over every latent coordinate. Guided error applies CFG 5 to both the teacher and narrow branch predictions before taking the ratio. Each row averages 640 equal-weight cached states (32 held-out prompts × 20 denoising steps) evaluated with the current training weights.
+
+| Update | Conditional | Unconditional | Guided |
+|---|---:|---:|---:|
+| 4,000 | 0.027696 | 0.026974 | 0.059094 |
+| 4,250 | 0.027204 | 0.026351 | 0.058749 |
+| 4,500 | 0.026786 | 0.026006 | 0.057795 |
+| 4,750 | 0.026692 | 0.025937 | 0.057508 |
+| 5,000 | 0.026277 | 0.025496 | 0.057076 |
+
+The untouched validation log in `distill-results/narrow/` records both update-2,750 evaluations around an earlier resume. The final EMA was copied to the lab's durable selection checkout at `out/distill-narrow-export/student/` and matched by SHA-256. The 100-prompt video benchmark is in progress.
 
 ## Per-pair selection study
 
