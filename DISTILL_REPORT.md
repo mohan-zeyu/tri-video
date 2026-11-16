@@ -283,3 +283,82 @@ Narrow zeroes the 44 coordinates of the selected 22 rotary pairs per head in eac
 Native Wan RMSNorm takes its mean square across all 1,536 features for one token and projection. Under narrow, only 1,008 live features contribute to the numerator, corresponding to 84 per head, while the denominator remains 1,536. Deletion zeroes the same pairs after RMSNorm, so all projected features participate in the norm statistic. Deletion also retains the first-step exemption. The difference between these controls includes both the norm statistic and first-step coverage.
 
 On CPU, the narrow hooks matched the manual zero-padded RMSNorm calculation on a tiny Wan model. The same test checked exact zero Q/K projection outputs and exact zero gradients in the masked Q/K weight and bias rows, nonzero gradients in kept rows, the layer-0 exemption, and masking with no step or branch context. The existing learned-center tests also passed on the pinned lab runtime.
+
+## Per-pair selection study
+
+### A. Calibration and selection
+
+The frozen bf16 Wan2.1 teacher replayed all 20 cached entering states for each of 64 calibration prompts, with both CFG branches. For each prompt, layer, denoising step, branch, head, and Q or K side, the collector measured normalized pre-RoPE pair means and energies across all 10,800 video tokens. The masks span all 14,400 layer–step–branch–head cells (30 layers × 20 steps × 2 branches × 12 heads). These statistics include layer 0 and step 1.
+
+For a cell, side, and rotary pair, the pooled static mean `mu_f` is the average of the 64 prompt-level token means. For each prompt, `err_pool_p,f` is the average squared L2 distance of its token pairs to `mu_f`. The damage score is the prompt-average of this error multiplied by the partner side’s prompt-average pair energy. This product is the proxy for expected squared logit perturbation before common scaling. Fixed high selects the original 22 high-frequency pairs on each side. Separate selects the 22 lowest-damage pairs independently on Q and K in every cell. Shared selects the 22 lowest sums of Q and K damage and uses those pairs on both sides.
+
+Cross-prompt stability compares the own-mean selection or damage ranking for one prompt and cell with the pooled selection or ranking in that cell. Jaccard compares the chosen 22-pair sets. Spearman ranks all 64 rotary pairs. The median and 10th percentile each summarize 921,600 prompt–cell comparisons per side.
+
+| Side | Jaccard median | Jaccard p10 | Damage Spearman median | Damage Spearman p10 |
+|---|---:|---:|---:|---:|
+| Q | 0.760 | 0.571 | 0.927 | 0.823 |
+| K | 0.760 | 0.571 | 0.931 | 0.825 |
+
+The 0.76 median Jaccard on both sides is between the brief’s 0.5 input-dependence threshold and its 0.8 strong-stability threshold. Pooled damage captures much of the prompt-level ordering, and selected sets still vary across prompts.
+
+Separate retains 40.76% of fixed-high Q selections and 42.27% of fixed-high K selections, counted across all cells. The composition below is the share of each variant and side’s 22 selections per cell, pooled over all cells. Axis entries show high, middle, and low frequency thirds in that order.
+
+| Selection | Temporal H/M/L | Height H/M/L | Width H/M/L |
+|---|---|---|---|
+| Separate Q | 18.65% / 10.48% / 7.59% | 10.07% / 10.46% / 7.76% | 12.05% / 15.01% / 7.95% |
+| Separate K | 19.37% / 10.24% / 7.34% | 10.45% / 10.37% / 7.61% | 12.45% / 14.72% / 7.45% |
+| Shared, each side | 18.94% / 10.50% / 7.49% | 9.86% / 10.65% / 7.62% | 12.11% / 15.15% / 7.67% |
+
+Each total damage sums the score over all selected Q and K pairs and all 14,400 cells, including the cells exempted at inference. For separate Q and K individually, this sum is 0.112% and 6.92% of the corresponding fixed-high sum, respectively.
+
+| Selection | Summed Q + K damage | Fraction of fixed high |
+|---|---:|---:|
+| fixed_high | 590,506,173 | 100.000% |
+| separate | 1,294,064 | 0.219% |
+| shared | 1,361,080 | 0.230% |
+
+The RMS concentration is `||mu_f|| / sqrt(mean_p E_p ||x_f||²)` for one pair and cell. Values below average those ratios over all pairs in the indicated subset and all cells, separately per side. Low damage in this study does not require a high concentration because partner energy also enters the score.
+
+| Side | Separate selected | Separate unselected | Fixed high selected |
+|---|---:|---:|---:|
+| Q | 0.4816 | 0.5648 | 0.7244 |
+| K | 0.4886 | 0.5362 | 0.7392 |
+
+Separate Q and K share an average of 17.57 selected pairs per cell out of 22 on each side. The median, 10th percentile, and 90th percentile over all cells are 18, 14, and 20 pairs. A one-sided replacement still requires a dot product. Only the shared pairs are position-only, and no inference speed was measured.
+
+Each layer ratio divides the total fixed-high Q + K damage by the total separate damage for that layer, summed over every denoising step, CFG branch, head, and selected pair. The intersection column averages the number of shared pairs per cell over the same steps, branches, and heads.
+
+| Layer | Fixed high / separate damage | Q–K intersection, mean pairs |
+|---|---:|---:|
+| 0 | 1,134.973 | 21.07 |
+| 1 | 23.638 | 19.01 |
+| 2 | 30.711 | 18.40 |
+| 3 | 7.757 | 16.62 |
+| 4 | 7.308 | 17.00 |
+| 5 | 36.647 | 16.97 |
+| 6 | 3.208 | 17.70 |
+| 7 | 5.745 | 17.31 |
+| 8 | 13.769 | 17.06 |
+| 9 | 9.562 | 16.14 |
+| 10 | 2.281 | 16.95 |
+| 11 | 5.299 | 17.56 |
+| 12 | 6.416 | 17.44 |
+| 13 | 2.872 | 18.37 |
+| 14 | 4.289 | 17.89 |
+| 15 | 3.252 | 18.99 |
+| 16 | 2.742 | 17.16 |
+| 17 | 7.771 | 17.15 |
+| 18 | 2.376 | 18.01 |
+| 19 | 5.783 | 16.95 |
+| 20 | 17.170 | 17.71 |
+| 21 | 12.088 | 16.49 |
+| 22 | 2.376 | 17.36 |
+| 23 | 4.421 | 18.06 |
+| 24 | 3.456 | 16.62 |
+| 25 | 2.618 | 17.43 |
+| 26 | 6.124 | 16.12 |
+| 27 | 101.188 | 17.21 |
+| 28 | 60,783.206 | 18.56 |
+| 29 | 9,932.877 | 17.86 |
+
+Collection on one RTX 5090 used 986 GPU-seconds (0.274 GPU-hours), including model loading and all 64 prompt files. CPU selection verified that every Q and K mask picks exactly 22 pairs in every cell and that all 64 statistics records completed. Lab artifacts are under `out/distill-pair-stats/` and `out/distill-selection/` in the selection checkout. The tracked numeric artifact is `distill-results/selection/selection-report.json`.
