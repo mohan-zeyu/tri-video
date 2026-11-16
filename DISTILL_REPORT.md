@@ -332,7 +332,7 @@ Validation measures each branch's squared velocity error normalized by teacher v
 | 4,750 | 0.026692 | 0.025937 | 0.057508 |
 | 5,000 | 0.026277 | 0.025496 | 0.057076 |
 
-The untouched validation log in `distill-results/narrow/` records both update-2,750 evaluations around an earlier resume. The final EMA was copied to the lab's durable selection checkout at `out/distill-narrow-export/student/` and matched by SHA-256. The 100-prompt video benchmark is in progress.
+The untouched validation log in `distill-results/narrow/` records both update-2,750 evaluations around an earlier resume. The final EMA was copied to the lab's durable selection checkout at `out/distill-narrow-export/student/` and matched by SHA-256. The 100-prompt narrow benchmark reached its GPU allocation after 2,553 GPU-seconds on GPU 4 (0.709 GPU-hours), with 90 of the 100 requested prompt-and-seed renders saved. All 90 match the manifest and recorded MP4 checksums, contain 45 frames at 480×480, and record finite latents at all 20 steps. Each records 2,320 calls across 29 active layers, 20 steps, both CFG branches, and Q and K. The generation artifacts are in `out/learned-center-wan-narrow-full100/` in the selection checkout. Ten renders, all seven VBench dimensions, and full-scope latent and frame agreement remain pending. The shared22 deletion control is queued after this benchmark.
 
 ## Per-pair selection study
 
