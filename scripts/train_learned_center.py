@@ -600,7 +600,11 @@ def main():
     parser.add_argument("--val-every", type=int, default=250)
     parser.add_argument("--val-prompts", type=int, help="validate on the first N validation prompts only (default: all)")
     parser.add_argument("--val-at-start", action="store_true", help="also validate the untrained student (step 0) through the same code path")
+    parser.add_argument("--guided-gate", type=int, nargs=2, metavar=("STEP", "REFERENCE_STEP"),
+                        action="append", default=[], help="stop unless guided validation error strictly improves over the reference step")
     parser.add_argument("--save-every", type=int, default=500)
+    parser.add_argument("--ema-checkpoints", action="store_true",
+                        help="retain an EMA model at each save instead of writing and rotating full optimizer states")
     parser.add_argument("--log-every", type=int, default=10)
     parser.add_argument("--seed", type=int, default=20261114)
     parser.add_argument("--no-fsdp", action="store_true")
@@ -613,6 +617,14 @@ def main():
         parser.error("--stop-after must be between 1 and --steps")
     if args.budget_seconds is not None and args.budget_seconds <= 0:
         parser.error("--budget-seconds must be positive")
+    gates = dict(args.guided_gate)
+    if gates and (args.stage == 1 or args.resume or args.val_every <= 0 or len(gates) != len(args.guided_gate)
+                  or any(not 0 <= ref < step <= (args.stop_after or args.steps)
+                         or step % args.val_every or ref % args.val_every or (ref == 0 and not args.val_at_start)
+                         for step, ref in gates.items())):
+        parser.error("--guided-gate requires unique validation steps and earlier measured reference steps on a fresh Stage 2 or 3 run")
+    if args.ema_checkpoints and (args.stage == 1 or args.ema <= 0 or args.resume):
+        parser.error("--ema-checkpoints requires EMA on a fresh Stage 2 or 3 run")
     if args.rollout_worker_budget < 0 or (args.rollout_worker_budget and (
             args.stage != 3 or args.rollout_lock_dir is None or not args.rollout_lock_dir.is_dir())):
         parser.error("--rollout-worker-budget requires stage 3 and an existing --rollout-lock-dir")
@@ -635,6 +647,8 @@ def main():
     val_store_ids = [pid for pid in val_ids if (traj_root / pid / "meta.json").exists()]
     if args.val_prompts:
         val_store_ids = val_store_ids[: args.val_prompts]
+    if gates and (not val_store_ids or (args.val_prompts and val_store_ids != val_ids[: args.val_prompts])):
+        raise RuntimeError("Guided gates require all requested validation trajectories")
     log(rank, f"trajectories: train {len(store.ids)}, val {len(val_store_ids)}, steps {store.steps}")
 
     teacher, student, snapshot = load_models(args, device)
@@ -693,6 +707,7 @@ def main():
     if not active_steps:
         raise RuntimeError("no active steps")
     val_cache = {}
+    guided_validation = {}
     history = []
     if rank == 0:
         (out / "args.json").write_text(json.dumps(vars(args), indent=1, default=str))
@@ -713,6 +728,7 @@ def main():
     if args.val_at_start and val_store_ids and args.stage != 1 and not args.resume:
         result = validate(student, teacher, center, store, val_store_ids, args, device, rank, world, val_cache)
         result["step"] = 0
+        guided_validation[0] = result["mean"][2]
         log(rank, "VAL", json.dumps({"step": 0, "mean_cond_uncond_guided": result["mean"]}))
         if rank == 0:
             with open(out / "validation.jsonl", "a") as f:
@@ -720,6 +736,7 @@ def main():
     stop_at = args.stop_after or args.steps
     last_step = start
     budget_stop = False
+    gate_stop = False
     for step in range(start, stop_at):
         if args.stage == 3 and step % args.rollout_every == 0:
             with use_ema(student, center, ema):
@@ -788,10 +805,21 @@ def main():
         if (step + 1) % args.val_every == 0 and val_store_ids and args.stage != 1:
             result = validate(student, teacher, center, store, val_store_ids, args, device, rank, world, val_cache)
             result["step"] = step + 1
+            guided_validation[last_step] = result["mean"][2]
             log(rank, "VAL", json.dumps({"step": step + 1, "mean_cond_uncond_guided": result["mean"]}))
             if rank == 0:
                 with open(out / "validation.jsonl", "a") as f:
                     f.write(json.dumps(result) + "\n")
+            if last_step in gates:
+                reference_step = gates[last_step]
+                reference_error = guided_validation[reference_step]
+                guided_error = guided_validation[last_step]
+                gate_stop = not guided_error < reference_error
+                decision = {"step": last_step, "reference_step": reference_step, "guided_error": guided_error,
+                            "reference_guided_error": reference_error, "passed": not gate_stop}
+                log(rank, "GUIDED GATE", json.dumps(decision))
+                if rank == 0:
+                    write_json(out / f"guided-gate-{last_step}.json", decision)
         if args.budget_seconds:
             # Reserve the larger of 5 minutes or 10 recent optimizer steps for
             # validation/checkpoint I/O and for workers to exit together.
@@ -800,21 +828,23 @@ def main():
                 stop_tensor = torch.tensor(int(budget_stop), device=device)
                 dist.all_reduce(stop_tensor, op=dist.ReduceOp.MAX)
                 budget_stop = bool(stop_tensor.item())
-        if (step + 1) % args.save_every == 0 or step + 1 == stop_at or budget_stop:
+        if last_step % args.save_every == 0 or last_step == stop_at or budget_stop or gate_stop:
             if args.stage == 1:
                 if rank == 0:
                     (out / "student").mkdir(exist_ok=True)
                     save_torch(out / "student" / "learned_center.pt", {"state_dict": center.state_dict(), "mode": center.mode})
             else:
-                if step + 1 == args.steps:
-                    save_student(student, center, out, snapshot, rank, world, args.no_fsdp, ema=ema, tag="student")
-            save_training_state(student, opt_model, center, opt_center, step + 1, out, rank, world, args.no_fsdp, ema, rng)
+                if last_step == args.steps or args.ema_checkpoints:
+                    tag = "student" if last_step == args.steps else f"ema-checkpoints/step-{last_step:06d}"
+                    save_student(student, center, out, snapshot, rank, world, args.no_fsdp, ema=ema, tag=tag)
+            if not args.ema_checkpoints:
+                save_training_state(student, opt_model, center, opt_center, last_step, out, rank, world, args.no_fsdp, ema, rng)
             if rank == 0:
                 with open(out / "history.jsonl", "a") as f:
                     for h in history:
                         f.write(json.dumps(h) + "\n")
                 history.clear()
-        if budget_stop:
+        if budget_stop or gate_stop:
             break
     if args.stage == 1 and val_store_ids:
         result = validate_attention(teacher, center, store, val_store_ids, device, rank, world)
