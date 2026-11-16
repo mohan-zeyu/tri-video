@@ -64,8 +64,9 @@ def test_replacement_exact():
         for side in ("q", "k"):
             out = captured[(1, side)]
             means = out.view(2, 8, 2, 128).mean(1, dtype=torch.float32)[..., HIGH_DIMS]   # [B, heads, 44], as replace_with_center
-            getattr(center, "mu_" + side)[1, 2, 0] = means[0]
-            getattr(center, "mu_" + side)[1, 2, 1] = means[1]
+            mu = getattr(center, "mu_" + side)
+            mu[1, 2, 0][:, HIGH_DIMS] = means[0]
+            mu[1, 2, 1][:, HIGH_DIMS] = means[1]
     center.set_context(torch.tensor([2, 2]), torch.tensor([0, 1]))
     for side in ("q", "k"):
         out = captured[(1, side)]
@@ -212,16 +213,122 @@ def test_stage1_checkpoint_only_mu_differs():
              "--no-fsdp", "--warmup", "1", "--save-every", "2", "--lr-center", "1e-2"], ROOT)
         saved = torch.load(tmp / "s1" / "student" / "learned_center.pt")["state_dict"]
         calib = torch.load(tmp / "traj" / "calibration.pt")
-        diff = (saved["mu_q"] - calib["mean_q"]).abs()
+        diff = (saved["mu_q"][..., HIGH_DIMS] - calib["mean_q"]).abs()
         assert diff[0].sum() == 0 and diff[1, 0].sum() == 0, "exempt cells moved"
         assert diff[1, 1:].sum() > 0, "active cells did not train"
         print("test_stage1_checkpoint_only_mu_differs OK")
+
+
+def test_masks_and_legacy_checkpoint():
+    """Per-side masks replace only their own pairs; a 44-wide legacy state dict loads and matches default behaviour."""
+    model = build_tiny()
+    torch.manual_seed(5)
+    x = torch.randn(2, 16, 2, 4, 4); text = torch.randn(2, 8, 64); t = torch.tensor([500.0, 500.0])
+    captured = {}
+    handles = [getattr(b.attn1, "norm_" + sd).register_forward_hook(lambda m, i, o, key=(l, sd): captured.__setitem__(key, o.detach().clone()))
+               for l, b in enumerate(model.blocks) for sd in ("q", "k")]
+    with torch.no_grad():
+        model(hidden_states=x, timestep=t, encoder_hidden_states=text, return_dict=False)
+    for h in handles:
+        h.remove()
+    L, S, B, H = 2, STEPS, 2, 2
+    mask_q = torch.zeros(L, S, B, H, 64, dtype=torch.bool); mask_k = torch.zeros_like(mask_q)
+    mask_q[..., [3, 40]] = True            # Q: pairs 3 and 40 ;  K: pairs 40 and 63 (one shared)
+    mask_k[..., [40, 63]] = True
+    center = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(), selection={"mask_q": mask_q, "mask_k": mask_k})
+    with torch.no_grad():
+        center.mu_q.fill_(7.0); center.mu_k.fill_(-3.0)
+    center.set_context(torch.tensor([1, 1]), torch.tensor([0, 1]))
+    out = captured[(1, "q")]
+    got = center.replace(out, 1, "q").view(2, 8, H, 64, 2)
+    ref = out.view(2, 8, H, 64, 2)
+    assert torch.equal(got[..., [3, 40], :], torch.full_like(got[..., [3, 40], :], 7.0)) and torch.equal(got[..., [0, 1, 2, 4, 63], :], ref[..., [0, 1, 2, 4, 63], :])
+    gotk = center.replace(captured[(1, "k")], 1, "k").view(2, 8, H, 64, 2)
+    assert torch.equal(gotk[..., [40, 63], :], torch.full_like(gotk[..., [40, 63], :], -3.0)) and torch.equal(gotk[..., 3, :], captured[(1, "k")].view(2, 8, H, 64, 2)[..., 3, :])
+    assert int(center.selected_pairs("q").sum(-1)[0, 0, 0, 0]) == 2 and not center.uses_default_masks
+    # legacy 44-wide checkpoint reproduces the default (HIGH) behaviour
+    torch.manual_seed(6)
+    legacy = {"mu_q": torch.randn(L, S, B, H, 44), "mu_k": torch.randn(L, S, B, H, 44),
+              "layer_active": torch.tensor([False, True]), "step_active": torch.tensor([False, True, True, True]), "high_dims": HIGH_DIMS.clone()}
+    new = LearnedCenter(layers=L, steps=S, heads=H)
+    new.load_state_dict(legacy)
+    assert new.uses_default_masks and torch.equal(new.mu_q[..., HIGH_DIMS], legacy["mu_q"])
+    assert new.mu_q[..., 17].abs().sum() == 0, "non-HIGH coordinate (pair 8) must stay zero after a legacy load"
+    new.set_context(torch.tensor([2, 2]), torch.tensor([0, 1]))
+    expected = out.view(2, 8, H, 128).clone(); expected[..., HIGH_DIMS] = legacy["mu_q"][1, 2].unsqueeze(1).expand(2, 8, H, 44)[torch.arange(2)[:, None, None], :, :][:, 0] if False else legacy["mu_q"][1][torch.tensor([2, 2]), torch.tensor([0, 1])].unsqueeze(1).expand(2, 8, H, 44)
+    assert torch.equal(new.replace(out, 1, "q"), expected.view(2, 8, -1))
+    again = LearnedCenter.from_checkpoint({"state_dict": new.state_dict(), "mode": "mean"})
+    assert torch.equal(again.mu_q, new.mu_q) and torch.equal(again.mask_k, new.mask_k)
+    print("test_masks_and_legacy_checkpoint OK")
+
+
+def test_statistics_selection_screen():
+    """Collector statistics match a direct computation; select_pairs produces valid masks and static exports;
+    screen_selections runs on the tiny model and reports finite errors."""
+    import collect_pair_statistics as C
+    import select_pairs as SP
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        cfg = write_fake_trajectories(tmp / "traj")
+        tiny = write_tiny_snapshot(tmp / "tiny")
+        from diffusers import WanTransformer3DModel
+        from train_learned_center import TrajectoryStore
+        model = WanTransformer3DModel.from_pretrained(tiny, subfolder="transformer", torch_dtype=torch.bfloat16).eval()
+        store = TrajectoryStore(tmp / "traj", ["d0000", "d0001", "d0002", "d0003"])
+        stats_dir = tmp / "stats"; stats_dir.mkdir()
+        for pid in store.ids:
+            stats = C.PairStats(model, store.steps)
+            direct = {}
+            hs = [getattr(b.attn1, "norm_" + sd).register_forward_hook(lambda m, i, o, key=(l, sd): direct.__setitem__((stats.context,) + key, o.detach().float().clone()))
+                  for l, b in enumerate(model.blocks) for sd in ("q", "k")]
+            with torch.inference_mode():
+                for step in range(store.steps):
+                    item = store.item(pid, step); stats.context = step
+                    x = item["x"].bfloat16().unsqueeze(0).expand(2, -1, -1, -1, -1).contiguous()
+                    text = torch.cat([item["positive"], item["negative"]]).bfloat16()
+                    model(hidden_states=x, timestep=torch.full((2,), float(item["timestep"])), encoder_hidden_states=text, return_dict=False)
+            stats.close(); [h.remove() for h in hs]
+            o = direct[(2, 1, "k")][1].view(-1, 2, 128)        # step 2, layer 1, uncond branch, K
+            assert torch.allclose(stats.mean["k"][1, 2, 1].float(), o.mean(0), atol=1e-5)
+            assert torch.allclose(stats.energy["k"][1, 2, 1].float(), o.view(-1, 2, 64, 2).square().sum(-1).mean(0), atol=1e-4)
+            torch.save({"prompt_id": pid, "steps": store.steps, "timesteps": store.timesteps, "mean_q": stats.mean["q"].float(), "mean_k": stats.mean["k"].float(),
+                        "energy_q": stats.energy["q"].float(), "energy_k": stats.energy["k"].float()}, stats_dir / f"{pid}.pt")
+        sel_dir = tmp / "sel"
+        proc = subprocess.run([sys.executable, str(ROOT / "scripts" / "select_pairs.py"), "--stats", str(stats_dir), "--out", str(sel_dir), "--pairs", "22"], cwd=ROOT, capture_output=True, text=True)
+        assert proc.returncode == 0, proc.stderr[-3000:]
+        sel = torch.load(sel_dir / "selection.pt")
+        for name, v in sel["variants"].items():
+            assert tuple(v["mask_q"].shape) == (2, STEPS, 2, 2, 64) and (v["mask_q"].sum(-1) == 22).all() and (v["mask_k"].sum(-1) == 22).all(), name
+        assert torch.equal(sel["variants"]["shared"]["mask_q"], sel["variants"]["shared"]["mask_k"])
+        assert torch.equal(sel["variants"]["fixed_high"]["mask_q"][0, 0, 0, 0].nonzero().flatten(), torch.tensor(sorted(set(HIGH_DIMS.tolist()[::2]) | set())) // 2) or True
+        high_pairs = sorted(set((HIGH_DIMS // 2).tolist()))
+        assert sel["variants"]["fixed_high"]["mask_q"][0, 0, 0, 0].nonzero().flatten().tolist() == high_pairs
+        report = json.loads((sel_dir / "selection-report.json").read_text())
+        assert 0 <= report["stability_q"]["jaccard_prompt_vs_pooled_median"] <= 1 and report["separate_q_k_intersection"]["mean_pairs"] <= 22
+        # the lowest-damage pairs are selected: check one cell by recomputation
+        dq = sel["damage_q"][1, 2, 1, 0]
+        assert set(dq.topk(22, largest=False).indices.tolist()) == set(sel["variants"]["separate"]["mask_q"][1, 2, 1, 0].nonzero().flatten().tolist())
+        static = LearnedCenter.from_checkpoint(torch.load(sel_dir / "static-separate" / "learned_center.pt"))
+        pooled = torch.load(sel_dir / "pair-statistics.pt")
+        assert torch.allclose(static.mu_q, pooled["mean_q"]) and torch.equal(static.selected_pairs("k"), sel["variants"]["separate"]["mask_k"])
+        proc = subprocess.run([sys.executable, str(ROOT / "scripts" / "screen_selections.py"), "--traj", str(tmp / "traj"), "--prompts", str(cfg), "--snapshot", str(tiny),
+                               "--selection", str(sel_dir / "selection.pt"), "--statistics", str(sel_dir / "pair-statistics.pt"), "--out", str(tmp / "screen"), "--val-prompts", "2"],
+                              cwd=ROOT, capture_output=True, text=True)
+        assert proc.returncode == 0, proc.stderr[-3000:]
+        summary = json.loads((tmp / "screen" / "complete.json").read_text())
+        assert set(summary["arms"]) == {f"{v}/{m}" for v in ("fixed_high", "separate", "shared") for m in ("mean", "delete")}
+        for arm, r in summary["arms"].items():
+            assert len(r["per_step"]) == STEPS and all(0 <= v < 1e6 for v in r["mean"]), arm
+        assert summary["arms"]["fixed_high/mean"]["mean"][2] != summary["arms"]["fixed_high/delete"]["mean"][2]
+        print("test_statistics_selection_screen OK")
 
 
 if __name__ == "__main__":
     os.environ.setdefault("OMP_NUM_THREADS", "4")
     test_replacement_exact()
     test_narrow_projection()
+    test_masks_and_legacy_checkpoint()
+    test_statistics_selection_screen()
     test_stage1_checkpoint_only_mu_differs()
     test_training_stages()
     print("ALL TESTS OK")

@@ -112,15 +112,19 @@ def main():
     center_hash = None
     if student_dir and (student_dir / "learned_center.pt").exists():
         saved = torch.load(student_dir / "learned_center.pt", map_location="cpu")
-        center.load_state_dict(saved["state_dict"])
+        center.load_state_dict(saved["state_dict"])      # masks (per-cell Q/K selections) and exemptions come from the checkpoint
         center_hash = digest(student_dir / "learned_center.pt")
     elif args.center_mode == "mean":
         raise RuntimeError("--center-mode mean needs --student with learned_center.pt")
     center.attach(pipe.transformer)
     exempt = {"layers": [int(i) for i in torch.nonzero(~center.layer_active).flatten()], "steps": [int(i) for i in torch.nonzero(~center.step_active).flatten()]}
+    selection_info = {"default_high_masks": center.uses_default_masks,
+                      "pairs_per_cell_q": float(center.selected_pairs("q").sum(-1).float().mean()),
+                      "pairs_per_cell_k": float(center.selected_pairs("k").sum(-1).float().mean()),
+                      "q_k_intersection_mean": float((center.selected_pairs("q") & center.selected_pairs("k")).sum(-1).float().mean())}
     environment = {"torch": torch.__version__, "diffusers": diffusers.__version__, "transformers": transformers.__version__,
                    "snapshot": revision, "weights": weights_source, "learned_center_sha256": center_hash, "center_mode": args.center_mode,
-                   "exempt": exempt, "gpu": torch.cuda.get_device_name(0), "hostname": socket.gethostname(), "pid": os.getpid(),
+                   "exempt": exempt, "selection": selection_info, "gpu": torch.cuda.get_device_name(0), "hostname": socket.gethostname(), "pid": os.getpid(),
                    "config_sha256": digest(config_path), "code_sha256": {n: digest(ROOT / "scripts" / n) for n in ("generate_learned_center.py", "learned_center.py")}}
     active_layers = int(center.layer_active.sum()) if args.center_mode != "off" else 0
     active_steps = int(center.step_active.sum()) if args.center_mode != "off" else 0

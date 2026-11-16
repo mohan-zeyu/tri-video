@@ -335,3 +335,12 @@ generalized before use.
 Before the long runs: a one-GPU pilot of each stage with `--steps 20 --val-every 10 --save-every 20
 --no-fsdp` (or 2 GPUs with FSDP) to record peak memory, seconds per step and that the validation numbers
 are finite. Record `torch.cuda.get_device_name` and the SDPA backend in the run metadata.
+
+### Per-pair selection extension (16 November)
+
+`LearnedCenter` now takes per-cell boolean masks for Q and K over all 64 pairs (128-wide means; 44-wide
+checkpoints still load). `scripts/collect_pair_statistics.py` records per-pair means and energies on the
+calibration prompts, `scripts/select_pairs.py` ranks pairs by replacement damage and writes the `fixed_high`,
+`separate` and `shared` selections plus static exports, `scripts/screen_selections.py` measures them
+training-free on held-out states, and `train_learned_center.py --selection ... --variant ...` trains them.
+The procedure is in `DISTILL_SELECTION_PROMPT.md`.

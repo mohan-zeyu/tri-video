@@ -571,7 +571,9 @@ def main():
     parser.add_argument("--out", required=True)
     parser.add_argument("--snapshot", default=os.environ.get("WAN_SNAPSHOT"), help="Wan snapshot dir with transformer/ and scheduler/")
     parser.add_argument("--init-student", help="directory with transformer/ + learned_center.pt from a previous stage")
-    parser.add_argument("--calibration", help="traj/calibration.pt for mu init (default: <traj>/calibration.pt)")
+    parser.add_argument("--calibration", help="means for mu init: traj/calibration.pt (44-wide) or pair-statistics.pt (full 128-wide); default <traj>/calibration.pt")
+    parser.add_argument("--selection", help="selection.pt from scripts/select_pairs.py (per-cell Q/K pair masks)")
+    parser.add_argument("--variant", default="separate", help="variant inside --selection: fixed_high | separate | shared")
     parser.add_argument("--center-mode", choices=("mean", "delete", "narrow", "off"), default="mean")
     parser.add_argument("--include-layer0", action="store_true")
     parser.add_argument("--include-step1", action="store_true")
@@ -633,9 +635,13 @@ def main():
 
     teacher, student, snapshot = load_models(args, device)
     layers, heads = len(teacher.blocks), teacher.config.num_attention_heads
+    selection = None
+    if args.selection:
+        selection = torch.load(args.selection, map_location="cpu")["variants"][args.variant]
+        log(rank, f"pair selection: {args.selection} variant {args.variant}")
     center = LearnedCenter(layers=layers, steps=store.steps, heads=heads, head_dim=teacher.config.attention_head_dim,
                            exempt_layers=() if args.include_layer0 else (0,), exempt_steps=() if args.include_step1 else (0,),
-                           mode=args.center_mode).to(device)
+                           mode=args.center_mode, selection=selection).to(device)
     if args.init_student:
         init_dir = Path(args.init_student)
         weights_file = init_dir / "transformer" / "diffusion_pytorch_model.safetensors"
