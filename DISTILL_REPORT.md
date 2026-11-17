@@ -364,6 +364,58 @@ Narrow scored below the teacher, trained fixed-high Stage 3 and dense on six of 
 
 Same-seed teacher agreement averaged absolute final-latent L2 627.957 and relative L2 0.715557 over 100 pairs, using every coordinate and the teacher norm as the relative denominator per prompt. Mean PSNR was 12.295 dB over all 4,500 aligned decoded RGB frames. The benchmark used 3,572 GPU-seconds (0.992 GPU-hours). It retained 90 renders after the initial 2,553 GPU-seconds, then used 1,019 GPU-seconds on GPU 5 after approval to render the final ten and score all 100. The benchmark and last 1,000 training updates used 13,124 GPU-seconds combined (3.646 GPU-hours). The reported summaries and per-prompt results are in `distill-results/narrow-paired/`. Lab renders and records are in `out/learned-center-wan-narrow-full100/` in the selection checkout.
 
+### Shared22 deletion control
+
+Shared22 deletion initialized from teacher weights and followed the tuned shared22 Stage 2 recipe for 2,500 updates. It used two ranks and two microbatches per rank, sampling four cached teacher prompt-and-step states per optimizer update with the same seed. The Q and K masks matched the tuned EMA and the original shared selection exactly across 14,400 layer–step–branch–head cells. At each of the 13,224 active cells, it zeroes both coordinates of the same 22 rotary pairs in both Q and K for every video token, after full native RMSNorm and before RoPE. Layer 0 and denoising step 1 are exempt.
+
+Each validation row averages relative squared velocity error over all latent coordinates at 20 cached teacher entering states for each of the same eight held-out prompts. Conditional and unconditional use their own teacher velocities. Guided error combines both branches at CFG 5 before computing the ratio. The table evaluates the current weights at each update.
+
+| Update | Deletion conditional | Deletion unconditional | Deletion guided | Learned means guided |
+|---|---:|---:|---:|---:|
+| 0 | 0.008363 | 0.008205 | 0.034872 | 0.030147 |
+| 250 | 0.004563 | 0.004953 | 0.029633 | 0.032010 |
+| 500 | 0.005117 | 0.005920 | 0.031879 | 0.029735 |
+| 750 | 0.004833 | 0.005077 | 0.030278 | 0.035191 |
+| 1,000 | 0.004947 | 0.005638 | 0.030603 | 0.029822 |
+| 1,250 | 0.003663 | 0.003494 | 0.026632 | 0.026262 |
+| 1,500 | 0.003750 | 0.003973 | 0.028333 | 0.026239 |
+| 1,750 | 0.003231 | 0.002826 | 0.024191 | 0.024334 |
+| 2,000 | 0.002735 | 0.002417 | 0.022847 | 0.022687 |
+| 2,250 | 0.002457 | 0.002216 | 0.021362 | 0.021209 |
+| 2,500 | 0.002348 | 0.002138 | 0.020530 | 0.020696 |
+
+Deletion completed in one run on GPUs 2 and 0 with finite logged losses. The median update time was 6.943 s across 251 logged optimizer updates, averaging two rank timings for each update and excluding evaluation and saves. Peak PyTorch allocation was 21.507 and 21.504 GiB by rank. Training used 36,712 GPU-seconds (10.198 GPU-hours). The final EMA and four intermediate 500-update EMA exports are in `out/distill-shared22-delete/` in the durable selection checkout. The training args, histories, mask audit and final EMA SHA-256 manifest are in `distill-results/shared22-delete/`.
+
+### Shared22 deletion benchmark on 100 matched prompts
+
+Each of the 100 deletion videos used the original fixed seed for its prompt, recorded finite latents at all 20 steps and passed the MP4 checksum and 45-frame, 480×480, 16 fps audits. All made 2,204 intervention calls across 29 active layers, 19 active steps, both CFG branches, and Q and K. Audited teacher, tuned shared22 and dense scores use the same prompt and seed manifest and pinned evaluator. Each VBench mean averages 100 per-video scores. Aesthetics and imaging use all 45 frames, and text–video consistency uses eight midpoint frames and the prompt.
+
+| Dimension | Shared22 deletion | Teacher | Tuned shared22 | Dense |
+|---|:---:|:---:|:---:|:---:|
+| subject_consistency | 0.966353 | 0.963999 | 0.967490 | 0.964285 |
+| background_consistency | 0.978334 | 0.976466 | 0.978377 | 0.977676 |
+| motion_smoothness | 0.986335 | 0.984463 | 0.986384 | 0.985506 |
+| dynamic_degree | 0.270000 | 0.330000 | 0.280000 | 0.250000 |
+| aesthetic_quality | 0.577787 | 0.588595 | 0.583495 | 0.578063 |
+| imaging_quality | 0.680191 | 0.660679 | 0.678854 | 0.670020 |
+| overall_consistency | 0.234605 | 0.232555 | 0.234047 | 0.234363 |
+
+The differences below are deletion minus the reference. Each 95% interval uses 10,000 paired prompt resamples of the 100 prompt-and-seed units, with NumPy seed 20261109.
+
+| Dimension | vs. teacher | vs. tuned shared22 | vs. dense |
+|---|:---:|:---:|:---:|
+| subject_consistency | +0.00235 [-0.00438, +0.00845] | -0.00114 [-0.00494, +0.00223] | +0.00207 [-0.00262, +0.00670] |
+| background_consistency | +0.00187 [-0.00154, +0.00534] | -0.00004 [-0.00243, +0.00236] | +0.00066 [-0.00168, +0.00301] |
+| motion_smoothness | +0.00187 [+0.00048, +0.00337] | -0.00005 [-0.00057, +0.00048] | +0.00083 [-0.00050, +0.00246] |
+| dynamic_degree | -0.06000 [-0.13000, +0.01000] | -0.01000 [-0.07000, +0.05000] | +0.02000 [-0.04000, +0.08000] |
+| aesthetic_quality | -0.01081 [-0.02346, +0.00174] | -0.00571 [-0.01637, +0.00459] | -0.00028 [-0.01189, +0.01145] |
+| imaging_quality | +0.01951 [+0.00229, +0.03680] | +0.00134 [-0.00870, +0.01113] | +0.01017 [-0.00286, +0.02310] |
+| overall_consistency | +0.00205 [-0.00420, +0.00836] | +0.00056 [-0.00378, +0.00496] | +0.00024 [-0.00464, +0.00521] |
+
+All seven intervals versus tuned shared22 and all seven versus dense span zero. Against tuned shared22, average aesthetics was 0.00571 lower with an interval from −0.01637 to +0.00459. Imaging and text–video means differed by +0.00134 and +0.00056, respectively. The matched experiment finds no detectable gain from learned means over post-RMSNorm zeroing of these shared pairs after fine-tuning. The result applies to the shared mask, exemptions, Stage 2 procedure and benchmark above. Against the teacher, deletion’s imaging quality and motion smoothness intervals were above zero.
+
+Same-seed teacher agreement averaged absolute final-latent L2 502.669 and relative L2 0.571827 over 100 matched pairs, each using every final latent coordinate. Relative L2 divides each difference norm by the teacher norm before averaging. Mean PSNR was 14.006 dB over 4,500 aligned decoded RGB frames. Benchmarking used 3,328 GPU-seconds (0.924 GPU-hours), for 40,040 GPU-seconds (11.122 GPU-hours) including training. This used 440 GPU-seconds of the approved additional benchmark allowance. Per-prompt results, comparisons and agreement are in `distill-results/shared22-delete/full100/`. Videos and generation records are in `out/learned-center-wan-shared22_delete-full100/` in the selection checkout.
+
 ## Per-pair selection study
 
 ### A. Calibration and selection
