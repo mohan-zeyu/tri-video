@@ -673,3 +673,52 @@ Same-seed agreement with the teacher gave mean final-latent L2 495.215 and relat
 The benchmark used 1,170 GPU-seconds on GPU 4, for 37,374 GPU-seconds (10.382 GPU-hours) including training. Training outputs, final EMA backup and benchmark records occupied about 17.51 GB, including linked teacher files in the benchmark count. All EMA milestones were retained. The lab checkpoint is `out/distill-shared22/student/`, and its checksum-verified durable copy is `out/distill-shared22-export/student/` in the selection checkout. Videos and source records are in `out/learned-center-wan-shared22/`. The curve and benchmark artifacts are under `distill-results/shared22/`.
 
 The 100-prompt benchmark awaits approval. Narrow remains paused at update 4,000, and the deletion control is still pending.
+
+## Pre-norm removal of the selected pairs
+
+Pre-norm removal zeroes both coordinates of each selected rotary pair in the Q and K projection outputs for every token, before native QK RMSNorm and RoPE. Post-norm deletion zeroes the same coordinates after RMSNorm and before RoPE. Pre-norm zeroing removes those coordinates from the sum of squares that sets the scale of the surviving values for each token. Native RMSNorm still divides by the full 1,536-coordinate projection width. Each active head retains 42 of 64 pairs, or 84 live coordinates, on Q and on K.
+
+Shared/narrow uses shared22’s per-layer, step, CFG branch and head masks, with layer 0 and denoising step 1 exempt, matching the post-norm deletion comparison. Pooled/narrow selects one set per layer and head, shared by Q and K and applied to both branches at all 20 steps, with layer 0 exempt. Its fixed output mask is equivalent to dropping the masked projection rows and supplying their implicit zeros to native full-width RMSNorm. This accounts for 47,069,088 Q/K weight and bias entries across the 29 active layers, from two projections × 528 rows × (1,536 inputs + one bias) per layer. The run uses masking on the existing matrices.
+
+### Selection v2 and training-free screen
+
+Selection v2 uses the earlier 64 calibration prompts, with each pair statistic computed across all 10,800 tokens at fixed layer, step, CFG branch, head and Q or K side. Pooled picks the 22 smallest summed Q-plus-K mean-replacement damage scores over all steps and branches for each layer and head. Both shared masks are tensor-equal to the original shared22 selection. Pooled shares 20.00861 of 22 pairs with shared on average (10th percentile 18), over all 14,400 layer–step–branch–head cells, including exempt cells. The energy-times-partner-energy criterion for zero replacement shares 18.86160 of 22 pairs with the original mean-replacement ranking across those same cells. The first is a step-and-branch pooling comparison and the second changes the ranking criterion.
+
+The screen uses the frozen teacher weights. It averages relative squared velocity error over every latent coordinate per observation, with each of the 32 held-out prompts contributing all 20 cached entering teacher states. Conditional and unconditional use their own teacher branches, and guided uses the CFG 5 combination before computing the ratio. Exempt steps still contribute observations. The earlier native bf16 versus fp32 reference was 0.002731 guided on 32 prompts × 20 entering teacher states, with native attention across all layers and steps.
+
+| Arm | Exemptions | Conditional | Unconditional | Guided CFG 5 |
+|---|---|---:|---:|---:|
+| Earlier shared/mean | Layer 0, step 1 | 0.006686 | 0.006748 | 0.032195 |
+| Earlier shared/delete | Layer 0, step 1 | 0.009840 | 0.009837 | 0.037419 |
+| Earlier fixed_high/delete | Layer 0, step 1 | 0.308276 | 0.307376 | 0.414549 |
+| shared/delete | Layer 0, step 1 | 0.009840 | 0.009837 | 0.037419 |
+| shared/narrow | Layer 0, step 1 | 0.032152 | 0.037423 | 0.113148 |
+| pooled/delete | Layer 0, step 1 | 0.009846 | 0.009700 | 0.037315 |
+| pooled/narrow | Layer 0, step 1 | 0.044226 | 0.048505 | 0.138203 |
+| pooled/delete | Layer 0 | 0.010068 | 0.009860 | 0.039605 |
+| pooled/narrow | Layer 0 | 0.044922 | 0.049555 | 0.144531 |
+
+Shared/narrow scored 0.113148, above the brief’s 0.05 range for expecting the gentle recipe to work. The direct run order requests C1 after B, so C1 uses the specified 2,500-update recipe with this higher starting error. Shared pre-norm error is 3.024× the fresh matched shared post-norm deletion result. The ratio exceeds 1.2, with higher error when zeroing moves before RMSNorm on these cached states. Pooled/narrow at all 20 steps scored 0.144531, between 0.05 and 0.15. The brief allows C2 at 2,500 updates. That horizon may be too short, and any extension requires approval.
+
+### Training-free videos on 30 matched prompts
+
+All four arms use the first 30 benchmark prompts with one original fixed seed each. The two pre-norm arms use teacher transformer weights. Every new shared/narrow video made 2,204 calls across 29 layers, 19 steps, two CFG branches and Q/K, and every pooled/narrow video made 2,320 across the same layers and branches and all 20 steps. All 60 new renders passed the 45-frame, 480×480, 16 fps and checksum audits and recorded finite latents at all 20 steps. The pinned VBench per-video scores are averaged over 30 videos per arm. Aesthetics and imaging use all 45 frames per video, and text–video consistency uses eight midpoint frames and the prompt.
+
+| Dimension | Teacher | Training-free shared22 means | Training-free shared/narrow | Training-free pooled/narrow |
+|---|---:|---:|---:|---:|
+| Aesthetics | 0.580512 | 0.539369 | 0.353448 | 0.326598 |
+| Imaging | 0.662574 | 0.615462 | 0.616318 | 0.638198 |
+| Text–video consistency | 0.228075 | 0.227472 | 0.077379 | 0.036490 |
+
+Differences are the pre-norm arm minus the reference. Each paired 95% interval uses 10,000 resamples of the 30 prompt-and-seed units with NumPy seed 20261109. At 30 prompts, aesthetics differences below about 0.02 are beyond the resolution of this benchmark.
+
+| Arm | Reference | Aesthetics | Imaging | Text–video consistency |
+|---|---|---:|---:|---:|
+| Training-free shared/narrow | Teacher | -0.22706 [-0.25890, -0.19719] | -0.04626 [-0.08954, -0.00019] | -0.15070 [-0.17374, -0.12740] |
+| Training-free shared/narrow | Training-free shared22 means | -0.18592 [-0.21931, -0.15268] | +0.00086 [-0.04533, +0.04988] | -0.15009 [-0.17609, -0.12520] |
+| Training-free pooled/narrow | Teacher | -0.25391 [-0.28599, -0.22298] | -0.02438 [-0.06448, +0.01797] | -0.19158 [-0.21989, -0.16329] |
+| Training-free pooled/narrow | Training-free shared22 means | -0.21277 [-0.24380, -0.18193] | +0.02274 [-0.01938, +0.06643] | -0.19098 [-0.21898, -0.16332] |
+
+Both pre-norm arms scored lower than the teacher and training-free shared22 means on aesthetics and text–video consistency, with all four intervals for each dimension below zero. The imaging intervals versus training-free shared22 means span zero for both pre-norm arms. These are training-free results.
+
+Stage A ran on CPU. Stage B used 5568.3 GPU-seconds (1.547 GPU-hours) for the two screens, 60 new renders and three pinned VBench dimensions. Report sources are in `distill-results/removal/`. Lab outputs are in `out/distill-selection-v2/` and `out/learned-center-wan-removal-static30/` in the isolated removal checkout.

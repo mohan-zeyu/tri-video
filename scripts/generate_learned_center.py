@@ -133,8 +133,9 @@ def main():
     scope = {
         "mean": "constant vectors on selected Q/K pairs after RMSNorm, per layer/step/branch/head",
         "delete": "zeros on selected Q/K pairs after RMSNorm and before RoPE, per layer/step/branch/head",
-        "narrow": "zeros on selected Q/K pairs before RMSNorm (norm over the remaining coordinates), per layer/step/branch/head"
-                  + ("; masks identical at every step and branch, equivalent to dropped projection rows" if center.cell_invariant() else ""),
+        "narrow": "zeros on selected Q/K pairs before native full-width RMSNorm, per layer/step/branch/head"
+                  + ("; masks identical at every step and branch, equivalent to dropped projection rows"
+                     if center.cell_invariant() and bool(center.step_active.all()) else ""),
         "off": "full Q/K with no replacements",
     }[args.center_mode]
 
