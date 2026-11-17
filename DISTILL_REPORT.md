@@ -332,7 +332,37 @@ Validation measures each branch's squared velocity error normalized by teacher v
 | 4,750 | 0.026692 | 0.025937 | 0.057508 |
 | 5,000 | 0.026277 | 0.025496 | 0.057076 |
 
-The untouched validation log in `distill-results/narrow/` records both update-2,750 evaluations around an earlier resume. The final EMA was copied to the lab's durable selection checkout at `out/distill-narrow-export/student/` and matched by SHA-256. The 100-prompt narrow benchmark reached its GPU allocation after 2,553 GPU-seconds on GPU 4 (0.709 GPU-hours), with 90 of the 100 requested prompt-and-seed renders saved. All 90 match the manifest and recorded MP4 checksums, contain 45 frames at 480×480, and record finite latents at all 20 steps. Each records 2,320 calls across 29 active layers, 20 steps, both CFG branches, and Q and K. The generation artifacts are in `out/learned-center-wan-narrow-full100/` in the selection checkout. Ten renders, all seven VBench dimensions, and full-scope latent and frame agreement remain pending. The shared22 deletion control is queued after this benchmark.
+The untouched validation log in `distill-results/narrow/` records both update-2,750 evaluations around an earlier resume. The final EMA was copied to the lab's durable selection checkout at `out/distill-narrow-export/student/` and matched by SHA-256.
+
+### Narrow benchmark on 100 matched prompts
+
+The update-5,000 EMA completed all 100 original prompts with their fixed seeds. Each narrow video passed the MP4 checksum and 45-frame, 480×480, 16 fps checks, recorded finite latents at all 20 steps, and made 2,320 intervention calls across 29 layers, 20 steps, both branches, and Q and K. The pinned VBench scorer evaluated all seven dimensions over the 100 narrow videos and reused audited teacher rows. The Stage 3 and dense scores also come from their audited runs on the same prompts and seeds. Aesthetics and imaging use all 45 frames per video. Text–video consistency uses eight midpoint frames and the prompt. The general VBench setup above describes the sampling for the other dimensions.
+
+| Dimension | Narrow | Teacher | Trained fixed-high Stage 3 | Dense |
+|---|:---:|:---:|:---:|:---:|
+| subject_consistency | 0.939386 | 0.963999 | 0.958942 | 0.964285 |
+| background_consistency | 0.971719 | 0.976466 | 0.974867 | 0.977676 |
+| motion_smoothness | 0.985804 | 0.984463 | 0.985119 | 0.985506 |
+| dynamic_degree | 0.060000 | 0.330000 | 0.210000 | 0.250000 |
+| aesthetic_quality | 0.309547 | 0.588595 | 0.517914 | 0.578063 |
+| imaging_quality | 0.540361 | 0.660679 | 0.652749 | 0.670020 |
+| overall_consistency | 0.102609 | 0.232555 | 0.219662 | 0.234363 |
+
+Differences are narrow minus the reference. The 95% percentile intervals use 10,000 paired resamples of the 100 prompt-and-seed units, with NumPy seed 20261109.
+
+| Dimension | vs. teacher | vs. trained fixed-high Stage 3 | vs. dense |
+|---|:---:|:---:|:---:|
+| subject_consistency | -0.02461 [-0.03256, -0.01610] | -0.01956 [-0.02518, -0.01390] | -0.02490 [-0.03189, -0.01765] |
+| background_consistency | -0.00475 [-0.00854, -0.00088] | -0.00315 [-0.00613, -0.00014] | -0.00596 [-0.00907, -0.00280] |
+| motion_smoothness | +0.00134 [-0.00071, +0.00341] | +0.00068 [-0.00058, +0.00214] | +0.00030 [-0.00125, +0.00222] |
+| dynamic_degree | -0.27000 [-0.37000, -0.18000] | -0.15000 [-0.22000, -0.08000] | -0.19000 [-0.28000, -0.11000] |
+| aesthetic_quality | -0.27905 [-0.29621, -0.26161] | -0.20837 [-0.22608, -0.19123] | -0.26852 [-0.28613, -0.25063] |
+| imaging_quality | -0.12032 [-0.14399, -0.09547] | -0.11239 [-0.13395, -0.09053] | -0.12966 [-0.15336, -0.10550] |
+| overall_consistency | -0.12995 [-0.14258, -0.11756] | -0.11705 [-0.13002, -0.10437] | -0.13175 [-0.14393, -0.11989] |
+
+Narrow scored below the teacher, trained fixed-high Stage 3 and dense on six of seven dimensions. Motion smoothness intervals span zero in all three comparisons. Against trained fixed-high, the gaps on the three quality measures were 0.20837 in aesthetics, 0.11239 in imaging, and 0.11705 in text–video consistency. The large deficit from removing the same fixed-high pairs before RMSNorm supports a benefit from the fixed-high student design. Mean replacement, norm statistics, first-step coverage and the Stage 3 rollout schedule all differ in this comparison. The shared22 deletion arm is the matched test of substituting means versus zeros after RMSNorm.
+
+Same-seed teacher agreement averaged absolute final-latent L2 627.957 and relative L2 0.715557 over 100 pairs, using every coordinate and the teacher norm as the relative denominator per prompt. Mean PSNR was 12.295 dB over all 4,500 aligned decoded RGB frames. The benchmark used 3,572 GPU-seconds (0.992 GPU-hours). It retained 90 renders after the initial 2,553 GPU-seconds, then used 1,019 GPU-seconds on GPU 5 after approval to render the final ten and score all 100. The benchmark and last 1,000 training updates used 13,124 GPU-seconds combined (3.646 GPU-hours). The reported summaries and per-prompt results are in `distill-results/narrow-paired/`. Lab renders and records are in `out/learned-center-wan-narrow-full100/` in the selection checkout.
 
 ## Per-pair selection study
 
