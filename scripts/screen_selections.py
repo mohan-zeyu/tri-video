@@ -3,12 +3,15 @@ frozen teacher, over held-out teacher states.
 
 For each validation prompt and each of the 20 entering states, both CFG branches: the native bf16 teacher
 velocity, then one forward per arm. Arms = (selection variant from select_pairs.py) x (mode): mode "mean" uses the
-pooled static means, mode "delete" zeros the same pairs. Error = relative squared velocity error (cond, uncond,
+pooled static means, mode "delete" zeros the same pairs after RMSNorm, mode "narrow" zeros them before RMSNorm
+(the norm then runs over the remaining coordinates; with the "pooled" variant this equals dropping projection
+rows). Error = relative squared velocity error (cond, uncond,
 guided w=5), exactly the Stage 0 reference metric (scripts/measure_distill_references.py), so results are
 comparable with: teacher bf16-vs-fp32 noise 0.0027 and training-free high current means 0.350 (guided).
 
 Exemptions follow the student by default (layer 0 and step 1 untouched); --no-exempt matches the reference's
-all-layer/all-step scope. One GPU per worker, resumable per prompt.
+all-layer/all-step scope; --all-steps keeps layer 0 exempt but touches every step (what a weight-level removal
+would do, since dropped rows cannot be restored at one step). One GPU per worker, resumable per prompt.
 """
 
 import argparse
@@ -72,6 +75,7 @@ def main():
     parser.add_argument("--modes", nargs="*", default=["mean", "delete"])
     parser.add_argument("--val-prompts", type=int, default=32, help="first N validation prompts")
     parser.add_argument("--no-exempt", action="store_true", help="apply to layer 0 and step 1 too (reference scope)")
+    parser.add_argument("--all-steps", action="store_true", help="keep layer 0 exempt but apply at every step (weight-removal scope)")
     parser.add_argument("--out", default="out/distill-selection/screen")
     parser.add_argument("--max-prompts", type=int)
     args = parser.parse_args()
@@ -89,10 +93,12 @@ def main():
     selection = torch.load(ROOT / args.selection if not os.path.isabs(args.selection) else args.selection, map_location="cpu")
     statistics = torch.load(ROOT / args.statistics if not os.path.isabs(args.statistics) else args.statistics, map_location="cpu")
     L, H, D = len(model.blocks), model.config.num_attention_heads, model.config.attention_head_dim
-    exempt_layers, exempt_steps = ((), ()) if args.no_exempt else ((0,), (0,))
+    exempt_layers, exempt_steps = ((), ()) if args.no_exempt else ((0,), () if args.all_steps else (0,))
     arms = {}
     for variant in args.variants:
         for mode in args.modes:
+            if mode not in ("mean", "delete", "narrow"):
+                raise ValueError(mode)
             center = LearnedCenter(layers=L, steps=store.steps, heads=H, head_dim=D, exempt_layers=exempt_layers, exempt_steps=exempt_steps,
                                    mode=mode, selection=selection["variants"][variant]).to(device)
             if mode == "mean":

@@ -344,3 +344,12 @@ calibration prompts, `scripts/select_pairs.py` ranks pairs by replacement damage
 `separate` and `shared` selections plus static exports, `scripts/screen_selections.py` measures them
 training-free on held-out states, and `train_learned_center.py --selection ... --variant ...` trains them.
 The procedure is in `DISTILL_SELECTION_PROMPT.md`.
+
+### Removal extension (17 November)
+
+The shared22 deletion control showed that post-norm zeros on the selected pairs match the learned means after the
+same fine-tuning, so the open question became whether the pairs can be removed *before* the norm, which is what
+deleting rows of `to_q`/`to_k` does. `LearnedCenter` narrow mode now takes the per-cell masks and the step exemption;
+`select_pairs.py` adds the step/branch-invariant `pooled` selection (the only kind a weight drop can realise);
+`screen_selections.py` screens `narrow` arms (`--all-steps` for the weight-removal scope). The procedure, training-free
+first and the matched 2,500-step fine-tune second, is in `DISTILL_REMOVAL_PROMPT.md`.

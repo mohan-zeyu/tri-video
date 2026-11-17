@@ -17,7 +17,9 @@ LearnedCenter module is replicated and its gradients are all-reduced manually. -
 with fp32 weights and bf16 autocast (CPU tests, or one large GPU).
 
 Controls: --center-mode off trains the dense control (same recipe, no replacement); --center-mode delete trains
-the post-norm deletion control; --center-mode narrow masks the projection before RMSNorm at every step.
+the post-norm deletion control; --center-mode narrow zeros the same masks before RMSNorm (with --selection, the
+per-cell masks and the usual exemptions; with --include-step1 and a step-invariant "pooled" selection this equals
+dropping projection rows).
 --include-layer0 / --include-step1 lift the default exemptions in modes that use them.
 """
 

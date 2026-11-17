@@ -10,7 +10,8 @@ Arms (--arm NAME, with --student DIR and --center-mode):
   student_s1     teacher weights + stage-1 trained means
   student        stage-3 student weights + trained means (mode mean)
   dense_control  fine-tuned weights trained with --center-mode off, replacement off
-  narrow         weights trained with --center-mode narrow, pre-norm HIGH zeros at every step
+  narrow         weights trained with --center-mode narrow, zeros before RMSNorm on the checkpoint's masks
+                 (the original control: fixed HIGH pairs at every step; with a selection: per-cell masks)
   deletion       weights trained with --center-mode delete, mode delete
 The arm name is free; the weights/means/mode come from the arguments. Every record stores the
 LearnedCenter state hash, the mode, exempt layers/steps and the number of replacement hook calls.
@@ -118,7 +119,7 @@ def main():
         raise RuntimeError("--center-mode mean needs --student with learned_center.pt")
     center.attach(pipe.transformer)
     exempt = {"layers": [int(i) for i in torch.nonzero(~center.layer_active).flatten()], "steps": [int(i) for i in torch.nonzero(~center.step_active).flatten()]}
-    selection_info = {"default_high_masks": center.uses_default_masks,
+    selection_info = {"default_high_masks": center.uses_default_masks, "cell_invariant_masks": center.cell_invariant(),
                       "pairs_per_cell_q": float(center.selected_pairs("q").sum(-1).float().mean()),
                       "pairs_per_cell_k": float(center.selected_pairs("k").sum(-1).float().mean()),
                       "q_k_intersection_mean": float((center.selected_pairs("q") & center.selected_pairs("k")).sum(-1).float().mean())}
@@ -132,7 +133,8 @@ def main():
     scope = {
         "mean": "constant vectors on selected Q/K pairs after RMSNorm, per layer/step/branch/head",
         "delete": "zeros on selected Q/K pairs after RMSNorm and before RoPE, per layer/step/branch/head",
-        "narrow": "zeros on 22 high Q/K pairs before RMSNorm at every step",
+        "narrow": "zeros on selected Q/K pairs before RMSNorm (norm over the remaining coordinates), per layer/step/branch/head"
+                  + ("; masks identical at every step and branch, equivalent to dropped projection rows" if center.cell_invariant() else ""),
         "off": "full Q/K with no replacements",
     }[args.center_mode]
 

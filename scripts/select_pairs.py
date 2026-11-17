@@ -19,6 +19,9 @@ Selections (each a bool mask [layers, steps, branches, heads, 64] per side):
   fixed_high   the original third: pairs t 0-7, h 22-28, w 43-49 on both sides
   separate     per cell and side, the --pairs lowest-damage pairs (Q and K chosen independently)
   shared       per cell, the --pairs lowest (damage_q + damage_k) pairs, same set on both sides
+  pooled       per (layer, head), the --pairs lowest sum over steps and branches of (damage_q + damage_k), same
+               set on both sides and at every step and branch: the only kind of selection that can be realised by
+               dropping rows of to_q/to_k (narrow mode) instead of masking at run time
 
 Also written: pooled statistics (pair-statistics.pt: full 128-dim pooled means, usable as --calibration), static
 learned_center.pt exports per variant, and selection-report.json with cross-prompt stability (Jaccard of each
@@ -108,6 +111,11 @@ def main():
     }
     shared = lowest_k_mask(damage_pooled["q"] + damage_pooled["k"], k)
     variants["shared"] = {"mask_q": shared, "mask_k": shared.clone()}
+    pooled_cell = lowest_k_mask((damage_pooled["q"] + damage_pooled["k"]).sum((1, 2)), k)               # [L, H, 64]
+    pooled_mask = pooled_cell[:, None, None].expand(L, S, B, H, 64).clone()
+    variants["pooled"] = {"mask_q": pooled_mask, "mask_k": pooled_mask.clone()}
+    # removal criterion (zeros instead of the pooled mean): energy x partner energy, no mean subtracted
+    removal_shared = lowest_k_mask(pooled_energy["q"] * pooled_energy["k"] * 2, k)
 
     # ---- stability and structure report ---------------------------------------------------------------
     report = {"prompts": P, "ids": ids, "pairs_per_side": k, "cells": L * S * B * H,
@@ -134,6 +142,13 @@ def main():
                                            "per_layer_mean": [round(float(v), 2) for v in inter.mean((1, 2, 3))],
                                            "scope": "number of pairs selected on both Q and K in the same cell, of the --pairs per side"}
     report["composition_shared"] = composition(shared)
+    report["composition_pooled"] = composition(pooled_cell)
+    report["pooled_vs_shared_intersection"] = {"mean_pairs": float((pooled_mask & shared).sum(-1).double().mean()),
+                                               "p10": float((pooled_mask & shared).sum(-1).double().flatten().quantile(0.1)),
+                                               "scope": "pairs the step/branch-invariant pooled set shares with the per-cell shared set, per cell, of --pairs"}
+    report["shared_vs_removal_criterion_intersection"] = {"mean_pairs": float((removal_shared & shared).sum(-1).double().mean()),
+                                                          "scope": "per cell, pairs in common between the shared selection (pooled-mean replacement damage) and the selection by energy x partner energy (zero replacement damage)"}
+    report["damage_pooled_over_shared"] = float((damage_pooled["q"][pooled_mask].sum() + damage_pooled["k"][pooled_mask].sum()) / (damage_pooled["q"][shared].sum() + damage_pooled["k"][shared].sum()))
     report["fixed_high_in_separate_q_fraction"] = float((variants["separate"]["mask_q"] & variants["fixed_high"]["mask_q"]).sum() / variants["fixed_high"]["mask_q"].sum())
     report["fixed_high_in_separate_k_fraction"] = float((variants["separate"]["mask_k"] & variants["fixed_high"]["mask_k"]).sum() / variants["fixed_high"]["mask_k"].sum())
     report["damage_total_by_variant"] = {name: float(damage_pooled["q"][v["mask_q"]].sum() + damage_pooled["k"][v["mask_k"]].sum()) for name, v in variants.items()}

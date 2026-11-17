@@ -5,7 +5,8 @@
    gradients reach mu_q/mu_k only.
 2. Fake trajectories + stages 1, 2 and 3 of train_learned_center.py run end to end (--no-fsdp), the student
    checkpoint loads back, and stage 3 fills the on-policy buffer.
-3. Narrow masks the projection before native RMSNorm at every step and blocks gradient to the masked rows.
+3. Narrow masks the projection before native RMSNorm at every step and blocks gradient to the masked rows;
+   with per-cell masks it follows the step/branch context and the step exemption like the other modes.
 
 Run from the repository root:  python scripts/test_learned_center.py
 """
@@ -102,7 +103,8 @@ def test_replacement_exact():
 
 def test_narrow_projection():
     model = build_tiny()
-    center = LearnedCenter(layers=2, steps=STEPS, heads=2, mode="narrow").attach(model)
+    center = LearnedCenter(layers=2, steps=STEPS, heads=2, mode="narrow", exempt_steps=()).attach(model)   # the original control
+    assert center.cell_invariant()
     high = (torch.arange(2)[:, None] * 128 + HIGH_DIMS).flatten()
     kept = torch.ones(256, dtype=torch.bool)
     kept[high] = False
@@ -138,6 +140,60 @@ def test_narrow_projection():
     assert center.calls == 4
     center.detach()
     print("test_narrow_projection OK")
+
+
+def test_narrow_selected():
+    """Narrow with per-cell masks: zeros before the norm on exactly the cell's pairs, exempt step and layer untouched,
+    context required when the masks vary by cell; a pooled (cell-invariant) selection works without context."""
+    model = build_tiny()
+    L, S, B, H = 2, STEPS, 2, 2
+    torch.manual_seed(8)
+    mask = torch.zeros(L, S, B, H, 64, dtype=torch.bool)
+    for l in range(L):
+        for st in range(S):
+            for b in range(B):
+                for h in range(H):
+                    mask[l, st, b, h, torch.randperm(64)[:22]] = True
+    center = LearnedCenter(layers=L, steps=S, heads=H, mode="narrow", exempt_layers=(0,), exempt_steps=(0,), selection={"mask_q": mask, "mask_k": mask})
+    assert not center.cell_invariant()
+    x = torch.randn(2, 8, 256)
+    raw = model.blocks[1].attn1.to_q(x)
+    try:
+        center.replace(raw, 1, "q"); raise AssertionError("context must be required for per-cell narrow masks")
+    except RuntimeError:
+        pass
+    center.set_context([2, 0], [1, 0])          # element 0: step 2 uncond (active); element 1: step 0 (exempt)
+    got = center.replace(raw, 1, "q").view(2, 8, H, 128)
+    m0 = center.mask_q[1, 2, 1]                                  # [H, 128]
+    ref0 = raw.view(2, 8, H, 128)[0].clone(); ref0[:, m0] = 0
+    assert torch.equal(got[0], ref0) and torch.equal(got[1], raw.view(2, 8, H, 128)[1])
+    assert int(m0[0].sum()) == 44
+    assert torch.equal(center.replace(raw, 0, "q"), raw), "exempt layer"
+    center.attach(model); center.calls = 0
+    center.set_context([2, 2], [0, 1])
+    with torch.no_grad():
+        model(hidden_states=torch.randn(2, 16, 2, 4, 4), timestep=torch.tensor([500.0, 500.0]), encoder_hidden_states=torch.randn(2, 8, 64), return_dict=False)
+    assert center.calls == 2, center.calls                       # layer 1 only, q and k
+    center.set_context([0, 0], [0, 1]); center.calls = 0
+    with torch.no_grad():
+        model(hidden_states=torch.randn(2, 16, 2, 4, 4), timestep=torch.tensor([500.0, 500.0]), encoder_hidden_states=torch.randn(2, 8, 64), return_dict=False)
+    assert center.calls == 0, "exempt step must not count"
+    center.detach()
+    # pooled: same set at every step and branch; no context needed; equals dropping the projection rows
+    pooled = mask[:, 0:1, 0:1].expand_as(mask).clone()
+    center = LearnedCenter(layers=L, steps=S, heads=H, mode="narrow", exempt_layers=(0,), exempt_steps=(), selection={"mask_q": pooled, "mask_k": pooled})
+    assert center.cell_invariant()
+    got = center.replace(raw, 1, "q")
+    proj = model.blocks[1].attn1.to_q
+    w = proj.weight.clone(); bb = proj.bias.clone(); rows = center.mask_q[1, 0, 0].flatten()
+    w[rows] = 0; bb[rows] = 0
+    torch.testing.assert_close(got, torch.nn.functional.linear(x, w, bb), rtol=0, atol=0)
+    center.set_context([1, 3], [0, 1])
+    torch.testing.assert_close(center.replace(raw, 1, "q"), got, rtol=0, atol=0)
+    # round trip through a checkpoint keeps masks, mode-independent
+    again = LearnedCenter.from_checkpoint({"state_dict": center.state_dict(), "mode": "narrow"})
+    assert again.mode == "narrow" and torch.equal(again.mask_k, center.mask_k) and again.cell_invariant()
+    print("test_narrow_selected OK")
 
 
 def write_fake_trajectories(root):
@@ -300,6 +356,10 @@ def test_statistics_selection_screen():
         for name, v in sel["variants"].items():
             assert tuple(v["mask_q"].shape) == (2, STEPS, 2, 2, 64) and (v["mask_q"].sum(-1) == 22).all() and (v["mask_k"].sum(-1) == 22).all(), name
         assert torch.equal(sel["variants"]["shared"]["mask_q"], sel["variants"]["shared"]["mask_k"])
+        pooled_m = sel["variants"]["pooled"]["mask_q"]
+        assert torch.equal(pooled_m, sel["variants"]["pooled"]["mask_k"]) and torch.equal(pooled_m, pooled_m[:, 0:1, 0:1].expand_as(pooled_m))
+        summed = (sel["damage_q"] + sel["damage_k"]).sum((1, 2))[1, 0]
+        assert set(summed.topk(22, largest=False).indices.tolist()) == set(pooled_m[1, 0, 0, 0].nonzero().flatten().tolist())
         assert torch.equal(sel["variants"]["fixed_high"]["mask_q"][0, 0, 0, 0].nonzero().flatten(), torch.tensor(sorted(set(HIGH_DIMS.tolist()[::2]) | set())) // 2) or True
         high_pairs = sorted(set((HIGH_DIMS // 2).tolist()))
         assert sel["variants"]["fixed_high"]["mask_q"][0, 0, 0, 0].nonzero().flatten().tolist() == high_pairs
@@ -320,6 +380,17 @@ def test_statistics_selection_screen():
         for arm, r in summary["arms"].items():
             assert len(r["per_step"]) == STEPS and all(0 <= v < 1e6 for v in r["mean"]), arm
         assert summary["arms"]["fixed_high/mean"]["mean"][2] != summary["arms"]["fixed_high/delete"]["mean"][2]
+        proc = subprocess.run([sys.executable, str(ROOT / "scripts" / "screen_selections.py"), "--traj", str(tmp / "traj"), "--prompts", str(cfg), "--snapshot", str(tiny),
+                               "--selection", str(sel_dir / "selection.pt"), "--statistics", str(sel_dir / "pair-statistics.pt"), "--out", str(tmp / "screen-narrow"),
+                               "--val-prompts", "1", "--variants", "shared", "pooled", "--modes", "delete", "narrow", "--all-steps"], cwd=ROOT, capture_output=True, text=True)
+        assert proc.returncode == 0, proc.stderr[-3000:]
+        narrow = json.loads((tmp / "screen-narrow" / "complete.json").read_text())
+        meta = json.loads((tmp / "screen-narrow" / "meta.json").read_text())
+        assert meta["exempt_layers"] == [0] and meta["exempt_steps"] == []
+        assert set(narrow["arms"]) == {"shared/delete", "shared/narrow", "pooled/delete", "pooled/narrow"}
+        assert narrow["arms"]["pooled/narrow"]["mean"][2] != narrow["arms"]["pooled/delete"]["mean"][2], "pre- and post-norm zeros must differ"
+        report = json.loads((sel_dir / "selection-report.json").read_text())
+        assert 0 <= report["pooled_vs_shared_intersection"]["mean_pairs"] <= 22
         print("test_statistics_selection_screen OK")
 
 
@@ -327,6 +398,7 @@ if __name__ == "__main__":
     os.environ.setdefault("OMP_NUM_THREADS", "4")
     test_replacement_exact()
     test_narrow_projection()
+    test_narrow_selected()
     test_masks_and_legacy_checkpoint()
     test_statistics_selection_screen()
     test_stage1_checkpoint_only_mu_differs()

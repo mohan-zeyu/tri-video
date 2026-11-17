@@ -12,12 +12,16 @@ own per-cell sets. mu_q/mu_k are fp32 parameters of shape [layers, steps, branch
 outside the mask are unused.
 
 Modes: "mean" (learned constants on the mask), "delete" (post-norm zeros on the mask), "narrow" (pre-norm
-zeros on the fixed HIGH set at every step; not combinable with a selection), "off" (dense attention).
+zeros on the mask, i.e. the projection output is zeroed before Wan's RMSNorm, so the norm statistics are taken
+over the remaining coordinates), "off" (dense attention).
 
 Mean and deletion hook attn1.norm_q / attn1.norm_k. Narrow hooks attn1.to_q / attn1.to_k on non-exempt layers
-and leaves native RMSNorm and RoPE in place. The step/branch context is set explicitly by the training loop
-(set_context) or inferred during pipeline rollouts (set_rollout + a transformer pre-hook that compares the
-text embeddings to the registered conditional/unconditional embeddings and counts conditional forwards).
+and leaves native RMSNorm and RoPE in place. Narrow takes the same per-cell masks and step exemptions as the
+other modes; when its masks do not depend on step or branch and no step is exempt (the original narrow control,
+or a "pooled" selection), it is exactly equivalent to deleting those rows of to_q/to_k, and it then also works
+without a step/branch context. The step/branch context is set explicitly by the training loop (set_context) or
+inferred during pipeline rollouts (set_rollout + a transformer pre-hook that compares the text embeddings to the
+registered conditional/unconditional embeddings and counts conditional forwards).
 
 Checkpoint compatibility: state dicts written by the earlier 44-wide version (mu_* of shape [..., 44], no
 masks) load into this module and reproduce its behaviour exactly.
@@ -59,21 +63,16 @@ class LearnedCenter(nn.Module):
         default = pair_mask_to_dims(high_pair_mask()).expand(shape).clone()
         mask_q, mask_k = default, default.clone()
         if selection is not None:
-            if mode == "narrow":
-                raise ValueError("narrow mode uses the fixed HIGH projection rows; it takes no selection")
             mask_q, mask_k = (self._coerce_mask(selection[k], shape) for k in ("mask_q", "mask_k"))
         self.register_buffer("mask_q", mask_q)
         self.register_buffer("mask_k", mask_k)
         layer_active = torch.ones(layers, dtype=torch.bool)
         layer_active[list(exempt_layers)] = False
         step_active = torch.ones(steps, dtype=torch.bool)
-        if mode != "narrow":
-            step_active[list(exempt_steps)] = False
+        step_active[list(exempt_steps)] = False
         self.register_buffer("layer_active", layer_active)
         self.register_buffer("step_active", step_active)
         self.register_buffer("high_dims", HIGH_DIMS.clone())
-        projection_high_dims = (torch.arange(heads)[:, None] * head_dim + HIGH_DIMS).flatten()
-        self.register_buffer("projection_high_dims", projection_high_dims, persistent=False)
         self.mode = mode
         self.step = None      # LongTensor [B], zero-based denoising step per batch element
         self.branch = None    # LongTensor [B], 0 = conditional, 1 = unconditional
@@ -91,6 +90,16 @@ class LearnedCenter(nn.Module):
         if not torch.equal(mask[..., 0::2], mask[..., 1::2]):
             raise ValueError("masks must select whole rotary pairs (both coordinates)")
         return mask.clone()
+
+    def cell_invariant(self, layer=None):
+        """True when the masks of this layer (or every layer) are the same at every step and branch."""
+        layers = range(self.layers) if layer is None else (layer,)
+        for mask in (self.mask_q, self.mask_k):
+            for l in layers:
+                m = mask[l]
+                if not torch.equal(m, m[0:1, 0:1].expand_as(m)):
+                    return False
+        return True
 
     @property
     def uses_default_masks(self):
@@ -128,25 +137,29 @@ class LearnedCenter(nn.Module):
         """Replace selected pre-RoPE Q/K entries at the mode's projection or norm hook."""
         if self.mode == "off" or not bool(self.layer_active[layer]):
             return x
-        if self.mode == "narrow":
-            self.calls += 1
-            return x.index_fill(-1, self.projection_high_dims, 0)
-        if self.step is None or self.branch is None:
-            raise RuntimeError("LearnedCenter context not set")
         batch, tokens, width = x.shape
-        step = self.step.to(x.device)
-        branch = self.branch.to(x.device)
-        if step.numel() != batch:
-            raise RuntimeError(f"context batch {step.numel()} != tensor batch {batch}")
-        active = self.step_active.to(x.device)[step]                      # [B]
-        if not bool(active.any()):
-            return x
-        mu = self.mu_q if side == "q" else self.mu_k
-        mask = (self.mask_q if side == "q" else self.mask_k)[layer][step, branch]   # [B, heads, 128]
-        mask = mask & active.view(batch, 1, 1)
+        masks = self.mask_q if side == "q" else self.mask_k
+        if self.step is None or self.branch is None:
+            # Context-free use is only defined for narrow with step/branch-invariant masks and no exempt step:
+            # then the removal is a fixed property of the layer (equivalent to dropping projection rows).
+            if self.mode == "narrow" and bool(self.step_active.all()) and self.cell_invariant(layer):
+                mask = masks[layer, 0, 0].unsqueeze(0).expand(batch, -1, -1)      # [B, heads, 128]
+                step = branch = None
+            else:
+                raise RuntimeError("LearnedCenter context not set")
+        else:
+            step = self.step.to(x.device)
+            branch = self.branch.to(x.device)
+            if step.numel() != batch:
+                raise RuntimeError(f"context batch {step.numel()} != tensor batch {batch}")
+            active = self.step_active.to(x.device)[step]                      # [B]
+            if not bool(active.any()):
+                return x
+            mask = masks[layer][step, branch] & active.view(batch, 1, 1)      # [B, heads, 128]
         if self.mode == "mean":
+            mu = self.mu_q if side == "q" else self.mu_k
             values = mu[layer][step, branch].to(x.dtype)                 # [B, heads, 128]
-        elif self.mode == "delete":
+        elif self.mode in ("delete", "narrow"):
             values = torch.zeros(batch, self.heads, self.head_dim, dtype=x.dtype, device=x.device)
         else:
             raise ValueError(self.mode)
