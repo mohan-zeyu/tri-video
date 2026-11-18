@@ -81,3 +81,46 @@ ran. No model identifiers in committed files; no speed claims.
    exemptions).
 3. `handoff.md` §16 updated.
 4. A final message: what ran, what failed and how it was fixed, the headline numbers, open issues.
+
+## C. The same swap on the fixed-high student (added 18 November; training-free, about 1.3 GPU-hours)
+
+The original study's student (fixed high third, 22 pairs t 0–7 / h 22–28 / w 43–49 on both Q and K, learned means,
+Stage 3 EMA after 5,000 updates) is preserved at `out/distill-controls-preserved/s3/student/` (transformer/ + a
+44-wide legacy `learned_center.pt`, which the current module loads and converts; verify by its recorded SHA-256 in
+`out/distill-controls-preserved/` and by `uses_default_masks == True`, exemptions layer 0 and step 1). Swap its means
+for zeros at inference; nothing is trained.
+
+| arm | weights | on the fixed high pairs | what it is |
+|---|---|---|---|
+| `fh_means` | fixed-high Stage 3 EMA | its trained means (`--center-mode mean`) | as benchmarked (`student` arm, `distill-results/student-paired/`), reference |
+| `fh_zeros` | fixed-high Stage 3 EMA | zeros (`--center-mode delete`) | **fine-tune with means, then drop them**, on the fixed set |
+
+C1. Screen (about 20 GPU-minutes):
+```sh
+CUDA_VISIBLE_DEVICES=<g> python scripts/screen_selections.py --val-prompts 32 --student out/distill-controls-preserved/s3/student \
+  --modes mean delete --out out/distill-swap/screen-fh
+```
+Scope as in A (32 held-out prompts × 20 teacher entering states, both branches, guided w=5, reference = native bf16
+teacher). The `student/mean` row should be near the Stage 3 final validation of 0.028238 guided on the same 32
+prompts (that row used the live weights; this one uses the EMA export, so a small difference is expected; state both).
+Put the two rows in one table with the four rows of A and with the training-free teacher rows for the fixed set
+(static means 0.283, zeros 0.415) so the ratio zeros/means can be read before and after training for both pair sets.
+
+C2. 100-prompt videos for `fh_zeros` only (about 1 GPU-hour); `fh_means` is the existing audited `student` arm, do
+not regenerate it. Add `fh_zeros` to the benchmark config's `modes`; expected intervention calls 2,204; the record's
+`center_mode` must say `delete` and `selection.default_high_masks` must be `true`:
+```sh
+python scripts/generate_learned_center.py --out out/learned-center-wan-swap --arm fh_zeros --student out/distill-controls-preserved/s3/student --center-mode delete
+```
+Seven VBench dimensions, paired comparisons (10,000 paired prompt resamples, NumPy seed 20261109) of `fh_zeros` vs
+`student` (the fixed-high means student) and vs the teacher, same-seed latent relative L2 / PSNR vs the teacher, in
+the layout of `distill-results/swap/full100/`.
+
+How to read it, next to A and B: the fixed high pairs are the most concentrated set (RMS-MRL 0.72 vs 0.48 on the
+selected pairs, pooled over the 64 calibration prompts and all tokens, per cell), so the trained student is expected to
+miss its means more than shared22 missed its own (shared22: −0.008 subject consistency, quality measures within
+their intervals). Report the size of the loss per dimension and say explicitly that this is a fine-tune-then-drop
+result; the fixed-high zeros-then-fine-tune arm was never run, so it does not say whether the means are *needed* on
+the fixed set. Budget: about 1.3 GPU-hours, one or two idle GPUs, same rules as above. Deliverables: add the screen
+files and `full100/` rows to `distill-results/swap/`, a subsection to the same report section, `handoff.md` §16, and
+a final message with the numbers. Commit once when C is complete.
