@@ -722,3 +722,21 @@ Differences are the pre-norm arm minus the reference. Each paired 95% interval u
 Both pre-norm arms scored lower than the teacher and training-free shared22 means on aesthetics and text–video consistency, with all four intervals for each dimension below zero. The imaging intervals versus training-free shared22 means span zero for both pre-norm arms. These are training-free results.
 
 Stage A ran on CPU. Stage B used 5568.3 GPU-seconds (1.547 GPU-hours) for the two screens, 60 new renders and three pinned VBench dimensions. Report sources are in `distill-results/removal/`. Lab outputs are in `out/distill-selection-v2/` and `out/learned-center-wan-removal-static30/` in the isolated removal checkout.
+
+### C1 interruption before the final EMA
+
+C1 trained from teacher weights on GPUs 0 and 3. At 02:16 Singapore time on 18 November, rank 0 received SIGKILL after the last logged update at 1,700. The launcher terminated its peer. The source of SIGKILL is unconfirmed. Logged losses were finite through update 1,700. The median optimizer-update time was 6.935 s across 171 logged updates, averaging the two rank timings per update and excluding validation and saving. The attempt charged 24,920 GPU-seconds (6.922 GPU-hours).
+
+Each validation row averages full-latent relative squared velocity error over eight held-out prompts × 20 cached teacher entering states. The two branch columns score their own teacher velocities, and guided combines both branches at CFG 5 before computing the ratio. The latest row uses the training weights at update 1,500.
+
+| Update | Shared pre-norm conditional | Shared pre-norm unconditional | Shared pre-norm guided | Shared post-norm guided |
+|---|---:|---:|---:|---:|
+| 0 | 0.029271 | 0.033403 | 0.097438 | 0.034872 |
+| 250 | 0.005078 | 0.005625 | 0.030510 | 0.029633 |
+| 500 | 0.004914 | 0.005674 | 0.031907 | 0.031879 |
+| 750 | 0.005358 | 0.005081 | 0.031111 | 0.030278 |
+| 1,000 | 0.004776 | 0.005105 | 0.028846 | 0.030603 |
+| 1,250 | 0.003709 | 0.003679 | 0.026474 | 0.026632 |
+| 1,500 | 0.003723 | 0.003954 | 0.027917 | 0.028333 |
+
+The prescribed EMA checkpoints at updates 500, 1,000 and 1,500 remain in `out/distill-narrow-shared22/ema-checkpoints/` on the lab host. The most recent export has exact shared Q/K masks and the matched layer-0 and step-1 exemptions, with its weights and center file checksummed. An exact resume requires the live weights, full optimizer and sampler state. The EMA-only run saved smoothed model exports. The 2,500-update C1 endpoint and its 100-prompt benchmark are pending a recovery decision. Pooled C2 follows C1 in the requested order. The saved training records and the interruption audit are in `distill-results/removal/narrow-shared22/interrupted/`.
