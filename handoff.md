@@ -606,4 +606,4 @@ The `d0000` pilot used GPU 1. The prompt replay took 138.93 s and peak device us
 
 GPU allocation was 3.832 hours by worker wall time, including 150.16 GPU-seconds for the pilot and 9056.67 for the rest of calibration plus 4589.19 for held-out replay. The full per-prompt records occupy 20.267 GB on the lab host.
 
-Stage B is verified. Stage C analysis and the eight-item report follow this checkpoint.
+Stage B is verified and published in `c327f75`. Stage C stopped at the calibration `center_pair_r` finite-float32 check. There were 18 overflows across 13 of 64 calibration prompts and 58,982,400 cell–pair entries. All 18 have nonpositive center-predicted pair row variance. Each correlation candidate pools all 10,800 queries × all 10,800 keys of one full 128-dimensional post-RoPE cell. Calibration covers layers 0–29, steps 0–19, both CFG branches and heads 0–11. Held-out analysis awaits approval of the undefined-correlation handling. Both raw splits remain on 5090. See [the diagnostic](distill-results/score-attribution/analysis-check-failure.json).
