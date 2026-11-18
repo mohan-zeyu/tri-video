@@ -7,7 +7,9 @@
    on fake saved captures (sweep source): record shapes, one cell recomputed independently from directly
    hooked Q/K, the attention-output validation, no claims left behind.
 3. analyze_pair_score_attribution.py on those records with a selection file: report structure, quantiles and
-   the selection overlay recomputed for the whole population, and the --cell lookup.
+   the selection overlay recomputed for the whole population, the --cell lookup, an undefined center_pair_r
+   (center-model variance at rounding noise) counted instead of overflowing, and a non-finite share stopping
+   the analysis.
 
 Run from the repository root:  python scripts/test_pair_score_attribution.py
 """
@@ -25,6 +27,7 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from full_sweep_metrics import rotate
+import analyze_pair_score_attribution as A
 from pair_score_attribution import QUANTILES, attribute, quantiles
 from test_learned_center import STEPS, write_fake_trajectories, write_tiny_snapshot
 
@@ -255,6 +258,32 @@ def test_collector_and_analysis():
         printed = run("analyze_pair_score_attribution.py", ["--stats", stats, "--cell", "d0001", 1, 2, "unconditional", 0])
         line = next(l for l in printed.splitlines() if l.startswith("  17 "))
         assert abs(float(line.split()[2]) - share[1, 1, 2, 1, 0, 17]) < 1e-5
+        # a pair whose center-model contribution is constant over keys to rounding noise (as in the lab records: stored
+        # row variance about -5e-17) has an undefined center_pair_r; it is counted, never turned into a huge number
+        noisy = tmp / "noisy"
+        noisy.mkdir()
+        for f in files:
+            r = torch.load(f)
+            if f.stem == "d0000":
+                r["center_var_own"][1, 2, 1, 0, 21] = -5.2293e-17
+                r["center_cross_own"][1, 2, 1, 0, 21] = 1.1937e-10
+            torch.save(r, noisy / f.name)
+        run("analyze_pair_score_attribution.py", ["--stats", noisy, "--out", tmp / "noisy-analysis", "--no-figures"])
+        text = (tmp / "noisy-analysis" / "report.json").read_text()
+        assert "NaN" not in text and "Infinity" not in text
+        clean, dirty = report["pair_center_r"], json.loads(text)["pair_center_r"]
+        assert dirty["undefined_entries"] == clean["undefined_entries"] + 1
+        assert dirty["undefined_entries_per_pair"][21] == clean["undefined_entries_per_pair"][21] + 1
+        assert dirty["entries"] == report["cells"] * 64 and dirty["defined_entries_outside_unit_interval"] == 0
+        assert all(-1 - 1e-4 <= v <= 1 + 1e-4 for pair in dirty["all"] for v in pair if v is not None)
+        assert A.shares(torch.load(noisy / "d0000.pt"))["center_pair_r"][1, 2, 1, 0, 21] != A.shares(torch.load(noisy / "d0000.pt"))["center_pair_r"][1, 2, 1, 0, 21]   # NaN
+        broken = torch.load(files[0])
+        broken["row_var"][0, 0, 0, 0] = 0
+        try:
+            A.build_report([broken], list(range(STEPS)))
+            raise AssertionError("a non-finite share must stop the analysis")
+        except FloatingPointError as error:
+            assert "var_cov_share" in str(error)
         run("analyze_pair_score_attribution.py", ["--stats", tmp / "sweep-attribution", "--out", tmp / "sweep-analysis", "--no-figures"])
         assert json.loads((tmp / "sweep-analysis" / "report.json").read_text())["shape"]["branches"] == 1
     print("test_collector_and_analysis OK")

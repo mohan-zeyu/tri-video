@@ -23,6 +23,7 @@ Outputs under --out: report.json (all distributions, each with its scope), REPOR
 import argparse
 import json
 import os
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -34,13 +35,20 @@ LEVEL_NAMES = ("min", "p05", "p25", "median", "p75", "p95", "max")
 SHARES = ("var_cov_share", "var_own_share", "adv_share", "top1_share", "amplitude_share")
 AXES = {"t": (0, 22), "h": (22, 43), "w": (43, 64)}
 DIMS = {"layer": 1, "step": 2, "branch": 3}                      # axes of [prompt, layer, step, branch, head]
+# center_pair_r is a correlation with the center model's pair contribution. For a low-frequency pair whose Q and K
+# token means are nearly in phase, that contribution is almost constant over keys: its row variance falls to the
+# rounding noise of the stored moments (the centers are rotated in fp32, relative variance noise about 4e-15) and
+# can even be stored as a tiny negative number. The correlation is then undefined, not large. It is reported only
+# where center_var_own exceeds CENTER_R_FLOOR x (|E q_f| |E k_f|)^2 / d, the largest square the center contribution
+# can take; at the floor the rounding noise in r is below 0.01. Undefined entries are NaN and are counted.
+CENTER_R_FLOOR = 1e-10
 
 
 def resolve(path):
     return Path(path) if os.path.isabs(str(path)) else ROOT / path
 
 
-def shares(record):
+def shares(record, center_r_floor=CENTER_R_FLOOR):
     """Per-cell shares and derived per-cell quantities of one record, [layer, step, branch, head, ...] (computed in
     float64, kept as float32)."""
     f = {k: v.double().numpy() for k, v in record.items() if torch.is_tensor(v) and k not in ("pair_cov", "filled")}
@@ -48,20 +56,22 @@ def shares(record):
     own_sum = f["var_own"].sum(-1)
     center_var = f["center_var_cov"].sum(-1)
     with np.errstate(divide="ignore", invalid="ignore"):          # cells of steps that were not analyzed are empty
-        return {k: v.astype(np.float32) for k, v in _shares(f, amplitude, own_sum, center_var).items()}
+        return {k: v.astype(np.float32) for k, v in _shares(f, amplitude, own_sum, center_var, center_r_floor).items()}
 
 
-def _shares(f, amplitude, own_sum, center_var):
+def _shares(f, amplitude, own_sum, center_var, center_r_floor):
+    center_square = (f["center_norm_q"] * f["center_norm_k"]) ** 2 / (2 * f["var_own"].shape[-1])
+    defined = (f["center_var_own"] > center_r_floor * center_square) & (f["var_own"] > 0)
     return {
         "var_cov_share": f["var_cov"] / f["row_var"][..., None],
         "var_own_share": f["var_own"] / own_sum[..., None],
         "adv_share": f["adv"] / f["adv_total"][..., None],
         "top1_share": f["top1"] / f["top1_total"][..., None],
         "amplitude_share": amplitude / amplitude.sum(-1, keepdims=True),
-        "center_pair_r": f["center_cross_own"] / np.sqrt(np.maximum(f["var_own"] * f["center_var_own"], 1e-300)),
+        "center_pair_r": np.where(defined, f["center_cross_own"] / np.sqrt(np.where(defined, f["var_own"] * f["center_var_own"], 1.0)), np.nan),
         "pair_mrl_min": np.minimum(f["center_norm_q"] / f["norm_q"], f["center_norm_k"] / f["norm_k"]),
         "interference_ratio": f["row_var"] / own_sum,
-        "center_logit_r": f["center_cross_cov"].sum(-1) / np.sqrt(np.maximum(f["row_var"] * center_var, 1e-300)),
+        "center_logit_r": f["center_cross_cov"].sum(-1) / np.sqrt(f["row_var"] * center_var),
         "center_explained_share": f["center_cross_cov"].sum(-1) / f["row_var"],
         "row_var": f["row_var"], "adv_total": f["adv_total"], "top1_total": f["top1_total"],
         "effective_keys": f["effective_keys"], "pmax": f["pmax"], "top1_self": f["top1_self"],
@@ -80,22 +90,43 @@ def load(stats, ids=None):
     return records, steps
 
 
-def dist(x, axis=None):
-    """Quantiles LEVELS of x; the levels become the last dimension."""
-    return np.moveaxis(np.quantile(x, LEVELS, axis=axis), 0, -1)
+def dist(x, axis=None, skip_nan=False):
+    """Quantiles LEVELS of x; the levels become the last dimension. skip_nan: over the defined entries only."""
+    return np.moveaxis((np.nanquantile if skip_nan else np.quantile)(x, LEVELS, axis=axis), 0, -1)
 
 
-def grouped(x, dim, per_pair):
+def grouped(x, dim, per_pair, skip_nan=False):
     """Distribution over all cells sharing one index of `dim`. x: [prompt, layer, step, branch, head(, pair)]."""
     moved = np.moveaxis(x, dim, 0)
     flat = moved.reshape(moved.shape[0], -1, x.shape[-1]) if per_pair else moved.reshape(moved.shape[0], -1)
-    return dist(flat, axis=1)
+    return dist(flat, axis=1, skip_nan=skip_nan)
 
 
-def breakdown(x, per_pair=False):
+def breakdown(x, per_pair=False, skip_nan=False):
     """Overall and per-layer / per-step / per-branch distributions over cells."""
-    overall = dist(x.reshape(-1, x.shape[-1]), axis=0) if per_pair else dist(x)
-    return {"all": overall.tolist(), **{f"by_{name}": grouped(x, dim, per_pair).tolist() for name, dim in DIMS.items()}}
+    overall = dist(x.reshape(-1, x.shape[-1]), axis=0, skip_nan=skip_nan) if per_pair else dist(x, skip_nan=skip_nan)
+    return {"all": overall.tolist(), **{f"by_{name}": grouped(x, dim, per_pair, skip_nan).tolist() for name, dim in DIMS.items()}}
+
+
+def check_finite(data):
+    """Every derived quantity must be finite; center_pair_r may be NaN (undefined) but never infinite."""
+    for name, value in data.items():
+        bad = np.isinf(value) if name == "center_pair_r" else ~np.isfinite(value)
+        if bad.any():
+            where = [int(i) for i in np.argwhere(bad)[0]]
+            raise FloatingPointError(f"{name}: {int(bad.sum())} non-finite entries of {value.size}; first at "
+                                     f"[prompt, layer, step, branch, head(, pair)] = {where}")
+
+
+def json_ready(value):
+    """NaN (an undefined quantile of an all-undefined population) becomes null; anything infinite is an error."""
+    if isinstance(value, dict):
+        return {k: json_ready(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [json_ready(v) for v in value]
+    if isinstance(value, float) and value != value:
+        return None
+    return value
 
 
 def ranks(x):
@@ -148,10 +179,11 @@ def selection_overlay(records, steps, data, selection, pairs_total=64):
     return out
 
 
-def build_report(records, steps, selection=None):
-    per_prompt = [shares(r) for r in records]
+def build_report(records, steps, selection=None, center_r_floor=CENTER_R_FLOOR):
+    per_prompt = [shares(r, center_r_floor) for r in records]
     data = {k: np.stack([p[k][:, steps] for p in per_prompt]) for k in per_prompt[0]}     # [prompt, layer, step, branch, head, ...]
     data["var_own"] = np.stack([r["var_own"].double().numpy()[:, steps] for r in records])
+    check_finite(data)
     n = data["var_cov_share"].shape
     report = {
         "prompts": [r["prompt_id"] for r in records], "steps_analyzed_zero_based": list(steps),
@@ -163,7 +195,20 @@ def build_report(records, steps, selection=None):
                    "[..., pair, level]. Distributions are over cells, never means over cells.",
     }
     report["pair_share"] = {m: breakdown(data[m], per_pair=True) for m in SHARES}
-    report["pair_center_r"] = breakdown(data["center_pair_r"], per_pair=True)
+    r = data["center_pair_r"]
+    undefined = np.isnan(r)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)                           # an all-undefined population gives NaN
+        report["pair_center_r"] = breakdown(r, per_pair=True, skip_nan=True)
+    report["pair_center_r"].update(
+        undefined_entries=int(undefined.sum()), entries=int(r.size),
+        undefined_entries_per_pair=undefined.reshape(-1, r.shape[-1]).sum(0).tolist(),
+        defined_entries_outside_unit_interval=int((np.abs(r[~undefined]) > 1 + 1e-4).sum()),
+        variance_floor=center_r_floor,
+        scope="per (cell, pair): pooled row-centred correlation, over every query x every key, between the pair's actual "
+              "contribution and its center-model contribution. Undefined (excluded from these quantiles and counted "
+              "here) where the center-model contribution's row variance is not above variance_floor x "
+              "(|E q_f| |E k_f|)^2 / 128, i.e. within rounding noise of zero; quantiles are over the defined entries")
     own = np.sort(data["var_own_share"], -1)[..., ::-1].cumsum(-1)
     k50, k90 = (own < .5).sum(-1) + 1, (own < .9).sum(-1) + 1
     report["concentration"] = {
@@ -204,10 +249,10 @@ def build_report(records, steps, selection=None):
     edges = np.linspace(0, 1, 21)
     r_edges = np.linspace(-1, 1, 41)
     report["center_r_vs_mrl_counts"] = {
-        "counts": np.histogram2d(data["pair_mrl_min"].reshape(-1), np.clip(data["center_pair_r"], -1, 1).reshape(-1), bins=(edges, r_edges))[0].astype(int).tolist(),
+        "counts": np.histogram2d(data["pair_mrl_min"][~undefined], np.clip(r[~undefined], -1, 1), bins=(edges, r_edges))[0].astype(int).tolist(),
         "mrl_edges": edges.tolist(), "r_edges": r_edges.tolist(),
-        "scope": "number of (cell, pair) entries by min(MRL_Q, MRL_K) of the pair (rows) and the pooled row-centred "
-                 "correlation between the pair's actual and center-model contribution (columns)"}
+        "scope": "number of (cell, pair) entries with a defined center_pair_r, by min(MRL_Q, MRL_K) of the pair (rows) "
+                 "and the pooled row-centred correlation between the pair's actual and center-model contribution (columns)"}
     if n[0] > 1:
         stability = {}
         for m in ("var_own_share", "adv_share"):
@@ -263,7 +308,11 @@ def markdown(report):
                         ("effective attended keys", report["head"]["effective_keys"]),
                         ("arg-max key is the query itself (fraction of queries)", report["head"]["top1_self"])):
         text.append(f"| {name} | {row(block['all'])} |")
-    text.append("")
+    c = report["pair_center_r"]
+    text.append(f"\n`center_pair_r` is undefined for {c['undefined_entries']:,} of {c['entries']:,} (cell, pair) entries: the "
+                f"center-model contribution of that pair is constant over keys to within rounding noise (row variance not above "
+                f"{c['variance_floor']:g} x its largest possible square). Its quantiles in `report.json` are over the defined "
+                f"entries; `undefined_entries_per_pair` gives the count for each pair.\n")
     if "selection" in report:
         text.append("## Score carried by the selected pairs (union of the Q and K masks), per prompt x cell\n")
         text.append("| variant | quantity | " + " | ".join(LEVEL_NAMES) + " |\n|---|---|" + "---:|" * 7)
@@ -373,6 +422,8 @@ def main():
     parser.add_argument("--out", default="distill-results/score-attribution")
     parser.add_argument("--atlas-prompts", type=int, default=2, help="prompts drawn as full per-cell atlases")
     parser.add_argument("--no-figures", action="store_true", help="skip figures (no matplotlib needed)")
+    parser.add_argument("--center-r-floor", type=float, default=CENTER_R_FLOOR,
+                        help="relative variance below which a pair's center-model contribution counts as constant")
     parser.add_argument("--cell", nargs=5, metavar=("PROMPT", "LAYER", "STEP", "BRANCH", "HEAD"), help="print one cell and exit")
     args = parser.parse_args()
     records, steps = load(args.stats, args.ids)
@@ -380,10 +431,10 @@ def main():
         print_cell(records, args.cell[0], int(args.cell[1]), int(args.cell[2]), args.cell[3], int(args.cell[4]))
         return
     selection = torch.load(resolve(args.selection), map_location="cpu") if args.selection else None
-    report, _ = build_report(records, steps, selection)
+    report, _ = build_report(records, steps, selection, args.center_r_floor)
     out = resolve(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    (out / "report.json").write_text(json.dumps(report) + "\n")
+    (out / "report.json").write_text(json.dumps(json_ready(report), allow_nan=False) + "\n")
     (out / "REPORT.md").write_text(markdown(report))
     if not args.no_figures:
         figures(report, records, steps, out / "figures", args.atlas_prompts)
