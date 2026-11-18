@@ -792,3 +792,56 @@ Shared pre-norm minus matched post-norm deletion on the 100 videos measured aest
 Across those same 100 pairs, mean whole-final-latent L2 versus the teacher was 499.304 and relative L2 was 0.567666. Relative L2 divides by the teacher latent norm per matched prompt before averaging. PSNR averaged 14.098 dB over 4,500 aligned decoded frames. Training used 37,956 GPU-seconds and benchmarking used 3,992, for 41,948 GPU-seconds (11.652 GPU-hours) for this arm. Training and benchmark artifacts are in `distill-results/removal/narrow-shared22/`. Lab videos are in `out/learned-center-wan-narrow_shared22-full100/`.
 
 The study charges C1’s interrupted attempt separately. Scoring used 493 seconds beyond the first C1 benchmark allowance, with the extra time charged to the approved combined budget. After A+B, the interrupted attempt and the completed C1 rerun, the C2 allocation is 40,963 GPU-seconds (11.379 GPU-hours). C2 uses the same scheduled EMA saves every 500 updates and writes full resumable optimizer checkpoints at updates 1,000 and 2,000. The CPU restart test passed with this save policy.
+
+## Fine-tune, then drop: swapping means and zeros in the trained students
+
+Both frozen EMA exports passed the published SHA-256 checks and have identical shared22 masks and exemptions. Each swap changes both coordinates of 22 selected rotary pairs on each of Q and K, for every video token. It applies the per-layer, step, CFG-branch and head mask after full-width QK RMSNorm and before RoPE. Layer 0 and denoising step 1 are exempt. Each within-EMA comparison holds the transformer and center export fixed.
+
+The stored mean norms are averages of the Euclidean norm over all 128 coordinates in each of 14,400 layer–step–branch–head cells, including exempt cells. Shared22 reports Q 12.270763 and K 12.713887. Deletion stores the calibration means and reports Q 12.271144 and K 12.714284.
+
+### Cached teacher-state screen
+
+Each row averages the relative squared velocity error over the full latent for each of 32 held-out prompts × 20 cached teacher entering states. Conditional and unconditional use their corresponding native bf16 teacher velocities. Guided combines both branches at CFG 5 before computing the error-to-energy ratio. Exempt steps contribute observations.
+
+| Arm | Conditional | Unconditional | Guided CFG 5 | First eight guided CFG 5 |
+|---|---:|---:|---:|---:|
+| Shared22 with trained means | 0.002411 | 0.002321 | 0.019374 | 0.020765 |
+| Shared22 with zeros | 0.003290 | 0.003233 | 0.021122 | 0.022121 |
+| Deletion with zeros | 0.002491 | 0.002420 | 0.019923 | 0.020852 |
+| Deletion with calibration means | 0.003079 | 0.002968 | 0.021128 | 0.022323 |
+
+On the first eight prompts and 160 states, the as-trained EMA runs measured 0.020765 for shared22 and 0.020852 for deletion. The respective live-weight training references at update 2,500 were 0.020696 and 0.020530.
+
+### Matched 100-prompt video benchmark
+
+Each arm uses one original fixed seed per prompt for 100 prompts. The frozen teacher and both as-trained reference rows were reused. All 200 new videos passed checksums and 45-frame, 480×480, 16 fps checks and recorded finite latents at all 20 steps. Each video logged 2,204 intervention calls, from 29 active layers × 19 active steps × two CFG branches × Q and K. The text encoder stayed resident on its GPU between prompts. On the first prompt, each swapped arm produced bitwise-identical final latents and identical MP4 hashes with both residency settings. The resident render was retained in the benchmark.
+
+Each dimension averages 100 per-video scores. Aesthetics and imaging use all 45 frames. Text–video consistency uses eight midpoint frames and the prompt. Subject and background consistency use 44 frame transitions, motion smoothness uses 22 reconstructions, and dynamic degree uses 22 flow transitions on subsampled frames.
+
+| Dimension | Teacher | Shared22 means | Shared22 zeros | Deletion zeros | Deletion with means |
+|---|---:|---:|---:|---:|---:|
+| Subject consistency | 0.963999 | 0.967490 | 0.959464 | 0.966353 | 0.968874 |
+| Background consistency | 0.976466 | 0.978377 | 0.975030 | 0.978334 | 0.978233 |
+| Motion smoothness | 0.984463 | 0.986384 | 0.985098 | 0.986335 | 0.986576 |
+| Dynamic degree | 0.330000 | 0.280000 | 0.320000 | 0.270000 | 0.200000 |
+| Aesthetics | 0.588595 | 0.583495 | 0.578923 | 0.577787 | 0.563431 |
+| Imaging | 0.660679 | 0.678854 | 0.669544 | 0.680191 | 0.665028 |
+| Text–video consistency | 0.232555 | 0.234047 | 0.233582 | 0.234605 | 0.227792 |
+
+The 95% percentile intervals use 10,000 paired resamples of the 100 prompt-and-seed units, NumPy seed 20261109.
+
+| Dimension | Shared22 zeros − means | Deletion means − zeros | Shared22 zeros − teacher | Deletion means − teacher |
+|---|---:|---:|---:|---:|
+| Subject consistency | -0.00803 [-0.01189, -0.00464] | +0.00252 [-0.00067, +0.00636] | -0.00453 [-0.01178, +0.00256] | +0.00488 [-0.00210, +0.01172] |
+| Background consistency | -0.00335 [-0.00566, -0.00103] | -0.00010 [-0.00177, +0.00159] | -0.00144 [-0.00496, +0.00204] | +0.00177 [-0.00177, +0.00542] |
+| Motion smoothness | -0.00129 [-0.00185, -0.00074] | +0.00024 [-0.00027, +0.00075] | +0.00064 [-0.00081, +0.00218] | +0.00211 [+0.00068, +0.00361] |
+| Dynamic degree | +0.04000 [-0.01000, +0.10000] | -0.07000 [-0.14000, -0.01000] | -0.01000 [-0.09000, +0.07000] | -0.13000 [-0.21000, -0.05000] |
+| Aesthetics | -0.00457 [-0.01625, +0.00663] | -0.01436 [-0.02683, -0.00150] | -0.00967 [-0.02376, +0.00454] | -0.02516 [-0.03981, -0.01040] |
+| Imaging | -0.00931 [-0.02144, +0.00359] | -0.01516 [-0.02625, -0.00499] | +0.00887 [-0.00728, +0.02487] | +0.00435 [-0.01398, +0.02212] |
+| Text–video consistency | -0.00047 [-0.00496, +0.00424] | -0.00681 [-0.01271, -0.00184] | +0.00103 [-0.00521, +0.00752] | -0.00476 [-0.01215, +0.00232] |
+
+Removing learned means after fine-tuning reduced subject consistency by 0.00803, background consistency by 0.00335, and motion smoothness by 0.00129. Their paired intervals were below zero. The paired intervals for aesthetics, imaging quality, dynamic degree, and text–video consistency spanned zero. Inserting calibration means into the zero-trained EMA reduced dynamic degree by 0.07000, aesthetics by 0.01436, imaging quality by 0.01516, and text–video consistency by 0.00681, with paired intervals below zero. These are effects of switching the selected values after training. The original matched fine-tunes produced comparable scores with learned means and zeros across all seven dimensions. Together the results support choosing zeros before fine-tuning when the aim is to remove the selected pairs.
+
+Same-seed relative final-latent L2 against the teacher was 0.557865 for shared22 with zeros and 0.597051 for deletion with means. Each ratio uses the L2 norm of the full final-latent difference divided by the teacher latent norm before averaging over the 100 pairs. Mean decoded-frame PSNR over 4,500 aligned RGB frames per arm was 14.268 and 13.690 dB, respectively.
+
+The CPU suite passed. The two screens and video benchmark used 7455.4 GPU-seconds (2.071 GPU-hours), with at most two GPUs in any wave. The audited artifacts are in `distill-results/swap/`. Lab videos and full generation records are in `out/learned-center-wan-swap/` in the swap checkout.

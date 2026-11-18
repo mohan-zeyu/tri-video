@@ -52,6 +52,8 @@ def main():
     parser.add_argument("--link-baseline", help="existing benchmark root whose videos/baseline and records/*/baseline are hard-linked as this arm")
     parser.add_argument("--prompts", nargs="*")
     parser.add_argument("--max-prompts", type=int)
+    parser.add_argument("--resident-text-encoder", action="store_true",
+                        help="keep the text encoder on CUDA between prompts when device memory permits")
     args = parser.parse_args()
     config_path = ROOT / args.config
     config = json.loads(config_path.read_text())
@@ -126,6 +128,7 @@ def main():
     environment = {"torch": torch.__version__, "diffusers": diffusers.__version__, "transformers": transformers.__version__,
                    "snapshot": revision, "weights": weights_source, "learned_center_sha256": center_hash, "center_mode": args.center_mode,
                    "exempt": exempt, "selection": selection_info, "gpu": torch.cuda.get_device_name(0), "hostname": socket.gethostname(), "pid": os.getpid(),
+                   "resident_text_encoder": args.resident_text_encoder,
                    "config_sha256": digest(config_path), "code_sha256": {n: digest(ROOT / "scripts" / n) for n in ("generate_learned_center.py", "learned_center.py")}}
     active_layers = int(center.layer_active.sum()) if args.center_mode != "off" else 0
     active_steps = int(center.step_active.sum()) if args.center_mode != "off" else 0
@@ -157,8 +160,9 @@ def main():
             pipe.text_encoder.to("cuda")
             positive, negative = pipe.encode_prompt(prompt=prompt["text"], negative_prompt=config["negative_prompt"], do_classifier_free_guidance=True,
                                                     device="cuda", num_videos_per_prompt=1, max_sequence_length=512)
-            pipe.text_encoder.to("cpu")
-            torch.cuda.empty_cache()
+            if not args.resident_text_encoder:
+                pipe.text_encoder.to("cpu")
+                torch.cuda.empty_cache()
             center.set_rollout(positive, negative)
             center.calls = 0
             started = time.time()
