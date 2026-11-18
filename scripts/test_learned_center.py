@@ -242,6 +242,28 @@ def test_training_stages():
         assert "TRAINING COMPLETE 2" in out2 and "VAL" in out2, out2[-800:]
         assert (tmp / "s2" / "student" / "transformer" / "diffusion_pytorch_model.safetensors").exists()
         assert (tmp / "s2" / "validation.jsonl").exists() and (tmp / "s2" / "history.jsonl").exists()
+        from safetensors.torch import load_file
+
+        resumed = tmp / "s2-resume"
+        saved_ema = resumed / "ema-checkpoints" / "step-000002" / "learned_center.pt"
+        flags = ["--stage", "2", "--out", str(resumed), "--steps", "4", "--init-student", str(tmp / "s1" / "student"),
+                 "--ema", "0.9", "--ema-checkpoints", "--resume-state-with-ema"] + common
+        assert "TRAINING PAUSED 2 2" in run(flags + ["--stop-after", "2"], ROOT)
+        early_ema = saved_ema.read_bytes()
+        with (resumed / "validation.jsonl").open("a") as stream:
+            stream.write('{"step": 4}\n{"step":')
+        assert "START_OPTIMIZER_STEP 3" in run(flags + ["--resume"], ROOT)
+        assert saved_ema.read_bytes() == early_ema
+        for name in ("history", "validation"):
+            def scores(path):
+                return [{k: v for k, v in json.loads(line).items() if k not in {"elapsed_s", "optimizer_step_seconds"}}
+                        for line in path.read_text().splitlines()]
+            assert scores(resumed / f"{name}.jsonl") == scores(tmp / "s2" / f"{name}.jsonl")
+        assert list((resumed / "interrupted-attempts").glob("*/validation.jsonl"))
+        weights = "student/transformer/diffusion_pytorch_model.safetensors"
+        actual, expected = load_file(resumed / weights), load_file(tmp / "s2" / weights)
+        assert actual.keys() == expected.keys()
+        assert all(torch.equal(actual[key], expected[key]) for key in actual)
         # stage 1 checkpoint has no transformer weights; stage 2 output must be loadable into stage 3
         out3 = run(["--stage", "3", "--out", str(tmp / "s3"), "--steps", "4", "--init-student", str(tmp / "s2" / "student"),
                     "--rollout-every", "2", "--rollouts-per-rank", "2", "--onpolicy-ramp", "1", "--onpolicy-frac", "1.0", "--ema", "0.9"] + common, ROOT)

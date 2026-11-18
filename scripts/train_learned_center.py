@@ -438,7 +438,8 @@ def save_student(student, center, out_dir, snapshot, rank, world, no_fsdp, ema=N
         dist.barrier()
 
 
-def save_training_state(student, opt_model, center, opt_center, step, out_dir, rank, world, no_fsdp, ema, rng):
+def save_training_state(student, opt_model, center, opt_center, step, out_dir, rank, world, no_fsdp, ema, rng,
+                        *, save_torch_rng=False):
     root = Path(out_dir) / "checkpoint"
     ckpt = root / f"step-{step:06d}"
     reshard(student)
@@ -446,7 +447,11 @@ def save_training_state(student, opt_model, center, opt_center, step, out_dir, r
         ckpt.mkdir(parents=True, exist_ok=True)
         save_torch(ckpt / "center.pt", {"step": step, "center": center.state_dict(), "opt_center": opt_center.state_dict()})
     ckpt.mkdir(parents=True, exist_ok=True)
-    save_torch(ckpt / f"rng-rank{rank:02d}.pt", rng.getstate())
+    rng_state = rng.getstate()
+    if save_torch_rng:
+        rng_state = {"sampler": rng_state, "torch": torch.get_rng_state(),
+                     "cuda": torch.cuda.get_rng_state() if torch.cuda.is_available() else None}
+    save_torch(ckpt / f"rng-rank{rank:02d}.pt", rng_state)
     if opt_model is not None:
         if no_fsdp or world == 1:
             if rank == 0:
@@ -480,29 +485,61 @@ def load_training_state(student, opt_model, center, opt_center, out_dir, world, 
     saved = torch.load(ckpt / "center.pt", map_location="cpu")
     center.load_state_dict(saved["center"])
     opt_center.load_state_dict(saved["opt_center"])
+    if opt_model is not None:
+        if no_fsdp or world == 1:
+            record = torch.load(ckpt / "model.pt", map_location="cpu")
+            student.load_state_dict(record["model"])
+            opt_model.load_state_dict(record["opt"])
+            if ema and record.get("ema"):
+                for e, r in zip(ema, record["ema"]):
+                    e.copy_(r.to(e.device))
+        else:
+            import torch.distributed.checkpoint as dcp
+            from torch.distributed.checkpoint.state_dict import get_state_dict, set_state_dict
+            msd, osd = get_state_dict(student, opt_model)
+            payload = {"model": msd, "optim": osd, "ema": {str(i): e for i, e in enumerate(ema)} if ema else {}}
+            dcp.load(payload, checkpoint_id=str(ckpt / "model"))
+            set_state_dict(student, opt_model, model_state_dict=payload["model"], optim_state_dict=payload["optim"])
+            if ema:
+                for i, e in enumerate(ema):
+                    e.copy_(payload["ema"][str(i)])
     rng_state = ckpt / f"rng-rank{rank:02d}.pt"
     if rng_state.exists():
-        rng.setstate(torch.load(rng_state, map_location="cpu"))
-    if opt_model is None:
-        return saved["step"]
-    if no_fsdp or world == 1:
-        record = torch.load(ckpt / "model.pt", map_location="cpu")
-        student.load_state_dict(record["model"])
-        opt_model.load_state_dict(record["opt"])
-        if ema and record.get("ema"):
-            for e, r in zip(ema, record["ema"]):
-                e.copy_(r.to(e.device))
-        return saved["step"]
-    import torch.distributed.checkpoint as dcp
-    from torch.distributed.checkpoint.state_dict import get_state_dict, set_state_dict
-    msd, osd = get_state_dict(student, opt_model)
-    payload = {"model": msd, "optim": osd, "ema": {str(i): e for i, e in enumerate(ema)} if ema else {}}
-    dcp.load(payload, checkpoint_id=str(ckpt / "model"))
-    set_state_dict(student, opt_model, model_state_dict=payload["model"], optim_state_dict=payload["optim"])
-    if ema:
-        for i, e in enumerate(ema):
-            e.copy_(payload["ema"][str(i)])
+        state = torch.load(rng_state, map_location="cpu")
+        if isinstance(state, dict):
+            rng.setstate(state["sampler"])
+            torch.set_rng_state(state["torch"])
+            if state["cuda"] is not None:
+                torch.cuda.set_rng_state(state["cuda"])
+        else:
+            rng.setstate(state)
     return saved["step"]
+
+
+def rewind_ema_progress(out, step, final_step):
+    """Preserve work newer than the committed checkpoint before replaying it."""
+    archive = out / "interrupted-attempts" / str(time.time_ns())
+    for name in ("history.jsonl", "validation.jsonl"):
+        path = out / name
+        if not path.exists():
+            continue
+        raw = path.read_bytes()
+        committed = b"".join(line for line in raw.splitlines(keepends=True)
+                             if line.endswith(b"\n") and json.loads(line)["step"] <= step)
+        if raw != committed:
+            archive.mkdir(parents=True, exist_ok=True)
+            (archive / name).write_bytes(raw)
+            pending = path.with_suffix(".rewind.tmp")
+            pending.write_bytes(committed)
+            pending.replace(path)
+    newer = [path for path in (out / "ema-checkpoints").glob("step-*")
+             if int(path.name.removeprefix("step-")) > step]
+    if step < final_step and (out / "student").exists():
+        newer.append(out / "student")
+    for path in newer:
+        archived = archive / path.relative_to(out)
+        archived.parent.mkdir(parents=True, exist_ok=True)
+        path.rename(archived)
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -607,6 +644,8 @@ def main():
     parser.add_argument("--save-every", type=int, default=500)
     parser.add_argument("--ema-checkpoints", action="store_true",
                         help="retain an EMA model at each save instead of writing and rotating full optimizer states")
+    parser.add_argument("--resume-state-with-ema", action="store_true",
+                        help="also keep the latest full Stage 2 optimizer, EMA and RNG checkpoint")
     parser.add_argument("--log-every", type=int, default=10)
     parser.add_argument("--seed", type=int, default=20261114)
     parser.add_argument("--no-fsdp", action="store_true")
@@ -625,8 +664,10 @@ def main():
                          or step % args.val_every or ref % args.val_every or (ref == 0 and not args.val_at_start)
                          for step, ref in gates.items())):
         parser.error("--guided-gate requires unique validation steps and earlier measured reference steps on a fresh Stage 2 or 3 run")
-    if args.ema_checkpoints and (args.stage == 1 or args.ema <= 0 or args.resume):
-        parser.error("--ema-checkpoints requires EMA on a fresh Stage 2 or 3 run")
+    if args.resume_state_with_ema and (args.stage != 2 or not args.ema_checkpoints):
+        parser.error("--resume-state-with-ema requires --ema-checkpoints in Stage 2")
+    if args.ema_checkpoints and (args.stage == 1 or args.ema <= 0 or (args.resume and not args.resume_state_with_ema)):
+        parser.error("--ema-checkpoints requires EMA in Stage 2 or 3 and --resume-state-with-ema to resume")
     if args.rollout_worker_budget < 0 or (args.rollout_worker_budget and (
             args.stage != 3 or args.rollout_lock_dir is None or not args.rollout_lock_dir.is_dir())):
         parser.error("--rollout-worker-budget requires stage 3 and an existing --rollout-lock-dir")
@@ -703,6 +744,8 @@ def main():
     opt_center = torch.optim.Adam(center.parameters(), lr=args.lr_center)
 
     start = load_training_state(student, opt_model, center, opt_center, out, world, args.no_fsdp, ema, rank, rng) if args.resume else 0
+    if args.resume and args.resume_state_with_ema and rank == 0:
+        rewind_ema_progress(out, start, args.steps)
     log(rank, "START_OPTIMIZER_STEP", start + 1)
     buffer = OnPolicyBuffer(out / "onpolicy", args.buffer_files, store) if args.stage == 3 else None
     active_steps = [s for s in range(store.steps) if bool(center.step_active[s])]
@@ -846,6 +889,9 @@ def main():
                     for h in history:
                         f.write(json.dumps(h) + "\n")
                 history.clear()
+            if args.resume_state_with_ema:
+                save_training_state(student, opt_model, center, opt_center, last_step, out, rank, world,
+                                    args.no_fsdp, ema, rng, save_torch_rng=True)
         if budget_stop or gate_stop:
             break
     if args.stage == 1 and val_store_ids:
