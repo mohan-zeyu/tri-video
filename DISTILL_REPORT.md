@@ -741,11 +741,258 @@ Each validation row averages full-latent relative squared velocity error over ei
 
 The prescribed EMA checkpoints at updates 500, 1,000 and 1,500 remain in `out/distill-narrow-shared22/ema-checkpoints/` on the lab host. The most recent export has exact shared Q/K masks and the matched layer-0 and step-1 exemptions, with its weights and center file checksummed. An exact resume requires the live weights, full optimizer and sampler state. The EMA-only run saved smoothed model exports. The approved recovery is a new exact C1 run from teacher weights, with up to seven additional GPU-hours for the combined study. C1 keeps the original training inputs, seed, optimizer and schedule. Its save mode retains every scheduled EMA export and the latest resumable checkpoint, including live model and optimizer weights, EMA buffers and rank-local random states. The CPU test recovered the same final weights and validation curve as an uninterrupted run. The rerun writes to `out/distill-narrow-shared22-rerun/`. Pooled C2 follows the rerun’s full benchmark. The saved training records and the interruption audit are in `distill-results/removal/narrow-shared22/interrupted/`.
 
-
 ## Per-pair attention-score attribution
 
-The frozen bf16 Wan2.1 teacher replayed 64 calibration prompts (`d0000`–`d0063`) and 32 held-out prompts (`d0064`–`d0095`) from the trajectory cache. The splits contain 921,600 and 460,800 cells respectively. A cell is one prompt × layer × denoising step × CFG branch × head. Both splits cover layers 0–29, step indices 0–19, the conditional and unconditional branches and heads 0–11. Each cell uses all 10,800 queries × all 10,800 keys of its full 128-dimensional post-RoPE head. The per-pair records retain within-cell pooled shares and separate across-query quantiles. Collection used 3.832 GPU-hours. [Calibration audit](distill-results/score-attribution/collection-audit.json) · [Held-out audit](distill-results/score-attribution-val/collection-audit.json)
+The frozen bf16 Wan2.1 teacher replayed the stored entering states for the splits below. One cell is one prompt × layer × denoising step × CFG branch × attention head. Layer, step, head and pair indices are zero-based. Every cell uses all 10,800 queries × all 10,800 keys of its full 128-dimensional post-RoPE head, over the complete video grid. A share pools only the queries and keys of that cell. The tables give distributions over the named cells or counts. Item 6 explicitly labels the quantiles across queries within one cell.
 
-The Stage A pilot on `d0000` took 138.93 replay seconds, with peak device memory of 7,571 MiB sampled every 500 ms. The pre-RoPE Q and K pair energies each matched the earlier `d0000` record exactly at all 921,600 pair entries per side, each calculated over all 10,800 video tokens in that cell. Across the two attribution splits, all 576 recomputed full attention outputs matched bit for bit. That check covers the first denoising step at layer indices 0, 15 and 29 in both CFG branches, using all video tokens, all heads and all projected output channels. [Pilot audit](distill-results/score-attribution/pilot-audit.json)
+| Split | Prompts | Layers | Denoising steps | CFG branches | Heads | Cells | Full distributions and maps |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Calibration | 64 (d0000–d0063) | 0–29 | 0–19 | conditional and unconditional | 0–11 | 921,600 | [report.json](distill-results/score-attribution/report.json) · [pair tables](distill-results/score-attribution/REPORT.md) · [figures](distill-results/score-attribution/figures) |
+| Held-out | 32 (d0064–d0095) | 0–29 | 0–19 | conditional and unconditional | 0–11 | 460,800 | [report.json](distill-results/score-attribution-val/report.json) · [pair tables](distill-results/score-attribution-val/REPORT.md) · [figures](distill-results/score-attribution-val/figures) |
 
-Stage C stopped after the calibration analyzer overflowed in `center_pair_r`. The audit counted 18 overflows across 13 prompts among the 58,982,400 calibration cell–pair entries in the scope above. Every overflow occurred where the stored center-predicted pair row variance was nonpositive. `center_pair_r` is the pooled row-centred Pearson correlation of one pair’s actual and token-mean-predicted contributions over every query and key in the cell. For example, `d0008`, layer 29, step index 7, unconditional branch, head 7, temporal pair 21 had a center-predicted row variance of −5.2293e−17 and actual-to-center covariance of +1.1937e−10. The analyzer’s denominator floor converted that combination to a float64 intermediate of +1.1937e140, which overflowed on the float32 cast. The full-logit `center_logit_r` calculation had zero float32 overflows across the same 921,600 calibration cells. These are diagnostic counts and one within-cell example. Calibration report distributions, figures and held-out analysis are pending. [Stage C diagnostic](distill-results/score-attribution/analysis-check-failure.json)
+Collection used 3.832 GPU-hours for both cached splits, including the 138.93-second `d0000` pilot with a sampled peak of 7,571 MiB. All 576 full-module attention checks were bit-exact across the 96 prompts at step index 0, layers 0, 15 and 29, both branches, all heads and all output tokens and channels. The pilot's pre-RoPE Q and K pair energies also matched earlier all-token per-cell pair statistics exactly. Calibration is in-sample for selection. The held-out overlay applies the same fixed selections to different prompts. [Calibration audit](distill-results/score-attribution/collection-audit.json) · [Held-out audit](distill-results/score-attribution-val/collection-audit.json)
+
+**Definitions.** Each pair contributes $c_f[i,j]=\langle q^r_i[f],k^r_j[f]\rangle/\sqrt{128}$. The full logit $s[i,j]=\sum_f c_f[i,j]$ sums all 64 pairs. The normalized pre-RoPE Q/K at `attn1.norm_q` and `attn1.norm_k` are rotated with the teacher’s angles and rounded to its bf16 dtype. Row-centred contributions are relative to each query’s mean over all keys, which is constant under that query’s softmax.
+
+`var_cov_share[f]` is the signed $\sum_g G[f,g]/\sum G$, where $G[f,g]=\operatorname{mean}_i\operatorname{Cov}_j(c_f[i,\cdot],c_g[i,\cdot])$ uses float64 second moments over the entire query–key grid. `var_own_share[f]` is the non-negative $G[f,f]/\sum_g G[g,g]$. `adv_share[f]` is $\sum_i A_f[i]/\sum_i\sum_g A_g[i]$, with $A_f[i]=\sum_j p[i,j]c_f[i,j]-\operatorname{mean}_j c_f[i,j]$ and $p=\operatorname{softmax}_j(s)$ over all keys. `top1_share` uses the arg-max key in place of the softmax weights. Each set of shares sums to one within its cell.
+
+The 64 × 64 `pair_cov` is $G/\sum G$, saved at float16 precision. The sum of its selected-set submatrix is the removed component’s row-centred logit variance relative to full logit row variance, subject to that storage precision. The stored `var_share_quantiles` and `adv_share_quantiles` are the 5th, 25th, 50th, 75th and 95th percentiles across the cell’s 10,800 query-level shares.
+
+The center model rotates each cell’s token-mean, normalized pre-RoPE Q and K at their real positions. `center_pair_r` is the pooled row-centred correlation between one pair’s actual and center-predicted contributions. `center_logit_r` is the corresponding correlation for the full logit, and `center_explained_share` is center-to-actual covariance divided by actual logit row variance.
+
+### 1. Which pairs carry the score
+
+Each count below comes from the individual pair medians of the named split’s full cell population. Columns give counts of pair medians strictly above the uniform reference 1/64 ≈ 0.015625. Angular frequency decreases with pair index within each axis.
+
+| Split | Pooled share | Axis | Highest frequencies | Middle frequencies | Lowest frequencies |
+| --- | --- | --- | --- | --- | --- |
+| Calibration | var_cov_share | t | 0/8 (0–7) | 0/7 (8–14) | 0/7 (15–21) |
+| Calibration | var_cov_share | h | 3/7 (22–28) | 0/7 (29–35) | 0/7 (36–42) |
+| Calibration | var_cov_share | w | 2/7 (43–49) | 0/7 (50–56) | 0/7 (57–63) |
+| Calibration | adv_share | t | 0/8 (0–7) | 0/7 (8–14) | 0/7 (15–21) |
+| Calibration | adv_share | h | 5/7 (22–28) | 0/7 (29–35) | 0/7 (36–42) |
+| Calibration | adv_share | w | 3/7 (43–49) | 0/7 (50–56) | 0/7 (57–63) |
+| Held-out | var_cov_share | t | 0/8 (0–7) | 0/7 (8–14) | 0/7 (15–21) |
+| Held-out | var_cov_share | h | 3/7 (22–28) | 0/7 (29–35) | 0/7 (36–42) |
+| Held-out | var_cov_share | w | 2/7 (43–49) | 0/7 (50–56) | 0/7 (57–63) |
+| Held-out | adv_share | t | 0/8 (0–7) | 0/7 (8–14) | 0/7 (15–21) |
+| Held-out | adv_share | h | 5/7 (22–28) | 0/7 (29–35) | 0/7 (36–42) |
+| Held-out | adv_share | w | 3/7 (43–49) | 0/7 (50–56) | 0/7 (57–63) |
+
+The following examples use the pair with the highest calibration median advantage share within each axis. Each layer column compares medians within individual layers, retaining every prompt of the split, all steps, both branches and all heads. Each step column does the same within individual steps with all layers. Each CFG column retains all other axes of the split. Full per-pair stratified distributions are in the JSON files.
+
+| Split | Axis and pair | Pooled share | Overall median | Layer medians min–max (layer) | Step medians min–max (step) | Conditional median | Unconditional median |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Calibration | t2 | var_cov_share | 0.0069 | 0.0014 (15) to 0.0711 (0) | 0.0055 (13) to 0.0135 (0) | 0.0069 | 0.0069 |
+| Calibration | t2 | adv_share | 0.0095 | 0.0010 (18) to 0.0626 (0) | 0.0081 (10) to 0.0153 (0) | 0.0095 | 0.0094 |
+| Calibration | h26 | var_cov_share | 0.0379 | 0.0167 (3) to 0.0684 (29) | 0.0315 (19) to 0.0485 (1) | 0.0382 | 0.0377 |
+| Calibration | h26 | adv_share | 0.0427 | 0.0258 (6) to 0.0725 (29) | 0.0394 (19) to 0.0502 (1) | 0.0428 | 0.0425 |
+| Calibration | w47 | var_cov_share | 0.0258 | 0.0089 (25) to 0.0864 (28) | 0.0235 (19) to 0.0314 (0) | 0.0259 | 0.0257 |
+| Calibration | w47 | adv_share | 0.0320 | 0.0156 (15) to 0.0768 (28) | 0.0315 (19) to 0.0340 (1) | 0.0321 | 0.0319 |
+| Held-out | t2 | var_cov_share | 0.0075 | 0.0015 (15) to 0.0720 (0) | 0.0060 (12) to 0.0142 (0) | 0.0074 | 0.0075 |
+| Held-out | t2 | adv_share | 0.0099 | 0.0011 (18) to 0.0634 (0) | 0.0084 (12) to 0.0159 (0) | 0.0098 | 0.0099 |
+| Held-out | h26 | var_cov_share | 0.0375 | 0.0163 (3) to 0.0729 (29) | 0.0322 (19) to 0.0485 (1) | 0.0377 | 0.0373 |
+| Held-out | h26 | adv_share | 0.0423 | 0.0250 (6) to 0.0738 (29) | 0.0396 (19) to 0.0501 (1) | 0.0424 | 0.0421 |
+| Held-out | w47 | var_cov_share | 0.0254 | 0.0089 (25) to 0.0865 (28) | 0.0242 (19) to 0.0313 (0) | 0.0255 | 0.0253 |
+| Held-out | w47 | adv_share | 0.0323 | 0.0158 (15) to 0.0776 (28) | 0.0320 (12) to 0.0330 (1) | 0.0324 | 0.0322 |
+
+### 2. How concentrated a head is
+
+For each split’s full cell population, the cumulative count uses that cell’s 64 pooled own-variance shares sorted largest first. The largest share is the maximum of those 64 per-cell shares.
+
+| Split | Per-cell measure | Min | p05 | p25 | Median | p75 | p95 | Max |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Calibration | Pairs needed for 50% of own variance | 1.0000 | 1.0000 | 2.0000 | 5.0000 | 12.0000 | 17.0000 | 24.0000 |
+| Calibration | Pairs needed for 90% of own variance | 1.0000 | 3.0000 | 10.0000 | 30.0000 | 42.0000 | 47.0000 | 54.0000 |
+| Calibration | Largest pair own-variance share | 0.0290 | 0.0525 | 0.0971 | 0.1936 | 0.3925 | 0.7621 | 0.9967 |
+| Held-out | Pairs needed for 50% of own variance | 1.0000 | 1.0000 | 2.0000 | 5.0000 | 12.0000 | 17.0000 | 25.0000 |
+| Held-out | Pairs needed for 90% of own variance | 1.0000 | 3.0000 | 10.0000 | 30.0000 | 42.0000 | 47.0000 | 54.0000 |
+| Held-out | Largest pair own-variance share | 0.0268 | 0.0532 | 0.0979 | 0.1953 | 0.3955 | 0.7772 | 0.9970 |
+
+| Split | Quantity | Most common (cells) | Second (cells) | Third (cells) |
+| --- | --- | --- | --- | --- |
+| Calibration | Pairs needed for 50% of own variance | 2 (162,956) | 1 (132,415) | 3 (66,216) |
+| Calibration | Pairs needed for 90% of own variance | 43 (40,955) | 44 (40,307) | 45 (37,334) |
+| Calibration | Largest own-variance pair ID | 22 (226,166) | 0 (184,052) | 43 (111,565) |
+| Calibration | Largest advantage pair ID | 22 (192,424) | 0 (160,901) | 26 (134,645) |
+| Held-out | Pairs needed for 50% of own variance | 2 (79,994) | 1 (69,361) | 3 (32,707) |
+| Held-out | Pairs needed for 90% of own variance | 44 (20,129) | 43 (20,027) | 42 (18,619) |
+| Held-out | Largest own-variance pair ID | 22 (106,730) | 0 (94,475) | 43 (61,146) |
+| Held-out | Largest advantage pair ID | 22 (89,972) | 0 (83,553) | 26 (64,359) |
+
+The full count by exact number of pairs and the count for every largest pair ID are in each split’s JSON.
+
+### 3. Amplitude versus score
+
+Spearman ranks the 64 pairs within each cell by the pre-RoPE amplitude $E_{tokens}\|q_f\|\cdot E_{tokens}\|k_f\|$ and the specified post-RoPE share, using all 10,800 tokens for each amplitude. The three-pair share sums the pooled scores of the highest-amplitude pair in each of t, h and w within that cell. Distributions use the full cell population of the indicated split.
+
+| Split | Per-cell measure | Min | p05 | p25 | Median | p75 | p95 | Max |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Calibration | Spearman amplitude vs own variance | 0.3747 | 0.8367 | 0.9202 | 0.9502 | 0.9681 | 0.9837 | 0.9978 |
+| Calibration | Spearman amplitude vs advantage | -0.1351 | 0.5409 | 0.7348 | 0.8223 | 0.8833 | 0.9409 | 0.9974 |
+| Calibration | Three axis-dominant pairs’ covariance share | -0.0949 | 0.0903 | 0.1372 | 0.2178 | 0.4283 | 0.7642 | 0.9963 |
+| Calibration | Three axis-dominant pairs’ advantage share | -0.1234 | 0.0789 | 0.1186 | 0.1865 | 0.3352 | 0.5476 | 0.9515 |
+| Held-out | Spearman amplitude vs own variance | 0.4153 | 0.8333 | 0.9175 | 0.9482 | 0.9670 | 0.9830 | 0.9975 |
+| Held-out | Spearman amplitude vs advantage | -0.0639 | 0.5371 | 0.7284 | 0.8168 | 0.8791 | 0.9386 | 0.9967 |
+| Held-out | Three axis-dominant pairs’ covariance share | -0.0298 | 0.0899 | 0.1377 | 0.2184 | 0.4342 | 0.7638 | 0.9965 |
+| Held-out | Three axis-dominant pairs’ advantage share | -0.1371 | 0.0778 | 0.1191 | 0.1875 | 0.3398 | 0.5504 | 0.9529 |
+
+| Split | Largest amplitude also largest own variance (cells) | Largest amplitude also largest advantage (cells) |
+| --- | --- | --- |
+| Calibration | 664,570 | 598,512 |
+| Held-out | 330,858 | 297,598 |
+
+### 4. Sign and interference
+
+Count one signed pooled pair share per cell and pair. The smallest entry is over the same cell–pair population. Interference is the per-cell ratio of total row-centred logit variance to the sum of pair own variances.
+
+| Split | Pooled share | Negative cell–pair entries | Total cell–pair entries | Minimum entry |
+| --- | --- | --- | --- | --- |
+| Calibration | var_cov_share | 1,079,309 | 58,982,400 | -0.1447 |
+| Calibration | adv_share | 1,426,553 | 58,982,400 | -0.1389 |
+| Held-out | var_cov_share | 602,585 | 29,491,200 | -0.0885 |
+| Held-out | adv_share | 752,973 | 29,491,200 | -0.1680 |
+
+| Split | Per-cell measure | Min | p05 | p25 | Median | p75 | p95 | Max |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Calibration | Interference ratio | 0.8782 | 1.1227 | 1.4554 | 2.0355 | 2.8135 | 4.3957 | 11.6680 |
+| Held-out | Interference ratio | 0.8602 | 1.1250 | 1.4425 | 2.0142 | 2.7760 | 4.3534 | 10.4261 |
+
+### 5. Center model
+
+These within-cell correlations and covariance shares pool every query × every key in the full head. The earlier sweep’s per-query Pearson measured only along an axis line. The following distributions use the full cell population of each split.
+
+| Split | Per-cell measure | Min | p05 | p25 | Median | p75 | p95 | Max |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Calibration | Center-to-actual logit r | -0.3188 | 0.2873 | 0.5037 | 0.6963 | 0.8702 | 0.9707 | 0.9980 |
+| Calibration | Center covariance / actual row variance | -0.0640 | 0.0384 | 0.1660 | 0.4202 | 0.7288 | 0.9331 | 0.9965 |
+| Held-out | Center-to-actual logit r | -0.1963 | 0.2686 | 0.4962 | 0.6955 | 0.8718 | 0.9707 | 0.9987 |
+| Held-out | Center covariance / actual row variance | -0.0121 | 0.0358 | 0.1651 | 0.4234 | 0.7314 | 0.9331 | 0.9962 |
+
+The first analysis stopped when the old analyzer divided by a tiny denominator for constant center contributions. After the CPU tests passed at `c4754e8`, Stage C used the saved records with the default `--center-r-floor` of 1e−10. A pair correlation is undefined when center-predicted row variance is at most that relative floor times `(|E q_f| |E k_f|)^2 / 128`, or when actual pair row variance is nonpositive. The pair-correlation quantiles and MRL counts use the defined entries. The publication check exempts the lowest-frequency pair of each axis (21, 42, 63) from the 1% per-pair undefined threshold.
+
+| Split | Undefined cell–pair entries | All cell–pair entries | Undefined entries by zero-based pair ID | Defined entries outside unit interval |
+| --- | --- | --- | --- | --- |
+| Calibration | 69,728 | 58,982,400 | 17 → 1,720, 18 → 4,352, 19 → 8,864, 20 → 12,453, 21 → 18,705, 41 → 4,586, 42 → 7,768, 62 → 3,979, 63 → 7,301 | 0 |
+| Held-out | 33,701 | 29,491,200 | 17 → 828, 18 → 2,085, 19 → 4,265, 20 → 5,786, 21 → 9,178, 41 → 2,283, 42 → 3,766, 62 → 1,866, 63 → 3,644 | 0 |
+
+Unlisted pairs have zero undefined entries. The analyzer's out-of-interval count uses a 1e−4 tolerance. The original 1% threshold was exceeded by calibration pair 20 (12,453/921,600, 1.3512%), held-out pair 20 (5,786/460,800, 1.2556%). Publication was approved with this limitation documented. Correlation quantiles for these pairs describe the cells where the center-predicted score has enough variation. The share and selection distributions use every cell of each split. [Original stop diagnostic](distill-results/score-attribution/analysis-check-failure.json)
+
+The MRL histogram counts cell–pair entries by the smaller of the pre-RoPE Q and K mean resultant lengths across the cell’s tokens, and by pooled center-to-actual correlation of that pair’s contribution.
+
+| Split | Minimum Q/K pair MRL bin | Cell–pair entries in bin | Entries with pooled pair r ≥ 0.8 |
+| --- | --- | --- | --- |
+| Calibration | [0, 0.2) | 7,729,384 | 0 |
+| Calibration | [0.8, 1] | 13,660,206 | 5,781,700 |
+| Held-out | [0, 0.2) | 3,655,454 | 0 |
+| Held-out | [0.8, 1] | 6,936,803 | 2,893,656 |
+
+### 6. Across-query variation in named cells
+
+The examples fix layer 15, denoising step index 9 and head 0 at the first prompt of each split. Each branch is a separate cell. The pooled share uses all its queries and keys. Brackets give p05, p50 and p95 of query-level shares across its 10,800 queries, each of which uses all 10,800 keys.
+
+| Split | Prompt and CFG branch | Pair | Pooled covariance share | Query covariance quantiles | Pooled advantage share | Query advantage quantiles |
+| --- | --- | --- | --- | --- | --- | --- |
+| Calibration | [d0000 conditional](distill-results/score-attribution/cell-examples/d0000-L15-S09-conditional-H00.txt) | 0 | +0.00252 | [-0.0009 +0.0014 +0.0115] | +0.00358 | [-0.0009 +0.0017 +0.0169] |
+| Calibration | [d0000 conditional](distill-results/score-attribution/cell-examples/d0000-L15-S09-conditional-H00.txt) | 21 | +0.01950 | [-0.0048 +0.0129 +0.0653] | +0.01880 | [-0.0020 +0.0131 +0.0648] |
+| Calibration | [d0000 conditional](distill-results/score-attribution/cell-examples/d0000-L15-S09-conditional-H00.txt) | 42 | +0.01908 | [-0.0044 +0.0147 +0.0580] | +0.01954 | [-0.0017 +0.0155 +0.0556] |
+| Calibration | [d0000 conditional](distill-results/score-attribution/cell-examples/d0000-L15-S09-conditional-H00.txt) | 63 | +0.01845 | [-0.0097 +0.0133 +0.0573] | +0.01993 | [-0.0050 +0.0139 +0.0616] |
+| Calibration | [d0000 unconditional](distill-results/score-attribution/cell-examples/d0000-L15-S09-unconditional-H00.txt) | 0 | +0.00232 | [-0.0008 +0.0013 +0.0106] | +0.00330 | [-0.0009 +0.0015 +0.0155] |
+| Calibration | [d0000 unconditional](distill-results/score-attribution/cell-examples/d0000-L15-S09-unconditional-H00.txt) | 21 | +0.01896 | [-0.0045 +0.0123 +0.0646] | +0.01850 | [-0.0018 +0.0126 +0.0646] |
+| Calibration | [d0000 unconditional](distill-results/score-attribution/cell-examples/d0000-L15-S09-unconditional-H00.txt) | 42 | +0.01765 | [-0.0044 +0.0138 +0.0537] | +0.01848 | [-0.0016 +0.0150 +0.0520] |
+| Calibration | [d0000 unconditional](distill-results/score-attribution/cell-examples/d0000-L15-S09-unconditional-H00.txt) | 63 | +0.01830 | [-0.0090 +0.0132 +0.0562] | +0.01983 | [-0.0049 +0.0138 +0.0604] |
+| Held-out | [d0064 conditional](distill-results/score-attribution-val/cell-examples/d0064-L15-S09-conditional-H00.txt) | 0 | +0.00060 | [-0.0006 +0.0002 +0.0040] | +0.00105 | [-0.0007 +0.0003 +0.0069] |
+| Held-out | [d0064 conditional](distill-results/score-attribution-val/cell-examples/d0064-L15-S09-conditional-H00.txt) | 21 | +0.01580 | [-0.0066 +0.0152 +0.0522] | +0.01784 | [-0.0023 +0.0159 +0.0528] |
+| Held-out | [d0064 conditional](distill-results/score-attribution-val/cell-examples/d0064-L15-S09-conditional-H00.txt) | 42 | +0.02257 | [-0.0066 +0.0196 +0.0717] | +0.02498 | [-0.0020 +0.0198 +0.0740] |
+| Held-out | [d0064 conditional](distill-results/score-attribution-val/cell-examples/d0064-L15-S09-conditional-H00.txt) | 63 | +0.02151 | [-0.0105 +0.0119 +0.0734] | +0.01821 | [-0.0066 +0.0109 +0.0633] |
+| Held-out | [d0064 unconditional](distill-results/score-attribution-val/cell-examples/d0064-L15-S09-unconditional-H00.txt) | 0 | +0.00053 | [-0.0005 +0.0002 +0.0034] | +0.00096 | [-0.0006 +0.0003 +0.0055] |
+| Held-out | [d0064 unconditional](distill-results/score-attribution-val/cell-examples/d0064-L15-S09-unconditional-H00.txt) | 21 | +0.01613 | [-0.0065 +0.0159 +0.0522] | +0.01743 | [-0.0021 +0.0160 +0.0519] |
+| Held-out | [d0064 unconditional](distill-results/score-attribution-val/cell-examples/d0064-L15-S09-unconditional-H00.txt) | 42 | +0.02179 | [-0.0073 +0.0192 +0.0702] | +0.02437 | [-0.0018 +0.0198 +0.0707] |
+| Held-out | [d0064 unconditional](distill-results/score-attribution-val/cell-examples/d0064-L15-S09-unconditional-H00.txt) | 63 | +0.01957 | [-0.0129 +0.0102 +0.0675] | +0.01627 | [-0.0087 +0.0097 +0.0573] |
+
+### 7. Cross-prompt stability
+
+At each fixed layer, step, branch and head, the reference is the per-pair median from the prompts in the same split. Each prompt contributes a Spearman over its 64 pooled shares or an exact overlap count of the two top-22 sets. The distributions include all the split’s prompt-specific cells.
+
+| Split | Per-cell measure | Min | p05 | p25 | Median | p75 | p95 | Max |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Calibration | Own-variance Spearman vs prompt median | 0.1626 | 0.7869 | 0.8902 | 0.9321 | 0.9609 | 0.9885 | 1.0000 |
+| Calibration | Advantage Spearman vs prompt median | -0.0526 | 0.7316 | 0.8567 | 0.9084 | 0.9450 | 0.9814 | 0.9999 |
+| Calibration | Own-variance largest-22 overlap | 8.0000 | 15.0000 | 18.0000 | 19.0000 | 21.0000 | 22.0000 | 22.0000 |
+| Calibration | Advantage largest-22 overlap | 7.0000 | 15.0000 | 17.0000 | 19.0000 | 20.0000 | 22.0000 | 22.0000 |
+| Held-out | Own-variance Spearman vs prompt median | -0.0142 | 0.7571 | 0.8786 | 0.9248 | 0.9567 | 0.9875 | 1.0000 |
+| Held-out | Advantage Spearman vs prompt median | -0.0321 | 0.7066 | 0.8454 | 0.9016 | 0.9402 | 0.9794 | 0.9998 |
+| Held-out | Own-variance largest-22 overlap | 6.0000 | 15.0000 | 18.0000 | 19.0000 | 21.0000 | 22.0000 | 22.0000 |
+| Held-out | Advantage largest-22 overlap | 4.0000 | 15.0000 | 17.0000 | 19.0000 | 20.0000 | 22.0000 | 22.0000 |
+
+### 8. Selections
+
+The overlay uses the v2 masks built on the 64 calibration prompts. The mask-size ranges cover all layers, steps, branches and heads and do not depend on prompt or tokens. `fixed_high` uses the fixed highest frequencies, `separate` chooses the 22 lowest-damage Q and K pairs separately within the layer–step–branch–head cell, `shared` chooses the 22 lowest summed Q-plus-K damage pairs there, and `pooled` fixes one shared mask per layer and head across steps and branches. Damage is the pooled-mean replacement error times the partner’s energy from the earlier calibration. The overlay includes layer 0 and the first denoising step.
+
+For each cell, take the union of the Q and K masks and sum its pooled pair shares. The variance column uses the corresponding covariance submatrix. The union can exceed 22 for the separate variant. The reference 22/64 = 0.34375 is the expectation for a uniformly chosen 22-pair set on a sum of shares. The cell’s 22 smallest own-variance shares give its minimum attainable own-variance share for 22 pairs.
+
+| Split | Variant | Q ∪ K pairs min / median / max | Q ∩ K pairs min / median / max |
+| --- | --- | --- | --- |
+| Calibration | fixed_high | 22 / 22 / 22 | 22 / 22 / 22 |
+| Calibration | separate | 22 / 26 / 38 | 6 / 18 / 22 |
+| Calibration | shared | 22 / 22 / 22 | 22 / 22 / 22 |
+| Calibration | pooled | 22 / 22 / 22 | 22 / 22 / 22 |
+| Held-out | fixed_high | 22 / 22 / 22 | 22 / 22 / 22 |
+| Held-out | separate | 22 / 26 / 38 | 6 / 18 / 22 |
+| Held-out | shared | 22 / 22 / 22 | 22 / 22 / 22 |
+| Held-out | pooled | 22 / 22 / 22 | 22 / 22 / 22 |
+
+**Calibration.** Pooled selected-set scores over the full split population of cells.
+
+| Variant | Per-cell measure | Min | p05 | p25 | Median | p75 | p95 | Max |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| fixed_high | Covariance share | 0.0003 | 0.0994 | 0.2889 | 0.6132 | 0.8969 | 0.9928 | 1.0033 |
+| fixed_high | Advantage share | -0.0139 | 0.1350 | 0.3185 | 0.6153 | 0.8888 | 0.9879 | 1.0649 |
+| fixed_high | Own-variance share | 0.0019 | 0.1483 | 0.3980 | 0.7712 | 0.9579 | 0.9988 | 1.0000 |
+| fixed_high | Removed-component variance ratio | 0.0006 | 0.0551 | 0.2181 | 0.5567 | 0.8819 | 0.9895 | 1.0525 |
+| separate | Covariance share | -0.0086 | 0.0015 | 0.0278 | 0.1157 | 0.1945 | 0.2931 | 0.7214 |
+| separate | Advantage share | -0.0227 | 0.0034 | 0.0497 | 0.1489 | 0.2296 | 0.3274 | 0.7231 |
+| separate | Own-variance share | 0.0000 | 0.0001 | 0.0101 | 0.0976 | 0.2049 | 0.3231 | 0.7854 |
+| separate | Removed-component variance ratio | 0.0000 | 0.0002 | 0.0109 | 0.0555 | 0.1097 | 0.1964 | 0.6497 |
+| shared | Covariance share | -0.0086 | 0.0013 | 0.0196 | 0.0806 | 0.1294 | 0.1869 | 0.6300 |
+| shared | Advantage share | -0.0247 | 0.0027 | 0.0365 | 0.1012 | 0.1540 | 0.2254 | 0.5219 |
+| shared | Own-variance share | 0.0000 | 0.0001 | 0.0068 | 0.0638 | 0.1342 | 0.2075 | 0.7001 |
+| shared | Removed-component variance ratio | 0.0000 | 0.0002 | 0.0069 | 0.0348 | 0.0643 | 0.1102 | 0.5448 |
+| pooled | Covariance share | -0.0066 | 0.0013 | 0.0203 | 0.0833 | 0.1333 | 0.2000 | 0.6893 |
+| pooled | Advantage share | -0.0250 | 0.0028 | 0.0375 | 0.1037 | 0.1598 | 0.2357 | 0.6812 |
+| pooled | Own-variance share | 0.0000 | 0.0001 | 0.0071 | 0.0662 | 0.1395 | 0.2283 | 0.7531 |
+| pooled | Removed-component variance ratio | 0.0000 | 0.0002 | 0.0073 | 0.0362 | 0.0667 | 0.1202 | 0.6543 |
+| Smallest 22 | Own-variance share | 0.0000 | 0.0001 | 0.0056 | 0.0470 | 0.0938 | 0.1380 | 0.2311 |
+
+**Held-out.** Pooled selected-set scores over the full split population of cells.
+
+| Variant | Per-cell measure | Min | p05 | p25 | Median | p75 | p95 | Max |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| fixed_high | Covariance share | 0.0017 | 0.0981 | 0.2892 | 0.6176 | 0.8994 | 0.9930 | 1.0058 |
+| fixed_high | Advantage share | -0.0121 | 0.1327 | 0.3223 | 0.6213 | 0.8928 | 0.9885 | 1.0640 |
+| fixed_high | Own-variance share | 0.0011 | 0.1488 | 0.4032 | 0.7739 | 0.9594 | 0.9988 | 1.0000 |
+| fixed_high | Removed-component variance ratio | 0.0003 | 0.0558 | 0.2230 | 0.5632 | 0.8858 | 0.9897 | 1.0923 |
+| separate | Covariance share | -0.0064 | 0.0014 | 0.0275 | 0.1155 | 0.1961 | 0.2978 | 0.6929 |
+| separate | Advantage share | -0.0302 | 0.0033 | 0.0483 | 0.1491 | 0.2318 | 0.3326 | 0.7059 |
+| separate | Own-variance share | 0.0000 | 0.0001 | 0.0099 | 0.0988 | 0.2077 | 0.3303 | 0.7317 |
+| separate | Removed-component variance ratio | 0.0000 | 0.0002 | 0.0109 | 0.0562 | 0.1115 | 0.2021 | 0.6440 |
+| shared | Covariance share | -0.0056 | 0.0013 | 0.0195 | 0.0813 | 0.1306 | 0.1914 | 0.5616 |
+| shared | Advantage share | -0.0291 | 0.0026 | 0.0352 | 0.1015 | 0.1553 | 0.2308 | 0.4875 |
+| shared | Own-variance share | 0.0000 | 0.0001 | 0.0066 | 0.0644 | 0.1368 | 0.2137 | 0.6439 |
+| shared | Removed-component variance ratio | 0.0000 | 0.0001 | 0.0069 | 0.0356 | 0.0655 | 0.1160 | 0.5032 |
+| pooled | Covariance share | -0.0056 | 0.0013 | 0.0203 | 0.0839 | 0.1346 | 0.2042 | 0.6880 |
+| pooled | Advantage share | -0.0277 | 0.0027 | 0.0362 | 0.1036 | 0.1612 | 0.2409 | 0.6917 |
+| pooled | Own-variance share | 0.0000 | 0.0001 | 0.0069 | 0.0667 | 0.1419 | 0.2332 | 0.7486 |
+| pooled | Removed-component variance ratio | 0.0000 | 0.0002 | 0.0073 | 0.0371 | 0.0678 | 0.1257 | 0.6249 |
+| Smallest 22 | Own-variance share | 0.0000 | 0.0001 | 0.0053 | 0.0467 | 0.0942 | 0.1388 | 0.2355 |
+
+The damage correlation ranks the 64 combined Q-plus-K damage scores and the actual pooled own variances within each cell. Both split rows use all layers, steps, CFG branches and heads.
+
+| Split | Per-cell measure | Min | p05 | p25 | Median | p75 | p95 | Max |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Calibration | Damage vs own variance Spearman | -0.0348 | 0.5712 | 0.7428 | 0.8432 | 0.9109 | 0.9678 | 0.9937 |
+| Held-out | Damage vs own variance Spearman | -0.0254 | 0.5401 | 0.7285 | 0.8330 | 0.9054 | 0.9650 | 0.9917 |
+
+In the calibration cells, the lowest-damage shared masks carry a median 10.1% of the pooled attention advantage (p05–p95 0.3%–22.5%). The comparable 22-pair medians are 10.4% for the pooled masks and 61.5% for the fixed highest frequencies. Within cells, the median Spearman of damage and pair own variance is 0.843. The damage criterion therefore selects pairs carrying a small share of the attention advantage in the median cell.
+
+In the held-out cells, the lowest-damage shared masks carry a median 10.1% of the pooled attention advantage (p05–p95 0.3%–23.1%). The comparable 22-pair medians are 10.4% for the pooled masks and 62.1% for the fixed highest frequencies. Within cells, the median Spearman of damage and pair own variance is 0.833. The damage criterion therefore selects pairs carrying a small share of the attention advantage in the median cell.
