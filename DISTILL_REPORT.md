@@ -853,3 +853,42 @@ Removing learned means after fine-tuning reduced subject consistency by 0.00803,
 Same-seed relative final-latent L2 against the teacher was 0.557865 for shared22 with zeros and 0.597051 for deletion with means. Each ratio uses the L2 norm of the full final-latent difference divided by the teacher latent norm before averaging over the 100 pairs. Mean decoded-frame PSNR over 4,500 aligned RGB frames per arm was 14.268 and 13.690 dB, respectively.
 
 The CPU suite passed. The two screens and video benchmark used 7455.4 GPU-seconds (2.071 GPU-hours), with at most two GPUs in any wave. The audited artifacts are in `distill-results/swap/`. Lab videos and full generation records are in `out/learned-center-wan-swap/` in the swap checkout.
+
+### Fixed-high Stage 3 EMA with its means removed
+
+The preserved Stage 3 EMA passed SHA-256 verification for the legacy 44-coordinate center file, transformer weights, and config. The loaded masks select temporal pairs 0–7, height pairs 22–28, and width pairs 43–49 on both Q and K for every head, using the flattened 64-pair index. The intervention sets both coordinates of those 22 pairs to zero for every video token, after full-width QK RMSNorm and before RoPE. Layer 0 and the first denoising step are exempt. Both arms use the same Stage 3 EMA weights from update 5,000.
+
+The following screen uses the same 32 held-out prompts × 20 cached teacher entering states as A. Each number is the equal mean over 640 full-latent relative squared velocity errors against the native bf16 teacher. The guided column combines both CFG branches at guidance 5 before taking each ratio. All rows include observations at the exempt step. The deletion EMA's mean row uses calibration means. The fixed-high EMA with its trained means scored 0.027988 guided. Its live-weight final training validation on the same states was 0.028238.
+
+| Transformer and mask | Selected values | Conditional | Unconditional | Guided CFG 5 | Guided zeros / means |
+|---|---|---:|---:|---:|---:|
+| Frozen teacher, fixed high | Means | 0.099291 | 0.098567 | 0.283408 | — |
+| Frozen teacher, fixed high | Zeros | 0.308276 | 0.307376 | 0.414549 | 1.463× |
+| Frozen teacher, shared22 | Means | 0.006686 | 0.006748 | 0.032195 | — |
+| Frozen teacher, shared22 | Zeros | 0.009840 | 0.009837 | 0.037419 | 1.162× |
+| Fixed-high Stage 3 EMA | Means | 0.005906 | 0.005730 | 0.027988 | — |
+| Fixed-high Stage 3 EMA | Zeros | 0.252905 | 0.251435 | 0.286806 | 10.248× |
+| Shared22 EMA | Means | 0.002411 | 0.002321 | 0.019374 | — |
+| Shared22 EMA | Zeros | 0.003290 | 0.003233 | 0.021122 | 1.090× |
+| Deletion EMA | Means | 0.003079 | 0.002968 | 0.021128 | — |
+| Deletion EMA | Zeros | 0.002491 | 0.002420 | 0.019923 | 0.943× |
+
+For context, RMS concentration for a pair is its pooled mean norm divided by its pooled root-mean-square vector norm. The per-cell mean and energy use all tokens for 64 calibration prompts. Averaging those ratios over the 22 selected pairs and all 14,400 layer–step–branch–head cells gives fixed-high Q/K values of 0.7244/0.7392 and shared22 values of 0.4505/0.4553. The previously reported 0.4816/0.4886 values describe the separate Q/K selection.
+
+The 100-prompt test used one original seed per prompt, the frozen teacher videos, and the existing fixed-high Stage 3 means arm. Each new video was 45 frames at 480×480 and 16 fps, with finite latents at all 20 steps. It made 2,204 intervention calls across 29 layers, 19 steps, both branches, and Q and K. The first same-seed prompt produced bitwise-identical final latents and identical MP4 hashes with encoder offload and with GPU residency. The benchmark retained the resident version and used the same setting for the remaining prompts.
+
+Each VBench mean averages 100 videos with the frame sampling described above. The paired 95% percentile intervals use 10,000 resamples of the 100 matched prompt-and-seed units, NumPy seed 20261109.
+
+| Dimension | Teacher | Fixed-high means | Fixed-high zeros | Zeros − fixed-high means | Zeros − teacher |
+|---|---:|---:|---:|---:|---:|
+| Subject consistency | 0.963999 | 0.958942 | 0.918897 | -0.04005 [-0.04873, -0.03102] | -0.04510 [-0.05385, -0.03579] |
+| Background consistency | 0.976466 | 0.974867 | 0.961895 | -0.01297 [-0.01810, -0.00761] | -0.01457 [-0.01989, -0.00926] |
+| Motion smoothness | 0.984463 | 0.985119 | 0.985614 | +0.00049 [-0.00321, +0.00436] | +0.00115 [-0.00270, +0.00517] |
+| Dynamic degree | 0.330000 | 0.210000 | 0.370000 | +0.16000 [+0.05000, +0.27000] | +0.04000 [-0.08000, +0.16000] |
+| Aesthetics | 0.588595 | 0.517914 | 0.354575 | -0.16334 [-0.18242, -0.14489] | -0.23402 [-0.25291, -0.21497] |
+| Imaging | 0.660679 | 0.652749 | 0.368282 | -0.28447 [-0.31481, -0.25331] | -0.29240 [-0.32337, -0.26185] |
+| Text–video consistency | 0.232555 | 0.219662 | 0.050654 | -0.16901 [-0.18313, -0.15492] | -0.18190 [-0.19489, -0.16857] |
+
+The fixed-high EMA was much more sensitive to an inference-only drop than shared22. On 100 matched videos, replacing the fixed-high means with zeros reduced aesthetics by 0.16334, imaging by 0.28447, and text–video consistency by 0.16901. Subject and background consistency also fell by 0.04005 and 0.01297, respectively. All five paired intervals were below zero. Motion smoothness spanned zero and dynamic degree rose by 0.16000 with an interval above zero, indicating more motion by that metric. The corresponding shared22 quality intervals for aesthetics, imaging, and text–video consistency all spanned zero, and the shared22 subject consistency drop was 0.00803. In the cached-state screen, the fixed-high zeros-to-means guided error ratio grew from 1.463× on frozen teacher weights to 10.248× after Stage 3 fine-tuning, while shared22's ratio was 1.162× on teacher weights and 1.090× after fine-tuning. This measures **fine-tune, then drop**. A fixed-high zeros-then-fine-tune arm would be needed to determine whether fixed-high means are necessary after adapting to zeros.
+
+Same-seed teacher-relative final-latent L2 was 0.823514, averaging the full-latent difference norm divided by the teacher latent norm over 100 pairs. Mean PSNR was 11.336 dB across 4,500 aligned decoded RGB frames. C used 3872.8 GPU-seconds (1.076 GPU-hours). Artifacts are in `distill-results/swap/screen-fh/` and `distill-results/swap/full100/fh_zeros/`. Lab videos and full records are under `out/learned-center-wan-swap/` in the fixed-high checkout.
