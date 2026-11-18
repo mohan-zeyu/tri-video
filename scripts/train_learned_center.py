@@ -646,6 +646,10 @@ def main():
                         help="retain an EMA model at each save instead of writing and rotating full optimizer states")
     parser.add_argument("--resume-state-with-ema", action="store_true",
                         help="also keep the latest full Stage 2 optimizer, EMA and RNG checkpoint")
+    parser.add_argument("--skip-final-resume-state", action="store_true",
+                        help="export the final EMA without writing an extra full optimizer checkpoint")
+    parser.add_argument("--resume-state-every", type=int,
+                        help="interval for full optimizer checkpoints, a multiple of the EMA save interval")
     parser.add_argument("--log-every", type=int, default=10)
     parser.add_argument("--seed", type=int, default=20261114)
     parser.add_argument("--no-fsdp", action="store_true")
@@ -666,6 +670,11 @@ def main():
         parser.error("--guided-gate requires unique validation steps and earlier measured reference steps on a fresh Stage 2 or 3 run")
     if args.resume_state_with_ema and (args.stage != 2 or not args.ema_checkpoints):
         parser.error("--resume-state-with-ema requires --ema-checkpoints in Stage 2")
+    if args.skip_final_resume_state and not args.resume_state_with_ema:
+        parser.error("--skip-final-resume-state requires --resume-state-with-ema")
+    if args.resume_state_every is not None and (not args.resume_state_with_ema or args.resume_state_every <= 0
+                                                or args.save_every <= 0 or args.resume_state_every % args.save_every):
+        parser.error("--resume-state-every requires resumable EMA saves and a positive multiple of --save-every")
     if args.ema_checkpoints and (args.stage == 1 or args.ema <= 0 or (args.resume and not args.resume_state_with_ema)):
         parser.error("--ema-checkpoints requires EMA in Stage 2 or 3 and --resume-state-with-ema to resume")
     if args.rollout_worker_budget < 0 or (args.rollout_worker_budget and (
@@ -889,7 +898,10 @@ def main():
                     for h in history:
                         f.write(json.dumps(h) + "\n")
                 history.clear()
-            if args.resume_state_with_ema:
+            full_state_due = (args.resume_state_every is None or last_step % args.resume_state_every == 0
+                              or last_step == stop_at or budget_stop or gate_stop)
+            if (args.resume_state_with_ema and full_state_due
+                    and (last_step < args.steps or not args.skip_final_resume_state)):
                 save_training_state(student, opt_model, center, opt_center, last_step, out, rank, world,
                                     args.no_fsdp, ema, rng, save_torch_rng=True)
         if budget_stop or gate_stop:

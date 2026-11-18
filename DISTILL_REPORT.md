@@ -740,3 +740,55 @@ Each validation row averages full-latent relative squared velocity error over ei
 | 1,500 | 0.003723 | 0.003954 | 0.027917 | 0.028333 |
 
 The prescribed EMA checkpoints at updates 500, 1,000 and 1,500 remain in `out/distill-narrow-shared22/ema-checkpoints/` on the lab host. The most recent export has exact shared Q/K masks and the matched layer-0 and step-1 exemptions, with its weights and center file checksummed. An exact resume requires the live weights, full optimizer and sampler state. The EMA-only run saved smoothed model exports. The approved recovery is a new exact C1 run from teacher weights, with up to seven additional GPU-hours for the combined study. C1 keeps the original training inputs, seed, optimizer and schedule. Its save mode retains every scheduled EMA export and the latest resumable checkpoint, including live model and optimizer weights, EMA buffers and rank-local random states. The CPU test recovered the same final weights and validation curve as an uninterrupted run. The rerun writes to `out/distill-narrow-shared22-rerun/`. Pooled C2 follows the rerun’s full benchmark. The saved training records and the interruption audit are in `distill-results/removal/narrow-shared22/interrupted/`.
+
+### C1 · Shared22 pre-norm removal after 2,500 updates
+
+Starting from teacher weights, this arm used the matched Stage 2 learning rate, warmup, feature and velocity losses, EMA, seed and optimizer. Two ranks used two microbatches each, for four cached teacher prompt-and-step samples per update. Both Q/K masks and both exemption buffers match shared22 post-norm deletion exactly. This comparison moves the same selected coordinates from after RMSNorm to before it, with layer 0 and step 1 exempt.
+
+The current training weights were validated on the first eight held-out prompts and all 20 entering teacher states. Relative squared velocity error normalizes the squared difference over all latent coordinates by the corresponding teacher velocity energy for each state. Guided combines both branches at CFG 5 before applying that ratio. Each row averages 160 equal-weight teacher states for each column.
+
+| Update | Pre-norm conditional | Pre-norm unconditional | Pre-norm guided | Post-norm shared22 guided |
+|---|---:|---:|---:|---:|
+| 0 | 0.029271 | 0.033403 | 0.097438 | 0.034872 |
+| 250 | 0.004715 | 0.005566 | 0.029992 | 0.029633 |
+| 500 | 0.004882 | 0.005696 | 0.033184 | 0.031879 |
+| 750 | 0.005117 | 0.004999 | 0.031525 | 0.030278 |
+| 1,000 | 0.004848 | 0.005404 | 0.030361 | 0.030603 |
+| 1,250 | 0.004044 | 0.003659 | 0.027766 | 0.026632 |
+| 1,500 | 0.003755 | 0.003651 | 0.027420 | 0.028333 |
+| 1,750 | 0.003174 | 0.002849 | 0.024078 | 0.024191 |
+| 2,000 | 0.002908 | 0.002473 | 0.023520 | 0.022847 |
+| 2,250 | 0.002622 | 0.002246 | 0.021800 | 0.021362 |
+| 2,500 | 0.002472 | 0.002167 | 0.021373 | 0.020530 |
+
+Training used GPUs 3 and 5 and completed 2,500 updates in one run with finite logged losses. Median optimizer-update time was 6.870 s across 251 logged steps, averaging the two rank timings for each recorded update and excluding validation and saving. GPU device usage reached 24,487 and 24,483 MiB in the recorded snapshots on GPUs 3 and 5. The timeout prevented the trainer from emitting its final PyTorch allocator peak, and driver accounting was disabled. All 2,500 updates and the final EMA were saved before the wall-time guard stopped the job while writing the final optimizer checkpoint. The EMA was independently opened, mask-checked, and checksummed before evaluation. The last complete optimizer checkpoint is at 2,000. The four intermediate and final EMA exports are preserved in `out/distill-narrow-shared22-rerun/` in the lab removal checkout.
+
+The full benchmark generated one video per original fixed seed for each of 100 prompts, with seven pinned VBench dimensions. Every video passed the MP4 checksum and 45-frame, 480×480, 16 fps audits and recorded finite latents at all 20 steps. Every video recorded 2,204 intervention calls over 29 active layers, 19 steps, both CFG branches and Q/K. Each dimension averages 100 per-video scores. Aesthetics and imaging use all 45 frames. Text–video consistency uses eight midpoint frames and the prompt.
+
+| Dimension | Shared22 pre-norm removal | Teacher | Dense | Tuned shared22 | Shared22 post-norm deletion |
+|---|---:|---:|---:|---:|---:|
+| Subject consistency | 0.962257 | 0.963999 | 0.964285 | 0.967490 | 0.966353 |
+| Background consistency | 0.974716 | 0.976466 | 0.977676 | 0.978377 | 0.978334 |
+| Motion smoothness | 0.985579 | 0.984463 | 0.985506 | 0.986384 | 0.986335 |
+| Dynamic degree | 0.300000 | 0.330000 | 0.250000 | 0.280000 | 0.270000 |
+| Aesthetics | 0.576878 | 0.588595 | 0.578063 | 0.583495 | 0.577787 |
+| Imaging | 0.678851 | 0.660679 | 0.670020 | 0.678854 | 0.680191 |
+| Text–video consistency | 0.231167 | 0.232555 | 0.234363 | 0.234047 | 0.234605 |
+
+Differences are this pre-norm removal arm minus the reference, with percentile 95% intervals from 10,000 paired prompt resamples on the 100 matched prompt-and-seed units, NumPy seed 20261109.
+
+| Dimension | vs. Teacher | vs. Dense | vs. Tuned shared22 | vs. Shared22 post-norm deletion |
+|---|---:|---:|---:|---:|
+| Subject consistency | -0.00174 [-0.00934, +0.00513] | -0.00203 [-0.00693, +0.00219] | -0.00523 [-0.01001, -0.00098] | -0.00410 [-0.00827, -0.00009] |
+| Background consistency | -0.00175 [-0.00544, +0.00173] | -0.00296 [-0.00563, -0.00052] | -0.00366 [-0.00637, -0.00113] | -0.00362 [-0.00612, -0.00138] |
+| Motion smoothness | +0.00112 [-0.00006, +0.00236] | +0.00007 [-0.00103, +0.00123] | -0.00080 [-0.00160, -0.00011] | -0.00076 [-0.00175, +0.00005] |
+| Dynamic degree | -0.03000 [-0.11000, +0.05000] | +0.05000 [-0.01000, +0.11000] | +0.02000 [-0.03000, +0.08000] | +0.03000 [-0.03000, +0.09000] |
+| Aesthetics | -0.01172 [-0.02343, -0.00005] | -0.00118 [-0.01227, +0.01010] | -0.00662 [-0.01782, +0.00478] | -0.00091 [-0.01040, +0.00861] |
+| Imaging | +0.01817 [+0.00184, +0.03516] | +0.00883 [-0.00305, +0.02102] | -0.00000 [-0.01404, +0.01357] | -0.00134 [-0.01071, +0.00798] |
+| Text–video consistency | -0.00139 [-0.00745, +0.00486] | -0.00320 [-0.00917, +0.00269] | -0.00288 [-0.00848, +0.00289] | -0.00344 [-0.00871, +0.00169] |
+
+Shared pre-norm minus matched post-norm deletion on the 100 videos measured aesthetics -0.00091 [-0.01040, +0.00861], imaging -0.00134 [-0.01071, +0.00798], and text–video consistency -0.00344 [-0.00871, +0.00169]. The paired intervals on all three quality measures span zero, as do the intervals for motion smoothness and dynamic degree. Subject and background consistency were lower by 0.00410 and 0.00362, with intervals below zero. Those dimensions compare frame embeddings across 44 transitions per video, averaged over the same 100 videos. This comparison holds the mask, exemptions, teacher initialization and fine-tuning recipe fixed.
+
+Across those same 100 pairs, mean whole-final-latent L2 versus the teacher was 499.304 and relative L2 was 0.567666. Relative L2 divides by the teacher latent norm per matched prompt before averaging. PSNR averaged 14.098 dB over 4,500 aligned decoded frames. Training used 37,956 GPU-seconds and benchmarking used 3,992, for 41,948 GPU-seconds (11.652 GPU-hours) for this arm. Training and benchmark artifacts are in `distill-results/removal/narrow-shared22/`. Lab videos are in `out/learned-center-wan-narrow_shared22-full100/`.
+
+The study charges C1’s interrupted attempt separately. Scoring used 493 seconds beyond the first C1 benchmark allowance, with the extra time charged to the approved combined budget. After A+B, the interrupted attempt and the completed C1 rerun, the C2 allocation is 40,963 GPU-seconds (11.379 GPU-hours). C2 uses the same scheduled EMA saves every 500 updates and writes full resumable optimizer checkpoints at updates 1,000 and 2,000. The CPU restart test passed with this save policy.

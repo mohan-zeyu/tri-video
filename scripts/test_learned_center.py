@@ -247,13 +247,15 @@ def test_training_stages():
         resumed = tmp / "s2-resume"
         saved_ema = resumed / "ema-checkpoints" / "step-000002" / "learned_center.pt"
         flags = ["--stage", "2", "--out", str(resumed), "--steps", "4", "--init-student", str(tmp / "s1" / "student"),
-                 "--ema", "0.9", "--ema-checkpoints", "--resume-state-with-ema"] + common
+                 "--ema", "0.9", "--ema-checkpoints", "--resume-state-with-ema", "--skip-final-resume-state",
+                 "--resume-state-every", "4"] + common
         assert "TRAINING PAUSED 2 2" in run(flags + ["--stop-after", "2"], ROOT)
         early_ema = saved_ema.read_bytes()
         with (resumed / "validation.jsonl").open("a") as stream:
             stream.write('{"step": 4}\n{"step":')
         assert "START_OPTIMIZER_STEP 3" in run(flags + ["--resume"], ROOT)
         assert saved_ema.read_bytes() == early_ema
+        assert json.loads((resumed / "checkpoint" / "latest.json").read_text())["step"] == 2
         for name in ("history", "validation"):
             def scores(path):
                 return [{k: v for k, v in json.loads(line).items() if k not in {"elapsed_s", "optimizer_step_seconds"}}
