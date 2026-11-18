@@ -9,6 +9,10 @@ rows). Error = relative squared velocity error (cond, uncond,
 guided w=5), exactly the Stage 0 reference metric (scripts/measure_distill_references.py), so results are
 comparable with: teacher bf16-vs-fp32 noise 0.0027 and training-free high current means 0.350 (guided).
 
+--student DIR screens a trained student instead: its transformer/ weights and its own learned_center.pt (masks,
+exemptions and means as trained), one arm per --modes entry named student/<mode>. "mean" is the student as trained
+(when it was trained with means), "delete" zeros the same pairs in that student: the fine-tune-then-drop swap.
+
 Exemptions follow the student by default (layer 0 and step 1 untouched); --no-exempt matches the reference's
 all-layer/all-step scope; --all-steps keeps layer 0 exempt but touches every step (what a weight-level removal
 would do, since dropped rows cannot be restored at one step). One GPU per worker, resumable per prompt.
@@ -77,6 +81,7 @@ def main():
     parser.add_argument("--no-exempt", action="store_true", help="apply to layer 0 and step 1 too (reference scope)")
     parser.add_argument("--all-steps", action="store_true", help="keep layer 0 exempt but apply at every step (weight-removal scope)")
     parser.add_argument("--out", default="out/distill-selection/screen")
+    parser.add_argument("--student", help="student directory (transformer/ + learned_center.pt): screen that student with its own masks and means")
     parser.add_argument("--max-prompts", type=int)
     args = parser.parse_args()
     prompts = json.loads((ROOT / args.prompts).read_text())["prompts"] if not os.path.isabs(args.prompts) else json.loads(Path(args.prompts).read_text())["prompts"]
@@ -89,23 +94,39 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     torch.backends.cuda.matmul.allow_tf32 = False
-    model = WanTransformer3DModel.from_pretrained(args.snapshot, subfolder="transformer", torch_dtype=torch.bfloat16, local_files_only=True).to(device).eval()
-    selection = torch.load(ROOT / args.selection if not os.path.isabs(args.selection) else args.selection, map_location="cpu")
-    statistics = torch.load(ROOT / args.statistics if not os.path.isabs(args.statistics) else args.statistics, map_location="cpu")
-    L, H, D = len(model.blocks), model.config.num_attention_heads, model.config.attention_head_dim
-    exempt_layers, exempt_steps = ((), ()) if args.no_exempt else ((0,), () if args.all_steps else (0,))
     arms = {}
-    for variant in args.variants:
+    if args.student:
+        student = Path(args.student) if os.path.isabs(args.student) else ROOT / args.student
+        model = WanTransformer3DModel.from_pretrained(student, subfolder="transformer", torch_dtype=torch.bfloat16).to(device).eval()
+        saved = torch.load(student / "learned_center.pt", map_location="cpu")
         for mode in args.modes:
             if mode not in ("mean", "delete", "narrow"):
                 raise ValueError(mode)
-            center = LearnedCenter(layers=L, steps=store.steps, heads=H, head_dim=D, exempt_layers=exempt_layers, exempt_steps=exempt_steps,
-                                   mode=mode, selection=selection["variants"][variant]).to(device)
-            if mode == "mean":
-                center.init_from_calibration(statistics)
-            arms[f"{variant}/{mode}"] = center
-    write_json(out / "meta.json", {"arms": list(arms), "val_prompts": ids, "exempt_layers": list(exempt_layers), "exempt_steps": list(exempt_steps),
-                                   "selection": str(args.selection), "statistics": str(args.statistics), "pairs_per_side": selection.get("pairs")})
+            arms[f"student/{mode}"] = LearnedCenter.from_checkpoint(saved, mode=mode).to(device)
+        ref = next(iter(arms.values()))
+        meta = {"arms": list(arms), "val_prompts": ids, "student": str(student), "student_center_mode": saved.get("mode"),
+                "exempt_layers": [int(i) for i in torch.nonzero(~ref.layer_active).flatten()], "exempt_steps": [int(i) for i in torch.nonzero(~ref.step_active).flatten()],
+                "pairs_per_cell": float(ref.selected_pairs("q").sum(-1).float().mean()), "cell_invariant": ref.cell_invariant(),
+                "mu_norm_q": float(ref.mu_q.norm(dim=-1).mean()), "mu_norm_k": float(ref.mu_k.norm(dim=-1).mean())}
+    else:
+        model = WanTransformer3DModel.from_pretrained(args.snapshot, subfolder="transformer", torch_dtype=torch.bfloat16, local_files_only=True).to(device).eval()
+        selection = torch.load(ROOT / args.selection if not os.path.isabs(args.selection) else args.selection, map_location="cpu")
+        statistics = torch.load(ROOT / args.statistics if not os.path.isabs(args.statistics) else args.statistics, map_location="cpu")
+        L, H, D = len(model.blocks), model.config.num_attention_heads, model.config.attention_head_dim
+        exempt_layers, exempt_steps = ((), ()) if args.no_exempt else ((0,), () if args.all_steps else (0,))
+        for variant in args.variants:
+            for mode in args.modes:
+                if mode not in ("mean", "delete", "narrow"):
+                    raise ValueError(mode)
+                center = LearnedCenter(layers=L, steps=store.steps, heads=H, head_dim=D, exempt_layers=exempt_layers, exempt_steps=exempt_steps,
+                                       mode=mode, selection=selection["variants"][variant]).to(device)
+                if mode == "mean":
+                    center.init_from_calibration(statistics)
+                arms[f"{variant}/{mode}"] = center
+        meta = {"arms": list(arms), "val_prompts": ids, "exempt_layers": list(exempt_layers), "exempt_steps": list(exempt_steps),
+                "selection": str(args.selection), "statistics": str(args.statistics), "pairs_per_side": selection.get("pairs")}
+    write_json(out / "meta.json", meta)
+    teacher = model if not args.student else WanTransformer3DModel.from_pretrained(args.snapshot, subfolder="transformer", torch_dtype=torch.bfloat16, local_files_only=True).to(device).eval()
     done = 0
     for pid in ids:
         target = out / f"{pid}.json"
@@ -121,7 +142,7 @@ def main():
             result = {arm: [] for arm in arms}
             for step in range(store.steps):
                 item = store.item(pid, step)
-                native = predict(model, item, device)
+                native = predict(teacher, item, device)
                 for name, center in arms.items():
                     center.attach(model)
                     center.set_context(torch.tensor([step, step]), torch.tensor([0, 1]))

@@ -242,6 +242,14 @@ def test_training_stages():
         assert "TRAINING COMPLETE 2" in out2 and "VAL" in out2, out2[-800:]
         assert (tmp / "s2" / "student" / "transformer" / "diffusion_pytorch_model.safetensors").exists()
         assert (tmp / "s2" / "validation.jsonl").exists() and (tmp / "s2" / "history.jsonl").exists()
+        # fine-tune-then-drop screen: the saved student with its own masks, means (mean) or zeros (delete)
+        proc = subprocess.run([sys.executable, str(ROOT / "scripts" / "screen_selections.py"), "--traj", str(traj), "--prompts", str(cfg), "--snapshot", str(tiny),
+                               "--student", str(tmp / "s2" / "student"), "--modes", "mean", "delete", "--out", str(tmp / "screen-student"), "--val-prompts", "2"],
+                              cwd=ROOT, capture_output=True, text=True)
+        assert proc.returncode == 0, proc.stderr[-3000:]
+        swap = json.loads((tmp / "screen-student" / "complete.json").read_text())
+        assert set(swap["arms"]) == {"student/mean", "student/delete"} and all(0 <= v < 1e6 for a in swap["arms"].values() for v in a["mean"])
+        assert json.loads((tmp / "screen-student" / "meta.json").read_text())["student_center_mode"] == "mean"
         from safetensors.torch import load_file
 
         resumed = tmp / "s2-resume"
