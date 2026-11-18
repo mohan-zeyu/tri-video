@@ -793,6 +793,14 @@ Across those same 100 pairs, mean whole-final-latent L2 versus the teacher was 4
 
 The study charges C1’s interrupted attempt separately. Scoring used 493 seconds beyond the first C1 benchmark allowance, with the extra time charged to the approved combined budget. After A+B, the interrupted attempt and the completed C1 rerun, the C2 allocation is 40,963 GPU-seconds (11.379 GPU-hours). C2 uses the same scheduled EMA saves every 500 updates and writes full resumable optimizer checkpoints at updates 1,000 and 2,000. The CPU restart test passed with this save policy.
 
+### C2 · Pooled pre-norm removal interrupted
+
+The fresh matched C2 run on GPUs 3 and 5 logged update 660 of 2,500. Rank 0 received SIGKILL around 19:52 Singapore time on 18 November, and the launcher terminated the peer. The source of the signal is unconfirmed. Losses were finite through the last log. Its latest durable EMA is at update 500, before the first full optimizer save scheduled at update 1,000. The 100-prompt benchmark remains pending.
+
+At update 500, guided relative squared velocity error was 0.035505, down from 0.121886 at initialization. Each value averages whole-latent errors on 160 states from eight held-out prompts × 20 cached teacher entering states, using both branches at CFG 5. The saved EMA has exactly the intended pooled Q/K masks, shared across steps and branches, with layer 0 exempt and all 20 steps active. The full paired benchmark will require a recovery decision.
+
+C2 charged 9,984 GPU-seconds (2.773 GPU-hours), leaving 30,979 GPU-seconds (8.605 GPU-hours) of the approved 31.5 GPU-hours. This accounts for A+B, both C1 attempts, C1 scoring, and the interrupted C2 run. The lab EMA stays under `out/distill-narrow-pooled/ema-checkpoints/step-000500/`. Checksums, training logs through the last EMA and the interruption audit are in `distill-results/removal/narrow-pooled/interrupted/`.
+
 ## Fine-tune, then drop: swapping means and zeros in the trained students
 
 Both frozen EMA exports passed the published SHA-256 checks and have identical shared22 masks and exemptions. Each swap changes both coordinates of 22 selected rotary pairs on each of Q and K, for every video token. It applies the per-layer, step, CFG-branch and head mask after full-width QK RMSNorm and before RoPE. Layer 0 and denoising step 1 are exempt. Each within-EMA comparison holds the transformer and center export fixed.
