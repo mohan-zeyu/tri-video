@@ -60,9 +60,11 @@ def read_commits(*rev_args):
         if not record:
             continue
         sha, author, date, message = record.split("\x1f", 3)
-        lines = message.strip().splitlines() or [""]
-        commits.append({"sha": sha, "author": author, "date": date, "subject": lines[0],
-                        "body": "\n".join(lines[1:]).strip(), "trailers": parse_trailers(message)})
+        trailers = parse_trailers(message)
+        paragraphs = [p.strip() for p in re.split(r"\n[ \t]*\n", message.strip()) if p.strip()] or [""]
+        body = paragraphs[1:-1] if trailers else paragraphs[1:]  # the trailer paragraph is not part of the body
+        commits.append({"sha": sha, "author": author, "date": date, "subject": paragraphs[0].splitlines()[0],
+                        "body": "\n\n".join(body), "trailers": trailers})
     return commits
 
 
