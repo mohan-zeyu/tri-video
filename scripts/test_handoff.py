@@ -81,7 +81,7 @@ def main():
         # wait returns at once when something is pending, and gives up at --timeout when nothing is.
         assert "PENDING hand-off for codex" in tool(codex, "wait", "--as", "codex", "--interval", "1").stdout
         idle = tool(claude, "wait", "--as", "claude", "--interval", "1", "--timeout", "1", ok=False)
-        assert idle.returncode == 1 and idle.stdout == ""
+        assert idle.returncode == 1 and idle.stdout == "" and "stopped waiting" in idle.stderr
 
         # watch runs its command once per new hand-off, retries a failed command, and stays silent when idle.
         out_file = os.path.join(tmp, "woken.txt")

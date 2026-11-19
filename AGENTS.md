@@ -29,8 +29,10 @@ work). The user decides direction. A hand-off is a commit trailer; `scripts/hand
 5. Right after every `send --to claude`, start the watcher as a background terminal, then end your turn:
    `python3 scripts/handoff.py watch --as codex --until-delivered --run 'codex queue --thread "$CODEX_THREAD_ID" --message "$HANDOFF_MESSAGE"'`
    It fetches every 5 minutes, queues one message into this same thread when the next hand-off arrives, and
-   exits. Do not poll it, and do not schedule a check in the chat: both cost a model turn each time. If a watcher
-   is already running it says so and exits. In a pinned checkout add `--branch <branch>`.
+   exits. It also stops after one hour without a hand-off (`--timeout`, in seconds; 0 for no limit); after that
+   nothing wakes you, and step 1 applies. Do not poll it, and do not schedule a check in the chat: both cost a
+   model turn each time. If a watcher is already running it says so and exits. In a pinned checkout add
+   `--branch <branch>`.
 6. Work that is not in a brief needs the user's approval; record who approved it and when in the commit message.
 
 ### claude
