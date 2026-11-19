@@ -95,6 +95,14 @@ def main():
         assert f"at commit {brief}" in woken[1] and "pending --as codex" in woken[1]
         tool(claude, "watch", "--as", "claude", "--once", "--run", record)
         assert len(Path(out_file).read_text().splitlines()) == 2
+        # With nothing new it stops at --timeout; a live watcher (here: this test's own pid) blocks a second one.
+        idle = tool(codex, "watch", "--as", "codex", "--interval", "1", "--timeout", "1", "--run", record, ok=False)
+        assert idle.returncode == 1 and "watcher stopped" in idle.stdout
+        pidfile = Path(codex) / ".git" / "handoff-watch-codex.pid"
+        assert not pidfile.exists()
+        pidfile.write_text(str(os.getpid()))
+        assert "already running" in tool(codex, "watch", "--as", "codex", "--once", "--run", record).stdout
+        pidfile.unlink()
 
         # Intermediate commits carry no trailer and change nothing.
         run(codex, "git", "pull", "-q", "--ff-only")
@@ -117,6 +125,11 @@ def main():
         assert len(waiting) == 1 and waiting[0]["subject"] == "Report test"
         report = waiting[0]["sha"]
         assert waiting[0]["trailers"]["handoff-ack"] == [brief]
+
+        # --until-delivered: the loop ends as soon as one hand-off has been delivered.
+        done = tool(claude, "watch", "--as", "claude", "--interval", "30", "--until-delivered", "--run", record)
+        assert f"notified claude of {report}" in done.stdout
+        assert Path(out_file).read_text().splitlines()[2] == f"claude {report}"
 
         # announce: the push range holds one hand-off to claude; an unknown or zero "before" looks at the tip only.
         run(claude, "git", "pull", "-q", "--ff-only")
