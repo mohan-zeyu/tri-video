@@ -23,7 +23,8 @@ work). The user decides direction. A hand-off is a commit trailer; `scripts/hand
    evidence files together, then
    `python3 scripts/handoff.py send --as codex --to claude --ack <brief sha> --status done -m "<subject>" -m "<what ran>"`
    (`--status interrupted` or `question` when you need a decision; say what you need in the message).
-   It commits what is staged, pushes, and merges first if the remote moved.
+   It commits what is staged, pushes, and merges first if the remote moved. In a checkout pinned to a commit
+   (detached HEAD) add `--branch <branch>`; merge the branch tip first if the checkout predates this script.
 5. Work that is not in a brief needs the user's approval; record who approved it and when in the commit message.
 
 ### claude
