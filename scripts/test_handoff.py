@@ -1,10 +1,11 @@
 """Tests for scripts/handoff.py on throwaway repositories: one bare remote and two clones ("claude", "codex").
 
-1. A hand-off is pending only for its addressee, intermediate commits wake nobody, and an ack clears it.
+1. A hand-off is pending only for its addressee, intermediate commits wake nobody, an ack clears it; `wait`
+   returns or times out; `watch` runs its command once per new hand-off and retries a failed command.
 2. `send` merges and pushes again when the remote moved (the .handoff logs merge by union); PAUSE holds hand-offs.
 3. `announce` lists exactly the hand-offs of one push range; trailers are read from the last paragraph only.
 
-Run from the repository root:  python3 scripts/test_handoff.py
+Run:  python3 scripts/test_handoff.py
 """
 
 import json
@@ -18,7 +19,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import handoff
 
 SCRIPT = str(Path(__file__).resolve().parent / "handoff.py")
-handoff_root = Path(__file__).resolve().parents[1]
 ENV = {**os.environ, "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1", "GIT_AUTHOR_NAME": "t",
        "GIT_AUTHOR_EMAIL": "t@example.invalid", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@example.invalid"}
 ENV.pop("HANDOFF_AGENT", None)
@@ -60,7 +60,7 @@ def main():
         run(tmp, "git", "clone", "-q", remote, claude)
         run(claude, "git", "checkout", "-q", "-b", "work")
         write(claude, "README", "start\n")
-        write(claude, ".gitattributes", (handoff_root / ".gitattributes").read_text())
+        write(claude, ".gitattributes", ".handoff/*.log merge=union\n")
         run(claude, "git", "commit", "-q", "-m", "Start")
         start = head(claude)
         run(claude, "git", "push", "-q", "-u", "origin", "work")
@@ -77,6 +77,24 @@ def main():
         assert waiting[0]["trailers"]["handoff-brief"] == ["BRIEF.md"] and "Carry out A" in waiting[0]["body"]
         assert pending(claude, "claude") == [] and tool(claude, "pending", "--as", "claude").stdout == ""
         assert "PENDING hand-off for codex" in tool(codex, "pending", "--as", "codex").stdout
+
+        # wait returns at once when something is pending, and gives up at --timeout when nothing is.
+        assert "PENDING hand-off for codex" in tool(codex, "wait", "--as", "codex", "--interval", "1").stdout
+        idle = tool(claude, "wait", "--as", "claude", "--interval", "1", "--timeout", "1", ok=False)
+        assert idle.returncode == 1 and idle.stdout == ""
+
+        # watch runs its command once per new hand-off, retries a failed command, and stays silent when idle.
+        out_file = os.path.join(tmp, "woken.txt")
+        record = f'printf "%s %s\\n" "$HANDOFF_AGENT" "$HANDOFF_SHA" >> "{out_file}"; echo "$HANDOFF_MESSAGE" >> "{out_file}"'
+        failed = tool(codex, "watch", "--as", "codex", "--once", "--run", "exit 3")
+        assert "exited 3" in failed.stderr and not os.path.exists(out_file)
+        tool(codex, "watch", "--as", "codex", "--once", "--run", record)
+        tool(codex, "watch", "--as", "codex", "--once", "--run", record)
+        woken = Path(out_file).read_text().splitlines()
+        assert woken[0] == f"codex {brief}" and len(woken) == 2, woken
+        assert f"at commit {brief}" in woken[1] and "pending --as codex" in woken[1]
+        tool(claude, "watch", "--as", "claude", "--once", "--run", record)
+        assert len(Path(out_file).read_text().splitlines()) == 2
 
         # Intermediate commits carry no trailer and change nothing.
         run(codex, "git", "pull", "-q", "--ff-only")

@@ -14,8 +14,8 @@ work). The user decides direction. A hand-off is a commit trailer; `scripts/hand
 
 ### codex
 
-1. Check: `python3 scripts/handoff.py pending --as codex` in a checkout of this branch. No output means nothing
-   to do; end quietly.
+1. When a message says a hand-off is waiting (or the user asks): `python3 scripts/handoff.py pending --as codex`
+   in a checkout of this branch. No output means nothing to do; end quietly.
 2. For each hand-off printed: pin a task checkout to that commit, read the brief named in `brief:`, follow the
    `message:`, and carry it out. The brief's ASK points are binding; stop and ask the user there.
 3. Commit intermediate progress as usual, without trailers.
@@ -34,6 +34,12 @@ Follow `.claude/skills/handoff/SKILL.md`. In short: examine results, ack, notify
 
 ### Setup, once
 
-- codex: schedule the check of step 1 every 10 minutes in the lab chat, in a checkout that tracks this branch.
+- codex: run the watcher outside the chat, on the machine where the lab thread lives, in a checkout that
+  tracks this branch:
+  `python3 scripts/handoff.py watch --as codex --run 'codex queue --thread "$CODEX_THREAD" --message "$HANDOFF_MESSAGE"'`
+  It fetches every 5 minutes and queues one message into the existing lab thread for each new hand-off, so no
+  model runs while nothing is pending. Do not schedule the check inside the lab chat: every firing is a model
+  turn. `CODEX_THREAD` is the id in the app's "Copy chat deep link" (`codex://threads/<id>`).
+  The relay (`.github/workflows/handoff-codex.yml`) is another signal for the same event; run one, not both.
 - claude: the research session subscribes to the branch's draft pull request. The workflow
   `.github/workflows/handoff-notify.yml` comments there on each `Handoff-To: claude`, which wakes that session.
