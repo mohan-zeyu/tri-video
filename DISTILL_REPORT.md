@@ -937,3 +937,42 @@ Each error is the mean of 640 per-state, full-latent relative squared velocity e
 All errors were finite. Shared22 reproduces the audited 0.032195 means / 0.037419 zeros screen. Two idle GPU workers used 2104.288 GPU-seconds (0.584524 GPU-hours), including model loading and shutdown. No training-free videos were generated.
 
 The optional means-only warm start is eligible because split/mean exceeds 0.3; it is omitted to retain more of the 25 GPU-hour budget for the specified full fine-tune and both 100-prompt benchmarks. C starts directly from teacher weights and calibrated split means. Its learning-rate schedule spans all 5,000 updates. The first invocation uses `--stop-after 1000` so the 0.08 guided-error gate can be inspected after a resumable optimizer/sampler/RNG/EMA save; a passing run resumes the same state for updates 1,001–5,000. This changes invocation boundaries, not optimizer updates or the recipe.
+
+
+### C interim: update 3,000 and budget ASK
+
+C started directly from teacher weights and the calibrated split means, with two ranks, accumulation 2 (four prompt–state samples per update, both CFG branches for each), a 5,000-update schedule, transformer learning rate 1e-5, means learning rate 1e-3, 250-update warmup, guided-loss weight 1, feature-loss weight 0.1, EMA 0.999 and clipping 1. Layer 0 and the first denoising step retain native attention. The optional means-only warm start was omitted.
+
+Live-weight validation compares full output latents with the native bf16 teacher at the same 160 cached entering states: eight held-out prompts × 20 denoising steps. Each row averages the per-state relative squared error equally; the guided column combines both branches at CFG 5 before taking the ratio. These are the same eight prompts at every checkpoint, shared with the shared22 and deletion validation curves.
+
+| Update | Conditional | Unconditional | Guided CFG 5 |
+|---:|---:|---:|---:|
+| 0 | 0.388294 | 0.386433 | 0.439942 |
+| 250 | 0.083288 | 0.085384 | 0.119650 |
+| 500 | 0.059953 | 0.062642 | 0.093083 |
+| 750 | 0.050674 | 0.052441 | 0.085051 |
+| 1000 | 0.044731 | 0.045743 | 0.077772 |
+| 1250 | 0.040755 | 0.040938 | 0.075413 |
+| 1500 | 0.037468 | 0.038264 | 0.072081 |
+| 1750 | 0.036187 | 0.036060 | 0.068370 |
+| 2000 | 0.033307 | 0.033249 | 0.063562 |
+| 2250 | 0.031734 | 0.031718 | 0.063497 |
+| 2500 | 0.030991 | 0.030605 | 0.063942 |
+| 2750 | 0.029908 | 0.030355 | 0.061492 |
+| 3000 | 0.028661 | 0.028897 | 0.059991 |
+
+The update-1,000 gate passed at 0.077772, below 0.08. Its full optimizer, sampler, Torch CPU/CUDA RNG and EMA state was saved and resumed for updates 1,001–3,000. The final live-weight guided error at this pause is 0.059991. All 302 logged training samples and all 13 validation rows were finite.
+
+![Split42 interim validation beside shared22 and deletion](distill-results/nope/progress-3000/validation-curve.png)
+
+The median logged optimizer-update duration was 7.107891 seconds, from 302 logged samples, reducing rank durations to their mean first. It excludes validation, export, full-save and logging time. Mean-norm drift from logged update 1 to 3,000 was Q 12.271144 → 12.309043 (+0.30885%) and K 12.714284 → 12.752518 (+0.30071%). These norms include all 128 stored coordinates in each cell and average all 14,400 layer–step–branch–head cells, including exempt cells and unused coordinates. They measure mean-vector magnitudes, without prompt or token averaging at measurement time.
+
+The completed first 1,000-update invocation reported allocator peaks of 23,391,334,912 bytes on rank 0 (21.785 GiB) and 23,387,980,288 bytes on rank 1 (21.782 GiB). Those are peaks for that invocation. The later invocation was intentionally terminated after its complete update-3,000 save and did not print a final allocator peak.
+
+The update-3,000 full save contains 22,782,015,301 bytes (21.22 GiB), including both distributed state shards, center optimizer and both rank RNG files. Its atomic latest pointer is at update 3,000; the center checkpoint step and 42-means / 22-NoPE masks were independently checked. The interval from the update-3,000 EMA-center file modification to the post-full-save pause was 1331.4 seconds (22.19 minutes), including full-save I/O and pause detection. Both ranks were observed waiting on storage I/O, with host memory available. The local disk had about 36 GiB free, less than the roughly 42.43 GiB required for two such full versions to coexist under the current save procedure. Storage and checkpoint-retention semantics were preserved.
+
+Training was paused for the budget ASK immediately after the full update-3,000 save. The intentional SIGTERM produced the elastic launcher’s exit status 1, recorded with its planned-pause marker. Both GPU allocations were released. The logical target remains 5,000 updates, and all earlier EMA exports are preserved. The pooled C2 recovery and shared22 extension were untouched.
+
+Measured allocation so far is 53756.576 GPU-seconds (14.932382 GPU-hours): 2104.288 for B and 51652.288 for C through the pause. Allocation sums each worker’s elapsed wall time times its GPU count, including loading, validation, saves, I/O waits and shutdown. Scaling C’s measured 3,000-update allocation to 5,000 and adding measured B plus the brief’s 2.3 GPU-hour estimate for D+E projects **26.80 GPU-hours**. This is an estimate of completion cost, not completed computation. The approved cap is 25 GPU-hours. **ASK:** approve up to 2.5 additional GPU-hours (27.5 total) to finish C and both 100-prompt benchmarks, or retain the 25-hour cap and choose a reduced scope. No D/E video generation or scoring has run, and no additional GPU work is authorized by this report.
+
+Interim evidence is under `distill-results/nope/progress-3000/`, including original/resumed arguments, complete logged curves, checkpoint audit, update-3,000 EMA hashes, the planned-pause marker and budget projection. On the lab host, exact resume state is `out/distill-split42/checkpoint/step-003000/`; the preserved EMA is `out/distill-split42/ema-checkpoints/step-003000/`, both in `/mnt/data/liuzeyu/tri-video-nope-2979d3e`.
