@@ -11,7 +11,7 @@ Agent names are free-form lowercase words (claude, codex, researcher, gpu ...).
   python3 scripts/handoff.py pending --as codex            # fetch, list what waits for codex (prints nothing if none)
   python3 scripts/handoff.py wait --as codex               # block until something waits for codex, print it, exit
   python3 scripts/handoff.py watch --as codex --run CMD    # run CMD once per new hand-off; no agent runs while idle
-                                                           # both stop after --timeout seconds (default 3600; 0 = never)
+                                                           # both stop after --timeout seconds (default 43200, 12 hours; 0 = never)
   python3 scripts/handoff.py send --as claude --to codex --brief BRIEF.md -m "Subject" -m "Body"
   python3 scripts/handoff.py send --as codex --to claude --ack <sha> --status done -m "Report"
   python3 scripts/handoff.py ack --as claude <sha>         # empty commit, when the answer needs no other commit
@@ -347,7 +347,7 @@ def main():
     p = sub.add_parser("wait", parents=[common], help="block until a hand-off waits for an agent")
     p.add_argument("--as", dest="as_name", help="who is waiting (default $HANDOFF_AGENT)")
     p.add_argument("--interval", type=int, default=120, help="seconds between fetches (default 120)")
-    p.add_argument("--timeout", type=int, default=3600, help="give up after this many seconds (default 3600; 0 = never)")
+    p.add_argument("--timeout", type=int, default=43200, help="give up after this many seconds (default 43200, 12 hours; 0 = never)")
     p.add_argument("--ignore-pause", action="store_true")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_wait)
@@ -359,8 +359,8 @@ def main():
     p.add_argument("--interval", type=int, default=300, help="seconds between fetches (default 300)")
     p.add_argument("--once", action="store_true", help="one pass and exit, for cron or launchd")
     p.add_argument("--until-delivered", action="store_true", help="exit once a hand-off has been delivered")
-    p.add_argument("--timeout", type=int, default=3600,
-                   help="stop after this many seconds without a hand-off (default 3600; 0 = never)")
+    p.add_argument("--timeout", type=int, default=43200,
+                   help="stop after this many seconds without a hand-off (default 43200, 12 hours; 0 = never)")
     p.add_argument("--ignore-pause", action="store_true")
     p.set_defaults(func=cmd_watch)
 
