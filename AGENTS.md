@@ -8,6 +8,8 @@ work). The user decides direction. A hand-off is a commit trailer; `scripts/hand
 
 - `Handoff-To: <agent>` on the commit that finishes a unit of work. Commits without it wake nobody.
 - `Handoff-Ack: <sha>` on the commit that answers a hand-off. Until then it is pending.
+- Always hand off with `scripts/handoff.py send`. It also appends a line to `.handoff/to-<agent>.log`, which is
+  what triggers the wake-up; a trailer typed by hand is listed by `pending` but wakes nobody.
 - A file `PAUSE` at the repository root holds all pending hand-offs. Only the user adds or removes it.
 
 ### codex

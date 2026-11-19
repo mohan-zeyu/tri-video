@@ -1,7 +1,7 @@
 """Tests for scripts/handoff.py on throwaway repositories: one bare remote and two clones ("claude", "codex").
 
 1. A hand-off is pending only for its addressee, intermediate commits wake nobody, and an ack clears it.
-2. `send` merges and pushes again when the remote moved; a PAUSE file holds hand-offs back.
+2. `send` merges and pushes again when the remote moved (the .handoff logs merge by union); PAUSE holds hand-offs.
 3. `announce` lists exactly the hand-offs of one push range; trailers are read from the last paragraph only.
 
 Run from the repository root:  python3 scripts/test_handoff.py
@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import handoff
 
 SCRIPT = str(Path(__file__).resolve().parent / "handoff.py")
+handoff_root = Path(__file__).resolve().parents[1]
 ENV = {**os.environ, "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1", "GIT_AUTHOR_NAME": "t",
        "GIT_AUTHOR_EMAIL": "t@example.invalid", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@example.invalid"}
 ENV.pop("HANDOFF_AGENT", None)
@@ -59,6 +60,7 @@ def main():
         run(tmp, "git", "clone", "-q", remote, claude)
         run(claude, "git", "checkout", "-q", "-b", "work")
         write(claude, "README", "start\n")
+        write(claude, ".gitattributes", (handoff_root / ".gitattributes").read_text())
         run(claude, "git", "commit", "-q", "-m", "Start")
         start = head(claude)
         run(claude, "git", "push", "-q", "-u", "origin", "work")
@@ -71,7 +73,7 @@ def main():
              "-m", "Carry out A then B.", "--trailer", "Co-Authored-By: Someone <s@example.invalid>")
         brief = head(claude)
         waiting = pending(codex, "codex")
-        assert [c["sha"] for c in waiting] == [brief] and waiting[0]["files"] == ["BRIEF.md"]
+        assert [c["sha"] for c in waiting] == [brief] and waiting[0]["files"] == [".handoff/to-codex.log", "BRIEF.md"]
         assert waiting[0]["trailers"]["handoff-brief"] == ["BRIEF.md"] and "Carry out A" in waiting[0]["body"]
         assert pending(claude, "claude") == [] and tool(claude, "pending", "--as", "claude").stdout == ""
         assert "PENDING hand-off for codex" in tool(codex, "pending", "--as", "codex").stdout
@@ -119,6 +121,17 @@ def main():
         assert len(pending(claude, "claude")) == 1
         tool(claude, "ack", "--as", "claude", report, "-m", "Examined.")
         assert pending(claude, "claude") == [] and pending(codex, "claude") == []
+
+        # Two hand-offs to claude pushed from different checkouts: the log lines merge without conflict.
+        run(codex, "git", "pull", "-q", "--ff-only")
+        run(claude, "git", "pull", "-q", "--ff-only")
+        tool(codex, "send", "--as", "codex", "--to", "claude", "--allow-empty", "-m", "Report one")
+        out = tool(claude, "send", "--as", "other", "--to", "claude", "--allow-empty", "-m", "Report two").stdout
+        assert "after merging the remote 1x" in out, out
+        log = (Path(claude) / ".handoff" / "to-claude.log").read_text().splitlines()
+        assert len(log) == 3 and {line.split("\t")[3] for line in log} == {"Report test", "Report one", "Report two"}
+        assert len(pending(codex, "claude")) == 2
+        tool(claude, "ack", "--as", "claude", *[c["sha"] for c in pending(claude, "claude")])
 
         # A conflicting remote change: the commit stays local, nothing is pushed, the merge is aborted.
         run(codex, "git", "pull", "-q", "--ff-only")

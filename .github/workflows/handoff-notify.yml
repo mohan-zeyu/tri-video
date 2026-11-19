@@ -1,10 +1,13 @@
 # When a push contains a commit with the trailer "Handoff-To: claude", comment on the branch's open pull request.
 # The research session subscribed to that pull request is woken by the comment. See AGENTS.md, "Hand-off protocol".
+# Every workflow run also wakes that session when its checks finish, so this runs only on pushes that change
+# .handoff/to-claude.log, which `scripts/handoff.py send --to claude` appends to.
 name: Hand-off notify
 
 on:
   push:
     branches-ignore: [main]
+    paths: ['.handoff/to-claude.log']
 
 permissions:
   contents: read

@@ -14,7 +14,9 @@ A file named PAUSE at the repository root holds every pending hand-off back unti
   python3 scripts/handoff.py announce --to claude --before <sha> --after <sha>   # used by the GitHub workflow
 
 `send` commits what is already staged (stage it yourself with git add) and pushes; if the remote moved it merges and
-pushes again. Standard library only. Tests: python3 scripts/test_handoff.py
+pushes again. It also appends a line to .handoff/to-<agent>.log: the GitHub workflow runs only on pushes that change
+.handoff/to-claude.log, so a trailer written by hand is still listed by `pending` but wakes nobody. Use `send`.
+Standard library only. Tests: python3 scripts/test_handoff.py
 """
 
 import argparse
@@ -28,6 +30,7 @@ import time
 TRAILER = re.compile(r"^([A-Za-z][A-Za-z0-9-]*):[ \t]*(.*)$")
 NAME = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 PAUSE_FILE = "PAUSE"
+LOG_DIR = ".handoff"  # send appends one line per hand-off to .handoff/to-<agent>.log; the workflow triggers on it
 
 
 def git(*args, check=True, stdin=None):
@@ -196,13 +199,19 @@ def cmd_send(args):
     staged = git("diff", "--cached", "--quiet", check=False).returncode != 0
     if not staged and not args.allow_empty:
         sys.exit("handoff: nothing is staged. git add the files of this hand-off first (or pass --allow-empty).")
+    log = os.path.join(git("rev-parse", "--show-toplevel").stdout.strip(), LOG_DIR, f"to-{to}.log")
+    os.makedirs(os.path.dirname(log), exist_ok=True)
+    stamp = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    with open(log, "a") as handle:
+        handle.write("\t".join([stamp, sender, args.status or "-", args.message[0].replace("\t", " ")]) + "\n")
+    git("add", log)
     trailers = [f"Handoff-To: {to}", f"Handoff-From: {sender}"]
     if args.brief:
         trailers.append(f"Handoff-Brief: {args.brief}")
     if args.status:
         trailers.append(f"Handoff-Status: {args.status}")
     trailers += [f"Handoff-Ack: {sha}" for sha in full_shas(args.ack)]
-    commit_and_push(args, args.message[0], args.message[1:], trailers, allow_empty=not staged)
+    commit_and_push(args, args.message[0], args.message[1:], trailers, allow_empty=False)
 
 
 def cmd_ack(args):
