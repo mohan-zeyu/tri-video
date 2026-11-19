@@ -20,6 +20,8 @@ The user stays in charge of direction: you carry briefs out and results in, you 
    (10,000 resamples, NumPy seed 20261109) against the existing arms. Compare `args.json` with the matched run,
    `validation.jsonl` with the report table, check `selection-records.json`, and review any script change.
    `Handoff-Status: interrupted` or `question` means the lab agent is waiting for a decision: find what it asks.
+   For an interrupted run, compare the last durable EMA's validation row with the matched arm at the same update,
+   so the user can choose between resuming and rerunning from numbers.
 4. Report to the user, short: outcome first with the commit hash, small tables each with a scope line (prompts,
    seeds, steps, layers, heads, CFG branches, pairs or whole Q/K, averaging order; the `AGENTS.md` rule), then
    flags (interruptions, budget, anything outside the brief, runs without an approval record), then your
