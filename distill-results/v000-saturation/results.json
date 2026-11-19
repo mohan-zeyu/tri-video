@@ -1,0 +1,199 @@
+{
+  "scope": "One prompt v000, seed 2026110900, teacher weights with native full Q/K, all 45 decoded frames and every pixel; HSV S=(max RGB-min RGB)/max RGB. No aggregation across prompts. No Q/K pair statistic and no cross-denoising-step statistic.",
+  "protocol": {
+    "prompt": {
+      "id": "v000",
+      "text": "lemur eating grass leaves",
+      "category": "animal",
+      "seed": 2026110900,
+      "audit": true
+    },
+    "negative_prompt_official": "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards",
+    "negative_prompt_source": "https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B-Diffusers/raw/0fad780a534b6463e45facd96134c9f345acfa5b/README.md",
+    "model_revision": "0fad780a534b6463e45facd96134c9f345acfa5b",
+    "cfg": 5,
+    "frames": 45,
+    "height": 480,
+    "width": 480,
+    "fps": 16,
+    "vae_dtype": "float32",
+    "transformer_dtype": "bfloat16",
+    "scheduler": "UniPCMultistepScheduler",
+    "flow_shift": 3,
+    "qk_intervention": "none"
+  },
+  "arms": {
+    "empty20": {
+      "decoded_stats": {
+        "mean_hsv_saturation": 0.8346855456190245,
+        "pixel_fraction_saturation_above_0_8": 0.749415412808642,
+        "per_channel_fraction_ge_250_over_255": [
+          0.04434230324074074,
+          0.07858140432098766,
+          0.012257040895061728
+        ],
+        "per_channel_fraction_le_5_over_255": [
+          0.0217061149691358,
+          0.015562885802469137,
+          0.6361539351851851
+        ],
+        "mean_rgb": [
+          0.49947069450969156,
+          0.6351825013509557,
+          0.1291777867488214
+        ]
+      },
+      "frames": 45
+    },
+    "official20": {
+      "decoded_stats": {
+        "mean_hsv_saturation": 0.6350644606852882,
+        "pixel_fraction_saturation_above_0_8": 0.4786887538580247,
+        "per_channel_fraction_ge_250_over_255": [
+          0.005384548611111111,
+          0.003638117283950617,
+          0.0003213734567901235
+        ],
+        "per_channel_fraction_le_5_over_255": [
+          0.0920817901234568,
+          0.05945920138888889,
+          0.32487307098765433
+        ],
+        "mean_rgb": [
+          0.33637989107677563,
+          0.44516376311957656,
+          0.29754821446931595
+        ]
+      },
+      "frames": 45,
+      "generation": {
+        "name": "official20",
+        "steps": 20,
+        "negative_prompt": "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards",
+        "seed": 2026110900,
+        "finite_latent_steps": 20,
+        "pre_encode_stats": {
+          "mean_hsv_saturation": 0.6503674338368639,
+          "pixel_fraction_saturation_above_0_8": 0.48475617283950617,
+          "per_channel_fraction_ge_250_over_255": [
+            0.0061480516975308645,
+            0.0043620756172839505,
+            0.00043653549382716047
+          ],
+          "per_channel_fraction_le_5_over_255": [
+            0.07971122685185185,
+            0.05422521219135802,
+            0.3260111882716049
+          ],
+          "mean_rgb": [
+            0.34218468921700274,
+            0.4523040522887389,
+            0.30039438800297297
+          ]
+        },
+        "mp4_sha256": "90807e0a073d7a722e00213e6c142fc74e02c91c7e10858adc03c037a44e1e05",
+        "elapsed_seconds": 17.91678810119629
+      }
+    },
+    "empty50": {
+      "decoded_stats": {
+        "mean_hsv_saturation": 0.49284166204803953,
+        "pixel_fraction_saturation_above_0_8": 0.29877748842592594,
+        "per_channel_fraction_ge_250_over_255": [
+          0.03160339506172839,
+          0.04161824845679012,
+          0.022423996913580248
+        ],
+        "per_channel_fraction_le_5_over_255": [
+          0.050906346450617285,
+          0.032768711419753085,
+          0.24910599922839508
+        ],
+        "mean_rgb": [
+          0.3737926898651356,
+          0.46741488892253047,
+          0.27455583522657717
+        ]
+      },
+      "frames": 45,
+      "generation": {
+        "name": "empty50",
+        "steps": 50,
+        "negative_prompt": "",
+        "seed": 2026110900,
+        "finite_latent_steps": 50,
+        "pre_encode_stats": {
+          "mean_hsv_saturation": 0.5042132368378733,
+          "pixel_fraction_saturation_above_0_8": 0.3024945987654321,
+          "per_channel_fraction_ge_250_over_255": [
+            0.03436159336419753,
+            0.044172743055555554,
+            0.024408564814814813
+          ],
+          "per_channel_fraction_le_5_over_255": [
+            0.04651630015432099,
+            0.030988425925925926,
+            0.2398978587962963
+          ],
+          "mean_rgb": [
+            0.37924362498439596,
+            0.4744451589115901,
+            0.27938650837747014
+          ]
+        },
+        "mp4_sha256": "6ad70ae9c32c3a981d9ac2a2f4edae9dd1320149abde08449652b74d89770833",
+        "elapsed_seconds": 34.97522735595703
+      }
+    },
+    "official50": {
+      "decoded_stats": {
+        "mean_hsv_saturation": 0.6981049101036848,
+        "pixel_fraction_saturation_above_0_8": 0.5881260609567901,
+        "per_channel_fraction_ge_250_over_255": [
+          0.02453539737654321,
+          0.04029128086419753,
+          0.07965354938271604
+        ],
+        "per_channel_fraction_le_5_over_255": [
+          0.23389332561728396,
+          0.06091001157407407,
+          0.350127025462963
+        ],
+        "mean_rgb": [
+          0.30853101938429517,
+          0.47390220419994955,
+          0.343418570585298
+        ]
+      },
+      "frames": 45,
+      "generation": {
+        "name": "official50",
+        "steps": 50,
+        "negative_prompt": "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards",
+        "seed": 2026110900,
+        "finite_latent_steps": 50,
+        "pre_encode_stats": {
+          "mean_hsv_saturation": 0.7124483507322328,
+          "pixel_fraction_saturation_above_0_8": 0.5896110146604938,
+          "per_channel_fraction_ge_250_over_255": [
+            0.0271532600308642,
+            0.04436062885802469,
+            0.0839759837962963
+          ],
+          "per_channel_fraction_le_5_over_255": [
+            0.22447588734567903,
+            0.05626938657407407,
+            0.35318364197530866
+          ],
+          "mean_rgb": [
+            0.3134749251240146,
+            0.4810613816718853,
+            0.34591046896443217
+          ]
+        },
+        "mp4_sha256": "79a8160549fadc8a1736b343c07feb8de51b966255b43531a618ef99f1328a60",
+        "elapsed_seconds": 35.16750693321228
+      }
+    }
+  }
+}

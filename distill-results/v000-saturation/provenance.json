@@ -1,0 +1,15 @@
+{
+  "date_singapore": "2026-11-19",
+  "video_sha256": {
+    "empty20": "fe6424c4a9b90f86b4137aa24f40094bc078b0480ef77086321a88c1e036f1e7",
+    "official20": "90807e0a073d7a722e00213e6c142fc74e02c91c7e10858adc03c037a44e1e05",
+    "empty50": "6ad70ae9c32c3a981d9ac2a2f4edae9dd1320149abde08449652b74d89770833",
+    "official50": "79a8160549fadc8a1736b343c07feb8de51b966255b43531a618ef99f1328a60"
+  },
+  "lab_output_directory": "/mnt/data/liuzeyu/tri-video-removal-f34fc19/out/baseline-color-check/same-seed",
+  "success_gpu_seconds": 147,
+  "failed_model_card_download_gpu_seconds": 87,
+  "total_allocated_gpu_seconds": 234,
+  "baseline_reused": true,
+  "new_video_count": 3
+}
