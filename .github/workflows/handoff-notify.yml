@@ -1,0 +1,34 @@
+# When a push contains a commit with the trailer "Handoff-To: claude", comment on the branch's open pull request.
+# The research session subscribed to that pull request is woken by the comment. See AGENTS.md, "Hand-off protocol".
+name: Hand-off notify
+
+on:
+  push:
+    branches-ignore: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+      - name: Announce hand-offs on the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          python3 scripts/handoff.py announce --to claude --before "$BEFORE" --after "$AFTER" > "$RUNNER_TEMP/body.md"
+          if [ ! -s "$RUNNER_TEMP/body.md" ]; then echo "No hand-off to claude in this push."; exit 0; fi
+          cat "$RUNNER_TEMP/body.md"
+          pr=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
+          if [ -z "$pr" ]; then echo "::warning::Hand-off found but $BRANCH has no open pull request."; exit 0; fi
+          gh pr comment "$pr" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/body.md"
