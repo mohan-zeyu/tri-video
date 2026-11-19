@@ -95,14 +95,14 @@ def main():
         assert f"at commit {brief}" in woken[1] and "pending --as codex" in woken[1]
         tool(claude, "watch", "--as", "claude", "--once", "--run", record)
         assert len(Path(out_file).read_text().splitlines()) == 2
-        # With nothing new it stops at --timeout; a live watcher (here: this test's own pid) blocks a second one.
+        # With nothing new it stops at --timeout; a live watcher (here: a lock this test holds) blocks a second one.
         idle = tool(codex, "watch", "--as", "codex", "--interval", "1", "--timeout", "1", "--run", record, ok=False)
         assert idle.returncode == 1 and "watcher stopped" in idle.stdout
-        pidfile = Path(codex) / ".git" / "handoff-watch-codex.pid"
-        assert not pidfile.exists()
-        pidfile.write_text(str(os.getpid()))
-        assert "already running" in tool(codex, "watch", "--as", "codex", "--once", "--run", record).stdout
-        pidfile.unlink()
+        import fcntl
+        with open(Path(codex) / ".git" / "handoff-watch-codex.lock", "w") as held:
+            fcntl.flock(held, fcntl.LOCK_EX)
+            assert "already running" in tool(codex, "watch", "--as", "codex", "--once", "--run", record).stdout
+        assert "already running" not in tool(codex, "watch", "--as", "codex", "--once", "--run", record).stdout
 
         # Intermediate commits carry no trailer and change nothing.
         run(codex, "git", "pull", "-q", "--ff-only")

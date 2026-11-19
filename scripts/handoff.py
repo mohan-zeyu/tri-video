@@ -224,55 +224,48 @@ def cmd_watch(args):
     name = agent_name(args.as_name)
     shared = git("rev-parse", "--git-common-dir").stdout.strip()  # shared by the worktrees of one clone
     state = os.path.join(shared, f"handoff-notified-{name}")
-    pidfile = os.path.join(shared, f"handoff-watch-{name}.pid")
-    try:
-        other = int(open(pidfile).read().strip())
-        os.kill(other, 0)
-        print(f"handoff: a watcher for {name} is already running here (pid {other}); not starting another.")
+    lock = open(os.path.join(shared, f"handoff-watch-{name}.lock"), "w")
+    try:  # the lock is released by the system when this process ends, however it ends
+        import fcntl
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except ImportError:
+        pass  # no fcntl on this platform: no guard against a second watcher
+    except OSError:
+        print(f"handoff: a watcher for {name} is already running in this clone; not starting another.")
         return
-    except (OSError, ValueError):
-        pass  # no pid file, or its process is gone
-    with open(pidfile, "w") as handle:
-        handle.write(str(os.getpid()))
     deadline = time.time() + args.timeout if args.timeout else None
-    try:
-        while True:
-            try:
-                waiting, _, _ = look(args, name)
-            except SystemExit as error:  # e.g. the network is down: keep watching unless this is a single pass
-                if args.once:
-                    raise
-                print(error, file=sys.stderr, flush=True)
-                waiting = []
-            seen = set(open(state).read().split()) if os.path.exists(state) else set()
-            delivered = 0
-            for c in waiting:
-                if c["sha"] in seen:
-                    continue
-                message = (f"A hand-off is waiting for {name} at commit {c['sha']}. Run "
-                           f"`python3 scripts/handoff.py pending --as {name}` and carry out what it prints, "
-                           f"following the Hand-off protocol in AGENTS.md.")
-                env = {**os.environ, "HANDOFF_AGENT": name, "HANDOFF_SHA": c["sha"], "HANDOFF_MESSAGE": message}
-                code = subprocess.run(args.run, shell=True, env=env).returncode
-                if code == 0:
-                    with open(state, "a") as handle:
-                        handle.write(c["sha"] + "\n")
-                    delivered += 1
-                    print(f"handoff: notified {name} of {c['sha']}", flush=True)
-                else:
-                    print(f"handoff: the --run command exited {code} for {c['sha']}; it will be tried again",
-                          file=sys.stderr, flush=True)
-            if args.once or (delivered and args.until_delivered):
-                return
-            if deadline and time.time() + args.interval > deadline:
-                print(f"handoff: no hand-off for {name} within {args.timeout} s; watcher stopped.", flush=True)
-                sys.exit(1)
-            time.sleep(args.interval)
-    finally:
+    while True:
         try:
-            os.remove(pidfile)
-        except OSError:
-            pass
+            waiting, _, _ = look(args, name)
+        except SystemExit as error:  # e.g. the network is down: keep watching unless this is a single pass
+            if args.once:
+                raise
+            print(error, file=sys.stderr, flush=True)
+            waiting = []
+        seen = set(open(state).read().split()) if os.path.exists(state) else set()
+        delivered = 0
+        for c in waiting:
+            if c["sha"] in seen:
+                continue
+            message = (f"A hand-off is waiting for {name} at commit {c['sha']}. Run "
+                       f"`python3 scripts/handoff.py pending --as {name}` and carry out what it prints, "
+                       f"following the Hand-off protocol in AGENTS.md.")
+            env = {**os.environ, "HANDOFF_AGENT": name, "HANDOFF_SHA": c["sha"], "HANDOFF_MESSAGE": message}
+            status = subprocess.run(args.run, shell=True, env=env).returncode
+            if status == 0:
+                with open(state, "a") as handle:
+                    handle.write(c["sha"] + "\n")
+                delivered += 1
+                print(f"handoff: notified {name} of {c['sha']}", flush=True)
+            else:
+                print(f"handoff: the --run command exited {status} for {c['sha']}; it will be tried again",
+                      file=sys.stderr, flush=True)
+        if args.once or (delivered and args.until_delivered):
+            return
+        if deadline and time.time() + args.interval > deadline:
+            print(f"handoff: no hand-off for {name} within {args.timeout} s; watcher stopped.", flush=True)
+            sys.exit(1)
+        time.sleep(args.interval)
 
 
 def cmd_send(args):
