@@ -1,0 +1,31 @@
+{
+  "shared_masks_tensor_equal_to_original": {
+    "mask_q": true,
+    "mask_k": true
+  },
+  "split_q_k_equal": true,
+  "means_pairs_per_cell": 42,
+  "nope_pairs_per_cell": 22,
+  "disjoint_and_cover_all_64": true,
+  "shared_in_split_means_fraction": 1.0,
+  "mask_shape_pairs": [
+    30,
+    20,
+    2,
+    12,
+    64
+  ],
+  "exempt_layers_zero_based": [
+    0
+  ],
+  "exempt_steps_zero_based": [
+    0
+  ],
+  "calibration_prompts": 64,
+  "train_eval_text_overlap": 0,
+  "train_validation_text_overlap": 0,
+  "train_p00_p03_text_overlap": 0,
+  "selection_sha256": "a89d3fa4a9903f57ac66c4b977eef7263301dacb6bbdfad32de5a954028f9b61",
+  "original_selection_sha256": "5bc23ceef49765442d41cedf09a02cd74d9793de1704b19156b44d86597de447",
+  "scope": "64 calibration prompts; per-prompt Q/K means and pair energy average all 10800 video tokens, after full-width RMSNorm and before RoPE. Rank the sum of pooled Q and K replacement damage separately at every layer, step, CFG branch and head; masks audited at all 14400 cells, before runtime exemptions."
+}

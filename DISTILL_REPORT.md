@@ -903,3 +903,37 @@ The native implementation uses 50 text-to-video steps and recommends CFG 6 with 
 The original benchmark fixed 20 steps and empty negative conditioning, and later experiments reused its frozen protocol. The initial protocol lacked a sampling-quality comparison. Existing benchmark conclusions have that configuration as their scope. New schedules and conditioning require matching inputs, calibrated means and step-indexed masks across the compared arms.
 
 The measured tables, official-source links, precise protocol, video hashes and frame comparison are in [the saturation findings](distill-results/v000-saturation/README.md). The experiment used 234 GPU-seconds including the model-card download retry.
+
+
+## Content/position split: means on 42 pairs, NoPE on 22
+
+This study partitions every Q/K head into the 42 pairs with the lowest shared pooled-mean replacement damage and the remaining 22 pairs. The 42 pairs use pooled constants after full-width QK RMSNorm, before RoPE, identically at every video token in each layer–step–branch–head cell. The complementary 22 retain content and use identity rotary factors (NoPE). Layer 0 and the first denoising step remain native. The proposed fine-tune starts from teacher weights; its inference-only zeros ablation will zero the same 42 pairs in the trained EMA.
+
+CPU tests passed in the existing runtime, including NoPE reference/permutation checks, selection masks, the three training stages and exact restart. Selection v3 reproduced the original shared22 Q/K masks tensor-exactly. All 14,400 cells have identical Q/K means sets of 42 pairs, disjoint from the 22 NoPE pairs and covering all 64; the shared22 containment fraction is 1.0. Calibration uses 64 prompts: per-prompt means and pair energies average all 10,800 video tokens after RMSNorm and before RoPE, then pool equally over prompts, retaining separate layer, denoising step, CFG branch and head.
+
+The following fractions count selected pairs over all 14,400 cells, including cells exempt at runtime. Each row partitions its own means or NoPE set across the three frequency thirds of each spatial/temporal axis. They are mask composition fractions, without token or prompt averaging at this reporting stage.
+
+| Set | t high/middle/low | h high/middle/low | w high/middle/low |
+|---|---|---|---|
+| 42 means pairs | 0.1225 / 0.1240 / 0.1028 | 0.0882 / 0.1259 / 0.1032 | 0.0904 / 0.1404 / 0.1027 |
+| 22 NoPE pairs | 0.1299 / 0.0815 / 0.1219 | 0.1499 / 0.0779 / 0.1211 | 0.1456 / 0.0502 / 0.1221 |
+
+Of the original 22 fixed-high pairs, 0.425287 fall in the NoPE set, pooled across all cells. The training-free screen completed; its results follow below.
+
+Artifacts: `distill-results/nope/{selection-report.json,mask-audit.json,cpu-tests.log}`. The lab checkout is `/mnt/data/liuzeyu/tri-video-nope-2979d3e`; earlier outputs are read through separate paths. The study uses a maximum of 25 GPU-hours, at most two training ranks plus two screen/benchmark workers. The pooled C2 recovery and shared22 extension are protected.
+
+
+### Training-free screen (B)
+
+Each error is the mean of 640 per-state, full-latent relative squared velocity errors: 32 held-out prompts × 20 cached teacher entering states. Conditional and unconditional errors are separate; guided errors combine both velocities at CFG 5 before taking the ratio. Native teacher targets are bf16. All rows include the exempt first step, with layer 0 native at every step; Q/K changes apply at all 10,800 tokens in 29 active layers and 19 steps. Sampling and cached conditioning retain the frozen 20-step, empty-negative benchmark protocol.
+
+| Training-free arm | Conditional | Unconditional | Guided CFG 5 |
+|---|---:|---:|---:|
+| shared/mean | 0.006686 | 0.006748 | 0.032195 |
+| shared/delete | 0.009840 | 0.009837 | 0.037419 |
+| split/mean | 0.387592 | 0.385888 | 0.443576 |
+| split/delete | 0.415090 | 0.414248 | 0.478554 |
+
+All errors were finite. Shared22 reproduces the audited 0.032195 means / 0.037419 zeros screen. Two idle GPU workers used 2104.288 GPU-seconds (0.584524 GPU-hours), including model loading and shutdown. No training-free videos were generated.
+
+The optional means-only warm start is eligible because split/mean exceeds 0.3; it is omitted to retain more of the 25 GPU-hour budget for the specified full fine-tune and both 100-prompt benchmarks. C starts directly from teacher weights and calibrated split means. Its learning-rate schedule spans all 5,000 updates. The first invocation uses `--stop-after 1000` so the 0.08 guided-error gate can be inspected after a resumable optimizer/sampler/RNG/EMA save; a passing run resumes the same state for updates 1,001–5,000. This changes invocation boundaries, not optimizer updates or the recipe.
