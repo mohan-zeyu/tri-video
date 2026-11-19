@@ -124,7 +124,8 @@ def main():
     selection_info = {"default_high_masks": center.uses_default_masks, "cell_invariant_masks": center.cell_invariant(),
                       "pairs_per_cell_q": float(center.selected_pairs("q").sum(-1).float().mean()),
                       "pairs_per_cell_k": float(center.selected_pairs("k").sum(-1).float().mean()),
-                      "q_k_intersection_mean": float((center.selected_pairs("q") & center.selected_pairs("k")).sum(-1).float().mean())}
+                      "q_k_intersection_mean": float((center.selected_pairs("q") & center.selected_pairs("k")).sum(-1).float().mean()),
+                      "nope_pairs_per_cell": float(center.selected_pairs("nope").sum(-1).float().mean())}
     environment = {"torch": torch.__version__, "diffusers": diffusers.__version__, "transformers": transformers.__version__,
                    "snapshot": revision, "weights": weights_source, "learned_center_sha256": center_hash, "center_mode": args.center_mode,
                    "exempt": exempt, "selection": selection_info, "gpu": torch.cuda.get_device_name(0), "hostname": socket.gethostname(), "pid": os.getpid(),
@@ -133,9 +134,12 @@ def main():
     active_layers = int(center.layer_active.sum()) if args.center_mode != "off" else 0
     active_steps = int(center.step_active.sum()) if args.center_mode != "off" else 0
     expected_calls = active_layers * 2 * 2 * active_steps if args.center_mode != "off" else 0   # layers x (q,k) x branches x steps
+    expected_nope_calls = active_layers * 2 * active_steps if (center.uses_nope and args.center_mode != "off") else 0   # one processor call per layer, branch, step
     scope = {
-        "mean": "constant vectors on selected Q/K pairs after RMSNorm, per layer/step/branch/head",
-        "delete": "zeros on selected Q/K pairs after RMSNorm and before RoPE, per layer/step/branch/head",
+        "mean": "constant vectors on selected Q/K pairs after RMSNorm, per layer/step/branch/head"
+                + ("; the other pairs keep content without rotary embedding (NoPE)" if center.uses_nope else ""),
+        "delete": "zeros on selected Q/K pairs after RMSNorm and before RoPE, per layer/step/branch/head"
+                  + ("; the other pairs keep content without rotary embedding (NoPE): position-blind attention" if center.uses_nope else ""),
         "narrow": "zeros on selected Q/K pairs before native full-width RMSNorm, per layer/step/branch/head"
                   + ("; masks identical at every step and branch, equivalent to dropped projection rows"
                      if center.cell_invariant() and bool(center.step_active.all()) else ""),
@@ -165,6 +169,7 @@ def main():
                 torch.cuda.empty_cache()
             center.set_rollout(positive, negative)
             center.calls = 0
+            center.nope_calls = 0
             started = time.time()
             latents_holder = {}
             checked_steps = []
@@ -187,6 +192,8 @@ def main():
             center.clear_rollout()
             if center.calls != expected_calls:
                 raise RuntimeError(f"replacement calls {center.calls} != expected {expected_calls}")
+            if center.nope_calls != expected_nope_calls:
+                raise RuntimeError(f"NoPE processor calls {center.nope_calls} != expected {expected_nope_calls}")
             if not np.isfinite(frames).all() or frames.shape != (config["frames"], config["height"], config["width"], 3):
                 raise RuntimeError(f"bad frames {frames.shape}")
             video_dir = dest / "videos" / args.arm
@@ -198,6 +205,7 @@ def main():
             save_torch(arm / "final-latents.pt", latents_holder["final"].cpu())
             write_json(arm / "complete.json", {"prompt": prompt, "mode": args.arm, "environment": environment,
                 "inference_decode_seconds": seconds, "finite_step_latents": len(checked_steps), "intervention_calls": center.calls, "expected_intervention_calls": expected_calls,
+                "nope_calls": center.nope_calls, "expected_nope_calls": expected_nope_calls,
                 "video_sha256": digest(video), "video_bytes": video.stat().st_size, "frames": list(frames.shape),
                 "center_scope": scope,
                 "peak_gpu_memory_bytes": torch.cuda.max_memory_allocated()})

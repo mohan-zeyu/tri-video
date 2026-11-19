@@ -353,3 +353,12 @@ deleting rows of `to_q`/`to_k` does. `LearnedCenter` narrow mode now takes the p
 `select_pairs.py` adds the step/branch-invariant `pooled` selection (the only kind a weight drop can realise);
 `screen_selections.py` screens `narrow` arms (`--all-steps` for the weight-removal scope). The procedure, training-free
 first and the matched 2,500-step fine-tune second, is in `DISTILL_REMOVAL_PROMPT.md`.
+
+### Content/position split extension (19 November)
+
+Every swap so far suggested that the untouched pairs still carried position through RoPE, so the constants were never
+the positional channel. `LearnedCenter` now takes a `mask_nope`: pairs that keep their content but receive no rotary
+embedding (the attention processor is wrapped, `NoPEProcessor`). The `split` selection puts learned means on the 42
+lowest-damage pairs and NoPE on the 22 highest, so the constants become the only positional signal (a per-head
+additive relative-position bias) and zeroing them removes position entirely. The procedure, training-free screen,
+5,000-step fine-tune, benchmark, zero swap and bias-table diagnostic, is in `DISTILL_NOPE_PROMPT.md`.

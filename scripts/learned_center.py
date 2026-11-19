@@ -11,6 +11,13 @@ repo's original high-frequency third. A selection produced by scripts/select_pai
 own per-cell sets. mu_q/mu_k are fp32 parameters of shape [layers, steps, branches, heads, 128]; entries
 outside the mask are unused.
 
+A third, optional mask S_nope (same for Q and K) marks pairs that keep their content but receive NO rotary
+embedding (NoPE): the attention processor is wrapped so that RoPE multiplies those pairs by 1 instead of
+e^{i w pos}. With S_q = S_k = S_mean and S_nope = the complement, the logit splits into a pure content term
+(the NoPE pairs, position-blind) and a pure position term (the constant pairs under RoPE, a per-head additive bias
+sum_f |mu_q,f||mu_k,f| cos(w_f delta + phi_f), computed by position_bias_tables). Setting the constants to zero
+then removes every positional signal from that attention layer.
+
 Modes: "mean" (learned constants on the mask), "delete" (post-norm zeros on the mask), "narrow" (pre-norm
 zeros on the mask, i.e. the projection output is zeroed before Wan's RMSNorm, so the norm statistics are taken
 over the remaining coordinates), "off" (dense attention).
@@ -62,10 +69,16 @@ class LearnedCenter(nn.Module):
         self.mu_k = nn.Parameter(torch.zeros(shape))
         default = pair_mask_to_dims(high_pair_mask()).expand(shape).clone()
         mask_q, mask_k = default, default.clone()
+        mask_nope = torch.zeros(shape, dtype=torch.bool)
         if selection is not None:
             mask_q, mask_k = (self._coerce_mask(selection[k], shape) for k in ("mask_q", "mask_k"))
+            if selection.get("mask_nope") is not None:
+                mask_nope = self._coerce_mask(selection["mask_nope"], shape)
+                if bool((mask_nope & (mask_q | mask_k)).any()):
+                    raise ValueError("a NoPE pair cannot also be a replaced pair")
         self.register_buffer("mask_q", mask_q)
         self.register_buffer("mask_k", mask_k)
+        self.register_buffer("mask_nope", mask_nope)
         layer_active = torch.ones(layers, dtype=torch.bool)
         layer_active[list(exempt_layers)] = False
         step_active = torch.ones(steps, dtype=torch.bool)
@@ -77,8 +90,10 @@ class LearnedCenter(nn.Module):
         self.step = None      # LongTensor [B], zero-based denoising step per batch element
         self.branch = None    # LongTensor [B], 0 = conditional, 1 = unconditional
         self.handles = []
+        self.wrapped = []      # (attention module, original processor) pairs replaced by NoPE wrappers
         self.rollout = None
         self.calls = 0
+        self.nope_calls = 0
 
     @staticmethod
     def _coerce_mask(mask, shape):
@@ -180,8 +195,30 @@ class LearnedCenter(nn.Module):
             for side in ("q", "k"):
                 module = getattr(block.attn1, hook_prefix + side)
                 self.handles.append(module.register_forward_hook(self._hook(layer, side)))
+            if self.uses_nope and bool(self.layer_active[layer]) and self.mode != "off":
+                attn = block.attn1
+                original = attn.processor
+                attn.set_processor(NoPEProcessor(original, self, layer))
+                self.wrapped.append((attn, original))
         self.handles.append(transformer.register_forward_pre_hook(self._transformer_pre_hook, with_kwargs=True))
         return self
+
+    @property
+    def uses_nope(self):
+        return bool(self.mask_nope.any())
+
+    def nope_mask_for(self, layer, batch, device):
+        """[B, heads, 128] bool: pairs that must not be rotated for the current context, or None if nothing to do."""
+        if self.step is None or self.branch is None:
+            raise RuntimeError("LearnedCenter context not set")
+        step = self.step.to(device)
+        branch = self.branch.to(device)
+        if step.numel() != batch:
+            raise RuntimeError(f"context batch {step.numel()} != tensor batch {batch}")
+        active = self.step_active.to(device)[step]
+        if not bool(active.any()):
+            return None
+        return self.mask_nope[layer][step, branch] & active.view(batch, 1, 1)
 
     def _hook(self, layer, side):
         def apply(module, inputs, output):
@@ -192,6 +229,9 @@ class LearnedCenter(nn.Module):
         for handle in self.handles:
             handle.remove()
         self.handles = []
+        for attn, original in self.wrapped:
+            attn.set_processor(original)
+        self.wrapped = []
 
     # ---- initialization and checkpoints --------------------------------------------------------------
     @torch.no_grad()
@@ -220,6 +260,8 @@ class LearnedCenter(nn.Module):
             key = prefix + name
             if key not in state_dict:
                 state_dict[key] = pair_mask_to_dims(high_pair_mask()).expand(self.mu_q.shape).clone()
+        if prefix + "mask_nope" not in state_dict:
+            state_dict[prefix + "mask_nope"] = torch.zeros(self.mu_q.shape, dtype=torch.bool)
         super()._load_from_state_dict(state_dict, prefix, *args, **kwargs)
 
     @classmethod
@@ -232,8 +274,8 @@ class LearnedCenter(nn.Module):
         return module
 
     def selected_pairs(self, side):
-        """[layers, steps, branches, heads, 64] bool: pairs replaced on this side (ignoring exemptions)."""
-        return (self.mask_q if side == "q" else self.mask_k)[..., 0::2]
+        """[layers, steps, branches, heads, 64] bool: pairs replaced on this side, or NoPE pairs for side "nope" (ignoring exemptions)."""
+        return {"q": self.mask_q, "k": self.mask_k, "nope": self.mask_nope}[side][..., 0::2]
 
     def position_bias_tables(self, layer, step, branch, rope_freqs):
         """Equivalent additive logit tables implied by the constants on pairs selected on BOTH sides (analysis).
@@ -251,3 +293,44 @@ class LearnedCenter(nn.Module):
             zs = z[:, sel]
             tables[axis] = lambda delta, w=w, zs=zs: (zs * torch.exp(1j * w * float(delta))).real.sum(-1)
         return tables
+
+
+class NoPEProcessor:
+    """Wraps a Wan attention processor so that the pairs in LearnedCenter.mask_nope receive no rotary embedding.
+
+    The wrapper rewrites the rotary tensors passed to the original processor: on NoPE coordinates cos -> 1 and
+    sin -> 0 (tuple format, diffusers >= 0.35, freqs [1, T, 1, 128] against q/k [B, T, H, 128]) or the complex
+    factor -> 1 (older format, freqs [1, 1, T, 64] against q/k [B, H, T, 128]). Every other pair sees the native
+    rotary values and dtype, so non-NoPE pairs are bit-identical to the unwrapped model. The mask is per batch
+    element (step, branch) and per head, as the other masks.
+    """
+
+    def __init__(self, original, center, layer):
+        self.original = original
+        self.center = center
+        self.layer = layer
+
+    def __call__(self, attn, hidden_states, encoder_hidden_states=None, attention_mask=None, rotary_emb=None, **kwargs):
+        if rotary_emb is not None and self.center.mode != "off":
+            batch, tokens = hidden_states.shape[0], hidden_states.shape[1]
+            nope = self.center.nope_mask_for(self.layer, batch, hidden_states.device)       # [B, H, 128] or None
+            if nope is not None and bool(nope.any()):
+                rotary_emb = self.rewrite(rotary_emb, nope, batch, tokens)
+                self.center.nope_calls += 1
+        return self.original(attn, hidden_states, encoder_hidden_states, attention_mask, rotary_emb, **kwargs)
+
+    @staticmethod
+    def rewrite(rotary_emb, nope, batch, tokens):
+        if isinstance(rotary_emb, (tuple, list)):
+            cos, sin = rotary_emb
+            if cos.dim() != 4 or cos.shape[1] != tokens:
+                raise RuntimeError(f"unexpected rotary layout {tuple(cos.shape)}")
+            m = nope[:, None, :, :]                                                     # [B, 1, H, 128]
+            cos = torch.where(m, torch.ones((), dtype=cos.dtype, device=cos.device), cos.to(nope.device))
+            sin = torch.where(m, torch.zeros((), dtype=sin.dtype, device=sin.device), sin.to(nope.device))
+            return (cos, sin)
+        freqs = rotary_emb
+        if not torch.is_complex(freqs) or freqs.dim() != 4 or freqs.shape[2] != tokens:
+            raise RuntimeError(f"unexpected rotary layout {tuple(freqs.shape)}")
+        m = nope[..., 0::2][:, :, None, :]                                              # [B, H, 1, 64]
+        return torch.where(m, torch.ones((), dtype=freqs.dtype, device=freqs.device), freqs)

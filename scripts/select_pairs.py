@@ -19,6 +19,9 @@ Selections (each a bool mask [layers, steps, branches, heads, 64] per side):
   fixed_high   the original third: pairs t 0-7, h 22-28, w 43-49 on both sides
   separate     per cell and side, the --pairs lowest-damage pairs (Q and K chosen independently)
   shared       per cell, the --pairs lowest (damage_q + damage_k) pairs, same set on both sides
+  split        per cell, the --means-pairs (default 42) lowest (damage_q + damage_k) pairs are replaced on both
+               sides, and the remaining pairs are marked NoPE (kept as content, no rotary embedding): the constant
+               pairs then carry all positional signal and the NoPE pairs all content
   pooled       per (layer, head), the --pairs lowest sum over steps and branches of (damage_q + damage_k), same
                set on both sides and at every step and branch: the only kind of selection that can be realised by
                dropping rows of to_q/to_k (narrow mode) instead of masking at run time
@@ -78,6 +81,7 @@ def main():
     parser.add_argument("--stats", default="out/distill-pair-stats", help="directory of per-prompt .pt files")
     parser.add_argument("--out", default="out/distill-selection")
     parser.add_argument("--pairs", type=int, default=22, help="pairs replaced per side per cell (22 = the original third)")
+    parser.add_argument("--means-pairs", type=int, default=42, help="'split' variant: pairs replaced by constants per cell; the other 64-N pairs become NoPE")
     parser.add_argument("--exempt-layer0", action="store_true", default=True)
     parser.add_argument("--include-layer0", action="store_true")
     parser.add_argument("--include-step1", action="store_true")
@@ -114,6 +118,8 @@ def main():
     pooled_cell = lowest_k_mask((damage_pooled["q"] + damage_pooled["k"]).sum((1, 2)), k)               # [L, H, 64]
     pooled_mask = pooled_cell[:, None, None].expand(L, S, B, H, 64).clone()
     variants["pooled"] = {"mask_q": pooled_mask, "mask_k": pooled_mask.clone()}
+    split_means = lowest_k_mask(damage_pooled["q"] + damage_pooled["k"], args.means_pairs)
+    variants["split"] = {"mask_q": split_means, "mask_k": split_means.clone(), "mask_nope": ~split_means}
     # removal criterion (zeros instead of the pooled mean): energy x partner energy, no mean subtracted
     removal_shared = lowest_k_mask(pooled_energy["q"] * pooled_energy["k"] * 2, k)
 
@@ -143,6 +149,11 @@ def main():
                                            "scope": "number of pairs selected on both Q and K in the same cell, of the --pairs per side"}
     report["composition_shared"] = composition(shared)
     report["composition_pooled"] = composition(pooled_cell)
+    report["split"] = {"means_pairs": args.means_pairs, "nope_pairs": 64 - args.means_pairs,
+                       "composition_means": composition(split_means), "composition_nope": composition(~split_means),
+                       "shared_in_split_means_fraction": float((split_means & shared).sum() / shared.sum()),
+                       "fixed_high_in_nope_fraction": float(((~split_means) & variants["fixed_high"]["mask_q"]).sum() / variants["fixed_high"]["mask_q"].sum()),
+                       "scope": "per cell; the split means set is the lowest-damage superset of the shared set when means_pairs >= pairs"}
     report["pooled_vs_shared_intersection"] = {"mean_pairs": float((pooled_mask & shared).sum(-1).double().mean()),
                                                "p10": float((pooled_mask & shared).sum(-1).double().flatten().quantile(0.1)),
                                                "scope": "pairs the step/branch-invariant pooled set shares with the per-cell shared set, per cell, of --pairs"}
