@@ -1012,3 +1012,46 @@ Evidence is under `distill-results/nope/progress-interrupted-4590/`: raw invocat
 
 
 The user replied "ok" to the interruption budget ASK on 20 November 2026 (Asia/Singapore), approving up to 2.5 additional GPU-hours, **30 GPU-hours total**, for exact recovery from full checkpoint 4,000 through the original 5,000-update target, then D and E. Recipe and masks remain unchanged. The previous 4,500 EMA and later history are archived by the existing restart procedure before replay, with no deletion. Approval evidence is `distill-results/nope/budget-approval-30.json`. The restart considers only idle GPUs 1, 0 and 6, selecting two; GPU 4 is excluded because it reported nonzero utilization. Protected studies remain untouched.
+
+
+### C completed: 5,000 updates with full resumable state
+
+Split42 completed the original Stage 2 recipe from teacher weights, without the optional Stage 1 warm start. The update-1,000 gate passed, and the original 5,000-update learning-rate schedule was retained through optimizer/sampler/Torch CPU+CUDA RNG/EMA restores at updates 1,000, 3,000 and 4,000. The last restore recovered from the rank-0 SIGKILL; its cause remains unconfirmed. All earlier EMA exports and interrupted attempts were preserved. No model, loss, split, calibration or exemption settings changed. Two idle GPU ranks with accumulation 2 give four prompt-state samples per update, each using both CFG branches.
+
+The final live-weight validation guided error is **0.053630**, versus **0.439942** at update zero. Scope: the same eight held-out prompts × 20 cached teacher entering states, whole-latent squared velocity-difference norm divided by teacher squared norm per case, equally averaged over prompt-state cases. Conditional and unconditional branches are separate below; guided predictions combine both branches at guidance 5 before evaluating. The training-free Stage B screen uses 32 prompts, so its 0.443576 value has a different prompt scope. These cached-state measurements use live weights and are not EMA video-quality measurements.
+
+| Update | Conditional | Unconditional | Guided |
+|---:|---:|---:|---:|
+| 0 | 0.388294 | 0.386433 | 0.439942 |
+| 250 | 0.083288 | 0.085384 | 0.119650 |
+| 500 | 0.059953 | 0.062642 | 0.093083 |
+| 750 | 0.050674 | 0.052441 | 0.085051 |
+| 1000 | 0.044731 | 0.045743 | 0.077772 |
+| 1250 | 0.040755 | 0.040938 | 0.075413 |
+| 1500 | 0.037468 | 0.038264 | 0.072081 |
+| 1750 | 0.036187 | 0.036060 | 0.068370 |
+| 2000 | 0.033307 | 0.033249 | 0.063562 |
+| 2250 | 0.031734 | 0.031718 | 0.063497 |
+| 2500 | 0.030991 | 0.030605 | 0.063942 |
+| 2750 | 0.029908 | 0.030355 | 0.061492 |
+| 3000 | 0.028661 | 0.028897 | 0.059991 |
+| 3250 | 0.027841 | 0.027500 | 0.058001 |
+| 3500 | 0.028563 | 0.027738 | 0.059687 |
+| 3750 | 0.026694 | 0.026528 | 0.056629 |
+| 4000 | 0.026948 | 0.026529 | 0.055715 |
+| 4250 | 0.025966 | 0.025926 | 0.054420 |
+| 4500 | 0.025713 | 0.025566 | 0.053734 |
+| 4750 | 0.025564 | 0.025386 | 0.053449 |
+| 5000 | 0.025404 | 0.025122 | 0.053630 |
+
+![Completed split42 validation alongside shared22 and deletion](distill-results/nope/training/validation-curve.png)
+
+All 504 canonical logged training samples and all 21 validation rows were finite. The full update-5,000 optimizer, sampler, both rank RNG and EMA checkpoint and final EMA export were independently checked. Final export checksums are in `distill-results/nope/training/final-ema.sha256`. The Q/K masks are tensor-equal to selection v3: 42 shared means pairs / 22 complementary NoPE pairs in every cell, disjoint and covering 64, with layer 0 and the first denoising step native. In active cells, each mean is constant across all 10,800 video tokens.
+
+The median logged rank-mean optimizer-update duration was 7.103248 seconds, excluding validation, model export, full-checkpoint I/O and logging. All C attempts together allocated 94184.036 GPU-seconds; including B gives 26.746757 GPU-hours against the user-approved 30-hour cap. Allocated cost sums each worker's elapsed wall time times its GPU count, including startup, validation, checkpoint/storage waits and shutdown. Previously reported peak PyTorch allocations were 21.785 / 21.782 GiB for the completed first invocation. Per-invocation final peaks, where printed, are retained in `training-summary.json`; interrupted invocations did not report a final peak.
+
+Mean-norm drift from logged update 1 to 5000 was Q 12.271144 → 12.318420 (+0.38527%) and K 12.714284 → 12.762206 (+0.37692%). Scope: each cell's Euclidean norm over all 128 stored mean coordinates, equally averaged over all 14,400 layer–step–branch–head cells, including exempt cells and unused coordinates; no prompt/token average at measurement time. The later position-bias diagnostic separately measures movement on the active selected coordinates.
+
+State restoration is exact in what was loaded, but real-GPU replay was not bitwise identical: at common update 4010, guided training loss differed by 0.00006587, with the same recorded learning-rate multiplier and mean norms. This is a single sampled training update, not held-out validation. The CPU exact-restart test passed before the study. No claim of bitwise GPU reproducibility or diagnosis of this small replay discrepancy is made. Both versions of the interrupted 4,500 EMA remain archived/recorded.
+
+Stage D now benchmarks the final EMA, followed by E's inference-only zero-means screen, videos and CPU position-bias tables. The frozen teacher videos and audited scores are reused. The pooled C2 recovery and shared22 extension remain untouched.

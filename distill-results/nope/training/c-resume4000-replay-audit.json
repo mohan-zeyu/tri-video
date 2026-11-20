@@ -1,0 +1,47 @@
+{
+  "step": 4010,
+  "metric_scope": "Rank-mean training scalar losses, gradient norm and mean norms on the same restored sampler state; full-latent velocity loss, feature taps, and all stored mean coordinates as in training history. Not a prompt-averaged validation or video benchmark.",
+  "metrics": {
+    "cfg": {
+      "original": 0.07572984183207154,
+      "replayed": 0.07579571520909667,
+      "abs_difference": 6.587337702512741e-05
+    },
+    "feat": {
+      "original": 0.12417299672961235,
+      "replayed": 0.12418285198509693,
+      "abs_difference": 9.855255484580994e-06
+    },
+    "grad_norm": {
+      "original": 4.434720039367676,
+      "replayed": 4.449614524841309,
+      "abs_difference": 0.014894485473632812
+    },
+    "mu_norm_q": {
+      "original": 12.315330505371094,
+      "replayed": 12.315330505371094,
+      "abs_difference": 0.0
+    },
+    "mu_norm_k": {
+      "original": 12.758989334106445,
+      "replayed": 12.758989334106445,
+      "abs_difference": 0.0
+    },
+    "vel_cond": {
+      "original": 0.02823836775496602,
+      "replayed": 0.028236024314537644,
+      "abs_difference": 2.343440428376198e-06
+    },
+    "vel_uncond": {
+      "original": 0.027089065639302135,
+      "replayed": 0.027066704002209008,
+      "abs_difference": 2.2361637093126774e-05
+    },
+    "lr_scale": {
+      "original": 0.1932478285470023,
+      "replayed": 0.1932478285470023,
+      "abs_difference": 0.0
+    }
+  },
+  "all_compared_metrics_exactly_equal": false
+}
