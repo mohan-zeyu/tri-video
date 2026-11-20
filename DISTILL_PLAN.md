@@ -362,3 +362,10 @@ embedding (the attention processor is wrapped, `NoPEProcessor`). The `split` sel
 lowest-damage pairs and NoPE on the 22 highest, so the constants become the only positional signal (a per-head
 additive relative-position bias) and zeroing them removes position entirely. The procedure, training-free screen,
 5,000-step fine-tune, benchmark, zero swap and bias-table diagnostic, is in `DISTILL_NOPE_PROMPT.md`.
+
+### No-exemption run (20 November)
+
+Layer 0 and step 1 were exempt in every arm as first-run insurance; the no-exemption screen showed the cost on the
+selected pairs is small (0.037 → 0.041 guided). The user decided to lift the exemptions. `DISTILL_NOEXEMPT_PROMPT.md`
+repeats the shared22 means student with all 30 layers and 20 steps active (2,400 interventions per video), benchmarks
+it, and runs its fine-tune-then-drop swap.
