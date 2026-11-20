@@ -1055,3 +1055,38 @@ Mean-norm drift from logged update 1 to 5000 was Q 12.271144 → 12.318420 (+0.3
 State restoration is exact in what was loaded, but real-GPU replay was not bitwise identical: at common update 4010, guided training loss differed by 0.00006587, with the same recorded learning-rate multiplier and mean norms. This is a single sampled training update, not held-out validation. The CPU exact-restart test passed before the study. No claim of bitwise GPU reproducibility or diagnosis of this small replay discrepancy is made. Both versions of the interrupted 4,500 EMA remain archived/recorded.
 
 Stage D now benchmarks the final EMA, followed by E's inference-only zero-means screen, videos and CPU position-bias tables. The frozen teacher videos and audited scores are reused. The pooled C2 recovery and shared22 extension remain untouched.
+
+
+### D: final split42 EMA, 100-prompt benchmark
+
+Scope: all 100 original benchmark prompts, one original fixed seed per prompt, 45 frames at 480×480 and 16 fps, 20 UniPC denoising steps, shift 3, CFG 5, empty negative conditioning. Final EMA weights; 42 shared Q/K mean pairs and 22 complementary NoPE pairs per cell, layer 0 and the first denoising step native. Means are post-full-width RMSNorm/pre-RoPE and identical across all 10,800 tokens in each active cell. All 100 videos passed finite-latent, 2,204 replacement-call and 1,102 NoPE-call audits; each record reports 42.0 Q/K pairs, 22.0 NoPE pairs and the exemptions. Teacher videos were hard-linked and audited teacher scores reused, never regenerated.
+
+Scores below are decoded-video VBench measurements, not Q/K-pair statistics or cached-state velocity errors. They average each dimension's original within-video aggregation equally over the 100 prompts. Aesthetics and MUSIQ imaging use all 45 frames per video; text–video consistency uses eight midpoint frames per video; remaining dimensions retain the original VBench implementation and its frame handling. Imaging scores are divided by 100 to use the official normalized scale. Paired intervals are percentile 95% intervals from 10,000 paired prompt resamples, NumPy seed 20261109, retaining each prompt's one seed and all compared arms together; they do not estimate variation across new seeds. Exact prompt/seed manifests, teacher hashes and scorer-source revisions were checked for every reused reference.
+
+| Dimension | Teacher | Dense | Tuned shared22 | Trained shared22 deletion | Split42 EMA |
+|---|---:|---:|---:|---:|---:|
+| Aesthetics | 0.588595 | 0.578063 | 0.583495 | 0.577787 | 0.299507 |
+| Imaging | 0.660679 | 0.670020 | 0.678854 | 0.680191 | 0.539214 |
+| Text–video | 0.232555 | 0.234363 | 0.234047 | 0.234605 | 0.104073 |
+| Subject consistency | 0.963999 | 0.964285 | 0.967490 | 0.966353 | 0.934688 |
+| Background consistency | 0.976466 | 0.977676 | 0.978377 | 0.978334 | 0.971790 |
+| Motion smoothness | 0.984463 | 0.985506 | 0.986384 | 0.986335 | 0.985618 |
+| Dynamic degree | 0.330000 | 0.250000 | 0.280000 | 0.270000 | 0.040000 |
+
+| Dimension | Split42 − teacher | Split42 − dense | Split42 − shared22 | Split42 − shared22 deletion |
+|---|---:|---:|---:|---:|
+| Aesthetics | -0.28909 [-0.30570, -0.27239] | -0.27856 [-0.29635, -0.26093] | -0.28399 [-0.30260, -0.26533] | -0.27828 [-0.29638, -0.26017] |
+| Imaging | -0.12147 [-0.14492, -0.09742] | -0.13081 [-0.15423, -0.10742] | -0.13964 [-0.16449, -0.11451] | -0.14098 [-0.16261, -0.11915] |
+| Text–video | -0.12848 [-0.14196, -0.11579] | -0.13029 [-0.14268, -0.11828] | -0.12997 [-0.14289, -0.11762] | -0.13053 [-0.14304, -0.11864] |
+| Subject consistency | -0.02931 [-0.03660, -0.02171] | -0.02960 [-0.03617, -0.02303] | -0.03280 [-0.03912, -0.02652] | -0.03167 [-0.03864, -0.02474] |
+| Background consistency | -0.00468 [-0.00848, -0.00079] | -0.00589 [-0.00906, -0.00265] | -0.00659 [-0.01019, -0.00280] | -0.00654 [-0.00964, -0.00353] |
+| Motion smoothness | +0.00116 [-0.00047, +0.00298] | +0.00011 [-0.00151, +0.00202] | -0.00077 [-0.00201, +0.00053] | -0.00072 [-0.00192, +0.00055] |
+| Dynamic degree | -0.29000 [-0.38000, -0.20000] | -0.21000 [-0.29000, -0.13000] | -0.24000 [-0.33000, -0.16000] | -0.23000 [-0.31000, -0.15000] |
+
+
+Same-seed agreement versus the frozen teacher: mean final-latent relative L2 **0.645951** over 100 prompt pairs, using all latent coordinates after the final (20th) denoising step, without averaging intermediate steps. Mean finite frame PSNR is **13.134 dB** over 4,500 aligned decoded frames; each frame uses every RGB channel/pixel and dB values are averaged equally. Identical frames with infinite PSNR: 0.
+
+Phase D allocated 2530.646 GPU-seconds, summing elapsed wall time on each leased idle GPU across all generation/parity/scorer jobs. Caches/initialization and worker teardown are included; CPU-only diagnostics and agreement use no GPUs. Raw videos and records remain on 5090. Published per-prompt scores, paired intervals, selection records, agreement, allocation ledger and scorer provenance are in `distill-results/nope/full100/split42/`; the committed summary omits its model identifier and records the raw summary SHA-256.
+
+
+The split42 EMA fails this free-generation benchmark: aesthetics, imaging and text–video consistency are below the teacher, dense control, tuned shared22 and trained shared22 deletion, with every corresponding paired 95% interval below zero over the 100 original prompt/seed pairs. For example, split42 aesthetics is 0.299507 versus teacher 0.588595, imaging is 0.539214 versus 0.660679, and text–video is 0.104073 versus 0.232555. The frame aggregation and prompt-bootstrap scopes are those stated above. Dynamic degree averages 0.040000 versus 0.330000 for the teacher; the slightly higher smoothness score should not be read as better overall quality in this low-motion arm. Passing the cached-teacher-state gate did not establish good free-rollout video quality. E will measure the additional effect of zeroing the means against this already poor reference, which limits a clean claim that zeroing alone causes collapse.
