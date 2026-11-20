@@ -118,11 +118,11 @@ def main():
         if (center.layers, center.steps, center.heads, center.head_dim) != (len(transformer.blocks), config["steps"], transformer.config.num_attention_heads, transformer.config.attention_head_dim):
             raise RuntimeError("learned_center.pt shape does not match the model/config")
         center_hash = digest(student_dir / "learned_center.pt")
+    elif args.center_mode == "mean":
+        raise RuntimeError("--center-mode mean needs --student with learned_center.pt")
     else:
         center = LearnedCenter(layers=len(transformer.blocks), steps=config["steps"], heads=transformer.config.num_attention_heads,
                                head_dim=transformer.config.attention_head_dim, mode=args.center_mode).to("cuda")
-    elif args.center_mode == "mean":
-        raise RuntimeError("--center-mode mean needs --student with learned_center.pt")
     center.attach(pipe.transformer)
     exempt = {"layers": [int(i) for i in torch.nonzero(~center.layer_active).flatten()], "steps": [int(i) for i in torch.nonzero(~center.step_active).flatten()]}
     selection_info = {"default_high_masks": center.uses_default_masks, "cell_invariant_masks": center.cell_invariant(),
