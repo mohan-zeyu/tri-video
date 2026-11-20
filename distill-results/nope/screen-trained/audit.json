@@ -1,0 +1,13 @@
+{
+  "prompts": 32,
+  "states_per_prompt": 20,
+  "arms": [
+    "student/mean",
+    "student/delete"
+  ],
+  "same_prompt_ids_as_training_free_screen": true,
+  "all_errors_finite": true,
+  "max_exempt_first_state_error_difference_between_modes": 0.0,
+  "final_ema_center_sha256": "49482bf1a0c0bef2fe06aab0566e799ecf6464a28cddc68711f44e30685aec75",
+  "scope": "Audit of already computed whole-latent relative squared errors; 32 prompts x 20 teacher states x conditional/unconditional/guided columns, both trained EMA modes. First-state comparison covers every prompt and all three error columns, with no new model forwards."
+}

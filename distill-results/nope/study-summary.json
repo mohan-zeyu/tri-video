@@ -1,0 +1,131 @@
+{
+  "completed_unix": 1795159377.0140486,
+  "all_phases_complete": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E"
+  ],
+  "approved_gpu_hours": 30,
+  "gpu_seconds_total": 102749.40615485382,
+  "gpu_hours_total": 28.541501709681615,
+  "gpu_hours_unused": 1.458498290318385,
+  "gpu_seconds_B_C": 96288.32415485382,
+  "gpu_seconds_D_E": {
+    "d": 2530.646,
+    "e": 3930.436
+  },
+  "accounting": "Worker wall time multiplied by allocated GPU count; includes all B/C attempts, loading, validation, saves/I/O/shutdown, D/E screen/parity/render/scorer jobs; CPU-only statistics, diagnostics and frame agreement excluded.",
+  "workers": {
+    "screen-b2-status.json": {
+      "state": "complete",
+      "exit_code": 0,
+      "gpus": [
+        1
+      ],
+      "started": 1795069504.6479375,
+      "finished": 1795070364.0046914,
+      "wall_seconds": 859.3567500114441,
+      "gpu_seconds": 859.3567500114441
+    },
+    "c-resume3000-status.json": {
+      "state": "failed",
+      "exit_code": 1,
+      "gpus": [
+        4,
+        1
+      ],
+      "started": 1795097459.7509508,
+      "finished": 1795110467.8996806,
+      "wall_seconds": 13008.148651361465,
+      "gpu_seconds": 26016.29730272293
+    },
+    "c-resume4000-status.json": {
+      "state": "complete",
+      "exit_code": 0,
+      "gpus": [
+        1,
+        0
+      ],
+      "started": 1795145868.6369948,
+      "finished": 1795154126.3623521,
+      "wall_seconds": 8257.725346803665,
+      "gpu_seconds": 16515.45069360733
+    },
+    "c-gate1000-status.json": {
+      "state": "complete",
+      "exit_code": 0,
+      "gpus": [
+        4,
+        1
+      ],
+      "started": 1795070517.2943273,
+      "finished": 1795078433.8499005,
+      "wall_seconds": 7916.555545091629,
+      "gpu_seconds": 15833.111090183258
+    },
+    "c-finish5000-status.json": {
+      "state": "failed",
+      "exit_code": 1,
+      "gpus": [
+        1,
+        0
+      ],
+      "started": 1795078444.9004653,
+      "finished": 1795096354.489129,
+      "wall_seconds": 17909.588609695435,
+      "gpu_seconds": 35819.17721939087
+    },
+    "screen-b-status.json": {
+      "state": "complete",
+      "exit_code": 0,
+      "gpus": [
+        4
+      ],
+      "started": 1795069058.4842741,
+      "finished": 1795070303.415381,
+      "wall_seconds": 1244.9310989379883,
+      "gpu_seconds": 1244.9310989379883
+    }
+  },
+  "final_ema_rechecked_after_benchmarks": [
+    {
+      "file": "student/learned_center.pt",
+      "sha256": "49482bf1a0c0bef2fe06aab0566e799ecf6464a28cddc68711f44e30685aec75",
+      "unchanged_after_benchmarks": true
+    },
+    {
+      "file": "student/transformer/config.json",
+      "sha256": "52669ea7e3f7954e403c37d6fe2c853728821b8feae11a582b40f9541b86a402",
+      "unchanged_after_benchmarks": true
+    },
+    {
+      "file": "student/transformer/diffusion_pytorch_model.safetensors",
+      "sha256": "d0523f8734b93aad0deb9112129705f4bb50a7fa9405eaa432db3ac2df47c220",
+      "unchanged_after_benchmarks": true
+    }
+  ],
+  "complete_resume_step": 5000,
+  "canonical_ema_exports": [
+    "ema-checkpoints/step-000500",
+    "ema-checkpoints/step-001000",
+    "ema-checkpoints/step-001500",
+    "ema-checkpoints/step-002000",
+    "ema-checkpoints/step-002500",
+    "ema-checkpoints/step-003000",
+    "ema-checkpoints/step-003500",
+    "ema-checkpoints/step-004000",
+    "ema-checkpoints/step-004500",
+    "student"
+  ],
+  "preserved_interrupted_ema_exports": [
+    "interrupted-attempts/1795146315449617281/ema-checkpoints/step-004500"
+  ],
+  "benchmark_scope": "100 original prompts with one original seed each per arm split42 and split42_zeros. 20 denoising steps, CFG5, shift3, 45 frames at 480x480, empty negative. Native layer0 and first denoising step. 42 constant/zero shared Q/K pairs, 22 complementary NoPE pairs per active cell; all 10800 tokens.",
+  "protected_studies": "No writes or signals sent to pooled C2 recovery or shared22 extension by this study.",
+  "open_issues": [
+    "Rank-0 SIGKILL cause unconfirmed; recovered from complete update4000 optimizer/sampler/RNG/EMA state to 5000.",
+    "Split42 EMA fails the free-generation benchmark despite passing the cached-state gate; no additional training or recipe changes are authorized by this completion."
+  ]
+}

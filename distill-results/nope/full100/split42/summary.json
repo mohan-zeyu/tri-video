@@ -6156,6 +6156,7 @@
     "omitted_fields": [
       "config.model"
     ],
-    "reason": "No model identifiers in newly committed evidence; raw summary retained on lab host."
+    "reason": "No model identifiers in newly committed evidence; raw summary retained on lab host.",
+    "selection_scope_note": "config.high_pairs is an unused legacy manifest field for these learned-center arms. Actual per-cell masks come from the final EMA learned_center.pt and are audited as 42 shared Q/K means pairs plus 22 NoPE pairs in selection-records.json; layer0 and first denoising step remain native."
   }
 }
