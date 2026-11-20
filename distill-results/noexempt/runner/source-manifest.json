@@ -1,0 +1,19 @@
+{
+  "captured_singapore": "2026-11-20T21:15:12.059015+08:00",
+  "live_source_root": "/mnt/data/liuzeyu/tri-video-noexempt-6f273d8/out/distill-noexempt-run",
+  "files": {
+    "supervisor.py": {
+      "bytes": 20025,
+      "sha256": "9b3cff370b5f0300820af0503dc562d1b8d6101d227ed5332bdf6d3f6c1d2506"
+    },
+    "gpu-worker.py": {
+      "bytes": 4202,
+      "sha256": "a872542dfea6fdbd188a5bb55dce750c265ebb33604286f0e5e566d2ff267c1e"
+    },
+    "benchmark.py": {
+      "bytes": 12344,
+      "sha256": "ddaf3c85feaf617a164ef41c27261ea873ce23be5acca52afbd5951af5c2cced"
+    }
+  },
+  "warning": "Read-only source archive. Do not rerun supervisor.py against an existing study; it is not restart-idempotent. Inspect live PID, workers and checkpoints first; see AGENT_TAKEOVER.md."
+}
