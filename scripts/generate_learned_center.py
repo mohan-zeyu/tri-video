@@ -110,22 +110,27 @@ def main():
     pipe.set_progress_bar_config(disable=True)
     pipe.vae.enable_tiling()
 
-    center = LearnedCenter(layers=len(transformer.blocks), steps=config["steps"], heads=transformer.config.num_attention_heads,
-                           head_dim=transformer.config.attention_head_dim, mode=args.center_mode).to("cuda")
     center_hash = None
     if student_dir and (student_dir / "learned_center.pt").exists():
         saved = torch.load(student_dir / "learned_center.pt", map_location="cpu")
-        center.load_state_dict(saved["state_dict"])      # masks (per-cell Q/K selections) and exemptions come from the checkpoint
+        # masks (per-cell Q/K selections), content pairs, wide flag and exemptions come from the checkpoint
+        center = LearnedCenter.from_checkpoint(saved, mode=args.center_mode).to("cuda")
+        if (center.layers, center.steps, center.heads, center.head_dim) != (len(transformer.blocks), config["steps"], transformer.config.num_attention_heads, transformer.config.attention_head_dim):
+            raise RuntimeError("learned_center.pt shape does not match the model/config")
         center_hash = digest(student_dir / "learned_center.pt")
     elif args.center_mode == "mean":
         raise RuntimeError("--center-mode mean needs --student with learned_center.pt")
+    else:
+        center = LearnedCenter(layers=len(transformer.blocks), steps=config["steps"], heads=transformer.config.num_attention_heads,
+                               head_dim=transformer.config.attention_head_dim, mode=args.center_mode).to("cuda")
     center.attach(pipe.transformer)
     exempt = {"layers": [int(i) for i in torch.nonzero(~center.layer_active).flatten()], "steps": [int(i) for i in torch.nonzero(~center.step_active).flatten()]}
     selection_info = {"default_high_masks": center.uses_default_masks, "cell_invariant_masks": center.cell_invariant(),
                       "pairs_per_cell_q": float(center.selected_pairs("q").sum(-1).float().mean()),
                       "pairs_per_cell_k": float(center.selected_pairs("k").sum(-1).float().mean()),
                       "q_k_intersection_mean": float((center.selected_pairs("q") & center.selected_pairs("k")).sum(-1).float().mean()),
-                      "nope_pairs_per_cell": float(center.selected_pairs("nope").sum(-1).float().mean())}
+                      "nope_pairs_per_cell": float(center.selected_pairs("nope").sum(-1).float().mean()),
+                      "wide_head": center.is_wide, "content_pairs": center.content_pairs if center.is_wide else 0}
     environment = {"torch": torch.__version__, "diffusers": diffusers.__version__, "transformers": transformers.__version__,
                    "snapshot": revision, "weights": weights_source, "learned_center_sha256": center_hash, "center_mode": args.center_mode,
                    "exempt": exempt, "selection": selection_info, "gpu": torch.cuda.get_device_name(0), "hostname": socket.gethostname(), "pid": os.getpid(),
@@ -136,9 +141,11 @@ def main():
     expected_calls = active_layers * 2 * 2 * active_steps if args.center_mode != "off" else 0   # layers x (q,k) x branches x steps
     expected_nope_calls = active_layers * 2 * active_steps if (center.uses_nope and args.center_mode != "off") else 0   # one processor call per layer, branch, step
     scope = {
-        "mean": "constant vectors on selected Q/K pairs after RMSNorm, per layer/step/branch/head"
+        "mean": ("widened head: full 128-dim constant vector under RoPE plus %d unrotated content pairs appended to Q/K, per layer/step/branch/head" % center.content_pairs) if center.is_wide else
+                "constant vectors on selected Q/K pairs after RMSNorm, per layer/step/branch/head"
                 + ("; the other pairs keep content without rotary embedding (NoPE)" if center.uses_nope else ""),
-        "delete": "zeros on selected Q/K pairs after RMSNorm and before RoPE, per layer/step/branch/head"
+        "delete": ("widened head with the position channel zeroed: attention on %d unrotated content pairs only" % center.content_pairs) if center.is_wide else
+                  "zeros on selected Q/K pairs after RMSNorm and before RoPE, per layer/step/branch/head"
                   + ("; the other pairs keep content without rotary embedding (NoPE): position-blind attention" if center.uses_nope else ""),
         "narrow": "zeros on selected Q/K pairs before native full-width RMSNorm, per layer/step/branch/head"
                   + ("; masks identical at every step and branch, equivalent to dropped projection rows"

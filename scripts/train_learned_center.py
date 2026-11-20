@@ -433,7 +433,7 @@ def save_student(student, center, out_dir, snapshot, rank, world, no_fsdp, ema=N
             save_file(tensors, str(pending), metadata={"format": "pt"})
             pending.replace(target / "diffusion_pytorch_model.safetensors")
             write_json(target / "config.json", json.loads((Path(snapshot) / "transformer" / "config.json").read_text()))
-            save_torch(target.parent / "learned_center.pt", {"state_dict": center.state_dict(), "mode": center.mode})
+            save_torch(target.parent / "learned_center.pt", {"state_dict": center.state_dict(), "mode": center.mode, "wide": center.is_wide})
     if world > 1:
         dist.barrier()
 
@@ -612,7 +612,7 @@ def main():
     parser.add_argument("--init-student", help="directory with transformer/ + learned_center.pt from a previous stage")
     parser.add_argument("--calibration", help="means for mu init: traj/calibration.pt (44-wide) or pair-statistics.pt (full 128-wide); default <traj>/calibration.pt")
     parser.add_argument("--selection", help="selection.pt from scripts/select_pairs.py (per-cell Q/K pair masks)")
-    parser.add_argument("--variant", default="separate", help="variant inside --selection: fixed_high | separate | shared")
+    parser.add_argument("--variant", default="separate", help="variant inside --selection: fixed_high | separate | shared | pooled | split | wide")
     parser.add_argument("--center-mode", choices=("mean", "delete", "narrow", "off"), default="mean")
     parser.add_argument("--include-layer0", action="store_true")
     parser.add_argument("--include-step1", action="store_true")
@@ -737,6 +737,8 @@ def main():
 
     if args.stage == 1:
         # the teacher module doubles as the student attention; only mu trains
+        if center.is_wide:
+            raise SystemExit("stage 1 (layer-local attention loss) is not defined for the widened head; use stage 2")
         center.attach(teacher)
         opt_model, ema, taps = None, None, None
         student = None
@@ -886,7 +888,7 @@ def main():
             if args.stage == 1:
                 if rank == 0:
                     (out / "student").mkdir(exist_ok=True)
-                    save_torch(out / "student" / "learned_center.pt", {"state_dict": center.state_dict(), "mode": center.mode})
+                    save_torch(out / "student" / "learned_center.pt", {"state_dict": center.state_dict(), "mode": center.mode, "wide": center.is_wide})
             else:
                 if last_step == args.steps or args.ema_checkpoints:
                     tag = "student" if last_step == args.steps else f"ema-checkpoints/step-{last_step:06d}"
