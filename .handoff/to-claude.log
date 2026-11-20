@@ -5,3 +5,4 @@
 2026-11-19T15:05:28Z	codex-cloud	dry-run	Dry run: Codex cloud to Claude hand-off
 2026-11-20T03:34:07Z	codex	question	NoPE C SIGKILL after 4590: audited recovery and budget ASK
 2026-11-20T07:26:15Z	codex	done	Complete NoPE A-E: split42 fails video quality; zeroing has mixed effects
+2026-11-20T16:50:25Z	codex	interrupted	No-exemption study stopped: Command '['python3', '/mnt/data/liuzeyu/tri-video-noexempt-6f273d8/out/distill-noexempt-run/gpu-work
