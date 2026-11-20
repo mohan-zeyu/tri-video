@@ -50,7 +50,7 @@ ASK before exceeding 13 GPU-hours, changing the recipe, running a zero-trained n
 
 ## Verified state at the snapshot
 
-- CPU suite: **ALL TESTS OK**, runtime with CUDA hidden.
+- CPU suite: **ALL TESTS OK** against the pinned `6f273d8` task code, runtime with CUDA hidden. This does not certify later code added to the branch.
 - A complete, committed as **`fc49b82`**, merged/pushed at **`5e8c9bf`**.
 - A guided errors: shared/mean **0.0344305184**, shared/delete **0.0396893420**. These are whole-latent relative squared velocity errors vs the native bf16 teacher, equally averaged over **32 held-out prompts × 20 teacher entering states**, combining both CFG branches at guidance 5. They are not Q/K-pair errors or video scores.
 - A allocated **1,259.271 GPU-seconds / 0.349797 GPU-hours**, including loading and shutdown.
@@ -128,6 +128,12 @@ export GIT_SSH_COMMAND='ssh -o HostName=ssh.github.com -p443 -o HostKeyAlias=git
 ```
 
 Do not weaken host-key verification or expose credentials. Local Mac Git push also works. Use the dedicated reporting checkout and explicit file staging; do not add bulk `out/` directories or the Mac main checkout's untracked report.
+
+## Concurrent branch work
+
+While this takeover guide was being prepared, commit `6d86b08` added a widened-head implementation and `DISTILL_WIDE_PROMPT.md`; the branch merged it at `8a20a71`. That is **not the current no-exemption run** and its existence alone is not a new GPU assignment or allocation. Follow actual pending/ack state and user instructions before starting it. The no-exemption runner source in this guide remains the inspected source above.
+
+The automatic publisher merges the remote branch after each stage commit. Existing training Python processes retain their loaded code, while later subprocesses can load newly merged files. In particular, later generation can see the widened-head additions. Before taking manual control, inspect checkpoint compatibility and recorded generation code hashes; do not claim the initial CPU pass tested those later additions. Do not reset or patch the live GPU checkout casually to resolve branch differences.
 
 ## Completed work and names that must not be mixed
 
