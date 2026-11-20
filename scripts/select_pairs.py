@@ -22,6 +22,9 @@ Selections (each a bool mask [layers, steps, branches, heads, 64] per side):
   split        per cell, the --means-pairs (default 42) lowest (damage_q + damage_k) pairs are replaced on both
                sides, and the remaining pairs are marked NoPE (kept as content, no rotary embedding): the constant
                pairs then carry all positional signal and the NoPE pairs all content
+  wide         widened head: constants on ALL 64 pairs (the full 128-dim mean under RoPE, a position channel) plus
+               the --content-pairs (default 32) HIGHEST-damage pairs as an unrotated content channel appended to
+               Q and K (LearnedCenter wide mode; V and to_out unchanged)
   pooled       per (layer, head), the --pairs lowest sum over steps and branches of (damage_q + damage_k), same
                set on both sides and at every step and branch: the only kind of selection that can be realised by
                dropping rows of to_q/to_k (narrow mode) instead of masking at run time
@@ -82,6 +85,7 @@ def main():
     parser.add_argument("--out", default="out/distill-selection")
     parser.add_argument("--pairs", type=int, default=22, help="pairs replaced per side per cell (22 = the original third)")
     parser.add_argument("--means-pairs", type=int, default=42, help="'split' variant: pairs replaced by constants per cell; the other 64-N pairs become NoPE")
+    parser.add_argument("--content-pairs", type=int, default=32, help="'wide' variant: highest-damage pairs kept as the unrotated content channel")
     parser.add_argument("--exempt-layer0", action="store_true", default=True)
     parser.add_argument("--include-layer0", action="store_true")
     parser.add_argument("--include-step1", action="store_true")
@@ -120,6 +124,9 @@ def main():
     variants["pooled"] = {"mask_q": pooled_mask, "mask_k": pooled_mask.clone()}
     split_means = lowest_k_mask(damage_pooled["q"] + damage_pooled["k"], args.means_pairs)
     variants["split"] = {"mask_q": split_means, "mask_k": split_means.clone(), "mask_nope": ~split_means}
+    content = ~lowest_k_mask(damage_pooled["q"] + damage_pooled["k"], 64 - args.content_pairs)       # the highest-damage pairs
+    all_pairs = torch.ones(L, S, B, H, 64, dtype=torch.bool)
+    variants["wide"] = {"mask_q": all_pairs, "mask_k": all_pairs.clone(), "mask_nope": content, "wide": True}
     # removal criterion (zeros instead of the pooled mean): energy x partner energy, no mean subtracted
     removal_shared = lowest_k_mask(pooled_energy["q"] * pooled_energy["k"] * 2, k)
 
@@ -149,6 +156,10 @@ def main():
                                            "scope": "number of pairs selected on both Q and K in the same cell, of the --pairs per side"}
     report["composition_shared"] = composition(shared)
     report["composition_pooled"] = composition(pooled_cell)
+    report["wide"] = {"content_pairs": args.content_pairs, "composition_content": composition(content),
+                      "fixed_high_in_content_fraction": float((content & variants["fixed_high"]["mask_q"]).sum() / variants["fixed_high"]["mask_q"].sum()),
+                      "content_vs_split_nope_intersection_mean": float((content & ~split_means).sum(-1).double().mean()),
+                      "scope": "per cell; content = the highest-damage pairs by damage_q + damage_k; means cover all 64 pairs"}
     report["split"] = {"means_pairs": args.means_pairs, "nope_pairs": 64 - args.means_pairs,
                        "composition_means": composition(split_means), "composition_nope": composition(~split_means),
                        "shared_in_split_means_fraction": float((split_means & shared).sum() / shared.sum()),
@@ -170,7 +181,7 @@ def main():
     save_torch(out / "pair-statistics.pt", {"mean_q": pooled["q"].float(), "mean_k": pooled["k"].float(),
         "energy_q": pooled_energy["q"].float(), "energy_k": pooled_energy["k"].float(), "prompts": ids,
         "scope": "pooled over calibration prompts of per-prompt all-token statistics; separate layer/step/branch/head; full 128 coordinates"})
-    save_torch(out / "selection.pt", {"variants": {n: {k_: v_.bool() for k_, v_ in v.items()} for n, v in variants.items()}, "pairs": k,
+    save_torch(out / "selection.pt", {"variants": {n: {k_: (v_.bool() if torch.is_tensor(v_) else v_) for k_, v_ in v.items()} for n, v in variants.items()}, "pairs": k,
         "damage_q": damage_pooled["q"].float(), "damage_k": damage_pooled["k"].float(), "mrl_q": mrl["q"].float(), "mrl_k": mrl["k"].float(),
         "criterion": "lowest damage = mean_p E_p||x_f - mu_f||^2 x mean_p E_p||partner_f||^2 per cell and side", "prompts": ids})
     exempt_layers = () if args.include_layer0 else (0,)
