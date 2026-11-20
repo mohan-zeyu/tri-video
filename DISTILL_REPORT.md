@@ -1153,3 +1153,17 @@ All requested A–E work is complete. Measured NoPE-study allocation is **28.541
 The final EMA's three SHA-256 values were rechecked after both benchmarks and match the C manifest. The nine 500-update milestones through 4,500, final update-5,000 `student/` export and interrupted update-4,500 archive are all preserved. The final full optimizer/model/EMA checkpoint at `out/distill-split42/checkpoint/step-005000/` contains 22,782,015,301 bytes; its center optimizer counters are 5,000, distributed metadata contains model/optimizer/EMA groups, and both rank sampler/Torch CPU/CUDA RNG records were checked. Recovery remains available without a fresh optimizer. Full audit: `distill-results/nope/training/full-checkpoint-5000-audit.json`; budget/export closure: `distill-results/nope/study-summary.json`. All bulk models, videos and records stay under `/mnt/data/liuzeyu/tri-video-nope-2979d3e` on 5090.
 
 Open issues are the unresolved cause of the earlier rank-0 SIGKILL and the failure of this split42 recipe on free-generation video quality. Runtime recovery used the complete update-4,000 optimizer/sampler/RNG/EMA state and retained the original schedule through 5,000. No additional training or alternative split was run. The publication-only export-count audit was corrected to recognize that the trainer writes its final EMA to `student/`, with no duplicate `ema-checkpoints/step-005000/`; no model file was missing or changed.
+
+
+## Shared22 with nothing exempt
+
+CPU suite passed. A selects22 shared Q/K rotary pairs per all14400 layer-step-branch-head cells using existing64-prompt pooled statistics; constants are post-full-width RMSNorm/pre-RoPE, identical across all10800 video tokens in each cell. No exempt layer or step. No masks or calibration outputs overwritten.
+
+A scope:32 held-out prompts x20 teacher entering states, whole-latent relative squared velocity errors vs native bf16 teacher, equal prompt-state mean; conditional/unconditional separate, both combined at CFG5 for guided.
+
+| Arm | Conditional | Unconditional | Guided |
+|---|---:|---:|---:|
+| shared/mean | 0.006842 | 0.006987 | 0.034431 |
+| shared/delete | 0.010010 | 0.010069 | 0.039689 |
+
+Exempted shared means/delete guided references on the same32-prompt scope are0.03219502645661123/0.03741946758891572 (distill-results/nope/screen/complete.json); earlier no-exempt separate/mean is0.04098448762670159 (distill-results/selection/screen-noexempt/complete.json). These are distinct masks/conditions. Original A uses 0.349797 allocated GPU-hours. Budget cap13GPU-hours, idle GPU leases only, max2 per job. User requested unattended continuation after verified startup to conserve model credits; webhook hand-offs replace periodic model checks.
