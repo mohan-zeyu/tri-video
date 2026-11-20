@@ -369,3 +369,13 @@ Layer 0 and step 1 were exempt in every arm as first-run insurance; the no-exemp
 selected pairs is small (0.037 → 0.041 guided). The user decided to lift the exemptions. `DISTILL_NOEXEMPT_PROMPT.md`
 repeats the shared22 means student with all 30 layers and 20 steps active (2,400 interventions per video), benchmarks
 it, and runs its fine-tune-then-drop swap.
+
+### Widened head (20 November)
+
+The senior's design, as clarified: per head, Q and K become 192 dims, the full 128-dim mean vector under normal RoPE
+(a content-free position channel over all 64 frequencies) concatenated with the 64 coordinates of the 32
+highest-damage pairs taken from the real projection without RoPE (a pure content channel); V, to_out and the
+1/sqrt(128) scale unchanged. `LearnedCenter(wide=True)` with `WideHeadProcessor` implements it functionally (the
+appended rows are gathered from the projection output, which equals copying those rows of to_q/to_k); the `wide`
+selection variant picks the content pairs. Mode `delete` zeroes the position channel. Nothing exempt. The procedure
+is in `DISTILL_WIDE_PROMPT.md`.

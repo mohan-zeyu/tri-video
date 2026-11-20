@@ -300,6 +300,107 @@ def test_nope():
     print("test_nope OK")
 
 
+def test_wide():
+    """Widened head: (a) exact agreement with an independent reference (complex-number rotation, explicit softmax);
+    (b) exempt batch elements and exempt layers equal the native model; (c) mode off installs nothing; (d) mode
+    delete (position channel zeroed) is permutation-equivariant when nothing is exempt; (e) checkpoint round trip."""
+    from diffusers.models.transformers.transformer_wan import _get_qkv_projections, WanAttnProcessor
+    model = build_tiny()
+    L, S, B, H, D, n = 2, STEPS, 2, 2, 128, 32
+    torch.manual_seed(21)
+    content = torch.zeros(L, S, B, H, 64, dtype=torch.bool)
+    for idx in torch.cartesian_prod(*[torch.arange(k) for k in (L, S, B, H)]):
+        content[tuple(idx.tolist())][torch.randperm(64)[:n]] = True
+    allp = torch.ones_like(content)
+    sel = {"mask_q": allp, "mask_k": allp, "mask_nope": content, "wide": True}
+    calib = {"mean_q": 0.3 * torch.randn(L, S, B, H, D), "mean_k": 0.3 * torch.randn(L, S, B, H, D)}
+    x = torch.randn(2, 16, 2, 4, 4); text = torch.randn(2, 8, 64); t = torch.tensor([500.0, 500.0])
+
+    class Reference:
+        def __init__(self, center, layer): self.center, self.layer = center, layer
+        def __call__(self, attn, hidden_states, encoder_hidden_states=None, attention_mask=None, rotary_emb=None, **kw):
+            c = self.center
+            q, k, v = _get_qkv_projections(attn, hidden_states, None)
+            q, k, v = (tt.unflatten(2, (attn.heads, -1)).double() for tt in (attn.norm_q(q), attn.norm_k(k), v))
+            cos, sin = rotary_emb
+            phase = torch.complex(cos[0, :, 0, 0::2].double(), sin[0, :, 0, 1::2].double())     # [T, 64]
+            Bq, T = q.shape[:2]
+            outs = []
+            for b in range(Bq):
+                st, br = int(c.step[b]), int(c.branch[b])
+                heads = []
+                for h in range(attn.heads):
+                    if bool(c.step_active[st]):
+                        pq = (c.mu_q[self.layer, st, br, h].double() if c.mode == "mean" else torch.zeros(D, dtype=torch.float64)).expand(T, D)
+                        pk = (c.mu_k[self.layer, st, br, h].double() if c.mode == "mean" else torch.zeros(D, dtype=torch.float64)).expand(T, D)
+                        sel_dims = c.mask_nope[self.layer, st, br, h].nonzero().flatten()
+                        tq, tk = q[b, :, h, sel_dims], k[b, :, h, sel_dims]
+                    else:
+                        pq, pk = q[b, :, h], k[b, :, h]
+                        tq = tk = torch.zeros(T, 0, dtype=torch.float64)
+                    rot = lambda z: torch.view_as_real(torch.view_as_complex(z.reshape(T, 64, 2).contiguous()) * phase).reshape(T, D)
+                    logits = (rot(pq) @ rot(pk).T + tq @ tk.T) / D ** 0.5
+                    heads.append(torch.softmax(logits, -1) @ v[b, :, h])
+                outs.append(torch.stack(heads, 1))
+            out = torch.stack(outs).flatten(2, 3).to(hidden_states.dtype)
+            return attn.to_out[1](attn.to_out[0](out))
+
+    def run(center, ctx, inp=x):
+        center.attach(model); center.set_context(*ctx)
+        with torch.no_grad():
+            y = model(hidden_states=inp, timestep=t, encoder_hidden_states=text, return_dict=False)[0]
+        center.detach(); return y
+    def run_reference(center, ctx):
+        center.set_context(*ctx)
+        originals = [(blk.attn1, blk.attn1.processor) for blk in model.blocks]
+        for l, blk in enumerate(model.blocks):
+            if bool(center.layer_active[l]) and center.mode != "off":
+                blk.attn1.set_processor(Reference(center, l))
+        with torch.no_grad():
+            y = model(hidden_states=x, timestep=t, encoder_hidden_states=text, return_dict=False)[0]
+        for attn, proc in originals: attn.set_processor(proc)
+        return y
+    with torch.no_grad():
+        native = model(hidden_states=x, timestep=t, encoder_hidden_states=text, return_dict=False)[0]
+    center = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(0,), exempt_steps=(0,), selection=sel); center.init_from_calibration(calib)
+    assert center.is_wide and center.content_pairs == n and center.uses_nope
+    assert torch.equal(center.content_index[1, 2, 1, 0], center.mask_nope[1, 2, 1, 0].nonzero().flatten())
+    for mode in ("mean", "delete"):
+        center.mode = mode
+        for ctx in (([2, 3], [0, 1]), ([2, 0], [1, 0])):
+            center.calls = center.nope_calls = 0
+            got = run(center, ctx)
+            torch.testing.assert_close(got, run_reference(center, ctx), rtol=1e-4, atol=1e-4)
+            assert (center.calls, center.nope_calls) == (2, 1), (center.calls, center.nope_calls)
+            assert all(type(blk.attn1.processor) is WanAttnProcessor for blk in model.blocks)
+            if ctx[0][1] == 0:                      # exempt step element must be native
+                torch.testing.assert_close(got[1], native[1], rtol=1e-5, atol=1e-5)
+                assert (got[0] - native[0]).abs().max() > 1e-3
+    center.mode = "off"; center.attach(model); assert center.wrapped == []; center.detach()
+    # (d) position channel zeroed, nothing exempt: permutation-equivariant in the token grid
+    blind = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(), mode="delete", selection=sel)
+    def tokens(lat): return lat.view(2, 16, 2, 2, 2, 2, 2).permute(0, 2, 3, 5, 1, 4, 6).reshape(2, 8, 16, 1, 2, 2)
+    def untokens(tok): return tok.view(2, 2, 2, 2, 16, 1, 2, 2).permute(0, 4, 1, 5, 2, 6, 3, 7).reshape(2, 16, 2, 4, 4)
+    perm = torch.randperm(8); xp = untokens(tokens(x)[:, perm])
+    y = run(blind, ([2, 2], [0, 1])); yp = run(blind, ([2, 2], [0, 1]), xp)
+    torch.testing.assert_close(tokens(yp), tokens(y)[:, perm], rtol=1e-4, atol=1e-4)
+    # with the position channel (means) the equivariance must break
+    seeing = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(), selection=sel)
+    seeing.init_from_calibration({k: 3 * v for k, v in calib.items()})      # unit-scale constants, as real means are
+    y = run(seeing, ([2, 2], [0, 1])); yp = run(seeing, ([2, 2], [0, 1]), xp)
+    assert (tokens(yp) - tokens(y)[:, perm]).abs().max() > 1e-3
+    # (e) checkpoint round trip keeps wide, content index and masks; legacy records load as not wide
+    again = LearnedCenter.from_checkpoint({"state_dict": center.state_dict(), "mode": "mean"})
+    assert again.is_wide and again.content_pairs == n and torch.equal(again.content_index, center.content_index) and torch.equal(again.mu_q, center.mu_q)
+    legacy = {k: v for k, v in LearnedCenter(layers=L, steps=S, heads=H).state_dict().items() if k not in ("wide", "content_index", "mask_nope")}
+    old = LearnedCenter(layers=L, steps=S, heads=H); old.load_state_dict(legacy); assert not old.is_wide and old.content_pairs == 0
+    try:
+        LearnedCenter(layers=L, steps=S, heads=H, selection={"mask_q": allp, "mask_k": allp, "mask_nope": content.clone().index_fill_(-1, torch.tensor([0]), True), "wide": True}); raise AssertionError("unequal content counts accepted")
+    except ValueError:
+        pass
+    print("test_wide OK")
+
+
 def write_fake_trajectories(root):
     from diffusers import UniPCMultistepScheduler
     sched = UniPCMultistepScheduler(num_train_timesteps=1000, prediction_type="flow_prediction", use_flow_sigmas=True, flow_shift=3.0, solver_order=2)
@@ -490,8 +591,13 @@ def test_statistics_selection_screen():
         assert proc.returncode == 0, proc.stderr[-3000:]
         sel = torch.load(sel_dir / "selection.pt")
         for name, v in sel["variants"].items():
-            n = 42 if name == "split" else 22
+            n = {"split": 42, "wide": 64}.get(name, 22)
             assert tuple(v["mask_q"].shape) == (2, STEPS, 2, 2, 64) and (v["mask_q"].sum(-1) == n).all() and (v["mask_k"].sum(-1) == n).all(), name
+        wide = sel["variants"]["wide"]
+        assert wide["wide"] is True and (wide["mask_nope"].sum(-1) == 32).all()
+        summed_all = (sel["damage_q"] + sel["damage_k"])[1, 2, 1, 0]
+        assert set(summed_all.topk(32, largest=True).indices.tolist()) == set(wide["mask_nope"][1, 2, 1, 0].nonzero().flatten().tolist()), "wide content = highest damage"
+        wstatic = LearnedCenter.from_checkpoint(torch.load(sel_dir / "static-wide" / "learned_center.pt")); assert wstatic.is_wide and wstatic.content_pairs == 32
         assert torch.equal(sel["variants"]["shared"]["mask_q"], sel["variants"]["shared"]["mask_k"])
         pooled_m = sel["variants"]["pooled"]["mask_q"]
         assert torch.equal(pooled_m, sel["variants"]["pooled"]["mask_k"]) and torch.equal(pooled_m, pooled_m[:, 0:1, 0:1].expand_as(pooled_m))
@@ -543,6 +649,7 @@ if __name__ == "__main__":
     test_narrow_projection()
     test_narrow_selected()
     test_nope()
+    test_wide()
     test_masks_and_legacy_checkpoint()
     test_statistics_selection_screen()
     test_stage1_checkpoint_only_mu_differs()
