@@ -979,3 +979,33 @@ Interim evidence is under `distill-results/nope/progress-3000/`, including origi
 
 
 The user approved the additional 2.5 GPU-hours in the lab chat on 19 November 2026 (Asia/Singapore), raising the total cap to 27.5 GPU-hours. C resumes the verified update-3,000 optimizer, sampler, Torch CPU/CUDA RNG and EMA state with the original 5,000-update schedule and two-rank recipe. The approval changes the allocation cap; no model or loss hyperparameters change. The approval record is `distill-results/nope/budget-approval.json`.
+
+
+### C interruption after update 4,590: recovery and budget decision
+
+The exact update-3,000 resume ran on idle GPUs 4 and 1, retaining the original 5,000-update horizon, optimizer, sampler, Torch CPU/CUDA RNG and EMA state. Rank 0 then received SIGKILL at 01:47:44 on 20 November 2026 (Asia/Singapore), after the update-4,500 validation. The last stdout optimizer update was 4,590; canonical history and validation files were flushed through 4,500. This was an unexpected interruption, separate from the earlier intentional budget pause. The elastic launcher subsequently terminated rank 1 and exited with status 1. No new GPU work was started after the interruption.
+
+The last complete resumable checkpoint is update **4,000**, not 4,590. Its atomic latest pointer, center optimizer step, distributed shard/metadata files and both rank RNG files were independently checked on CPU. It contains 22,782,015,237 bytes. The latest preserved EMA is update **4,500**; its three export-file SHA-256 values and masks were audited. All 14,400 layer–step–branch–head cells retain 42 shared Q/K means pairs and 22 complementary NoPE pairs, with layer 0 and the first step exempt. The masks apply identically to all 10,800 video tokens at each active cell. Earlier EMA exports remain preserved. Exact continuation must use the 4,000 optimizer checkpoint; starting from the 4,500 EMA with a new optimizer would change the recipe.
+
+The additional live-weight validation rows below use the same first eight held-out prompts × 20 cached teacher entering states. Each error is a whole-latent squared velocity-difference norm divided by the corresponding teacher squared norm, averaged equally over the prompt–state cases. Conditional and unconditional errors are separate; guided predictions combine both branches at CFG 5 before measuring the ratio. These are cached-state validation results, not EMA video scores or per-pair Q/K errors.
+
+| Update | Conditional | Unconditional | Guided |
+|---:|---:|---:|---:|
+| 3250 | 0.027841 | 0.027500 | 0.058001 |
+| 3500 | 0.028563 | 0.027738 | 0.059687 |
+| 3750 | 0.026694 | 0.026528 | 0.056629 |
+| 4000 | 0.026948 | 0.026529 | 0.055715 |
+| 4250 | 0.025963 | 0.025934 | 0.054435 |
+| 4500 | 0.025709 | 0.025557 | 0.053698 |
+
+![Split42 validation through the interruption](distill-results/nope/progress-interrupted-4590/validation-curve.png)
+
+All 453 canonical logged training rows and all 19 validation rows are finite; the final stdout update 4,590 also has finite losses. Mean norms from logged update 1 to saved history update 4,500 changed from Q 12.271144 to 12.317051 (+0.37411%) and K 12.714284 to 12.760779 (+0.36569%). These are Euclidean norms across all 128 stored mean coordinates per cell, equally averaged over all 14,400 layer–step–branch–head cells including exempt cells and unused coordinates, without token or prompt averaging at measurement time. The interrupted invocation's median logged optimizer-update duration was 6.998470 seconds, from rank-mean update timings after 3,000; it excludes validation, exports, full saves and logging. A final allocator peak was not printed by this interrupted invocation.
+
+**The SIGKILL cause is unconfirmed.** There is no Python/CUDA OOM exception. Kernel `dmesg` access was denied; the available journal excludes system messages and returned no entries for the failure interval. The current SSH session exposes no readable cgroup memory counters. These observations do not prove an OOM or identify who sent the signal. No speculative change to the training recipe or checkpoint implementation has been applied.
+
+The interrupted invocation consumed 26,016.297 GPU-seconds. Total B+C allocation is now **79,772.873 GPU-seconds / 22.159132 GPU-hours**, leaving **5.340868 GPU-hours** under the user-approved **27.5** cap. Accounting includes all attempts, model initialization, validation, checkpoint/storage waits and shutdown: elapsed worker wall time multiplied by the allocated GPU count. Scaling the interrupted invocation's allocated cost over its 1,590 updates to the 1,000 updates that must be replayed from checkpoint 4,000 estimates **4.545 GPU-hours** for recovery; adding the brief's **2.3 GPU-hours** for D+E projects **29.004 GPU-hours total**. This estimate includes the observed full-save overhead; it is not completed computation or a performance claim.
+
+**ASK:** approve up to **2.5 additional GPU-hours (30 total)** to resume the exact update-4,000 state through 5,000 and then complete D+E, or approve a reduced scope using the preserved update-4,500 EMA for D+E without further training. The reduced-scope option would retain the 27.5-hour cap but would not satisfy the original 5,000-update recipe. Neither change has been applied. The brief requires ASK before exceeding the budget or changing the recipe. No split42 videos or VBench scores have been produced yet; D and E are pending. Protected pooled C2 recovery and shared22 extension outputs were untouched.
+
+Evidence is under `distill-results/nope/progress-interrupted-4590/`: raw invocation arguments/status, failure tail, canonical history and validation, the complete-checkpoint audit, EMA hashes, measured allocation and projection, and the updated comparison curve. Lab recovery paths are `out/distill-split42/checkpoint/step-004000/` and `out/distill-split42/ema-checkpoints/step-004500/` in `/mnt/data/liuzeyu/tri-video-nope-2979d3e`.
