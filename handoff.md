@@ -653,3 +653,26 @@ Exempted shared means/delete guided references on the same32-prompt scope are0.0
 ### No-exemption runner stopped for attention
 
 Command '['python3', '/mnt/data/liuzeyu/tri-video-noexempt-6f273d8/out/distill-noexempt-run/gpu-worker.py', '--root', '/mnt/data/liuzeyu/tri-video-noexempt-6f273d8', '--name', 'train-b01', '--gpus', '2', '--candidates', '1,0,6,2,3,5', '--wall-limit', '18150', '--', '/dev/shm/tri-center-runtime/bin/python', '-m', 'torch.distributed.run', '--standalone', '--nproc_per_node', '2', 'scripts/train_learned_center.py', '--stage', '2', '--out', 'out/distill-s22-all', '--steps', '2500', '--accum', '2', '--lr', '1e-5', '--lr-center', '2e-4', '--warmup', '250', '--lambda-cfg', '1', '--lambda-feat', '0.1', '--ema', '0.999', '--clip', '1', '--val-every', '250', '--val-prompts', '8', '--val-at-start', '--save-every', '500', '--ema-checkpoints', '--resume-state-with-ema', '--resume-state-every', '1000', '--seed', '20261114', '--selection', 'out/distill-selection/selection.pt', '--variant', 'shared', '--calibration', 'out/distill-selection/pair-statistics.pt', '--center-mode', 'mean', '--include-layer0', '--include-step1', '--traj', '/tmp/tri-distill-pilot.EG6asH/traj', '--snapshot', '/dev/shm/tri-wan-snapshot', '--budget-seconds', '17550']' returned non-zero exit status 1.. Allocated GPU-hours 8.078830/13. All outputs preserved; see distill-results/noexempt/interruption.json and out/distill-noexempt-run/ logs. No further GPU work is launched by the runner.
+
+
+### No-exemption B: 2500-update fine-tune
+
+From teacher weights, original tuned shared22 recipe with --include-layer0 --include-step1, two ranks and accumulation2; seed20261114, model lr1e-5, means lr2e-4, warmup250, feature weight0.1, EMA0.999. All logged losses/validations finite. Full2500 optimizer/sampler/CPU+CUDA RNG/EMA save and final EMA masks audited. Whole-latent relative squared velocity errors average the first eight held-out prompts x20 teacher entering states; both branches combine at CFG5.
+
+| Update | Guided |
+|---:|---:|
+| 0 | 0.031922 |
+| 250 | 0.030385 |
+| 500 | 0.035585 |
+| 750 | 0.031774 |
+| 1000 | 0.028721 |
+| 1250 | 0.027883 |
+| 1500 | 0.028245 |
+| 1750 | 0.022584 |
+| 2000 | 0.022213 |
+| 2250 | 0.020564 |
+| 2500 | 0.020078 |
+
+![Validation curve](distill-results/noexempt/training/validation-curve.png)
+
+Median logged rank-mean optimizer seconds/update: 6.911287, excluding validation/saves. Peak allocator bytes per reported invocation/rank and all arguments are in training/summary.json and args.json. Mean-norm drift: {"q": {"first": 12.271143913269043, "last": 12.27061653137207, "percent": -0.004297740297887209}, "k": {"first": 12.71428394317627, "last": 12.713732719421387, "percent": -0.004335468338967363}}; scope: Per-cell Euclidean norm over all128 stored mean coordinates, equal average over all14400 cells including unused coordinates; no token/prompt average at measurement time. Allocated A+B GPU-hours: 15.189086, including startup, validation, saves/I/O and all attempts. All historical outputs retained.

@@ -1,0 +1,6 @@
+{
+  "state": "abandoned_before_gpu_claim",
+  "gpu_seconds": 0,
+  "time": 1795238567.5140264,
+  "note": "Waited for GPUs 1/6 (false 100% utilisation, 0 MiB, no processes); stopped with its supervisor by user-approved move to GPUs 2/3; never claimed a GPU."
+}

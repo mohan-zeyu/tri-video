@@ -1,0 +1,33 @@
+{
+  "updates": 2500,
+  "median_logged_rank_mean_seconds_per_update": 6.911286746500991,
+  "time_scope": "Logged optimizer updates, excluding validation/export/checkpoint I/O; allocated wall time separately includes these costs.",
+  "reported_peaks": [
+    {
+      "log": "train-b04.log",
+      "rank": 1,
+      "peak_cuda_allocated_bytes": 23121825280,
+      "wall_seconds": 4070.0438854640815
+    },
+    {
+      "log": "train-b04.log",
+      "rank": 0,
+      "peak_cuda_allocated_bytes": 23125179904,
+      "wall_seconds": 4069.7057123580016
+    }
+  ],
+  "mu_norm_drift": {
+    "q": {
+      "first": 12.271143913269043,
+      "last": 12.27061653137207,
+      "percent": -0.004297740297887209
+    },
+    "k": {
+      "first": 12.71428394317627,
+      "last": 12.713732719421387,
+      "percent": -0.004335468338967363
+    }
+  },
+  "mu_scope": "Per-cell Euclidean norm over all128 stored mean coordinates, equal average over all14400 cells including unused coordinates; no token/prompt average at measurement time.",
+  "allocated_gpu_seconds_through_B": 54680.7097465992
+}
