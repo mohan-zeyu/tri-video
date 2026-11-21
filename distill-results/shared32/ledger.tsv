@@ -11,3 +11,15 @@ mean-dynamic_degree	3	142.808	0
 mean-background_consistency	3	70.958	0
 mean-subject_consistency	2	93.824	0
 mean-motion_smoothness	3	80.633	0
+screen-trained	2	1255.835	0
+delete-parity-offload	2	60.034	0
+delete-parity-resident	2	40.400	0
+delete-render-1	5	882.691	0
+delete-render-0	2	898.561	0
+delete-overall_consistency	2	95.834	0
+delete-aesthetic_quality	3	100.600	0
+delete-imaging_quality	2	100.554	0
+delete-dynamic_degree	3	115.636	0
+delete-subject_consistency	2	85.562	0
+delete-background_consistency	3	70.615	0
+delete-motion_smoothness	2	60.026	0
