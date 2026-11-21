@@ -1,0 +1,2802 @@
+[
+  {
+    "prompt": {
+      "id": "v000",
+      "text": "lemur eating grass leaves",
+      "category": "animal",
+      "seed": 2026110900,
+      "audit": true
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "362882acff908af05e45918b1167bf1bfa2c9eaf42c0d6e2840b477d9bc952ff"
+  },
+  {
+    "prompt": {
+      "id": "v013",
+      "text": "a miniature house",
+      "category": "architecture",
+      "seed": 2026110913,
+      "audit": true
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "7091278c81cb39279a2b170f65ed56d1eb8324560445d3bbee54e73c9e1aaa68"
+  },
+  {
+    "prompt": {
+      "id": "v026",
+      "text": "a broccoli soup on wooden table",
+      "category": "food",
+      "seed": 2026110926,
+      "audit": true
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "90871055b511ab788a36b51efb16024d8bfdf669105d0a593ff45d6bf3dd5e8d"
+  },
+  {
+    "prompt": {
+      "id": "v039",
+      "text": "a girl pushing the chair while her sister is on the chair",
+      "category": "human",
+      "seed": 2026110939,
+      "audit": true
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "22f61898152f8254ce2d91342e4a43015e996df2250cc093e37a308fe7130b04"
+  },
+  {
+    "prompt": {
+      "id": "v052",
+      "text": "modern office waiting room",
+      "category": "lifestyle",
+      "seed": 2026110952,
+      "audit": true
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "6ff918744530d41635b1df3eda6fdad168d67f1dd46bf03489e0a16a28a30039"
+  },
+  {
+    "prompt": {
+      "id": "v064",
+      "text": "a man holding leaves looking at the camera",
+      "category": "plant",
+      "seed": 2026110964,
+      "audit": true
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "5a116ed04a7ee1ac503a4a6c86778a7d556b41b64efb61b2344fbccd135fd5a9"
+  },
+  {
+    "prompt": {
+      "id": "v076",
+      "text": "fireworks display in the sky at night",
+      "category": "scenery",
+      "seed": 2026110976,
+      "audit": true
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "306a05d131ce23a1b5221d108bf14d73e92ebf68fe369f18b018966f4be43498"
+  },
+  {
+    "prompt": {
+      "id": "v088",
+      "text": "video of passengers riding a double decker bus during night",
+      "category": "vehicles",
+      "seed": 2026110988,
+      "audit": true
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "c7d758f7e5233cf5ddff788dd598bbfe02a14eee553f473cfd8738b1a13f6e8b"
+  },
+  {
+    "prompt": {
+      "id": "v001",
+      "text": "chameleon eating ant",
+      "category": "animal",
+      "seed": 2026110901,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "450b72020c8d6acb20f14b3538f8d935c6e348e241fb5bd7fbd3a1df17b6cb28"
+  },
+  {
+    "prompt": {
+      "id": "v014",
+      "text": "red paper lantern decorations hanging outside a building",
+      "category": "architecture",
+      "seed": 2026110914,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "916ef75b14986cd500eb9ed0777ea427e0f2d16ac8263231247f4a76caf98a8c"
+  },
+  {
+    "prompt": {
+      "id": "v027",
+      "text": "a mother preparing food with her kids",
+      "category": "food",
+      "seed": 2026110927,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "7807b694ded63e903c2d3222026cd85962150c001737eedd809fdd25429418c0"
+  },
+  {
+    "prompt": {
+      "id": "v040",
+      "text": "cab driver talking to passenger",
+      "category": "human",
+      "seed": 2026110940,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "0e23f8b427832366a7d29eb9a2a195be339dc86a7132469963804750bf8be0f6"
+  },
+  {
+    "prompt": {
+      "id": "v053",
+      "text": "woman painting at home",
+      "category": "lifestyle",
+      "seed": 2026110953,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "45b11bf43a435bcb833278b5588fe51569f1af19ef483951724f70e8ad616e06"
+  },
+  {
+    "prompt": {
+      "id": "v065",
+      "text": "green moss in forest nature",
+      "category": "plant",
+      "seed": 2026110965,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "82cc43ffb64be23aaeebbc2f7ef0b5d6a7e69f590bda6045500731022bde7bd5"
+  },
+  {
+    "prompt": {
+      "id": "v077",
+      "text": "video of ocean during daytime",
+      "category": "scenery",
+      "seed": 2026110977,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "b0ad887c05086bf0463aaaac736f27c0ca2f2473a15c0d62d7f090767cec787d"
+  },
+  {
+    "prompt": {
+      "id": "v089",
+      "text": "cargo train traveling on the mountainside",
+      "category": "vehicles",
+      "seed": 2026110989,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "6311a53ef814d84bb5f683496f0265dce0632f5bf0b6cdf73e7423401a253343"
+  },
+  {
+    "prompt": {
+      "id": "v002",
+      "text": "a raccoon climbing a tree",
+      "category": "animal",
+      "seed": 2026110902,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "4f650dde89898a71c4b24a62a017d1f8c291a0518bd93eeca9630f4299237acf"
+  },
+  {
+    "prompt": {
+      "id": "v015",
+      "text": "modern wooden house interior",
+      "category": "architecture",
+      "seed": 2026110915,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "4ac2a43e1270b69f8af6e2084071493d43126cc9c9324cc982279e859f42a14e"
+  },
+  {
+    "prompt": {
+      "id": "v028",
+      "text": "boy getting a dumpling using chopsticks",
+      "category": "food",
+      "seed": 2026110928,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "c0559acfe1a118d6db25bf1e66f8d97db6668beefe5404cabfbf17545a09b947"
+  },
+  {
+    "prompt": {
+      "id": "v041",
+      "text": "friends talking while on the basketball court",
+      "category": "human",
+      "seed": 2026110941,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "1543020454663c4bd65f96236d05c02f3916add4a2a458857fe3f348fbd18f4b"
+  },
+  {
+    "prompt": {
+      "id": "v054",
+      "text": "woman and man in pajamas working from home",
+      "category": "lifestyle",
+      "seed": 2026110954,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "27fb7d4d6190ce504d2156f8aa6f76ea2108a607f93fd72b7999d9eca4d00e3e"
+  },
+  {
+    "prompt": {
+      "id": "v066",
+      "text": "a shadow of a swaying plant",
+      "category": "plant",
+      "seed": 2026110966,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "8cd7145064afda03d7802f3e98ebd4571ecd26c5196123d20a5cabb4fbd19015"
+  },
+  {
+    "prompt": {
+      "id": "v078",
+      "text": "scenery of desert landscape",
+      "category": "scenery",
+      "seed": 2026110978,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "e7ed1b49b921af1e749f2fb30e61d4fb8bec44742d18341a238590335f0eb34a"
+  },
+  {
+    "prompt": {
+      "id": "v090",
+      "text": "video of blinking traffic lights",
+      "category": "vehicles",
+      "seed": 2026110990,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "2b5111a62db297f799ba14c9fbcba500917fef80c0b7f15933fdc4e549a05091"
+  },
+  {
+    "prompt": {
+      "id": "v003",
+      "text": "koala eating leaves from a branch",
+      "category": "animal",
+      "seed": 2026110903,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "92ce7b4d626860ab32a0125886ad2235f13180dc6abd8297c9715fa398d65fec"
+  },
+  {
+    "prompt": {
+      "id": "v016",
+      "text": "silhouette of a building",
+      "category": "architecture",
+      "seed": 2026110916,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "2231aa043512016304d15e62502e9f456ebd74bed215348f74471a65993ea2c4"
+  },
+  {
+    "prompt": {
+      "id": "v029",
+      "text": "fresh dim sum set up on a bamboo steam tray for cooking",
+      "category": "food",
+      "seed": 2026110929,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "d434e20cfe5d755ce00184a1b02a02c0ea72a5b8c2026f1a91ab345a0e8c456f"
+  },
+  {
+    "prompt": {
+      "id": "v042",
+      "text": "brother and sister using hammock",
+      "category": "human",
+      "seed": 2026110942,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "3dc2ffb356533837aab922257d0c38da7ddb4303f413b030a31bca3a50618be5"
+  },
+  {
+    "prompt": {
+      "id": "v055",
+      "text": "a toolbox and a paint roller beside a huge package in a room",
+      "category": "lifestyle",
+      "seed": 2026110955,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "35beb09fc3c0bc12a40e63a9fb914f3818063022754b3a87aed910d208e1701b"
+  },
+  {
+    "prompt": {
+      "id": "v067",
+      "text": "tree with golden leaves",
+      "category": "plant",
+      "seed": 2026110967,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "87bd19c84df8357ec2e8a822afe414394704e894eb416703f6d6212bf971d46d"
+  },
+  {
+    "prompt": {
+      "id": "v079",
+      "text": "sun view through a spider web",
+      "category": "scenery",
+      "seed": 2026110979,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "b04b3d466062f09b743d42479d607d986177ee72639c94b44db6d9dbad312a4b"
+  },
+  {
+    "prompt": {
+      "id": "v091",
+      "text": "a modern railway station in malaysia use for public transportation",
+      "category": "vehicles",
+      "seed": 2026110991,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "b5de64f54bcfd14497730f471046ea820d7fc2e697275f642c4b670664a22bca"
+  },
+  {
+    "prompt": {
+      "id": "v004",
+      "text": "paper cut out of a pair of hands a whale and a heart",
+      "category": "animal",
+      "seed": 2026110904,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "bf79d005dc3d6974056684d5d921e5ae7ecbb844441d3197680ce2b8cdd5c561"
+  },
+  {
+    "prompt": {
+      "id": "v017",
+      "text": "candle on a jar and a house figurine on a surface",
+      "category": "architecture",
+      "seed": 2026110917,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "b12d69baae98fe7ad40b8b0e773add6304ff8b2ce7eddc5f8e4373c63273148b"
+  },
+  {
+    "prompt": {
+      "id": "v030",
+      "text": "a man eating a donut",
+      "category": "food",
+      "seed": 2026110930,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "4410819d41b85dd2c139ed2ed0fb55bb8e265ec84fae2f2f50044df00184c72b"
+  },
+  {
+    "prompt": {
+      "id": "v043",
+      "text": "couple dancing with body paint",
+      "category": "human",
+      "seed": 2026110943,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "8a8008a7267c43c7c959e1188e8f4e741b7051821d4371ec9b6ac1793814b11f"
+  },
+  {
+    "prompt": {
+      "id": "v056",
+      "text": "video of a bathroom interior",
+      "category": "lifestyle",
+      "seed": 2026110956,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "ca95166966112ad2a18af51cd9fa5fa961c79cc97dd6251c2f70cbcc09a079dc"
+  },
+  {
+    "prompt": {
+      "id": "v068",
+      "text": "forest trees and a medieval castle at sunset",
+      "category": "plant",
+      "seed": 2026110968,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "d5ed31b72aa368ff65b30b0e8206b3756718b34b69cfda546a0974848fd6544b"
+  },
+  {
+    "prompt": {
+      "id": "v080",
+      "text": "scenic view from wooden pathway",
+      "category": "scenery",
+      "seed": 2026110980,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "d50bb4585ee8d3e6fa196ba4d30e2967f264b76dd820543b6977572f95ed5a83"
+  },
+  {
+    "prompt": {
+      "id": "v092",
+      "text": "drone view of an illuminated bridge across a river",
+      "category": "vehicles",
+      "seed": 2026110992,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "e82fa264efa49558e6fc3b509aae248e585c1dc59c98f87598253525592fc8e8"
+  },
+  {
+    "prompt": {
+      "id": "v005",
+      "text": "a frog eating an ant",
+      "category": "animal",
+      "seed": 2026110905,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "128450173f5c9ab495868a181c80f04e26b565d4649448f8b5ad03739aa8185d"
+  },
+  {
+    "prompt": {
+      "id": "v018",
+      "text": "house in village",
+      "category": "architecture",
+      "seed": 2026110918,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "e5c2377cd30625a3420c4ea8f5c7ae045318c1211eb2f116038d22fb7fe03d6d"
+  },
+  {
+    "prompt": {
+      "id": "v031",
+      "text": "preparing a cocktail drink",
+      "category": "food",
+      "seed": 2026110931,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "51bc0713b9925c5173793620cd11c099571421eaa980c631914f6154ea64ef3c"
+  },
+  {
+    "prompt": {
+      "id": "v044",
+      "text": "teacher writing on her notebook",
+      "category": "human",
+      "seed": 2026110944,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "1b85e632c2937cf625f1bb19d5f5c4579b2eca70cf11dbd3f6e33ef8d56a6778"
+  },
+  {
+    "prompt": {
+      "id": "v057",
+      "text": "a woman in a locker room",
+      "category": "lifestyle",
+      "seed": 2026110957,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "5214e363aa1c44b64cc4cdff8e130bb539137fe58e49647b9f1d4b1e4aed58ee"
+  },
+  {
+    "prompt": {
+      "id": "v069",
+      "text": "flower field near the waterfall",
+      "category": "plant",
+      "seed": 2026110969,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "f10352909ae56eda67d4adc4f512571edf44bd27b5eed0795b48ca97c162e933"
+  },
+  {
+    "prompt": {
+      "id": "v081",
+      "text": "close up view of swaying white flowers and leaves",
+      "category": "scenery",
+      "seed": 2026110981,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "5e1ef55c07f764a031c4cdc781224716e6210d88f1e81f036ca9ea4500015eb0"
+  },
+  {
+    "prompt": {
+      "id": "v093",
+      "text": "man wearing motorcycle helmet looking at the camera",
+      "category": "vehicles",
+      "seed": 2026110993,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "56061a280404e9bc574248dc42a1803e18932db4876336e05268ea6252a60f7c"
+  },
+  {
+    "prompt": {
+      "id": "v006",
+      "text": "a tortoise covered with algae",
+      "category": "animal",
+      "seed": 2026110906,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "a94fe817ccecff1473cb2cf7873056e58df803aeaef4c8f3211dfe599af5c4dc"
+  },
+  {
+    "prompt": {
+      "id": "v019",
+      "text": "view of the sky through a building",
+      "category": "architecture",
+      "seed": 2026110919,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "6cd2d6974d345bf1352ea0cb94a6b6af29cca63ab7af9c534e463addb84a604a"
+  },
+  {
+    "prompt": {
+      "id": "v032",
+      "text": "grilling a meat on a charcoal grill",
+      "category": "food",
+      "seed": 2026110932,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "5f963fb16b0e43cd63755da2e3ae18f5cca3705eaa8d7692b8cac38a3f6a2240"
+  },
+  {
+    "prompt": {
+      "id": "v045",
+      "text": "a group of campers with a cute dog",
+      "category": "human",
+      "seed": 2026110945,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "44b9dde1380a4644db7ac63c150f9784949bcd633f7b14c34aaeed59ff359cd2"
+  },
+  {
+    "prompt": {
+      "id": "v058",
+      "text": "aerial shot of interior of the warehouse",
+      "category": "lifestyle",
+      "seed": 2026110958,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "64feb1827c28870cced3063b705bca977f885c3fa621da1c676086dae7baa853"
+  },
+  {
+    "prompt": {
+      "id": "v070",
+      "text": "a mossy fountain and green plants in a botanical garden",
+      "category": "plant",
+      "seed": 2026110970,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "c888e8c9cee0396bcb7e722b13ea0649bc1e3a139c24b078455967a35ca7925f"
+  },
+  {
+    "prompt": {
+      "id": "v082",
+      "text": "a bonfire near river",
+      "category": "scenery",
+      "seed": 2026110982,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "120f8c01fc03f6ea58103d5bcb0dcd42fb55f886121ff00962fee3f96b25eb91"
+  },
+  {
+    "prompt": {
+      "id": "v094",
+      "text": "a woman in a halloween costume posing on a motorcycle",
+      "category": "vehicles",
+      "seed": 2026110994,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "2ec4fd4a301dbbafa667c4624bc17c0ebe6dcce26c0d6684ad3a74781e524514"
+  },
+  {
+    "prompt": {
+      "id": "v007",
+      "text": "a pig wallowing in mud",
+      "category": "animal",
+      "seed": 2026110907,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "3bac87dfef2a35b651593b0d4dbd39852c08aec0e0e530f98b23ccd8f6e17b8b"
+  },
+  {
+    "prompt": {
+      "id": "v020",
+      "text": "aerial view of the highway and building in a city",
+      "category": "architecture",
+      "seed": 2026110920,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "220011ec1fddb6fc785e65e1e02acde9a268438c438a74f2f08d9bff2bd4af57"
+  },
+  {
+    "prompt": {
+      "id": "v033",
+      "text": "an orange fruit cut in half",
+      "category": "food",
+      "seed": 2026110933,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "126b5a3072d1b962d106e626e8e18e41386070c8122d9661ba44524c5af7aa46"
+  },
+  {
+    "prompt": {
+      "id": "v046",
+      "text": "a man video recording the movie in theater",
+      "category": "human",
+      "seed": 2026110946,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "0866848839fcb9958e66f245c31e31f48e7a860fb64f91a7e275ecf3f8c281d5"
+  },
+  {
+    "prompt": {
+      "id": "v059",
+      "text": "sunlight inside a room",
+      "category": "lifestyle",
+      "seed": 2026110959,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "bb9a783a5c63977097c71347d27584b0dbfe2ccacdb9ff2467458a9e9b3fd3ab"
+  },
+  {
+    "prompt": {
+      "id": "v071",
+      "text": "a woman opening a book with a flower inside",
+      "category": "plant",
+      "seed": 2026110971,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "719e7a687a1027296923e91dbd5c0e045893a52fa313794f17544c789e29ab3a"
+  },
+  {
+    "prompt": {
+      "id": "v083",
+      "text": "view of the sea from an abandoned building",
+      "category": "scenery",
+      "seed": 2026110983,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "fb239af4168ae139eaae7147e77df094f5f931f65cd11530157f9bc13d3e8112"
+  },
+  {
+    "prompt": {
+      "id": "v095",
+      "text": "drone footage of a wreck ship on shore",
+      "category": "vehicles",
+      "seed": 2026110995,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "0b5290646de38022bbac42ceed12dd0bacf3c7c58c27d449da567d34e781d172"
+  },
+  {
+    "prompt": {
+      "id": "v008",
+      "text": "spider making a web",
+      "category": "animal",
+      "seed": 2026110908,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "d4ad18771bc1619d834f4b5282bec34949b65cb90be747d9086c8f69dd80c429"
+  },
+  {
+    "prompt": {
+      "id": "v021",
+      "text": "city view reflected on a glass building",
+      "category": "architecture",
+      "seed": 2026110921,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "e2897207ffa969b8456b31071903331a4b8b4eafffd20485cd69c20927c2965c"
+  },
+  {
+    "prompt": {
+      "id": "v034",
+      "text": "grilling a steak on a pan grill",
+      "category": "food",
+      "seed": 2026110934,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "8eb5a8aadf0f6d1a572080eee204ff6a99aa865925e2e8bb4819f9c9ec7a64c4"
+  },
+  {
+    "prompt": {
+      "id": "v047",
+      "text": "pregnant woman exercising with trainer",
+      "category": "human",
+      "seed": 2026110947,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "0a5061ae7ebc69588b112ed1e5bc6d4be1260fe5fe9816ad65f83138270797e5"
+  },
+  {
+    "prompt": {
+      "id": "v060",
+      "text": "a person sanitizing an office space using smoke machine",
+      "category": "lifestyle",
+      "seed": 2026110960,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "25496b3e2cd328a092a5e38e4e8882a8522892e0814ce6a13f0388a58c2b4810"
+  },
+  {
+    "prompt": {
+      "id": "v072",
+      "text": "trees in the forest during sunny day",
+      "category": "plant",
+      "seed": 2026110972,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "f52a3c4fd1100ef34f50b28e3748d96e328b154717f25693a338d025ea721fe0"
+  },
+  {
+    "prompt": {
+      "id": "v084",
+      "text": "view of golden domed church",
+      "category": "scenery",
+      "seed": 2026110984,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "1acb611ef50f88aefd01e6905ca9806f217fcf7a4c613dbf2a60a433d2b11411"
+  },
+  {
+    "prompt": {
+      "id": "v096",
+      "text": "boat sailing in the middle of the ocean",
+      "category": "vehicles",
+      "seed": 2026110996,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "9f5621733fef18ad0873024f01aa3ca2de50d1bb230ec87947f1b43ee6fa6ed9"
+  },
+  {
+    "prompt": {
+      "id": "v009",
+      "text": "an american crocodile",
+      "category": "animal",
+      "seed": 2026110909,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "d6c97e2b00900d77f689793705bd7305fdc7777da633b1d3d872b7d5a2c196e7"
+  },
+  {
+    "prompt": {
+      "id": "v022",
+      "text": "time lapse footage of the sun light in front of a small house porch",
+      "category": "architecture",
+      "seed": 2026110922,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "377a02ac61348538acd83500edc23af032197fe95a8661f335391c957a31608f"
+  },
+  {
+    "prompt": {
+      "id": "v035",
+      "text": "girl peeling a banana",
+      "category": "food",
+      "seed": 2026110935,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "c2a487a90a24152249206328439973d3dac065825bbc2a265c8e8b9343fcdeeb"
+  },
+  {
+    "prompt": {
+      "id": "v048",
+      "text": "a family wearing paper bag masks",
+      "category": "human",
+      "seed": 2026110948,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "5f71215b1f9a092e8a7363ea327c0e820819dd0dd4f006be0c0320980e6d1e0f"
+  },
+  {
+    "prompt": {
+      "id": "v061",
+      "text": "a woman recording herself while exercising at home",
+      "category": "lifestyle",
+      "seed": 2026110961,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "493b310cd88e2e936497f54bc92cf8c2e2588201f0bdfc8556501eb32d28a13f"
+  },
+  {
+    "prompt": {
+      "id": "v073",
+      "text": "plucking leaves from plant",
+      "category": "plant",
+      "seed": 2026110973,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "825aa3429ff1f26641a7350f0360917b53ac967217a17032933367f8902e0dfb"
+  },
+  {
+    "prompt": {
+      "id": "v085",
+      "text": "waterfalls in between mountain",
+      "category": "scenery",
+      "seed": 2026110985,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "ba13b9ce9c28515debd28cfb15c2ede97bff59e7d8df9d19f854dfa143e79882"
+  },
+  {
+    "prompt": {
+      "id": "v097",
+      "text": "people in queue to military ship",
+      "category": "vehicles",
+      "seed": 2026110997,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "81e81b924cc0cda7d4928480d6345746a52bacafe440c1c6fae5340416a3875a"
+  },
+  {
+    "prompt": {
+      "id": "v010",
+      "text": "cat licking another cat",
+      "category": "animal",
+      "seed": 2026110910,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "1f071bf590526aab17bed2684665eda64969236876e744800113787e211335bd"
+  },
+  {
+    "prompt": {
+      "id": "v023",
+      "text": "waterfall and house",
+      "category": "architecture",
+      "seed": 2026110923,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "e3c613d542b953ffe29ea7e6968532aafc89ebd8f54cb9ccf3389316a74b0e9f"
+  },
+  {
+    "prompt": {
+      "id": "v036",
+      "text": "pancake with blueberry on the top",
+      "category": "food",
+      "seed": 2026110936,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "532d9f5c9911adc2d8fd73a4eab3cfabe9fab625dca5d10ba2a79c1ec6e778a3"
+  },
+  {
+    "prompt": {
+      "id": "v049",
+      "text": "woman adding honey to the cinnamon rolls",
+      "category": "human",
+      "seed": 2026110949,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "3ce5ea2f734f3f7344ae090f3a12f2a84f0f69c2d81882ecafb0fc262b70789d"
+  },
+  {
+    "prompt": {
+      "id": "v062",
+      "text": "a family stacking cardboard boxes in a room",
+      "category": "lifestyle",
+      "seed": 2026110962,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "022ddd253b09073b91fc9fa21aaf7686ba8a352c3291d69442558cde00af740f"
+  },
+  {
+    "prompt": {
+      "id": "v074",
+      "text": "reflection of tree branches",
+      "category": "plant",
+      "seed": 2026110974,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "3cf4268395b9f07abc9c602bb5a025f40e5383ffba4aa30028d469cb59189c54"
+  },
+  {
+    "prompt": {
+      "id": "v086",
+      "text": "close up view of lighted candles",
+      "category": "scenery",
+      "seed": 2026110986,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "31b0e7db31762bb717a9b129af5169e477db06712cb24feb24d5007ba386ac36"
+  },
+  {
+    "prompt": {
+      "id": "v098",
+      "text": "video of a kayak boat in a river",
+      "category": "vehicles",
+      "seed": 2026110998,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "7251818cf4392c3f9c1dd98d2ea32031261818f6973cdeab6d81934415102676"
+  },
+  {
+    "prompt": {
+      "id": "v011",
+      "text": "brown chicken hunting for its food",
+      "category": "animal",
+      "seed": 2026110911,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "eb5615072e9e46fed60c997cba8717460732b99b1d877059910b893c32057c96"
+  },
+  {
+    "prompt": {
+      "id": "v024",
+      "text": "a beach house built over a seawall protected from the sea waves",
+      "category": "architecture",
+      "seed": 2026110924,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "c8069207618225e200fcec733760f3fcda3d95cb8b706fc34befd330288380d6"
+  },
+  {
+    "prompt": {
+      "id": "v037",
+      "text": "a chef cutting sushi rolls",
+      "category": "food",
+      "seed": 2026110937,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "e5d5c2d28967685168812939c020fd6ac539f0a1fa2ce5dd8c710b3a47b0b6ba"
+  },
+  {
+    "prompt": {
+      "id": "v050",
+      "text": "a child playing with water",
+      "category": "human",
+      "seed": 2026110950,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "18dfbec90f031a8f56a5fe59d02574dd3895aec78c78c93eddba73474027b386"
+  },
+  {
+    "prompt": {
+      "id": "v063",
+      "text": "man doing handstand in indoor garden",
+      "category": "lifestyle",
+      "seed": 2026110963,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "9910c1eec4191f6672cdaa6841c1eb1000cdb8d04938ae61e163f1cc3852a81f"
+  },
+  {
+    "prompt": {
+      "id": "v075",
+      "text": "a coconut tree by the house",
+      "category": "plant",
+      "seed": 2026110975,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "c8257471bcd495fda7d7cf0c264599887b4bf2a4f8b14bc08e36ec1f6d0c88e0"
+  },
+  {
+    "prompt": {
+      "id": "v087",
+      "text": "a dark clouds over shadowing the full moon",
+      "category": "scenery",
+      "seed": 2026110987,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "c36b3e7cffe189fb0bad74ee2c1e09f1369feb99774319b45fd91aa12c7eaac2"
+  },
+  {
+    "prompt": {
+      "id": "v099",
+      "text": "a white yacht traveling on a river and passing under the bridge",
+      "category": "vehicles",
+      "seed": 2026110999,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "ec0f64a1244129713273dbd903e350c4d7c9a34e842164c6d0177ee608baca9e"
+  },
+  {
+    "prompt": {
+      "id": "v012",
+      "text": "wild rabbit in a green meadow",
+      "category": "animal",
+      "seed": 2026110912,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "133c331b53e6ffcbb2f56fc5399564d08e2c37a4c7d637a50dc46c6d0cf08bc4"
+  },
+  {
+    "prompt": {
+      "id": "v025",
+      "text": "water tower on the desert",
+      "category": "architecture",
+      "seed": 2026110925,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "a6655c682ca5531af2d3a47ae801bd92c51356b8f99e9977e2267101947db3f9"
+  },
+  {
+    "prompt": {
+      "id": "v038",
+      "text": "little boy pretending to eat the watermelon",
+      "category": "food",
+      "seed": 2026110938,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "324e8e1e3a46428af544ef4a7829e05606b3398124d139e55b7d82eb92861e7c"
+  },
+  {
+    "prompt": {
+      "id": "v051",
+      "text": "a man in a hoodie and woman with a red bandana talking to each other and smiling",
+      "category": "human",
+      "seed": 2026110951,
+      "audit": false
+    },
+    "arm": "s32_means",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2400,
+    "nope_calls": 0,
+    "video_sha256": "0681b0bbfaeed3023c88e955a17be89c389f4c3ee259d2b467518ffa951b0726"
+  }
+]
