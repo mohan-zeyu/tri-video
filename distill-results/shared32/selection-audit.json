@@ -1,0 +1,10 @@
+{
+  "variant": "shared",
+  "means_pairs": 32,
+  "pairs_per_cell_q": 32,
+  "pairs_per_cell_k": 32,
+  "cells": 14400,
+  "layers_active": 30,
+  "steps_active": 20,
+  "scope": "Per layer-step-branch-head cell, pair-level masks over the 64 rotary pairs per head; damage pooled over the calibration prompts."
+}

@@ -1,0 +1,28 @@
+name: Notify Codex hand-offs
+
+on:
+  push:
+    branches: [claude/magical-goodall-dmq9i1]
+    paths:
+      - .handoff/to-codex.log
+      - .handoff/codex-bridge-test
+
+permissions:
+  contents: read
+
+jobs:
+  signal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+      - name: Send signed event to the outbound relay
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          CODEX_HANDOFF_SIGNING_KEY: ${{ secrets.CODEX_HANDOFF_SIGNING_KEY }}
+          CODEX_HANDOFF_RELAY_URL: ${{ secrets.CODEX_HANDOFF_RELAY_URL }}
+        run: python3 scripts/notify_codex_handoff.py

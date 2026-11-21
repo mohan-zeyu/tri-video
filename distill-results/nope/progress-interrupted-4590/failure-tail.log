@@ -1,0 +1,65 @@
+{"cfg": 0.04442120483145118, "feat": 0.12471040710806847, "grad_norm": 0.22740164399147034, "mu_norm_k": 12.760382652282715, "mu_norm_q": 12.316669464111328, "onpolicy": 0.0, "optimizer_step_seconds": 7.57022125646472, "vel_cond": 0.03127506608143449, "vel_uncond": 0.031526774168014526, "step": 4370, "lr_scale": 0.13862257246175813, "elapsed_s": 11222.6}
+{"cfg": 0.06349571933969855, "feat": 0.1160980612039566, "grad_norm": 0.929995596408844, "mu_norm_k": 12.760418891906738, "mu_norm_q": 12.316704750061035, "onpolicy": 0.0, "optimizer_step_seconds": 6.971964551601559, "vel_cond": 0.03268561419099569, "vel_uncond": 0.03278465638868511, "step": 4380, "lr_scale": 0.13742522797998277, "elapsed_s": 11293.3}
+{"cfg": 0.053373089991509914, "feat": 0.10344185773283243, "grad_norm": 1.1185849905014038, "mu_norm_k": 12.760454177856445, "mu_norm_q": 12.316737174987793, "onpolicy": 0.0, "optimizer_step_seconds": 7.003051612409763, "vel_cond": 0.024313227069796994, "vel_uncond": 0.024547361361328512, "step": 4390, "lr_scale": 0.1362459308552924, "elapsed_s": 11364.9}
+{"cfg": 0.059718343429267406, "feat": 0.1305318083614111, "grad_norm": 0.2978036403656006, "mu_norm_k": 12.760485649108887, "mu_norm_q": 12.316767692565918, "onpolicy": 0.0, "optimizer_step_seconds": 7.2504278409760445, "vel_cond": 0.041387684643268585, "vel_uncond": 0.04153782548382878, "step": 4400, "lr_scale": 0.1350847326739638, "elapsed_s": 11437.4}
+{"cfg": 0.06312941061332822, "feat": 0.1315322183072567, "grad_norm": 0.1741095334291458, "mu_norm_k": 12.760517120361328, "mu_norm_q": 12.316797256469727, "onpolicy": 0.0, "optimizer_step_seconds": 7.008475238457322, "vel_cond": 0.04340429790318012, "vel_uncond": 0.043926780577749014, "step": 4410, "lr_scale": 0.1339416842305671, "elapsed_s": 11509.4}
+{"cfg": 0.042616928461939096, "feat": 0.09111224301159382, "grad_norm": 4.9877166748046875, "mu_norm_k": 12.760549545288086, "mu_norm_q": 12.316827774047852, "onpolicy": 0.0, "optimizer_step_seconds": 6.980256106588058, "vel_cond": 0.012418312253430486, "vel_uncond": 0.012803207035176456, "step": 4420, "lr_scale": 0.13281683552574405, "elapsed_s": 11580.2}
+{"cfg": 0.035574985668063164, "feat": 0.10231663100421429, "grad_norm": 0.174599751830101, "mu_norm_k": 12.760580062866211, "mu_norm_q": 12.316858291625977, "onpolicy": 0.0, "optimizer_step_seconds": 6.970774658606388, "vel_cond": 0.02627869788557291, "vel_uncond": 0.026608798652887344, "step": 4430, "lr_scale": 0.13171023576402127, "elapsed_s": 11651.6}
+{"cfg": 0.06234170123934746, "feat": 0.1105774063616991, "grad_norm": 0.48237937688827515, "mu_norm_k": 12.760607719421387, "mu_norm_q": 12.31688404083252, "onpolicy": 0.0, "optimizer_step_seconds": 7.675921138026752, "vel_cond": 0.02303893049247563, "vel_uncond": 0.02285220054909587, "step": 4440, "lr_scale": 0.13062193335165703, "elapsed_s": 11723.0}
+{"cfg": 0.04583059577271342, "feat": 0.1016857959330082, "grad_norm": 1.132680892944336, "mu_norm_k": 12.760634422302246, "mu_norm_q": 12.316909790039062, "onpolicy": 0.0, "optimizer_step_seconds": 7.304313987493515, "vel_cond": 0.021311602904461324, "vel_uncond": 0.020460769708734006, "step": 4450, "lr_scale": 0.1295519758945246, "elapsed_s": 11793.6}
+{"cfg": 0.06114899646490812, "feat": 0.11310478672385216, "grad_norm": 0.7410013675689697, "mu_norm_k": 12.760662078857422, "mu_norm_q": 12.316937446594238, "onpolicy": 0.0, "optimizer_step_seconds": 7.008088617003523, "vel_cond": 0.031231575179845095, "vel_uncond": 0.03177469479851425, "step": 4460, "lr_scale": 0.12850041019602926, "elapsed_s": 11864.1}
+{"cfg": 0.14563086815178394, "feat": 0.11063115112483501, "grad_norm": 0.8320276737213135, "mu_norm_k": 12.76069450378418, "mu_norm_q": 12.31696891784668, "onpolicy": 0.0, "optimizer_step_seconds": 6.974521292024292, "vel_cond": 0.02772828098386526, "vel_uncond": 0.023513098247349262, "step": 4470, "lr_scale": 0.12746728225506115, "elapsed_s": 11935.1}
+{"cfg": 0.10340431611984968, "feat": 0.1109632384032011, "grad_norm": 6.183893203735352, "mu_norm_k": 12.760723114013672, "mu_norm_q": 12.316996574401855, "onpolicy": 0.0, "optimizer_step_seconds": 6.979928131448105, "vel_cond": 0.03130451403558254, "vel_uncond": 0.031227730214595795, "step": 4480, "lr_scale": 0.12645263726398348, "elapsed_s": 12005.7}
+{"cfg": 0.04967838525772095, "feat": 0.11055148206651211, "grad_norm": 1.8702147006988525, "mu_norm_k": 12.760750770568848, "mu_norm_q": 12.317025184631348, "onpolicy": 0.0, "optimizer_step_seconds": 7.018752770964056, "vel_cond": 0.025248774560168386, "vel_uncond": 0.02457092923577875, "step": 4490, "lr_scale": 0.12545651960665502, "elapsed_s": 12076.7}
+{"cfg": 0.07801873097196221, "feat": 0.10929995030164719, "grad_norm": 0.8092023134231567, "mu_norm_k": 12.76077938079834, "mu_norm_q": 12.31705093383789, "onpolicy": 0.0, "optimizer_step_seconds": 7.14109675202053, "vel_cond": 0.017784539377316833, "vel_uncond": 0.017491625156253576, "step": 4500, "lr_scale": 0.12447897285648907, "elapsed_s": 12148.1}
+VAL {"step": 4500, "mean_cond_uncond_guided": [0.0257085153090884, 0.025556623111333464, 0.05369807099923492]}
+{"cfg": 0.07743384875357151, "feat": 0.10882461257278919, "grad_norm": 0.7820353507995605, "mu_norm_k": 12.760809898376465, "mu_norm_q": 12.3170804977417, "onpolicy": 0.0, "optimizer_step_seconds": 7.218616201542318, "vel_cond": 0.023725470760837197, "vel_uncond": 0.023229878628626466, "step": 4510, "lr_scale": 0.12352003977454742, "elapsed_s": 12337.7}
+{"cfg": 0.05868465872481465, "feat": 0.1051440117880702, "grad_norm": 2.3358469009399414, "mu_norm_k": 12.760842323303223, "mu_norm_q": 12.31711196899414, "onpolicy": 0.0, "optimizer_step_seconds": 7.012353845522739, "vel_cond": 0.031972763244993985, "vel_uncond": 0.03096619641291909, "step": 4520, "lr_scale": 0.12257976230766943, "elapsed_s": 12408.4}
+{"cfg": 0.04732192447409034, "feat": 0.11907168477773666, "grad_norm": 0.41245660185813904, "mu_norm_k": 12.760872840881348, "mu_norm_q": 12.31714153289795, "onpolicy": 0.0, "optimizer_step_seconds": 7.357609057449736, "vel_cond": 0.028785754460841417, "vel_uncond": 0.028875167947262526, "step": 4530, "lr_scale": 0.12165818158663778, "elapsed_s": 12479.4}
+{"cfg": 0.048928297124803066, "feat": 0.12764594703912735, "grad_norm": 0.19564634561538696, "mu_norm_k": 12.760900497436523, "mu_norm_q": 12.317169189453125, "onpolicy": 0.0, "optimizer_step_seconds": 7.017589775961824, "vel_cond": 0.03497995808720589, "vel_uncond": 0.03509149746969342, "step": 4540, "lr_scale": 0.12075533792437847, "elapsed_s": 12549.9}
+{"cfg": 0.04568564426153898, "feat": 0.10211986117064953, "grad_norm": 0.545723021030426, "mu_norm_k": 12.760930061340332, "mu_norm_q": 12.317197799682617, "onpolicy": 0.0, "optimizer_step_seconds": 7.060369433951564, "vel_cond": 0.021820087742526084, "vel_uncond": 0.021721875062212348, "step": 4550, "lr_scale": 0.11987127081419831, "elapsed_s": 12621.1}
+{"cfg": 0.04625332821160555, "feat": 0.09845734853297472, "grad_norm": 1.6112406253814697, "mu_norm_k": 12.760960578918457, "mu_norm_q": 12.31722640991211, "onpolicy": 0.0, "optimizer_step_seconds": 6.990293656010181, "vel_cond": 0.020832386217080057, "vel_uncond": 0.020420548622496426, "step": 4560, "lr_scale": 0.11900601892805648, "elapsed_s": 12693.4}
+{"cfg": 0.04872048064135015, "feat": 0.10537722520530224, "grad_norm": 0.18891996145248413, "mu_norm_k": 12.760994911193848, "mu_norm_q": 12.317259788513184, "onpolicy": 0.0, "optimizer_step_seconds": 6.996666327002458, "vel_cond": 0.02993296890053898, "vel_uncond": 0.029564578784629703, "step": 4570, "lr_scale": 0.11815962011487362, "elapsed_s": 12765.2}
+{"cfg": 0.04105729050934315, "feat": 0.10715612396597862, "grad_norm": 8.388178825378418, "mu_norm_k": 12.761026382446289, "mu_norm_q": 12.317288398742676, "onpolicy": 0.0, "optimizer_step_seconds": 7.471975906984881, "vel_cond": 0.01990986173041165, "vel_uncond": 0.028464333154261112, "step": 4580, "lr_scale": 0.11733211139887587, "elapsed_s": 12836.5}
+{"cfg": 0.05086984019726515, "feat": 0.12192746624350548, "grad_norm": 0.5455885529518127, "mu_norm_k": 12.761054992675781, "mu_norm_q": 12.317317962646484, "onpolicy": 0.0, "optimizer_step_seconds": 6.979395443573594, "vel_cond": 0.03303832933306694, "vel_uncond": 0.03348976094275713, "step": 4590, "lr_scale": 0.11652352897797501, "elapsed_s": 12906.8}
+W1120 01:47:44.363000 2428097 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 2428186 closing signal SIGTERM
+E1120 01:47:47.385000 2428097 torch/distributed/elastic/multiprocessing/api.py:986] failed (exitcode: -9) local_rank: 0 (pid: 2428185) of binary: /dev/shm/tri-center-runtime/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/dev/shm/tri-center-runtime/lib/python3.12/site-packages/torch/distributed/run.py", line 994, in <module>
+    main()
+  File "/dev/shm/tri-center-runtime/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/dev/shm/tri-center-runtime/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/dev/shm/tri-center-runtime/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/dev/shm/tri-center-runtime/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/dev/shm/tri-center-runtime/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 317, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+=========================================================
+scripts/train_learned_center.py FAILED
+---------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-11-20_01:47:47
+  host      : node01
+  rank      : 1 (local_rank: 1)
+  exitcode  : -15 (pid: 2428186)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 2428186
+---------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-11-20_01:47:44
+  host      : node01
+  rank      : 0 (local_rank: 0)
+  exitcode  : -9 (pid: 2428185)
+  error_file: <N/A>
+  traceback : Signal 9 (SIGKILL) received by PID 2428185
+=========================================================

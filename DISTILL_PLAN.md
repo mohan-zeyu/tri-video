@@ -1,0 +1,381 @@
+# Distilling Wan2.1-T2V-1.3B into a "mean-vector" student
+
+Plan for the senior's proposal: a student with Wan's architecture in which the high-frequency third of the
+rotary pairs in every self-attention head is replaced by learned constant ("mean") vectors, one set per
+denoising step, trained by distillation from the frozen Wan teacher. All weights may be updated.
+
+Status: plan plus implementation. The code (section 11) is written and tested on CPU with a tiny random Wan,
+including the FSDP2 multi-process path; nothing has been run on the real model yet. Compute estimates are
+analytic and state their assumptions. Repo numbers carry their scope per `AGENTS.md`.
+
+Decisions taken (14 November): means per (step, CFG branch); full fine-tuning; layer 0 and denoising step 1
+exempt from the replacement by default; training prompts from the VBench suite plus OpenVid-1M captions
+(`configs/distill_prompts.json`); hardware is 7x RTX 5090 (32 GB each).
+
+## 1. The student, stated exactly
+
+Teacher T: `Wan-AI/Wan2.1-T2V-1.3B-Diffusers`, revision `0fad780a`, frozen. 30 blocks, 12 heads, 128 dims per
+head, 20 UniPC steps (flow_shift 3), CFG 5, empty negative prompt, 45 frames at 480×480 (12×30×30 = 10,800
+tokens). This is the configuration of every completed benchmark in the repo, so the student can be compared
+pair-wise with the existing baseline/all/high arms on the same 100 prompts and seeds.
+
+Student S: a copy of T with one change in every self-attention layer `l`, head `h`, denoising step `s` and
+CFG branch `b`:
+
+```
+q = norm_q(W_q x)   reshaped to [tokens, 12 heads, 128]          (normalized, pre-RoPE, as in the teacher)
+q[:, h, HIGH] = mu_q[l, s, b, h]                                  (44 coordinates, same for every token)
+k[:, h, HIGH] = mu_k[l, s, b, h]
+then native 3D RoPE and native attention on all 10,800 tokens, V untouched
+```
+
+- `HIGH` = the 44 coordinates of pairs t 0–7, h 22–28, w 43–49 (22 pairs), exactly the set used by the
+  repo's high-pair arm (`scripts/center_replacement.py: HIGH_PAIRS`).
+- `mu_q, mu_k`: fp32 parameters of shape `[30 layers, 20 steps, 2 branches, 12 heads, 44]` each.
+  That is 1,267,200 parameters in total, which is 0.1% of the 1.3B model.
+- "One mean per step" is taken literally: the step index `s` (1–20 of the fixed 20-step schedule) selects the
+  vector. The CFG branch index `b` is also included because the repo's calibration kept branches separate
+  (`handoff.md` §13) and it costs nothing. Sharing across branches is ablation A1.
+- Variant for schedule independence (optional, stage 2 onward): replace the step table by a 2-layer MLP from
+  Wan's timestep embedding to the 44 coordinates, initialized to reproduce the table. Use it only if the
+  student must run at other step counts.
+- What the change means mathematically: after RoPE, the 22 constant pairs contribute
+  `sum_f |mu_q,f||mu_k,f| cos(omega_f * delta_f + phi_f)` to every logit, a learned relative-position bias
+  `b_t(dt) + b_h(dh) + b_w(dw)` per (l, s, b, h). Content in those pairs is gone; the other 42 pairs and the
+  rest of the network must carry it. That is why every parameter is allowed to train.
+- Training-time implementation: literal substitution in the normalized Q/K, so the standard attention kernel
+  and the exact teacher numerics are reused. The Q/K projection columns for `HIGH` are still computed because
+  Wan's QK-RMSNorm statistics span all 1,536 dims. Dropping them, and the speed kernel that turns the constant
+  pairs into bias tables, is deployment work after the quality question is settled (section 9).
+
+Code: a `LearnedCenter` module attached to each block's `attn1`, with forward hooks on `norm_q`/`norm_k`
+outputs (the same hook points as `run_center_benchmark.Intervention`), and the current `(s, b)` set by the
+training loop. The existing branch check (`torch.equal` against the supplied embeddings) and the 120-hooks-per-step
+count check are kept.
+
+## 2. Data
+
+### Prompts
+
+- Training: at least 2,000 captions, text-disjoint from the 100 evaluation prompts in
+  `configs/center_benchmark_wan.json` and from the 4 calibration prompts p00–p03. Suggested sources: the
+  VBench prompt suite entries not drawn in the evaluation sample, plus OpenVid-1M or VidProM captions,
+  deduplicated by normalized text against the evaluation set.
+- Validation: 32 held-out training-distribution prompts (never trained on) for step-wise velocity error and
+  quick visual checks.
+- Evaluation: the existing 100 prompts and their seeds (section 8).
+
+### Teacher trajectories (off-policy states)
+
+For each training prompt `p` with seed `seed(p)` (deterministic, derived from the prompt id, independent
+across prompts):
+
+1. Encode the prompt once with umT5 (bf16); store the conditional and unconditional embeddings
+   (512×4096 bf16 each, 8 MB per prompt).
+2. Run the teacher's 20-step CFG-5 trajectory and store the latent entering every step, `x_s` for s = 1..20
+   (16×12×60×60 bf16 = 1.4 MB each, 28 MB per prompt; 56 GB for 2,000 prompts).
+3. Do not store teacher velocities; they are recomputed on the fly (so the same code serves on-policy states).
+
+Cost: 2,000 videos at the measured 15.4 s each (lab host, descriptive timing, `handoff.md` §13) on 7 GPUs
+is about 1.3 hours without VAE decode.
+
+### Calibration of the initial means (stage 0)
+
+On 64 training prompts, record at every (l, s, b, h) the fp32 mean over all 10,800 tokens of the normalized
+pre-RoPE Q and K restricted to `HIGH`, then average over the 64 prompts. This is the per-step analogue of
+`scripts/calibrate_wan_triattention.py`, which pooled all steps. Initialize `mu_q, mu_k` from it. Also store
+the per-prompt means to report their spread (cosine between per-prompt and pooled centers, per pair group),
+which the repo has never measured at full scale.
+
+## 3. Losses
+
+Notation: `v_T^b(x, s)` and `v_S^b(x, s)` are teacher and student velocity predictions (Wan predicts flow
+velocity) at latent `x`, step `s`, branch `b in {c, u}`. Norms are over all latent entries of one sample.
+`w = 5` is the guidance scale. Every term is a relative error so that all 20 steps weigh equally despite
+different velocity scales.
+
+```
+L_vel  = sum_{b in {c,u}} ||v_S^b - v_T^b||^2 / ||v_T^b||^2
+L_cfg  = ||vhat_S - vhat_T||^2 / ||vhat_T||^2,   vhat = v^u + w (v^c - v^u)
+L_feat = (1/5) sum_{l in {5,10,15,20,25}} ||h_S^l - h_T^l||^2 / ||h_T^l||^2     (residual stream after block l)
+L_attn = sum_l ||A_S^l(x_T^l) - A_T^l(x_T^l)||^2 / ||A_T^l(x_T^l)||^2           (stage 1 only; see below)
+
+Stage 2/3 objective:   L = L_vel + lambda_cfg L_cfg + lambda_feat L_feat
+                        lambda_cfg = 1.0,  lambda_feat = 0.1
+```
+
+Why each term:
+
+- `L_vel`: the direct distillation target for both branches.
+- `L_cfg`: the sampler uses `vhat`, which multiplies the branch difference by 5. Both earlier replacement
+  arms lost text-video consistency almost completely (0.233 → 0.043 / 0.030, 100-prompt arm means,
+  `handoff.md` §11), i.e. the conditional/unconditional *difference* is what broke. This term protects it.
+- `L_feat`: intermediate matching speeds up early training and keeps deep layers from drifting. Drop it
+  (set to 0) if validation `L_cfg` is not improved by it after stage 2; it is a convenience, not a necessity.
+- `L_attn` (stage 1): layer-local. Feed each block's attention module the *teacher's* input for that layer and
+  match the teacher's attention output. Every layer is independent, so one teacher forward yields 30 layers ×
+  2 branches of training signal, and only `mu` is trained. This is the cheapest direct test of "train the mean
+  vectors": if the means alone cannot bring per-layer error down, the rest of the network must do the work.
+
+Not used: losses through the full 20-step rollout (backprop through 40 forwards of a 1.3B model is not
+affordable and not needed), adversarial or DMD losses (the student keeps 20 steps; plain regression suffices).
+
+## 4. Training stages
+
+| Stage | Trainable | States | Optimizer steps | Batch (samples) | Purpose |
+|---|---|---|---|---|---|
+| 0 Calibrate | none | 64 teacher trajectories | – | – | initialize `mu` |
+| 1 Means only | `mu_q, mu_k` | teacher states, teacher layer inputs | 2,000 | 8 | test the senior's idea in isolation; good init |
+| 2 Off-policy | all weights + `mu` | teacher states | 5,000 | 8 | main distillation |
+| 3 On-policy | all weights + `mu` | 50% teacher states, 50% student states | 5,000 | 8 | fix compounding error |
+| 4 Deploy (optional) | all | as stage 3 | 2,000 | 8 | norm over kept dims only, dropped projections |
+
+One sample = one (prompt, step, both branches). Steps are sampled uniformly over 1–20 so that every per-step
+mean receives equal signal; re-weight toward steps whose validation error lags.
+
+### Stage 3: on-policy distillation
+
+The student will be run with its own sampler, so its errors accumulate across steps; training only on
+teacher states never shows it the states it actually visits (the training-free arm's collapse of dynamic
+degree to 0.04 is this effect at its worst). Procedure (student rollouts, teacher labels; no gradient through
+the sampler):
+
+1. Every 200 optimizer steps, generate 64 rollouts with the EMA student on fresh training prompts and fresh
+   seeds, full 20-step CFG-5 UniPC, and store all 20 entering latents per rollout (1,280 states).
+2. Keep a FIFO buffer of the most recent 10,000 student states.
+3. Each training batch draws half its samples from teacher trajectories and half from the buffer. In both
+   cases the target is the teacher's velocity at that state and step, so the loss is identical.
+4. Ramp the on-policy fraction from 0 to 0.5 over the first 1,000 steps of stage 3.
+
+Rollout cost: 64 rollouts × 40 forwards is about 15 s each on one GPU at the lab's measured speed, i.e. about
+2.5 minutes per refresh on 7 GPUs, 25 refreshes per stage.
+
+### Optimizer and precision
+
+| Item | Setting |
+|---|---|
+| `mu_q, mu_k` | Adam, lr 1e-3, no weight decay (stage 1); lr 2e-4 in stages 2–3 |
+| all other weights | AdamW, lr 1e-5, weight decay 0, betas (0.9, 0.99), 500-step warmup then cosine to 1e-6 |
+| precision | bf16 compute, fp32 master weights, fp32 loss |
+| gradient clip | 1.0 |
+| EMA | 0.999 on all trained parameters; EMA weights are used for rollouts and evaluation |
+| memory | gradient checkpointing per block; optimizer state sharded (FSDP/ZeRO-2) across GPUs |
+| CFG branches | run as a batch of 2 through the student and the teacher |
+
+Memory per GPU for full fine-tuning: about 2.6 GB bf16 weights + 2.6 GB grads + 15.6 GB fp32 master and
+Adam (before sharding), plus a few GB of activations with checkpointing at 10,800 tokens × 2 branches. Fits
+an 80 GB GPU unsharded; on 32 GB GPUs shard the optimizer state or use 8-bit Adam. If memory still binds,
+fall back to LoRA rank 64 on `to_q, to_k, to_v, to_out` and the FFN (lr 1e-4) and keep `mu` fully trainable.
+
+### Compute estimate
+
+Per sample: teacher forward 2 branches + student forward and backward 2 branches ≈ 400 TFLOP (forward ≈ 50
+TFLOP per branch at 10,800 tokens, analytic, 2 FLOPs per MAC, transformer blocks only). At an assumed 150
+TFLOP/s sustained per GPU, 7 GPUs process about 2.6 samples/s:
+
+- stage 1: 16,000 samples, but only means train and no backward through the network: under 1 hour;
+- stage 2: 40,000 samples, about 4.5 hours;
+- stage 3: 40,000 samples plus rollouts, about 5.5 hours;
+- data generation 1.3 hours; evaluation (300 videos + 7 VBench dimensions) about 3 hours.
+
+Roughly one day on 7 GPUs. Halve the throughput if the GPUs are consumer cards. The lab host's GPU model
+is not recorded in the repo; record it in the run metadata.
+
+## 5. Seeds
+
+- Teacher trajectories: one seed per training prompt, `seed(p) = sha256(prompt_id) mod 2^31`, fixed.
+- On-policy rollouts: `seed = base + refresh_index * 1000 + rollout_index`, never reused.
+- Training data order: seeded sampler, logged.
+- Evaluation: the 100 seeds already frozen in `configs/center_benchmark_wan.json`, so every arm is paired
+  with the existing baseline, all-pair and high-pair videos. Add a second seed per prompt for the final claim.
+
+## 6. Monitoring and gates
+
+Validation every 250 optimizer steps on the 32 held-out prompts, teacher states, both branches, all 20 steps:
+
+- `L_vel`, `L_cfg` per step (20 curves each); the per-step curves show whether a particular step's mean is
+  failing.
+- Same-seed agreement with the teacher: generate 8 validation videos with the EMA student and the teacher
+  from identical seeds; report latent relative error at the final step and PSNR/LPIPS on decoded frames.
+- `||mu||` per pair group over training. If the means shrink toward zero, the student has learned to
+  *delete* the pairs; compare with the deletion control (section 8) before claiming the mean matters.
+- Reference levels for `L_cfg` (measure once, before training): bf16-vs-fp32 teacher noise floor (harmless)
+  and the training-free high-pair replacement on the same states (known destructive, `handoff.md` §11).
+  The student's validation `L_cfg` should end much closer to the first than the second.
+
+Gates:
+
+- After stage 1: if trained means reduce the per-layer attention error by less than 20% relative to the
+  calibrated means, record it (the senior's idea in isolation does not suffice) and proceed to stage 2 anyway;
+  the rest of the network is allowed to adapt.
+- After stage 2: if validation `L_cfg` is not below half of the training-free reference, consider the
+  exemptions in section 7 before stage 3.
+- After stage 3: run the full evaluation.
+
+## 7. Ablations and exemptions, in priority order
+
+- A1 branch-shared means (`[30, 20, 12, 44]`) vs branch-specific.
+- A2 timestep-MLP means vs the step table.
+- A3 exempt layer 0 and step 1 (both behave differently in the repo's measurements: layer 0 low-K MRL rises
+  from 0.46–0.52 to 0.68–0.70 across denoising, 4 prompts × 12 heads; step 1→2 is the largest profile change).
+- A4 means only (stage 1 result carried to generation) vs full fine-tuning.
+- A5 replace the *low* third instead of the high third (constant low-frequency pairs are near-constant
+  logits, i.e. deletion), as a check that the high-frequency choice matters.
+
+## 8. Evaluation
+
+Arms, all on the 100 evaluation prompts with the frozen seeds, 45×480×480, 20 steps, CFG 5:
+
+1. Teacher baseline (already generated and verified; reuse).
+2. Training-free high-pair arm with current-token means (already generated; reuse).
+3. Static calibrated means, no training (stage 0 only).
+4. Student after stage 1 (means trained, network frozen).
+5. Student after stage 3 (full plan).
+6. Dense control: the teacher fine-tuned with exactly the stage 2–3 recipe but *without* the replacement.
+   This separates the effect of the architecture change from the effect of the distillation data and
+   training. Without it, a quality drop cannot be attributed.
+7. Deletion control: `HIGH` coordinates set to zero in Q and K, trained with the same recipe. If it matches
+   arm 5, the learned "mean" carries no information beyond removing the pairs.
+
+Metrics: the seven VBench dimensions with the repo's pinned evaluator and paired prompt bootstrap (10,000
+resamples, seed 20261109), reported with the same scopes as `handoff.md` §11; same-seed teacher agreement
+(final-latent relative error, frame PSNR/LPIPS); per-step validation velocity errors. Dynamic degree is
+reported but never interpreted alone.
+
+## 9. What this plan does not deliver
+
+- Speed. The student computes the same FLOPs as the teacher during training and in arms 3–7. The saving
+  (about 10% of block FLOPs at 10,800 tokens, about 13% at 32,760; analytic) needs a kernel that takes
+  84-dim Q/K plus three bias tables, and stage 4 to drop the projections and renormalize over kept dims.
+  Measure wall-clock only after that exists.
+- A guarantee of quality. The training-free arm's per-head attention error has a heavy tail (40–61 of 360
+  heads worse than a constant output at every measured step, one prompt, conditional branch, CPU pilot in
+  this project's scratch notes). Full fine-tuning may or may not absorb that. The gates and the dense control
+  make the outcome interpretable either way.
+
+## 10. Decisions and their consequences
+
+1. **Means per (step, branch).** `mu` has shape `[30, 20, 2, 12, 44]` per side. Branch-shared is ablation A1.
+2. **Full fine-tuning on 7x RTX 5090 (32 GB).** fp32 master weights, fp32 gradients and Adam state for 1.3B
+   parameters are about 21 GB before sharding, so the student is sharded with FSDP2 (per block, mixed
+   precision bf16 compute / fp32 reduce). Per GPU that leaves roughly 3 GB of sharded state, 2.6 GB for the
+   replicated bf16 teacher, the unsharded bf16 parameters of one block at a time, and activations for
+   10,800 tokens x 2 branches with gradient checkpointing. Expect under 20 GB per GPU; if not, lower
+   `--accum` has no effect on memory, so switch the FFN to LoRA (not implemented) or reduce to one branch per
+   sample. The 5090 is sm_120: FlashAttention-3 kernels are unavailable, PyTorch SDPA falls back to its
+   flash/efficient kernels, which is fine for training. Sustained bf16 throughput is unknown; assume about
+   100 TFLOP/s per GPU, so the section 4 estimate becomes about 1.5x longer (roughly 1.5-2 days for all stages).
+3. **Layer 0 and step 1 exempt.** Both are the regimes the repo's measurements single out (layer-0 drift over
+   denoising; largest profile change at step 1->2). The student still trains on step-1 states and layer-0
+   weights, so they stay consistent with the fine-tuned network; only the replacement is skipped there.
+   `--include-layer0 --include-step1` lift the exemptions (ablation A3).
+4. **Prompts.** `configs/distill_prompts.json`: 3,641 prompts = 1,641 VBench-suite prompts (short, object/scene
+   style) + 2,000 OpenVid-1M captions (long, descriptive; 8-120 words), all text-disjoint from the 100
+   evaluation prompts and p00-p03. 64 are calibration prompts (also trained on), 32 are validation (never
+   trained on). Selection seed 20261114; per-prompt seed = sha256(id) mod 2^31.
+5. **Timestep-MLP means (A2):** not implemented; the step table is the spec.
+
+## 11. Implementation and runbook
+
+Code on branch `claude/magical-goodall-dmq9i1`:
+
+| File | Role |
+|---|---|
+| `scripts/learned_center.py` | `LearnedCenter`: the per-(layer, step, branch, head) constants, hooks on `attn1.norm_q/norm_k`, modes mean/delete/off, exemptions, rollout branch/step inference |
+| `scripts/build_distill_prompts.py` | builds `configs/distill_prompts.json` from the VBench suite and OpenVid captions |
+| `scripts/dump_teacher_trajectories.py` | teacher trajectories (20 entering latents + embeddings per prompt) and the stage-0 calibration means |
+| `scripts/train_learned_center.py` | stages 1-3, FSDP2, EMA, validation, on-policy buffer, checkpoints, controls |
+| `scripts/generate_learned_center.py` | the evaluation arms in the `run_center_benchmark.py` layout |
+| `scripts/test_learned_center.py` | CPU tests (exactness vs `replace_with_center`, stages 1-3 end to end) |
+| `configs/learned_center_benchmark_wan.json` | the 100 evaluation prompts/seeds with the six arms |
+
+Tested on CPU: `python scripts/test_learned_center.py` (tiny random Wan, --no-fsdp) and the same tiny model
+under `torchrun --nproc_per_node 2` for stages 2 and 3 including save, resume and rollouts. Not tested: the
+real model, GPUs, NCCL, memory.
+
+Runbook on the lab host (`WAN_SNAPSHOT` set as for the earlier benchmarks; run from the repo root with the
+inference runtime that has torch >= 2.11, diffusers 0.42):
+
+```sh
+# 0. teacher trajectories + calibration (one worker per GPU; calib first so stage 1 can start early)
+for g in 0 1 2 3 4 5 6; do CUDA_VISIBLE_DEVICES=$g python scripts/dump_teacher_trajectories.py --split calib val & done; wait
+for g in 0 1 2 3 4 5 6; do CUDA_VISIBLE_DEVICES=$g python scripts/dump_teacher_trajectories.py --split train & done; wait
+# -> out/distill-traj-wan/<id>/..., out/distill-traj-wan/calibration.pt, calibration-spread.json
+
+# 1. means only, layer-local (teacher frozen)
+torchrun --nproc_per_node 7 scripts/train_learned_center.py --stage 1 --out out/distill-s1 --steps 2000 --lr-center 1e-3
+
+# 2. off-policy, full fine-tuning
+torchrun --nproc_per_node 7 scripts/train_learned_center.py --stage 2 --out out/distill-s2 --steps 5000 \
+    --init-student out/distill-s1/student
+
+# 3. on-policy
+torchrun --nproc_per_node 7 scripts/train_learned_center.py --stage 3 --out out/distill-s3 --steps 5000 \
+    --init-student out/distill-s2/student --rollout-every 200 --rollouts-per-rank 9
+
+# controls (same recipe): dense and deletion
+torchrun --nproc_per_node 7 scripts/train_learned_center.py --stage 2 --out out/distill-dense --steps 5000 --center-mode off
+torchrun --nproc_per_node 7 scripts/train_learned_center.py --stage 2 --out out/distill-delete --steps 5000 --center-mode delete
+
+# evaluation arms on the 100 benchmark prompts (one GPU per worker, as before)
+python scripts/generate_learned_center.py --config configs/learned_center_benchmark_wan.json --out out/learned-center-wan --arm baseline --link-baseline out/center-benchmark-wan-20261109
+python scripts/generate_learned_center.py --config configs/learned_center_benchmark_wan.json --out out/learned-center-wan --arm static --student out/distill-static --center-mode mean
+python scripts/generate_learned_center.py --config configs/learned_center_benchmark_wan.json --out out/learned-center-wan --arm student_s1 --student out/distill-s1/student
+python scripts/generate_learned_center.py --config configs/learned_center_benchmark_wan.json --out out/learned-center-wan --arm student --student out/distill-s3/student
+python scripts/generate_learned_center.py --config configs/learned_center_benchmark_wan.json --out out/learned-center-wan --arm dense_control --student out/distill-dense/student --center-mode off
+python scripts/generate_learned_center.py --config configs/learned_center_benchmark_wan.json --out out/learned-center-wan --arm deletion --student out/distill-delete/student --center-mode delete
+```
+
+The `static` arm needs a directory holding only `learned_center.pt` built from `calibration.pt`
+(`LearnedCenter().init_from_calibration(...)` then `torch.save({"state_dict": ..., "mode": "mean"}, ...)`).
+The VBench evaluator and summarizer (`evaluate_center_benchmark.py`, `summarize_center_benchmark.py`) read
+`config["modes"]`, but the summarizer still assumes 3 arms x 100 videos; it needs its 300-video constants
+generalized before use.
+
+Before the long runs: a one-GPU pilot of each stage with `--steps 20 --val-every 10 --save-every 20
+--no-fsdp` (or 2 GPUs with FSDP) to record peak memory, seconds per step and that the validation numbers
+are finite. Record `torch.cuda.get_device_name` and the SDPA backend in the run metadata.
+
+### Per-pair selection extension (16 November)
+
+`LearnedCenter` now takes per-cell boolean masks for Q and K over all 64 pairs (128-wide means; 44-wide
+checkpoints still load). `scripts/collect_pair_statistics.py` records per-pair means and energies on the
+calibration prompts, `scripts/select_pairs.py` ranks pairs by replacement damage and writes the `fixed_high`,
+`separate` and `shared` selections plus static exports, `scripts/screen_selections.py` measures them
+training-free on held-out states, and `train_learned_center.py --selection ... --variant ...` trains them.
+The procedure is in `DISTILL_SELECTION_PROMPT.md`.
+
+### Removal extension (17 November)
+
+The shared22 deletion control showed that post-norm zeros on the selected pairs match the learned means after the
+same fine-tuning, so the open question became whether the pairs can be removed *before* the norm, which is what
+deleting rows of `to_q`/`to_k` does. `LearnedCenter` narrow mode now takes the per-cell masks and the step exemption;
+`select_pairs.py` adds the step/branch-invariant `pooled` selection (the only kind a weight drop can realise);
+`screen_selections.py` screens `narrow` arms (`--all-steps` for the weight-removal scope). The procedure, training-free
+first and the matched 2,500-step fine-tune second, is in `DISTILL_REMOVAL_PROMPT.md`.
+
+### Content/position split extension (19 November)
+
+Every swap so far suggested that the untouched pairs still carried position through RoPE, so the constants were never
+the positional channel. `LearnedCenter` now takes a `mask_nope`: pairs that keep their content but receive no rotary
+embedding (the attention processor is wrapped, `NoPEProcessor`). The `split` selection puts learned means on the 42
+lowest-damage pairs and NoPE on the 22 highest, so the constants become the only positional signal (a per-head
+additive relative-position bias) and zeroing them removes position entirely. The procedure, training-free screen,
+5,000-step fine-tune, benchmark, zero swap and bias-table diagnostic, is in `DISTILL_NOPE_PROMPT.md`.
+
+### No-exemption run (20 November)
+
+Layer 0 and step 1 were exempt in every arm as first-run insurance; the no-exemption screen showed the cost on the
+selected pairs is small (0.037 → 0.041 guided). The user decided to lift the exemptions. `DISTILL_NOEXEMPT_PROMPT.md`
+repeats the shared22 means student with all 30 layers and 20 steps active (2,400 interventions per video), benchmarks
+it, and runs its fine-tune-then-drop swap.
+
+### Widened head (20 November)
+
+The senior's design, as clarified: per head, Q and K become 192 dims, the full 128-dim mean vector under normal RoPE
+(a content-free position channel over all 64 frequencies) concatenated with the 64 coordinates of the 32
+highest-damage pairs taken from the real projection without RoPE (a pure content channel); V, to_out and the
+1/sqrt(128) scale unchanged. `LearnedCenter(wide=True)` with `WideHeadProcessor` implements it functionally (the
+appended rows are gathered from the projection output, which equals copying those rows of to_q/to_k); the `wide`
+selection variant picks the content pairs. Mode `delete` zeroes the position channel. Nothing exempt. The procedure
+is in `DISTILL_WIDE_PROMPT.md`.

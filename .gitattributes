@@ -1,0 +1,2 @@
+# Hand-off logs are append-only; concurrent appends from two checkouts keep both lines.
+.handoff/*.log merge=union

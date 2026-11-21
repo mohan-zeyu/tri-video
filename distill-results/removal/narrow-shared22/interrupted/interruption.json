@@ -1,0 +1,12 @@
+{
+  "observed_at_singapore_time": "2026-11-18T02:16:05+08:00",
+  "root_rank": 0,
+  "signal": "SIGKILL",
+  "source_of_signal": null,
+  "peer_signal": "SIGTERM",
+  "last_logged_update": 1700,
+  "last_durable_ema_update": 1500,
+  "charged_gpu_seconds": 24920,
+  "logged_update_timing_samples": 171,
+  "median_optimizer_step_seconds": 6.934905828034971
+}

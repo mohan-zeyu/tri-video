@@ -1,0 +1,11 @@
+{
+  "all_layers_active": 30,
+  "all_steps_active": 20,
+  "cells": 14400,
+  "shared_q_k_pairs_per_cell": 22,
+  "nope_pairs": 0,
+  "selection_tensor_equal": true,
+  "expected_calls_per_video": 2400,
+  "complete_resume_step": 2500,
+  "scope": "All layer-step-CFG branch-head cells, post-full-width RMSNorm/pre-RoPE constants over all10800 video tokens; zero exemptions."
+}

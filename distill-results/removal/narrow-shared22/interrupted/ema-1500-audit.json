@@ -1,0 +1,1 @@
+{"ema_update": 1500, "variant": "shared", "mode": "narrow", "masks_match_original": true, "layer0_exempt": true, "step1_exempt": true, "tensor_entries": 825, "export_path": "out/distill-narrow-shared22/ema-checkpoints/step-001500", "optimizer_snapshot_present": false}
