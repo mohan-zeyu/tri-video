@@ -1276,3 +1276,57 @@ From teacher weights, original tuned shared22 recipe with --include-layer0 --inc
 ![Validation curve](distill-results/noexempt/training/validation-curve.png)
 
 Median logged rank-mean optimizer seconds/update: 6.911287, excluding validation/saves. Peak allocator bytes per reported invocation/rank and all arguments are in training/summary.json and args.json. Mean-norm drift: {"q": {"first": 12.271143913269043, "last": 12.27061653137207, "percent": -0.004297740297887209}, "k": {"first": 12.71428394317627, "last": 12.713732719421387, "percent": -0.004335468338967363}}; scope: Per-cell Euclidean norm over all128 stored mean coordinates, equal average over all14400 cells including unused coordinates; no token/prompt average at measurement time. Allocated A+B GPU-hours: 15.189086, including startup, validation, saves/I/O and all attempts. All historical outputs retained.
+
+
+### No-exemption C: s22_all_means, 100 prompts
+
+One original seed per each of100 original prompts;20 UniPC steps, shift3, CFG5, empty negative,45frames480x480 at16fps. Shared22 Q/K means/zeros after full-width RMSNorm before RoPE, all10800 tokens per active cell; all30layers and20steps active, no exemptions, no NoPE. All100 videos audited at2400 replacement calls each. VBench scores are equal prompt averages of original within-video aggregation: aesthetics/MUSIQ all45 frames, text-video eight midpoint frames, other dimensions original VBench handling. Imaging divided by100. Frozen teacher videos/scores reused, not regenerated. Intervals are pointwise95% from10000 paired prompt resamples, NumPy seed20261109, one fixed seed per prompt; no across-seed uncertainty.
+
+| Dimension | Candidate | Candidate minus references, mean [95% CI] |
+|---|---:|---|
+| subject_consistency | 0.964203 | s22_all_means_minus_baseline: +0.000204 [-0.005767, +0.005880]; s22_all_means_minus_dense_control: -0.000081 [-0.004010, +0.003926]; s22_all_means_minus_shared22: -0.003287 [-0.006891, +0.000131]; s22_all_means_minus_shared22_delete: -0.002150 [-0.005663, +0.001312] |
+| background_consistency | 0.977130 | s22_all_means_minus_baseline: +0.000664 [-0.002719, +0.003881]; s22_all_means_minus_dense_control: -0.000546 [-0.003169, +0.001892]; s22_all_means_minus_shared22: -0.001247 [-0.003821, +0.001264]; s22_all_means_minus_shared22_delete: -0.001204 [-0.003233, +0.000692] |
+| motion_smoothness | 0.986207 | s22_all_means_minus_baseline: +0.001745 [+0.000299, +0.003322]; s22_all_means_minus_dense_control: +0.000701 [-0.000860, +0.002473]; s22_all_means_minus_shared22: -0.000176 [-0.000862, +0.000493]; s22_all_means_minus_shared22_delete: -0.000127 [-0.000879, +0.000624] |
+| dynamic_degree | 0.270000 | s22_all_means_minus_baseline: -0.060000 [-0.140000, +0.020000]; s22_all_means_minus_dense_control: +0.020000 [-0.050000, +0.090000]; s22_all_means_minus_shared22: -0.010000 [-0.060000, +0.040000]; s22_all_means_minus_shared22_delete: +0.000000 [-0.050000, +0.050000] |
+| aesthetic_quality | 0.587182 | s22_all_means_minus_baseline: -0.001413 [-0.013543, +0.010953]; s22_all_means_minus_dense_control: +0.009119 [-0.001919, +0.020228]; s22_all_means_minus_shared22: +0.003686 [-0.007249, +0.014825]; s22_all_means_minus_shared22_delete: +0.009394 [+0.000182, +0.018940] |
+| imaging_quality | 0.671702 | s22_all_means_minus_baseline: +0.011022 [-0.006866, +0.028433]; s22_all_means_minus_dense_control: +0.001681 [-0.015285, +0.017837]; s22_all_means_minus_shared22: -0.007153 [-0.018713, +0.004116]; s22_all_means_minus_shared22_delete: -0.008489 [-0.019778, +0.002521] |
+| overall_consistency | 0.233914 | s22_all_means_minus_baseline: +0.001359 [-0.005146, +0.007986]; s22_all_means_minus_dense_control: -0.000450 [-0.006936, +0.005713]; s22_all_means_minus_shared22: -0.000134 [-0.005125, +0.005050]; s22_all_means_minus_shared22_delete: -0.000692 [-0.006004, +0.004455] |
+
+Paired differences versus exempted shared22 include zero for ['subject_consistency', 'background_consistency', 'motion_smoothness', 'dynamic_degree', 'aesthetic_quality', 'imaging_quality', 'overall_consistency']; exclude zero for []. This is detection on these100 prompt/seed pairs, not proof of equivalence.
+
+Teacher agreement: mean full-coordinate final-latent relative L2 0.563031 over100 final-state pairs (step20, no intermediate-step average); frame PSNR 14.254dB over4500 aligned decoded frames, all RGB pixels/channels per-frame then equal dB average.
+
+
+
+### No-exemption C: s22_all_zeros, 100 prompts
+
+One original seed per each of100 original prompts;20 UniPC steps, shift3, CFG5, empty negative,45frames480x480 at16fps. Shared22 Q/K means/zeros after full-width RMSNorm before RoPE, all10800 tokens per active cell; all30layers and20steps active, no exemptions, no NoPE. All100 videos audited at2400 replacement calls each. VBench scores are equal prompt averages of original within-video aggregation: aesthetics/MUSIQ all45 frames, text-video eight midpoint frames, other dimensions original VBench handling. Imaging divided by100. Frozen teacher videos/scores reused, not regenerated. Intervals are pointwise95% from10000 paired prompt resamples, NumPy seed20261109, one fixed seed per prompt; no across-seed uncertainty.
+
+| Dimension | Candidate | Candidate minus references, mean [95% CI] |
+|---|---:|---|
+| subject_consistency | 0.955522 | s22_all_zeros_minus_baseline: -0.008477 [-0.015773, -0.001639]; s22_all_zeros_minus_s22_all_means: -0.008681 [-0.015403, -0.003157]; s22_all_zeros_minus_s22_zeros: -0.003942 [-0.009757, +0.001392] |
+| background_consistency | 0.972344 | s22_all_zeros_minus_baseline: -0.004122 [-0.007377, -0.000982]; s22_all_zeros_minus_s22_all_means: -0.004786 [-0.007857, -0.002052]; s22_all_zeros_minus_s22_zeros: -0.002686 [-0.005185, -0.000378] |
+| motion_smoothness | 0.984424 | s22_all_zeros_minus_baseline: -0.000039 [-0.001544, +0.001579]; s22_all_zeros_minus_s22_all_means: -0.001784 [-0.002416, -0.001207]; s22_all_zeros_minus_s22_zeros: -0.000674 [-0.001470, +0.000082] |
+| dynamic_degree | 0.390000 | s22_all_zeros_minus_baseline: +0.060000 [-0.020000, +0.140000]; s22_all_zeros_minus_s22_all_means: +0.120000 [+0.060000, +0.190000]; s22_all_zeros_minus_s22_zeros: +0.070000 [+0.000000, +0.140000] |
+| aesthetic_quality | 0.578991 | s22_all_zeros_minus_baseline: -0.009604 [-0.023531, +0.004327]; s22_all_zeros_minus_s22_all_means: -0.008191 [-0.018619, +0.002252]; s22_all_zeros_minus_s22_zeros: +0.000068 [-0.011080, +0.011411] |
+| imaging_quality | 0.664556 | s22_all_zeros_minus_baseline: +0.003877 [-0.013585, +0.021320]; s22_all_zeros_minus_s22_all_means: -0.007145 [-0.018235, +0.003237]; s22_all_zeros_minus_s22_zeros: -0.004988 [-0.018429, +0.008360] |
+| overall_consistency | 0.236756 | s22_all_zeros_minus_baseline: +0.004201 [-0.002246, +0.010553]; s22_all_zeros_minus_s22_all_means: +0.002842 [-0.002622, +0.008456]; s22_all_zeros_minus_s22_zeros: +0.003174 [-0.001242, +0.007615] |
+
+This is an inference-only means-to-zeros swap on identical trained weights; interpret its paired changes dimension by dimension, not as a new zero-trained control.
+
+Teacher agreement: mean full-coordinate final-latent relative L2 0.562306 over100 final-state pairs (step20, no intermediate-step average); frame PSNR 14.284dB over4500 aligned decoded frames, all RGB pixels/channels per-frame then equal dB average.
+
+
+
+### No-exemption study complete
+
+All four swaps, each on100 original prompt/seed pairs with10000 paired prompt resamples seed20261109; decoded-video scores with within-video frame scopes stated above:
+
+| Swap | Aesthetics | Imaging | Text-video | Subject |
+|---|---:|---:|---:|---:|
+| Shared22 exempted | -0.004572 [-0.016253,+0.006629] | -0.009310 [-0.021441,+0.003594] | -0.000466 [-0.004960,+0.004237] | -0.008026 [-0.011886,-0.004642] |
+| Fixed high | -0.163339 [-0.182423,-0.144891] | -0.284466 [-0.314808,-0.253312] | -0.169008 [-0.183127,-0.154921] | -0.040046 [-0.048728,-0.031019] |
+| Split42 | +0.030776 [+0.017194,+0.044369] | -0.120718 [-0.150167,-0.091682] | -0.047353 [-0.057224,-0.037764] | -0.000305 [-0.008526,+0.007682] |
+| Shared22 no exemptions | -0.008191 [-0.018619,+0.002252] | -0.007145 [-0.018235,+0.003237] | +0.002842 [-0.002622,+0.008456] | -0.008681 [-0.015403,-0.003157] |
+
+Trained-student screen (32 prompts x20 teacher states, whole-latent ratios, both CFG branches combined at5): {"student/mean": [0.0023714893834039684, 0.002332464066830653, 0.019325562404992523], "student/delete": [0.003279625959294208, 0.0032788750341296692, 0.02113469421310583]}. Columns conditional/unconditional/guided. Total allocated study GPU-hours 16.853779/18 (cap raised from 13 by the user after the external SIGTERM). Full2500 optimizer/sampler/RNG/EMA state and all prior outputs preserved. Evidence under distill-results/noexempt/. No additional recipe or zeros-trained arm was run.
