@@ -1155,6 +1155,87 @@ The final EMA's three SHA-256 values were rechecked after both benchmarks and ma
 Open issues are the unresolved cause of the earlier rank-0 SIGKILL and the failure of this split42 recipe on free-generation video quality. Runtime recovery used the complete update-4,000 optimizer/sampler/RNG/EMA state and retained the original schedule through 5,000. No additional training or alternative split was run. The publication-only export-count audit was corrected to recognize that the trainer writes its final EMA to `student/`, with no duplicate `ema-checkpoints/step-005000/`; no model file was missing or changed.
 
 
+## Widened head: 128 means under RoPE + 32 unrotated content pairs
+
+Brief `DISTILL_WIDE_PROMPT.md`, run 20-21 November 2026 in lab checkout `tri-video-wide-67ed977` (pinned to 1359c17);
+full evidence, exact flags and runner sources in `distill-results/wide/` (its `README.md` has every table).
+
+**Architecture.** Per self-attention head, layer, denoising step and CFG branch, Q and K are widened to 192 dims:
+`[RoPE(mu) (128, constant over tokens) | the 32 highest-damage pairs' real post-QK-norm values (64, not rotated)]`,
+logit scale 1/sqrt(128), V and to_out unchanged. The first block is a content-free per-head relative-position bias
+over all 64 frequencies; the second is a pure content channel. Mode `delete` zeroes the position channel
+(content-only attention on the same student). **Nothing exempt:** all 30 layers and 20 steps, 2,400 replacement and
+1,200 processor calls per video, audited on every video.
+
+**Selection (A).** Selection v4 (`--pairs 22 --content-pairs 32 --include-layer0 --include-step1`, damage pooled over
+64 calibration prompts): shared masks tensor-equal to the original; 64 means pairs and exactly 32 content pairs in all
+14,400 cells; 49.8% of fixed-high pair slots fall in the content set, and the 22 split42 NoPE pairs are inside the
+32 in every cell.
+
+**Screens (B and E1).** Whole-latent relative squared velocity error vs the bf16 teacher, equal mean over 32
+held-out prompts x 20 teacher entering states, guided = both branches combined at CFG 5, nothing exempt:
+
+| Arm | Guided | Means |
+|---|---:|---|
+| shared/mean | 0.034431 | pooled calibration |
+| shared/delete | 0.039689 | — |
+| wide/mean | 0.151673 | pooled calibration |
+| wide/delete (content only) | 0.571677 | — |
+| wide32 student/mean | 0.031038 | trained EMA |
+| wide32 student/delete | 0.389783 | — |
+
+**Fine-tune (C).** Stage 2 from teacher weights, 5,000 updates, two ranks x accumulation 2, model lr 1e-5, means lr
+1e-3, EMA 0.999. Update-1,000 gate passed (guided 0.0449 <= 0.10, live weights, first 8 held-out prompts x 20 states,
+CFG 5); resumed from the complete update-1,000 save after the user raised the cap from 28 to 30 GPU-hours. Guided
+validation 0.1466 -> 0.0316 (min 0.0302 at 4,750), beside shared22 0.0301 -> 0.0207 and split42 0.440 -> 0.0536
+(both with layer 0 / step 1 exempt). Median 8.15 s per update (about 1.15x the shared22 recipe on the same GPUs),
+peak allocator 21.86 GiB per rank. Mean norms +0.30% (Q and K; live, all 14,400 cells, 128 coordinates).
+
+![Widened-head validation](distill-results/wide/training/validation-curve.png)
+
+**Videos (D and E2).** 100 original prompts, one fixed seed each, frozen protocol (20 UniPC steps, shift 3, CFG 5,
+empty negative, 45 frames at 480x480); VBench equal prompt means with VBench's own within-video aggregation
+(aesthetics and imaging all 45 frames, text-video eight midpoint frames). Paired mean [pointwise 95%, 10,000 prompt
+resamples, seed 20261109]:
+
+| Dimension | Teacher | wide32 | wide32_zeros | wide32 − shared22 | wide32 − split42 | wide32_zeros − wide32 |
+|---|---:|---:|---:|---|---|---|
+| Aesthetics | 0.5886 | 0.5323 | 0.3394 | -0.0512 [-0.0696, -0.0322] | +0.2328 [+0.2129, +0.2530] | -0.1929 [-0.2130, -0.1733] |
+| Imaging (/100) | 0.6607 | 0.6603 | 0.3463 | -0.0185 [-0.0387, +0.0015] | +0.1211 [+0.0998, +0.1424] | -0.3140 [-0.3423, -0.2846] |
+| Text-video | 0.2326 | 0.2147 | 0.0426 | -0.0193 [-0.0270, -0.0117] | +0.1106 [+0.0980, +0.1238] | -0.1721 [-0.1859, -0.1583] |
+| Subject | 0.9640 | 0.9589 | 0.9189 | -0.0086 [-0.0142, -0.0032] | +0.0242 [+0.0188, +0.0295] | -0.0400 [-0.0486, -0.0306] |
+| Background | 0.9765 | 0.9729 | 0.9602 | -0.0055 [-0.0092, -0.0020] | +0.0011 [-0.0024, +0.0046] | -0.0128 [-0.0183, -0.0070] |
+| Motion smoothness | 0.9845 | 0.9868 | 0.9832 | +0.0004 [-0.0006, +0.0015] | +0.0012 [+0.0000, +0.0023] | -0.0036 [-0.0065, -0.0006] |
+| Dynamic degree | 0.3300 | 0.2000 | 0.5100 | -0.0800 [-0.1500, -0.0100] | +0.1600 [+0.0900, +0.2300] | +0.3100 [+0.2100, +0.4200] |
+
+Final-latent relative L2 vs the teacher (step-20 state, all coordinates, prompt ratios averaged) / frame PSNR over all
+4,500 decoded frames: wide32 0.6344 / 13.257 dB, wide32_zeros 0.8613 / 11.181 dB (shared22 0.5591 / 14.194 dB,
+split42 0.6460 / 13.134 dB).
+
+**Swap table** (zeros minus each model's own trained-means videos, same prompts, seeds and statistics):
+
+| Swap | Aesthetics | Imaging | Text-video | Subject |
+|---|---|---|---|---|
+| Shared22 (layer 0 / step 1 exempt) | -0.0046 [-0.0163, +0.0066] | -0.0093 [-0.0214, +0.0036] | -0.0005 [-0.0050, +0.0042] | -0.0080 [-0.0119, -0.0046] |
+| Fixed high | -0.1633 [-0.1824, -0.1449] | -0.2845 [-0.3148, -0.2533] | -0.1690 [-0.1831, -0.1549] | -0.0400 [-0.0487, -0.0310] |
+| Split42 (layer 0 / step 1 exempt) | +0.0308 [+0.0172, +0.0444] | -0.1207 [-0.1502, -0.0917] | -0.0474 [-0.0572, -0.0378] | -0.0003 [-0.0085, +0.0077] |
+| wide32 (nothing exempt) | -0.1929 [-0.2130, -0.1733] | -0.3140 [-0.3423, -0.2846] | -0.1721 [-0.1859, -0.1583] | -0.0400 [-0.0486, -0.0306] |
+
+**Position bias (E3).** Trained vs calibration `position_bias_tables` for layers 5/15/25, steps 2/10/18, both branches,
+all heads (`distill-results/wide/bias-tables/`): the trained means drifted 2.40% (Q) / 2.21% (K) in relative L2
+(all cells and coordinates pooled), and the trained bias nearly overlays the calibration bias.
+
+![Widened-head position bias](distill-results/wide/bias-tables/trained-vs-calibration.png)
+
+**Verdict.** The widened student does not reach shared22 quality: on 100 videos it is 0.051 lower in aesthetics and
+0.019 lower in text-video than tuned shared22 (intervals exclude zero), although it is far better than split42 on every
+dimension and its imaging is level with the teacher. Zeroing its position channel, so that no layer has any
+positional input, is catastrophic and as severe as the fixed-high swap: position-blind attention fails, and the
+fine-tune-then-drop test fails for this architecture. The learned position channel stays close to its pooled-mean
+initialisation. The study allocated 27.334 GPU-hours of the approved 30 (B 0.611, C 24.855, D 0.725, E 1.143; wall
+time x GPUs including loading, validation, saves and scorers). No speed claims; no other content widths or a
+zeros-trained wide arm were run.
+
 ## Shared22 with nothing exempt
 
 CPU suite passed. A selects22 shared Q/K rotary pairs per all14400 layer-step-branch-head cells using existing64-prompt pooled statistics; constants are post-full-width RMSNorm/pre-RoPE, identical across all10800 video tokens in each cell. No exempt layer or step. No masks or calibration outputs overwritten.

@@ -636,6 +636,20 @@ NoPE phase E completed: `split42_zeros`, 100 original prompt/seed videos, 20-ste
 CURRENT NoPE STATE: A–E complete; no study GPU jobs remain. C recovered the update-4,000 full optimizer/sampler/Torch CPU+CUDA RNG/EMA checkpoint and completed the original 5,000-update recipe. Final EMA and full resumable state are preserved at `out/distill-split42/student/` and `out/distill-split42/checkpoint/step-005000/` in `/mnt/data/liuzeyu/tri-video-nope-2979d3e`; nine earlier canonical EMA milestones and the interrupted 4,500 EMA archive remain intact. EMA hashes were unchanged after both benchmarks. Total study use 28.541502/30 approved GPU-hours, including every failed/replayed attempt and all B/D/E GPU work; CPU tests/statistics/diagnostics/agreement excluded. Both 100-prompt original-seed cohorts and all seven VBench dimensions are audited. Means/zeros aesthetics are 0.299507/0.330283, imaging 0.539214/0.418496 and text–video 0.104073/0.056721, equal prompt means over 100 videos with 45 frames for the first two and eight midpoint frames for text–video. Zero-minus-means paired intervals (10000 prompt resamples, seed20261109) are +0.030776 [0.017194,0.044369] aesthetics, −0.120718 [−0.150167,−0.091682] imaging and −0.047353 [−0.057224,−0.037764] text–video. The split42 means arm already fails teacher/dense/shared22/deletion comparisons, so the result is mixed additional degradation, not a clean uniform collapse from a good baseline. Native layer0 and first-step RoPE remain. E's 32-prompt ×20-state whole-latent guided errors are 0.059897 means and 0.101854 zeros, both branches at CFG5; the same first eight prompts give EMA0.054257 versus live-C0.053630. All 18 CPU bias-table contexts and individual-head figure are committed; selected-coordinate parameter relative L2 drift is Q0.061294/K0.065904 over all 1,110,816 active selected coordinates per side, without token averages. Evidence: `distill-results/nope/`. The SIGKILL cause and poor free-generation quality remain unresolved; no further recipe was tried. Protected studies unchanged.
 
 
+### Widened head (wide32), 20-21 November 2026
+
+Complete (A-E) per `DISTILL_WIDE_PROMPT.md`; report section "Widened head: 128 means under RoPE + 32 unrotated
+content pairs" in `DISTILL_REPORT.md`, evidence in `distill-results/wide/`. Lab root
+`/mnt/data/liuzeyu/tri-video-wide-67ed977` (pinned 1359c17): selection `out/distill-selection-v4/`, training
+`out/distill-wide32/` (final EMA `student/`, complete resume state `checkpoint/step-005000/`, EMA exports every 500),
+videos `out/learned-center-wan-wide32[-zeros]/`, runner logs `out/distill-wide-run/`. Headline: wide32 is far better
+than split42 but below shared22 on 100 videos (aesthetics -0.051, text-video -0.019); zeroing its position channel is
+catastrophic (aesthetics -0.193, imaging -0.314 vs wide32). 27.334 of 30 approved GPU-hours. Also fixed a SyntaxError
+in `generate_learned_center.py` (1359c17). During C the concurrent no-exemption training was SIGTERMed externally,
+30 s into wide32's update-1,000 full save (likely earlyoom, unconfirmed); it was resumed under a user-approved 18
+GPU-hour cap and reports separately. Open: other content widths and a zeros-trained wide arm (need approval);
+`memlog.sh` (passive, read-only) still logs host memory in the run directory.
+
 ## Shared22 with nothing exempt
 
 CPU suite passed. A selects22 shared Q/K rotary pairs per all14400 layer-step-branch-head cells using existing64-prompt pooled statistics; constants are post-full-width RMSNorm/pre-RoPE, identical across all10800 video tokens in each cell. No exempt layer or step. No masks or calibration outputs overwritten.

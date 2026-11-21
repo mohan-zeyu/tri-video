@@ -1,0 +1,27 @@
+WAITING FOR IDLE GPU ['D-encoder-False']
+START D-encoder-False GPU=2 pid=2753418
+EXIT D-encoder-False GPU=2 seconds=130.2 status=0
+WAITING FOR IDLE GPU ['D-encoder-True']
+START D-encoder-True GPU=2 pid=2760519
+EXIT D-encoder-True GPU=2 seconds=36.2 status=0
+WAITING FOR IDLE GPU ['D-render-0', 'D-render-1']
+START D-render-0 GPU=2 pid=2764373
+START D-render-1 GPU=3 pid=2764393
+EXIT D-render-0 GPU=2 seconds=928.5 status=0
+EXIT D-render-1 GPU=3 seconds=942.4 status=0
+WAITING FOR IDLE GPU ['D-overall_consistency', 'D-aesthetic_quality', 'D-imaging_quality', 'D-dynamic_degree', 'D-subject_consistency', 'D-background_consistency', 'D-motion_smoothness']
+START D-overall_consistency GPU=2 pid=2800726
+START D-aesthetic_quality GPU=3 pid=2800731
+EXIT D-overall_consistency GPU=2 seconds=82.3 status=0
+START D-imaging_quality GPU=2 pid=2803312
+EXIT D-aesthetic_quality GPU=3 seconds=91.2 status=0
+START D-dynamic_degree GPU=3 pid=2803900
+EXIT D-imaging_quality GPU=2 seconds=94.8 status=0
+START D-subject_consistency GPU=2 pid=2818028
+EXIT D-dynamic_degree GPU=3 seconds=107.9 status=0
+START D-background_consistency GPU=3 pid=2821710
+EXIT D-subject_consistency GPU=2 seconds=77.4 status=0
+START D-motion_smoothness GPU=2 pid=2823504
+EXIT D-background_consistency GPU=3 seconds=57.5 status=0
+EXIT D-motion_smoothness GPU=2 seconds=62.2 status=0
+D COMPLETE 2610.475 GPU seconds

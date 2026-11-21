@@ -1,0 +1,9 @@
+{
+  "approved_gpu_hours_total": 18,
+  "source": "User-assigned brief 6f273d8, explicitly instructed to carry out by user in lab chat; return after verifying the run works to conserve credits.",
+  "recipe_changes_approved": false,
+  "max_training_gpus": 2,
+  "max_total_gpus": 4,
+  "previous_approved_gpu_hours_total": 13,
+  "raise": "User approved on 21 Nov 2026 in the Claude Code session adopting this study: resume B from the complete update-1000 save (exact recipe + --resume, new attempt name) after train-b01 was SIGTERMed externally at update ~1880, then the unchanged C; ASK again before 18 GPU-hours."
+}
