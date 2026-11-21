@@ -6156,6 +6156,6 @@
     "omitted_fields": [
       "config.model"
     ],
-    "selection_note": "Legacy high_pairs field unused; the actual masks (64 means pairs, 32 content pairs per cell, widened head) come from the final EMA learned_center.pt and selection-records.json. No exempt layers or steps."
+    "selection_note": "Widened head: 64 means pairs (full 128-dim constant under RoPE) + 32 unrotated content pairs per cell from the final EMA; legacy high_pairs field unused. No exempt layers or steps."
   }
 }
