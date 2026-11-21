@@ -147,3 +147,58 @@ processes of up to about 54 GB RSS. On the user's approval the no-exemption stud
 update-1,000 save as `train-b02` (exact recipe + `--resume`) under a cap raised from 13 to 18 GPU-hours, with a
 continuation runner derived from its original supervisor by asserted substitutions
 (`../noexempt/runner-resume/`).
+
+
+## D. Benchmark: wide32 (final EMA, position channel active), 100 prompts
+
+Frozen benchmark protocol: one original seed for each of the 100 original prompts; 20 UniPC steps, shift 3, CFG 5,
+empty negative conditioning, 45 frames at 480x480, 16 fps, bf16 transformer, fp32 tiled VAE. Widened head in all
+30 layers and 20 steps, nothing exempt. All 100 videos audited (`selection-records.json`): 2,400 replacement
+calls and 1,200 widened-head processor calls each, 64 means pairs and 32 content pairs per cell, `wide_head` true,
+center SHA-256 equal to the final EMA. Text encoder: resident and offloaded encoders gave identical final latents
+and MP4 on prompt v000 (`encoder-parity.json`). Frozen teacher videos and scores reused, not regenerated.
+
+VBench scores (`summary.json`): equal averages over the 100 prompts of each video's own VBench aggregate.
+Aesthetics and imaging (MUSIQ, /100) use all 45 frames; text-video (`overall_consistency`) eight midpoint frames;
+the other dimensions VBench's own handling; `dynamic_degree` is the fraction of videos judged dynamic. Reference
+columns are the audited summaries of the same prompts/seeds/teacher checksums/scorer revision; the tuned shared22,
+shared22 deletion and split42 arms had layer 0 / step 1 exempt.
+
+| Dimension | Teacher | Dense control | shared22 | shared22 deletion | split42 | **wide32** |
+|---|---:|---:|---:|---:|---:|---:|
+| aesthetic_quality | 0.588595 | 0.578063 | 0.583495 | 0.577787 | 0.299507 | **0.532274** |
+| imaging_quality | 0.660679 | 0.670020 | 0.678854 | 0.680191 | 0.539214 | **0.660333** |
+| overall_consistency | 0.232555 | 0.234363 | 0.234047 | 0.234605 | 0.104073 | **0.214718** |
+| subject_consistency | 0.963999 | 0.964285 | 0.967490 | 0.966353 | 0.934688 | **0.958884** |
+| background_consistency | 0.976466 | 0.977676 | 0.978377 | 0.978334 | 0.971790 | **0.972926** |
+| motion_smoothness | 0.984463 | 0.985506 | 0.986384 | 0.986335 | 0.985618 | **0.986772** |
+| dynamic_degree | 0.330000 | 0.250000 | 0.280000 | 0.270000 | 0.040000 | **0.200000** |
+
+Paired differences (`paired-comparisons.json`): wide32 minus reference, mean over the 100 prompt pairs with pointwise
+95% intervals from 10,000 paired prompt resamples (NumPy seed 20261109); one fixed seed per prompt, so no
+across-seed uncertainty.
+
+| Dimension | − teacher | − dense | − shared22 | − shared22 deletion | − split42 |
+|---|---|---|---|---|---|
+| aesthetic_quality | -0.0563 [-0.0736, -0.0391] | -0.0458 [-0.0608, -0.0307] | -0.0512 [-0.0696, -0.0322] | -0.0455 [-0.0633, -0.0275] | +0.2328 [+0.2129, +0.2530] |
+| imaging_quality | -0.0003 [-0.0189, +0.0177] | -0.0097 [-0.0270, +0.0063] | -0.0185 [-0.0387, +0.0015] | -0.0199 [-0.0373, -0.0034] | +0.1211 [+0.0998, +0.1424] |
+| overall_consistency | -0.0178 [-0.0260, -0.0096] | -0.0196 [-0.0279, -0.0114] | -0.0193 [-0.0270, -0.0117] | -0.0199 [-0.0272, -0.0126] | +0.1106 [+0.0980, +0.1238] |
+| subject_consistency | -0.0051 [-0.0118, +0.0018] | -0.0054 [-0.0104, -0.0004] | -0.0086 [-0.0142, -0.0032] | -0.0075 [-0.0136, -0.0011] | +0.0242 [+0.0188, +0.0295] |
+| background_consistency | -0.0035 [-0.0068, -0.0002] | -0.0048 [-0.0074, -0.0022] | -0.0055 [-0.0092, -0.0020] | -0.0054 [-0.0085, -0.0025] | +0.0011 [-0.0024, +0.0046] |
+| motion_smoothness | +0.0023 [+0.0006, +0.0042] | +0.0013 [-0.0004, +0.0033] | +0.0004 [-0.0006, +0.0015] | +0.0004 [-0.0006, +0.0015] | +0.0012 [+0.0000, +0.0023] |
+| dynamic_degree | -0.1300 [-0.2200, -0.0400] | -0.0500 [-0.1300, +0.0200] | -0.0800 [-0.1500, -0.0100] | -0.0700 [-0.1400, +0.0000] | +0.1600 [+0.0900, +0.2300] |
+
+Teacher agreement (`agreement/`): mean final-latent relative L2 0.6344 (all
+coordinates of the step-20 final latent per prompt, ratio averaged over 100 prompts; not an intermediate-step
+average); mean frame PSNR 13.257 dB over 4,500 aligned decoded frames (per-frame dB,
+all RGB pixels, equal average). For reference shared22 0.5591 / 14.194 dB, shared22 deletion 0.5718 / 14.006 dB.
+
+Reading: the widened student is far better than split42 on every dimension (aesthetics +0.233, imaging +0.121,
+text-video +0.111), so a full-width position channel plus a 32-pair content channel trains much better than the
+42/22 split. It does **not** reach shared22 quality: aesthetics is 0.051 below tuned shared22 and 0.056 below the
+teacher, text-video 0.019 below shared22, and subject/background consistency and dynamic degree are lower; all of
+these intervals exclude zero. Imaging is level with the teacher (interval includes zero) and motion smoothness is
+slightly higher. These are detections on these 100 prompt/seed pairs, not proofs of equivalence.
+
+D allocated 2610.5 GPU-seconds (parity, rendering, seven scorers); study total after D
+26.191 GPU-hours of 30.
