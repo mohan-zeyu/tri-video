@@ -65,5 +65,85 @@ the widened head with pooled means is about 4.4x the shared22 guided error. Zero
 attention on 32 unrotated pairs) is far worse at 0.572, above split42's training-free start of 0.44 (different
 architecture and scope).
 
-`supervisor.py` and `gpu-worker.py` are the exact lab runner sources for B/C (idle-GPU leases on GPUs 2 and 3 only;
+`runner/` holds the exact lab runner sources for B-E (supervisor.py, supervisor-c2.py, de-runner.py, benchmark.py) (training leased idle GPUs 2 and 3 only; D/E benchmarks lease idle GPUs in order 2, 3, 1, 6, 0, 5;
 GPUs 1/6 belong to the running no-exemption study, GPU 4 is excluded).
+
+
+## C. Fine-tune: 5,000 updates, two ranks x accumulation 2
+
+Exact brief recipe (`training/args.json`, `train-c0*-request.json`): Stage 2 from teacher weights, `--variant wide`,
+pooled calibration means as initialisation, model lr 1e-5, means lr 1e-3, warmup 250, lambda_cfg 1.0, lambda_feat 0.1,
+EMA 0.999, clip 1.0, seed 20261114, `--include-layer0 --include-step1`, full resumable saves every 1,000 updates,
+EMA exports every 500. Two invocations of the same recipe:
+
+- `train-c01`: teacher weights to update 1,000 with `--stop-after 1000` (keeps the full-run LR schedule) so the
+  brief's gate could be applied before more GPU time was spent. Gate (`gate-1000.json`): guided validation
+  0.044856 <= 0.10, **passed**. Projected study total at the 28 GPU-hour cap was 28.54, so the runner stopped
+  there (ASK); the user raised the cap to 30 GPU-hours (`budget-approval.json`).
+- `train-c02`: `--resume` from the complete update-1,000 optimizer/model/EMA/sampler/RNG save to update 5,000.
+  No interruptions, no failures.
+
+All logged losses and validations finite. History steps unique and ordered.
+
+Validation (`validation.jsonl`): live student weights; whole-latent relative squared velocity error vs the bf16
+teacher, equal mean over the first 8 held-out prompts x 20 teacher entering states; conditional, unconditional
+and guided (both branches combined at CFG 5); nothing exempt.
+
+| Update | Conditional | Unconditional | Guided |
+|---:|---:|---:|---:|
+| 0 | 0.050563 | 0.048541 | 0.146573 |
+| 250 | 0.015470 | 0.015812 | 0.053977 |
+| 500 | 0.013743 | 0.013364 | 0.048481 |
+| 750 | 0.013129 | 0.012565 | 0.046039 |
+| 1000 | 0.011984 | 0.011770 | 0.044856 |
+| 1250 | 0.010328 | 0.010135 | 0.039935 |
+| 1500 | 0.009670 | 0.009874 | 0.040851 |
+| 1750 | 0.009880 | 0.010043 | 0.039678 |
+| 2000 | 0.009178 | 0.008966 | 0.037290 |
+| 2250 | 0.009426 | 0.009374 | 0.039115 |
+| 2500 | 0.008446 | 0.008065 | 0.038545 |
+| 2750 | 0.008595 | 0.008635 | 0.038153 |
+| 3000 | 0.007617 | 0.007874 | 0.036000 |
+| 3250 | 0.007347 | 0.007300 | 0.036409 |
+| 3500 | 0.007582 | 0.007634 | 0.034893 |
+| 3750 | 0.006893 | 0.006615 | 0.034582 |
+| 4000 | 0.006948 | 0.006305 | 0.034319 |
+| 4250 | 0.006566 | 0.006279 | 0.032763 |
+| 4500 | 0.006459 | 0.006081 | 0.031158 |
+| 4750 | 0.006228 | 0.005876 | 0.030207 |
+| 5000 | 0.006318 | 0.005887 | 0.031561 |
+
+![Validation curve](training/validation-curve.png)
+
+Reference curves on the same 8-prompt scope (layer 0 / step 1 exempt in both): tuned shared22 0.0301 -> 0.0207 at
+2,500; split42 (NoPE) 0.440 -> 0.0536 at 5,000. The no-exemption shared22 run (interrupted, see below) reached
+0.0225 at update 1,750 from 0.0319. wide32 ends at 0.0316 (minimum 0.0302 at 4,750): it starts 3x lower than split42
+and ends 1.7x lower, but stays above both shared22 curves on this cached-state scope.
+
+- Median rank-mean optimizer seconds per update: 8.1521 (logged
+  updates, excluding validation and checkpoint I/O; the no-exemption shared22 recipe logs about 6.9-7.2 s on the
+  same GPUs, so about 1.15x).
+- Peak allocator memory: 21.86 GiB on each rank in both invocations (`torch.cuda.max_memory_allocated`; nvidia-smi
+  showed about 28.2 GB in use on each GPU during c02, including allocator cache).
+- Mean-norm drift (`mu_norm_q/k`: live per-cell Euclidean norm over all 128 coordinates, equal average over all
+  14,400 cells, update 10 -> 5,000): Q 12.2711 -> 12.3083 (+0.30%), K 12.7143 -> 12.7520 (+0.30%). Despite lr
+  1e-3 the average norm barely moved; direction changes are measured by the E bias tables (relative L2 drift).
+- Mask/width audit of the saved final EMA (`mask-width-audit.json`): `wide` True, 64 means pairs and 32 content
+  pairs in every one of the 14,400 cells, masks tensor-equal to selection v4, no exempt layers or steps; complete
+  resume state at update 5,000. Final EMA SHA-256 in `final-ema.sha256`.
+- Allocated GPU-seconds (wall x 2 GPUs, including loading, validation and saves): c01 17949,
+  c02 71527; A-C total 25.466 GPU-hours of 30.
+
+## Concurrent no-exemption study: interruption and resume
+
+At 00:47:51 on 21 Nov the no-exemption shared22 training (`train-b01`, GPUs 1/6) received an external SIGTERM on
+rank 0 at about update 1,880, below its wall limit; its supervisor stopped and handed off `interrupted`
+(aa686f5). Likely sender: the host's earlyoom daemon (SIGTERM when available memory < 10% with swap already
+full), unconfirmed because the system journal is not readable. The kill came 30 s into wide32's update-1,000
+full optimizer-state save (EMA export written at 1795193240, kill at 1795193271 epoch seconds), so that save's host-memory
+use is a plausible contributor; the wide ranks reached about 34 GB RSS during later saves. A passive memory log of this study (`runner/memlog.sh`, 10 s samples over about 10 hours)
+afterwards recorded a minimum of 29.6 GB available (never below the 10% trigger), the dips driven by other users'
+processes of up to about 54 GB RSS. On the user's approval the no-exemption study was resumed from its complete
+update-1,000 save as `train-b02` (exact recipe + `--resume`) under a cap raised from 13 to 18 GPU-hours, with a
+continuation runner derived from its original supervisor by asserted substitutions
+(`../noexempt/runner-resume/`).
