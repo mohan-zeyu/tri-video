@@ -191,7 +191,8 @@ across-seed uncertainty.
 Teacher agreement (`agreement/`): mean final-latent relative L2 0.6344 (all
 coordinates of the step-20 final latent per prompt, ratio averaged over 100 prompts; not an intermediate-step
 average); mean frame PSNR 13.257 dB over 4,500 aligned decoded frames (per-frame dB,
-all RGB pixels, equal average). For reference shared22 0.5591 / 14.194 dB, shared22 deletion 0.5718 / 14.006 dB.
+all RGB pixels, equal average). For reference shared22 0.5591 / 14.194 dB, shared22 deletion 0.5718 / 14.006 dB, dense control
+0.5663 / 14.202 dB, split42 0.6460 / 13.134 dB: wide32's final-latent agreement is close to split42's, not shared22's.
 
 Reading: the widened student is far better than split42 on every dimension (aesthetics +0.233, imaging +0.121,
 text-video +0.111), so a full-width position channel plus a 32-pair content channel trains much better than the
@@ -202,54 +203,3 @@ slightly higher. These are detections on these 100 prompt/seed pairs, not proofs
 
 D allocated 2610.5 GPU-seconds (parity, rendering, seven scorers); study total after D
 26.191 GPU-hours of 30.
-
-
-## D. 100-prompt benchmark, arm `wide32` (0.725 allocated GPU-hours: parity, two render workers, seven scorers)
-
-`generate_learned_center.py --center-mode mean --student out/distill-wide32/student`, frozen benchmark protocol: one
-original seed for each of the 100 original prompts, 20 UniPC steps, shift 3, CFG 5, empty negative, 45 frames at
-480x480, 16 fps, bf16 transformer, fp32 tiled VAE. Teacher videos and scores are the frozen benchmark (hard-linked
-and reused, never regenerated). Every one of the 100 records audited (`selection-records.json`): 2,400 replacement
-calls and 1,200 widened-head processor calls, `wide_head` true, 32 content pairs, 64 means pairs on Q and K, no
-exempt layers or steps, final EMA SHA-256 matched. Resident and offloaded text encoders give identical final latents
-and MP4 on v000 (`encoder-parity.json`).
-
-VBench scores: equal prompt averages of VBench's within-video aggregation (aesthetics and imaging over all 45 frames,
-text-video on eight midpoint frames, the others per VBench); imaging divided by 100.
-
-| Dimension | Teacher | wide32 | shared22 (exempt) | split42 |
-|---|---:|---:|---:|---:|
-| Aesthetics | 0.5886 | 0.5323 | 0.5835 | 0.2995 |
-| Imaging (/100) | 0.6607 | 0.6603 | 0.6789 | 0.5392 |
-| Text-video | 0.2326 | 0.2147 | 0.2340 | 0.1041 |
-| Subject | 0.9640 | 0.9589 | 0.9675 | 0.9347 |
-| Background | 0.9765 | 0.9729 | 0.9784 | 0.9718 |
-| Motion smoothness | 0.9845 | 0.9868 | 0.9864 | 0.9856 |
-| Dynamic degree | 0.3300 | 0.2000 | 0.2800 | 0.0400 |
-
-Paired differences, wide32 minus each reference: mean [pointwise 95% interval] from 10,000 paired prompt resamples,
-NumPy seed 20261109; one fixed seed per prompt, so no across-seed uncertainty. shared22, shared22 deletion and split42
-had layer 0 / step 1 exempt; wide32 has nothing exempt.
-
-| Dimension | minus teacher | minus dense | minus shared22 | minus shared22 deletion | minus split42 |
-|---|---|---|---|---|---|
-| Aesthetics | -0.0563 [-0.0736, -0.0391] | -0.0458 [-0.0608, -0.0307] | -0.0512 [-0.0696, -0.0322] | -0.0455 [-0.0633, -0.0275] | +0.2328 [+0.2129, +0.2530] |
-| Imaging (/100) | -0.0003 [-0.0189, +0.0177] | -0.0097 [-0.0270, +0.0063] | -0.0185 [-0.0387, +0.0015] | -0.0199 [-0.0373, -0.0034] | +0.1211 [+0.0998, +0.1424] |
-| Text-video | -0.0178 [-0.0260, -0.0096] | -0.0196 [-0.0279, -0.0114] | -0.0193 [-0.0270, -0.0117] | -0.0199 [-0.0272, -0.0126] | +0.1106 [+0.0980, +0.1238] |
-| Subject | -0.0051 [-0.0118, +0.0018] | -0.0054 [-0.0104, -0.0004] | -0.0086 [-0.0142, -0.0032] | -0.0075 [-0.0136, -0.0011] | +0.0242 [+0.0188, +0.0295] |
-| Background | -0.0035 [-0.0068, -0.0002] | -0.0048 [-0.0074, -0.0022] | -0.0055 [-0.0092, -0.0020] | -0.0054 [-0.0085, -0.0025] | +0.0011 [-0.0024, +0.0046] |
-| Motion smoothness | +0.0023 [+0.0006, +0.0042] | +0.0013 [-0.0004, +0.0033] | +0.0004 [-0.0006, +0.0015] | +0.0004 [-0.0006, +0.0015] | +0.0012 [+0.0000, +0.0023] |
-| Dynamic degree | -0.1300 [-0.2200, -0.0400] | -0.0500 [-0.1300, +0.0200] | -0.0800 [-0.1500, -0.0100] | -0.0700 [-0.1400, +0.0000] | +0.1600 [+0.0900, +0.2300] |
-
-Teacher agreement (`agreement/`): mean final-latent relative L2 0.6344 over the 100 final states (step 20 only, all
-coordinates, prompt ratios averaged); frame PSNR 13.257 dB over all 4,500 aligned decoded frames (per-frame dB over all
-RGB pixels, then averaged). References on the same scope: shared22 0.5591 / 14.194 dB, shared22 deletion 0.5718 /
-14.006 dB, dense control 0.5663 / 14.202 dB, split42 0.6460 / 13.134 dB.
-
-Reading: the widened student is far better than split42 on every quality dimension (aesthetics +0.233, imaging
-+0.121, text-video +0.111, dynamic degree +0.16; all intervals exclude zero), so keeping 32 content pairs at full
-precision beside a 128-dim position channel fixes most of the NoPE split's failure. It does **not** reach shared22:
-aesthetics -0.051 and text-video -0.019 below shared22 (intervals exclude zero), subject/background consistency
-slightly lower, and dynamic degree 0.20 vs the teacher's 0.33. Imaging is indistinguishable from the teacher
-(-0.0003 [-0.0189, +0.0177]). Final-latent agreement is close to split42's and well below shared22's. This is
-detection on these 100 prompt/seed pairs, not proof of equivalence where intervals include zero.
