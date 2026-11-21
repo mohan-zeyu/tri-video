@@ -203,3 +203,88 @@ slightly higher. These are detections on these 100 prompt/seed pairs, not proofs
 
 D allocated 2610.5 GPU-seconds (parity, rendering, seven scorers); study total after D
 26.191 GPU-hours of 30.
+
+
+## E. Drop the position channel (no training; 1.143 allocated GPU-hours)
+
+### E1. Trained-student screen (`screen-trained/`)
+
+`screen_selections.py --val-prompts 32 --student out/distill-wide32/student --modes mean delete`: the final EMA with
+its own masks and **trained** means (the screen's generic `scope` string says "static pooled means"; in `--student`
+mode the means are the student's). Same scope as B: whole-latent relative squared velocity error vs the bf16
+teacher, equal mean over 32 held-out prompts x 20 teacher entering states, branches separate and combined at CFG 5;
+nothing exempt.
+
+| Arm | Conditional | Unconditional | Guided |
+|---|---:|---:|---:|
+| student/mean (wide32) | 0.006938 | 0.006817 | 0.031038 |
+| student/delete (position channel zeroed) | 0.348398 | 0.347715 | 0.389783 |
+
+Fine-tuning brought the widened head from 0.1517 (B, pooled means) to 0.0310 on this 32-prompt scope, below the
+training-free shared22/mean reference 0.0344. Zeroing the trained position channel lifts it to 0.390; the
+content-only training-free value was 0.572.
+
+### E2. 100-prompt benchmark, arm `wide32_zeros` (`full100/wide32_zeros/`)
+
+`generate_learned_center.py --center-mode delete --student out/distill-wide32/student`: the same trained weights and
+content pairs, position channel zeroed in all 30 layers and 20 steps, so no layer receives any positional input.
+Same frozen protocol, audit (2,400 replacement / 1,200 processor calls per video, wide head, 32 content pairs, no
+exemptions), scorer scopes and paired statistics as D.
+
+| Dimension | Teacher | wide32 | **wide32_zeros** | − wide32 | − teacher |
+|---|---:|---:|---:|---|---|
+| aesthetic_quality | 0.588595 | 0.532274 | **0.339361** | -0.1929 [-0.2130, -0.1733] | -0.2492 [-0.2680, -0.2304] |
+| imaging_quality | 0.660679 | 0.660333 | **0.346344** | -0.3140 [-0.3423, -0.2846] | -0.3143 [-0.3426, -0.2859] |
+| overall_consistency | 0.232555 | 0.214718 | **0.042624** | -0.1721 [-0.1859, -0.1583] | -0.1899 [-0.2024, -0.1774] |
+| subject_consistency | 0.963999 | 0.958884 | **0.918905** | -0.0400 [-0.0486, -0.0306] | -0.0451 [-0.0535, -0.0361] |
+| background_consistency | 0.976466 | 0.972926 | **0.960164** | -0.0128 [-0.0183, -0.0070] | -0.0163 [-0.0214, -0.0111] |
+| motion_smoothness | 0.984463 | 0.986772 | **0.983220** | -0.0036 [-0.0065, -0.0006] | -0.0012 [-0.0047, +0.0024] |
+| dynamic_degree | 0.330000 | 0.200000 | **0.510000** | +0.3100 [+0.2100, +0.4200] | +0.1800 [+0.0700, +0.2900] |
+
+Teacher agreement: final-latent relative L2 0.8613 (step-20 final state, all coordinates, prompt ratios averaged),
+frame PSNR 11.181 dB over all 4,500 aligned decoded frames.
+
+### Swap table: inference-only zeroing of each trained model's constants
+
+Each row: zeros minus that model's own trained-means videos on the same 100 prompt/seed pairs; mean [pointwise 95%,
+10,000 paired prompt resamples, seed 20261109]. The no-exemption shared22 swap (`s22_all_zeros`) is still running
+and will be added by that study.
+
+| Swap (zeros minus own trained means) | Aesthetics | Imaging | Text-video | Subject |
+|---|---|---|---|---|
+| Shared22 (layer 0 / step 1 exempt) | -0.0046 [-0.0163, +0.0066] | -0.0093 [-0.0214, +0.0036] | -0.0005 [-0.0050, +0.0042] | -0.0080 [-0.0119, -0.0046] |
+| Fixed high | -0.1633 [-0.1824, -0.1449] | -0.2845 [-0.3148, -0.2533] | -0.1690 [-0.1831, -0.1549] | -0.0400 [-0.0487, -0.0310] |
+| Split42 (NoPE; layer 0 / step 1 exempt) | +0.0308 [+0.0172, +0.0444] | -0.1207 [-0.1502, -0.0917] | -0.0474 [-0.0572, -0.0378] | -0.0003 [-0.0085, +0.0077] |
+| **wide32 (nothing exempt)** | -0.1929 [-0.2130, -0.1733] | -0.3140 [-0.3423, -0.2846] | -0.1721 [-0.1859, -0.1583] | -0.0400 [-0.0486, -0.0306] |
+
+Position-blind attention fails: zeroing wide32's position channel costs as much as zeroing fixed-high (aesthetics
+-0.193, imaging -0.314, text-video -0.172, subject -0.040). Subject and background consistency drop and dynamic
+degree jumps to 0.51 (+0.31), consistent with incoherent motion rather than more motion. Shared22's 22 pairs are
+the only swap that is nearly free.
+
+### E3. Position-bias tables (`bias-tables/`, CPU)
+
+`scripts/diagnose_wide_bias.py` (the wide variant of `diagnose_nope_bias.py`): `position_bias_tables` for layers
+{5, 15, 25} (zero-based), denoising steps {2, 10, 18} (one-based), both branches, all 12 heads separately, for the
+calibration means and the trained EMA. Each table is the scaled additive QK-logit contribution (1/sqrt(128)) of the
+128-dim constant vectors under RoPE, summed over the rotary pairs of one axis (t 22, h 21, w 21 pairs), as a
+function of query-minus-key grid offset; the content channel is excluded. No token, prompt, step, head or branch
+averages.
+
+![Bias tables](bias-tables/trained-vs-calibration.png)
+
+Mean drift (`index.json`; all 14,400 cells and all 128 coordinates pooled, Euclidean ratio of trained-EMA minus
+calibration over calibration): Q 2.40%, K 2.21%. The trained biases nearly overlay the calibration biases: the
+learned position channel is essentially the pooled-mean bias the student started from (sharp peaks at zero offset;
+layer 5 strongly periodic on h/w), and fine-tuning adapted the transformer weights and content use around it.
+
+## Summary
+
+- The widened student (128-dim means under RoPE + 32 unrotated highest-damage content pairs, nothing exempt) trains
+  far better than split42 and reaches a cached-state guided error of 0.031 (32-prompt screen), but on 100 decoded
+  videos it does **not** reach shared22 quality: aesthetics -0.051 and text-video -0.019 vs tuned shared22,
+  intervals excluding zero; imaging is level with the teacher.
+- Zeroing its position channel is catastrophic, as severe as the fixed-high swap. With no positional input
+  anywhere, this student cannot produce coherent video; the fine-tune-then-drop test fails for this architecture.
+- Budget: A-E allocated 27.334 GPU-hours of the user-approved 30 (B 0.611, C 24.855, D 0.725, E 1.143),
+  allocated wall time x GPUs including loading, validation, saves and scorers; CPU work excluded.
