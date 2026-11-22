@@ -1330,3 +1330,91 @@ All four swaps, each on100 original prompt/seed pairs with10000 paired prompt re
 | Shared22 no exemptions | -0.008191 [-0.018619,+0.002252] | -0.007145 [-0.018235,+0.003237] | +0.002842 [-0.002622,+0.008456] | -0.008681 [-0.015403,-0.003157] |
 
 Trained-student screen (32 prompts x20 teacher states, whole-latent ratios, both CFG branches combined at5): {"student/mean": [0.0023714893834039684, 0.002332464066830653, 0.019325562404992523], "student/delete": [0.003279625959294208, 0.0032788750341296692, 0.02113469421310583]}. Columns conditional/unconditional/guided. Total allocated study GPU-hours 16.853779/18 (cap raised from 13 by the user after the external SIGTERM). Full2500 optimizer/sampler/RNG/EMA state and all prior outputs preserved. Evidence under distill-results/noexempt/. No additional recipe or zeros-trained arm was run.
+
+## Shared32 with nothing exempt: half of the rotary pairs as means
+
+User-assigned 21 November 2026 (18 GPU-hours approved, recipe of the no-exemption shared22 study `s22_all`, trainer
+unchanged). Run 21-22 November 2026 by `scripts/center_study.py` from `configs/studies/shared32.json` in lab checkout
+`/mnt/data/liuzeyu/tri-video-s32-31ef4d2`; full evidence and the auto-generated report in `distill-results/shared32/`.
+
+**What is replaced.** In every self-attention layer (all 30), denoising step (all 20), CFG branch and head, the same 32
+of the 64 rotary pairs on Q and K (64 of 128 dimensions per side) are replaced, after QK-RMSNorm and before RoPE, by a
+learned constant that is identical across all 10,800 video tokens. The 32 pairs per cell are the lowest-damage pairs
+by pooled damage_q + damage_k over the 64 calibration prompts (selection audit: 32 Q, 32 K and 32 Q-K intersection
+pairs in all 14,400 cells); shared22 is a subset in every cell. Mode `delete` (the `s32_zeros` arm) sets those same
+pairs to zero at inference on the identical trained weights. Every video recorded 2,400 replacement calls (30 layers x
+20 steps x 2 branches x 2 sides) and was audited against the final EMA hash, masks and empty exemption lists.
+
+**Velocity error.** Whole-latent relative squared velocity error vs the bf16 teacher; each number is the equal mean
+over the same 32 held-out prompts (d0064-d0095) x 20 teacher entering states (one state per denoising step);
+conditional and unconditional branches separately, guided = both combined at CFG 5. Training-free arms use the pooled
+calibration means (64 prompts x 10,800 tokens per cell); trained arms use the final EMA weights and means.
+
+| Arm | Pairs | Means | Conditional | Unconditional | Guided |
+|---|---:|---|---:|---:|---:|
+| shared/mean | 22 | pooled | 0.006842 | 0.006987 | 0.034431 |
+| shared/delete | 22 | — | 0.010010 | 0.010069 | 0.039689 |
+| shared/mean | 32 | pooled | 0.020686 | 0.020958 | 0.059044 |
+| shared/delete | 32 | — | 0.034511 | 0.035247 | 0.075852 |
+| s22_all student/mean | 22 | trained EMA | 0.002371 | 0.002332 | 0.019326 |
+| s22_all student/delete | 22 | — | 0.003280 | 0.003279 | 0.021135 |
+| s32 student/mean | 32 | trained EMA | 0.003545 | 0.003468 | 0.023981 |
+| s32 student/delete | 32 | — | 0.006230 | 0.006240 | 0.027866 |
+
+Guided error by denoising step (step k = the k-th teacher entering state, mean over the same 32 prompts):
+
+| Arm | 1 | 2 | 3 | 4 | 5 | 10 | 15 | 20 | Mean of 20 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 22 pooled mean | 0.0428 | 0.0817 | 0.0749 | 0.0540 | 0.0455 | 0.0256 | 0.0193 | 0.0401 | 0.0344 |
+| 32 pooled mean | 0.1061 | 0.1453 | 0.1166 | 0.0889 | 0.0716 | 0.0410 | 0.0318 | 0.0721 | 0.0590 |
+| 32 delete (free) | 0.1034 | 0.1607 | 0.1333 | 0.1031 | 0.0866 | 0.0546 | 0.0456 | 0.1261 | 0.0759 |
+| s22_all mean | 0.0557 | 0.0613 | 0.0449 | 0.0288 | 0.0210 | 0.0109 | 0.0083 | 0.0217 | 0.0193 |
+| s32 mean | 0.0751 | 0.0739 | 0.0587 | 0.0350 | 0.0266 | 0.0132 | 0.0101 | 0.0248 | 0.0240 |
+| s32 delete | 0.0703 | 0.0797 | 0.0654 | 0.0409 | 0.0307 | 0.0164 | 0.0134 | 0.0342 | 0.0279 |
+
+**Fine-tune.** Stage 2 from teacher weights, 2,500 updates, two ranks x accumulation 2, model lr 1e-5, means lr 2e-4,
+warmup 250, feature weight 0.1, EMA 0.999, seed 20261114. Guided validation (live weights, first 8 held-out prompts x
+20 states, whole latent, CFG 5) fell 0.0542 -> 0.0242, beside s22_all 0.0319 -> 0.0201 on the same scope. One attempt
+(19,050 s on two GPUs), no external kills; median 6.95 s per update (rank-mean optimizer time, excluding validation
+and saves); peak CUDA allocation 21.54 GiB per rank. Mean norms changed by -0.001% (Q and K; live per-cell norm over
+all 128 stored coordinates, equal average over all cells, first vs last update).
+
+![Shared32 validation](distill-results/shared32/training/validation-curve.png)
+
+**Videos.** 100 original prompts, one fixed seed each, frozen protocol (20 UniPC steps, shift 3, CFG 5, empty
+negative, 45 frames at 480x480); frozen teacher reused. VBench equal prompt means with VBench's within-video aggregation
+(aesthetics and imaging all 45 frames, text-video eight midpoint frames, imaging /100; dynamic degree = fraction of the
+100 videos judged dynamic). Paired mean [pointwise 95%, 10,000 prompt resamples, NumPy seed 20261109; one seed per
+prompt, no across-seed uncertainty]:
+
+| Dimension | Teacher | s32_means | s32_zeros | means − teacher | zeros − teacher | zeros − means | means − s22_all_means | zeros − s22_all_zeros |
+|---|---:|---:|---:|---|---|---|---|---|
+| Aesthetics | 0.5886 | 0.5692 | 0.5323 | -0.0194 [-0.0330, -0.0058] | -0.0563 [-0.0733, -0.0395] | -0.0369 [-0.0506, -0.0237] | -0.0180 [-0.0290, -0.0071] | -0.0467 [-0.0602, -0.0333] |
+| Imaging | 0.6607 | 0.6769 | 0.6354 | +0.0162 [-0.0021, +0.0337] | -0.0253 [-0.0437, -0.0066] | -0.0415 [-0.0545, -0.0288] | +0.0052 [-0.0066, +0.0170] | -0.0292 [-0.0421, -0.0168] |
+| Text-video | 0.2326 | 0.2314 | 0.2169 | -0.0012 [-0.0077, +0.0054] | -0.0157 [-0.0234, -0.0083] | -0.0145 [-0.0202, -0.0090] | -0.0025 [-0.0082, +0.0032] | -0.0199 [-0.0263, -0.0137] |
+| Subject | 0.9640 | 0.9652 | 0.9470 | +0.0012 [-0.0067, +0.0088] | -0.0170 [-0.0262, -0.0084] | -0.0182 [-0.0238, -0.0129] | +0.0010 [-0.0037, +0.0060] | -0.0085 [-0.0144, -0.0025] |
+| Background | 0.9765 | 0.9758 | 0.9683 | -0.0006 [-0.0044, +0.0030] | -0.0082 [-0.0126, -0.0041] | -0.0076 [-0.0111, -0.0043] | -0.0013 [-0.0034, +0.0008] | -0.0041 [-0.0071, -0.0010] |
+| Motion smoothness | 0.9845 | 0.9863 | 0.9829 | +0.0019 [+0.0004, +0.0035] | -0.0016 [-0.0034, +0.0004] | -0.0034 [-0.0047, -0.0022] | +0.0001 [-0.0012, +0.0012] | -0.0015 [-0.0030, -0.0002] |
+| Dynamic degree | 0.3300 | 0.2100 | 0.2600 | -0.1200 [-0.2000, -0.0400] | -0.0700 [-0.1600, +0.0200] | +0.0500 [-0.0200, +0.1300] | -0.0600 [-0.1200, +0.0000] | -0.1300 [-0.2000, -0.0600] |
+
+Final-latent relative L2 vs the teacher (step-20 state, all coordinates, prompt ratios averaged) / frame PSNR over all
+4,500 decoded frames: s32_means 0.5818 / 13.910 dB, s32_zeros 0.5757 / 14.161 dB (s22_all_means 0.5630 / 14.254 dB,
+s22_all_zeros 0.5623 / 14.284 dB).
+
+**Swap row** (zeros minus the same model's trained-means videos), to extend the swap table above:
+
+| Swap | Aesthetics | Imaging | Text-video | Subject |
+|---|---|---|---|---|
+| Shared32 no exemptions | -0.0369 [-0.0506, -0.0237] | -0.0415 [-0.0545, -0.0288] | -0.0145 [-0.0202, -0.0090] | -0.0182 [-0.0238, -0.0129] |
+
+**Verdict.** Fine-tuning recovers most of the training-free damage of replacing half the pairs: the training-free
+shared32 screen (0.0590 guided) is 1.7x shared22's, and the earlier 30-prompt training-free shared32 videos (layer 0 /
+step 1 exempt, a different cohort) lost 0.18 aesthetics, whereas the trained s32_means is at teacher level on
+text-video, imaging, subject and background over 100 videos. It is not free: aesthetics is 0.019 below the teacher and
+0.018 below s22_all_means, and fewer videos are dynamic (21 vs 33 of 100). Zeroing the 32 pairs at inference, nearly
+free at 22 pairs (no aesthetics, imaging or text-video interval excluded zero), now costs 0.037 aesthetics, 0.042
+imaging and 0.015 text-video against the same model's means, a moderate drop far smaller than the fixed-high or wide32
+swaps. In all eight screen arms the largest per-step errors fall in steps 1-3 (plus step 20 for training-free
+shared32 delete) and the smallest in steps 13-17. 12.798 of 18 approved GPU-hours
+(allocated wall time x GPUs of every GPU job, including loading, validation, saves and scorers). No zeros-trained arm,
+other pair counts or seeds were run.

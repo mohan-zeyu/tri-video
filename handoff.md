@@ -744,3 +744,18 @@ All four swaps, each on100 original prompt/seed pairs with10000 paired prompt re
 | Shared22 no exemptions | -0.008191 [-0.018619,+0.002252] | -0.007145 [-0.018235,+0.003237] | +0.002842 [-0.002622,+0.008456] | -0.008681 [-0.015403,-0.003157] |
 
 Trained-student screen (32 prompts x20 teacher states, whole-latent ratios, both CFG branches combined at5): {"student/mean": [0.0023714893834039684, 0.002332464066830653, 0.019325562404992523], "student/delete": [0.003279625959294208, 0.0032788750341296692, 0.02113469421310583]}. Columns conditional/unconditional/guided. Total allocated study GPU-hours 16.853779/18 (cap raised from 13 by the user after the external SIGTERM). Full2500 optimizer/sampler/RNG/EMA state and all prior outputs preserved. Evidence under distill-results/noexempt/. No additional recipe or zeros-trained arm was run.
+
+
+### Shared32 with nothing exempt, 21-22 November 2026
+
+Complete; report section "Shared32 with nothing exempt: half of the rotary pairs as means" in `DISTILL_REPORT.md`,
+evidence in `distill-results/shared32/`. Run by the new one-command interface `scripts/center_study.py
+configs/studies/shared32.json` (CPU tests `scripts/test_center_study.py`); a new pair count or variant is a copied
+spec with `means_pairs`/`variant`/`name`/`approved_gpu_hours` changed, and the zeros arm is automatic. Lab root
+`/mnt/data/liuzeyu/tri-video-s32-31ef4d2`: everything under `out/study-shared32/` (selection, screens, training with
+final EMA `student/` and complete resume state at update 2,500, bench-mean/bench-delete videos, run/ledger.tsv).
+Headline (100 videos, paired 95% CIs): s32_means is teacher-level except aesthetics -0.019 and dynamic degree -0.12;
+it is 0.018 below s22_all_means in aesthetics. The inference-only zeros swap costs aesthetics -0.037, imaging -0.042,
+text-video -0.015 vs s32_means (s22_all's swap was within noise on those three). Trained-student guided velocity error
+0.0240 means / 0.0279 zeros (32 held-out prompts x 20 states, whole latent, CFG 5). 12.798 of 18 approved GPU-hours.
+Open: zeros-trained arm, other pair counts (need approval).
