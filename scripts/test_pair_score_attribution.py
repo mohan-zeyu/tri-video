@@ -12,6 +12,8 @@
    the analysis.
 4. step_similarity_pair_score_attribution.py: the step-to-step similarity of each trajectory's 64 shares,
    recomputed here for one pair of steps over all trajectories, per layer and per branch.
+6. selection_score_share.py: shares of named pair sets and of a set difference, recomputed here and compared with
+   the analyzer's selection overlay.
 5. plot_step_trajectories_pair_score_attribution.py: every plotted number is one cell-pair value, and the drawn
    heads and pairs follow the stated selection rule.
 
@@ -288,6 +290,24 @@ def test_collector_and_analysis():
             raise AssertionError("a non-finite share must stop the analysis")
         except FloatingPointError as error:
             assert "var_cov_share" in str(error)
+        # score share of named pair sets (shared22-like, a nested shared32-like set, and what the larger set adds)
+        mask_32 = torch.zeros_like(scores, dtype=torch.bool).scatter_(-1, scores.topk(32).indices, True)
+        torch.save({"variants": {"shared": {"mask_q": mask_32, "mask_k": mask_32.clone()}}, "pairs": 32}, tmp / "selection32.pt")
+        run("selection_score_share.py", ["--stats", stats, "--set", "s22", tmp / "selection.pt", "shared", "--set", "s32", tmp / "selection32.pt", "shared",
+                                         "--set", "sep", tmp / "selection.pt", "separate", "--difference", "added", "s32", "s22", "--out", out, "--tag", "test"])
+        sets = json.loads((out / "selection-shares-test.json").read_text())
+        adv = np.stack([(r["adv"].double() / r["adv_total"].double()[..., None]).numpy() for r in records])
+        m22, m32 = mask_q.numpy(), mask_32.numpy()
+        assert sets["entries"] == report["cells"] and sets["sets"]["s32"]["pairs_per_cell"] == [32.0] * 7 and sets["sets"]["added"]["pairs_per_cell"] == [10.0] * 7
+        assert sets["set_sources"]["added"]["pairs_of_b_outside_a"] == 0 and sets["sets"]["sep"]["pairs_per_cell"][0] >= 22
+        assert np.allclose(sets["sets"]["s32"]["adv_share"]["all"], np.quantile((adv * m32).sum(-1), levels), atol=1e-6)
+        assert np.allclose(sets["sets"]["added"]["var_cov_share"]["all"], np.quantile((share * (m32 & ~m22)).sum(-1), levels), atol=1e-6)
+        assert np.allclose(sets["sets"]["s22"]["var_cov_share"]["by_layer"][1], np.quantile((share * m22).sum(-1)[:, 1], levels), atol=1e-6)
+        assert np.allclose(sets["sets"]["s22"]["var_cov_share"]["all"], report["selection"]["shared"]["union_var_cov_share"]["all"], atol=1e-9)
+        assert np.allclose(sets["sets"]["sep"]["deleted_logit_variance"]["all"], report["selection"]["separate"]["union_deleted_logit_variance"]["all"], atol=1e-9)
+        assert np.allclose(sets["sets"]["s32"]["reference"]["smallest_possible_var_own_share"]["all"], np.quantile(np.sort(own, -1)[..., :32].sum(-1), levels), atol=1e-6)
+        assert "reference" not in sets["sets"]["sep"] and "| s32 | 32 | adv_share |" in (out / "SELECTION-SHARES-test.md").read_text()
+
         # step similarity: each trajectory (prompt x layer x branch x head) compared with itself at two steps
         run("step_similarity_pair_score_attribution.py", ["--stats", stats, "--out", out])
         sim = json.loads((out / "step-similarity.json").read_text())

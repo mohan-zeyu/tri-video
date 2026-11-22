@@ -389,3 +389,10 @@ representative heads of every layer (one prompt, one branch, one cell-pair value
 `step_similarity_pair_score_attribution.py` reports, as quantiles over the prompt × layer × branch × head
 trajectories, how similar a head's 64 shares are between every two steps. No GPU work and no new collection. The
 procedure is in `DISTILL_SCORE_STEPS_PROMPT.md`.
+
+### Score share of the shared32 pairs (22 November)
+
+A read-only addition to the attribution study. `scripts/selection_score_share.py` sums the teacher's per-cell pair
+shares over named pair sets read from selection files, and reports quantiles over prompt × cell entries. The brief
+`DISTILL_SCORE_SHARED32_PROMPT.md` applies it to shared22, shared32 and the ten pairs shared32 adds, on the existing
+calibration and held-out records. CPU only.
