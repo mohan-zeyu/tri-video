@@ -1,0 +1,12 @@
+{
+  "reason": "Pause at complete full checkpoint for the brief budget ASK; projected full study exceeds 25 GPU-hours because checkpoint I/O is slow.",
+  "checkpoint": {
+    "directory": "step-003000",
+    "step": 3000
+  },
+  "pid": 1932220,
+  "time": 1795096348.373361,
+  "signal": "SIGTERM",
+  "planned_pause": true,
+  "original_recipe_target_updates": 5000
+}

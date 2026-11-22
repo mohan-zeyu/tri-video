@@ -1,0 +1,19 @@
+{
+  "name": "shared32",
+  "description": "Shared Q/K selection with half of the 64 rotary pairs per head (the 32 lowest-damage pairs by pooled damage_q + damage_k, the same set on Q and K; a superset of shared22) replaced by learned means after QK-RMSNorm and before RoPE; nothing exempt. Same recipe as the no-exemption shared22 study (s22_all) so the two are directly comparable. Arms: trained means, and the same 32 pairs zeroed at inference (zeros swap). User-assigned 21 November 2026, 18 GPU-hours approved, trainer unchanged.",
+  "variant": "shared",
+  "means_pairs": 32,
+  "exempt": false,
+  "approved_gpu_hours": 18,
+  "train": {"steps": 2500, "lr": 1e-5, "lr_center": 2e-4, "warmup": 250, "ema": 0.999, "seed": 20261114},
+  "arms": {"mean": "s32_means", "delete": "s32_zeros"},
+  "references": {
+    "mean": [["dense_control", "distill-results/dense-paired/summary.json"],
+             ["shared22", "distill-results/shared22/full100/summary.json"],
+             ["s22_all_means", "distill-results/noexempt/full100/s22_all_means/summary.json"]],
+    "delete": [["s22_all_zeros", "distill-results/noexempt/full100/s22_all_zeros/summary.json"],
+               ["s22_zeros", "distill-results/swap/full100/summary.json"]]
+  },
+  "curves": [["shared22, nothing exempt (s22_all)", "distill-results/noexempt/training/validation.jsonl"],
+             ["shared22, layer 0 / step 1 exempt", "distill-results/shared22/validation.jsonl"]]
+}

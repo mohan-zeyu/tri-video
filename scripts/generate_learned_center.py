@@ -52,6 +52,8 @@ def main():
     parser.add_argument("--link-baseline", help="existing benchmark root whose videos/baseline and records/*/baseline are hard-linked as this arm")
     parser.add_argument("--prompts", nargs="*")
     parser.add_argument("--max-prompts", type=int)
+    parser.add_argument("--resident-text-encoder", action="store_true",
+                        help="keep the text encoder on CUDA between prompts when device memory permits")
     args = parser.parse_args()
     config_path = ROOT / args.config
     config = json.loads(config_path.read_text())
@@ -108,31 +110,43 @@ def main():
     pipe.set_progress_bar_config(disable=True)
     pipe.vae.enable_tiling()
 
-    center = LearnedCenter(layers=len(transformer.blocks), steps=config["steps"], heads=transformer.config.num_attention_heads,
-                           head_dim=transformer.config.attention_head_dim, mode=args.center_mode).to("cuda")
     center_hash = None
     if student_dir and (student_dir / "learned_center.pt").exists():
         saved = torch.load(student_dir / "learned_center.pt", map_location="cpu")
-        center.load_state_dict(saved["state_dict"])      # masks (per-cell Q/K selections) and exemptions come from the checkpoint
+        # masks (per-cell Q/K selections), content pairs, wide flag and exemptions come from the checkpoint
+        center = LearnedCenter.from_checkpoint(saved, mode=args.center_mode).to("cuda")
+        if (center.layers, center.steps, center.heads, center.head_dim) != (len(transformer.blocks), config["steps"], transformer.config.num_attention_heads, transformer.config.attention_head_dim):
+            raise RuntimeError("learned_center.pt shape does not match the model/config")
         center_hash = digest(student_dir / "learned_center.pt")
     elif args.center_mode == "mean":
         raise RuntimeError("--center-mode mean needs --student with learned_center.pt")
+    else:
+        center = LearnedCenter(layers=len(transformer.blocks), steps=config["steps"], heads=transformer.config.num_attention_heads,
+                               head_dim=transformer.config.attention_head_dim, mode=args.center_mode).to("cuda")
     center.attach(pipe.transformer)
     exempt = {"layers": [int(i) for i in torch.nonzero(~center.layer_active).flatten()], "steps": [int(i) for i in torch.nonzero(~center.step_active).flatten()]}
     selection_info = {"default_high_masks": center.uses_default_masks, "cell_invariant_masks": center.cell_invariant(),
                       "pairs_per_cell_q": float(center.selected_pairs("q").sum(-1).float().mean()),
                       "pairs_per_cell_k": float(center.selected_pairs("k").sum(-1).float().mean()),
-                      "q_k_intersection_mean": float((center.selected_pairs("q") & center.selected_pairs("k")).sum(-1).float().mean())}
+                      "q_k_intersection_mean": float((center.selected_pairs("q") & center.selected_pairs("k")).sum(-1).float().mean()),
+                      "nope_pairs_per_cell": float(center.selected_pairs("nope").sum(-1).float().mean()),
+                      "wide_head": center.is_wide, "content_pairs": center.content_pairs if center.is_wide else 0}
     environment = {"torch": torch.__version__, "diffusers": diffusers.__version__, "transformers": transformers.__version__,
                    "snapshot": revision, "weights": weights_source, "learned_center_sha256": center_hash, "center_mode": args.center_mode,
                    "exempt": exempt, "selection": selection_info, "gpu": torch.cuda.get_device_name(0), "hostname": socket.gethostname(), "pid": os.getpid(),
+                   "resident_text_encoder": args.resident_text_encoder,
                    "config_sha256": digest(config_path), "code_sha256": {n: digest(ROOT / "scripts" / n) for n in ("generate_learned_center.py", "learned_center.py")}}
     active_layers = int(center.layer_active.sum()) if args.center_mode != "off" else 0
     active_steps = int(center.step_active.sum()) if args.center_mode != "off" else 0
     expected_calls = active_layers * 2 * 2 * active_steps if args.center_mode != "off" else 0   # layers x (q,k) x branches x steps
+    expected_nope_calls = active_layers * 2 * active_steps if (center.uses_nope and args.center_mode != "off") else 0   # one processor call per layer, branch, step
     scope = {
-        "mean": "constant vectors on selected Q/K pairs after RMSNorm, per layer/step/branch/head",
-        "delete": "zeros on selected Q/K pairs after RMSNorm and before RoPE, per layer/step/branch/head",
+        "mean": ("widened head: full 128-dim constant vector under RoPE plus %d unrotated content pairs appended to Q/K, per layer/step/branch/head" % center.content_pairs) if center.is_wide else
+                "constant vectors on selected Q/K pairs after RMSNorm, per layer/step/branch/head"
+                + ("; the other pairs keep content without rotary embedding (NoPE)" if center.uses_nope else ""),
+        "delete": ("widened head with the position channel zeroed: attention on %d unrotated content pairs only" % center.content_pairs) if center.is_wide else
+                  "zeros on selected Q/K pairs after RMSNorm and before RoPE, per layer/step/branch/head"
+                  + ("; the other pairs keep content without rotary embedding (NoPE): position-blind attention" if center.uses_nope else ""),
         "narrow": "zeros on selected Q/K pairs before native full-width RMSNorm, per layer/step/branch/head"
                   + ("; masks identical at every step and branch, equivalent to dropped projection rows"
                      if center.cell_invariant() and bool(center.step_active.all()) else ""),
@@ -157,10 +171,12 @@ def main():
             pipe.text_encoder.to("cuda")
             positive, negative = pipe.encode_prompt(prompt=prompt["text"], negative_prompt=config["negative_prompt"], do_classifier_free_guidance=True,
                                                     device="cuda", num_videos_per_prompt=1, max_sequence_length=512)
-            pipe.text_encoder.to("cpu")
-            torch.cuda.empty_cache()
+            if not args.resident_text_encoder:
+                pipe.text_encoder.to("cpu")
+                torch.cuda.empty_cache()
             center.set_rollout(positive, negative)
             center.calls = 0
+            center.nope_calls = 0
             started = time.time()
             latents_holder = {}
             checked_steps = []
@@ -183,6 +199,8 @@ def main():
             center.clear_rollout()
             if center.calls != expected_calls:
                 raise RuntimeError(f"replacement calls {center.calls} != expected {expected_calls}")
+            if center.nope_calls != expected_nope_calls:
+                raise RuntimeError(f"NoPE processor calls {center.nope_calls} != expected {expected_nope_calls}")
             if not np.isfinite(frames).all() or frames.shape != (config["frames"], config["height"], config["width"], 3):
                 raise RuntimeError(f"bad frames {frames.shape}")
             video_dir = dest / "videos" / args.arm
@@ -194,6 +212,7 @@ def main():
             save_torch(arm / "final-latents.pt", latents_holder["final"].cpu())
             write_json(arm / "complete.json", {"prompt": prompt, "mode": args.arm, "environment": environment,
                 "inference_decode_seconds": seconds, "finite_step_latents": len(checked_steps), "intervention_calls": center.calls, "expected_intervention_calls": expected_calls,
+                "nope_calls": center.nope_calls, "expected_nope_calls": expected_nope_calls,
                 "video_sha256": digest(video), "video_bytes": video.stat().st_size, "frames": list(frames.shape),
                 "center_scope": scope,
                 "peak_gpu_memory_bytes": torch.cuda.max_memory_allocated()})

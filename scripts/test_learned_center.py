@@ -196,6 +196,211 @@ def test_narrow_selected():
     print("test_narrow_selected OK")
 
 
+def test_nope():
+    """NoPE pairs: (a) exact agreement with a reference processor that rotates only the non-NoPE pairs, per head and
+    batch element; (b) all-NoPE attention is permutation-equivariant in the token grid (no positional signal left);
+    (c) exempt steps and the empty mask leave the model untouched; (d) processors are restored on detach."""
+    from diffusers.models.transformers.transformer_wan import _get_qkv_projections, WanAttnProcessor
+    from diffusers.models.attention_dispatch import dispatch_attention_fn
+
+    class Reference:
+        """diffusers' self-attention path with the rotation skipped on a per-(batch, head) pair mask."""
+        def __init__(self, center, layer):
+            self.center, self.layer = center, layer
+        def __call__(self, attn, hidden_states, encoder_hidden_states=None, attention_mask=None, rotary_emb=None, **kw):
+            q, k, v = _get_qkv_projections(attn, hidden_states, encoder_hidden_states)
+            q, k, v = (t.unflatten(2, (attn.heads, -1)) for t in (attn.norm_q(q), attn.norm_k(k), v))
+            cos, sin = rotary_emb
+            B, T, H, D = q.shape
+            step, branch = self.center.step, self.center.branch
+            def rot(x):
+                out = x.clone()
+                for b in range(B):
+                    if not bool(self.center.step_active[step[b]]):
+                        keep = torch.ones(H, D, dtype=torch.bool)
+                    else:
+                        keep = ~self.center.mask_nope[self.layer, step[b], branch[b]]
+                    xb = x[b]                                   # native dtypes, as diffusers computes it
+                    x1, x2 = xb.unflatten(-1, (-1, 2)).unbind(-1)
+                    c = cos[0, :, 0, 0::2][:, None, :]; sn = sin[0, :, 0, 1::2][:, None, :]
+                    r = torch.empty_like(xb); r[..., 0::2] = x1 * c - x2 * sn; r[..., 1::2] = x1 * sn + x2 * c
+                    out[b] = torch.where(keep[None], r.type_as(xb), xb)
+                return out
+            q, k = rot(q), rot(k)
+            h = dispatch_attention_fn(q, k, v, attn_mask=None, dropout_p=0.0, is_causal=False, backend=None, parallel_config=None)
+            h = h.flatten(2, 3).type_as(q)
+            return attn.to_out[1](attn.to_out[0](h))
+
+    model = build_tiny()
+    L, S, B, H = 2, STEPS, 2, 2
+    torch.manual_seed(12)
+    means = torch.zeros(L, S, B, H, 64, dtype=torch.bool)
+    for idx in torch.cartesian_prod(*[torch.arange(n) for n in (L, S, B, H)]):
+        means[tuple(idx.tolist())][torch.randperm(64)[:42]] = True
+    x = torch.randn(2, 16, 2, 4, 4); text = torch.randn(2, 8, 64); t = torch.tensor([500.0, 500.0])
+    calib = {"mean_q": 0.3 * torch.randn(L, S, B, H, 128), "mean_k": 0.3 * torch.randn(L, S, B, H, 128)}
+    def run(center, ctx):
+        center.attach(model); center.set_context(*ctx)
+        with torch.no_grad():
+            y = model(hidden_states=x, timestep=t, encoder_hidden_states=text, return_dict=False)[0]
+        center.detach(); return y
+    # (a) wrapper == reference, including an exempt step in one batch element
+    sel = {"mask_q": means, "mask_k": means, "mask_nope": ~means}
+    center = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(0,), exempt_steps=(0,), selection=sel); center.init_from_calibration(calib)
+    assert center.uses_nope and int(center.selected_pairs("nope").sum(-1)[1, 1, 0, 0]) == 22
+    for ctx in (([2, 3], [0, 1]), ([2, 0], [1, 0])):
+        got = run(center, ctx)
+        # reference: same means (norm hooks of a NoPE-free twin) + hand-rotated processor
+        twin = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(0,), exempt_steps=(0,), selection={"mask_q": means, "mask_k": means}); twin.init_from_calibration(calib)
+        twin.attach(model); twin.set_context(*ctx); center.set_context(*ctx)
+        originals = [(blk.attn1, blk.attn1.processor) for blk in model.blocks]
+        model.blocks[1].attn1.set_processor(Reference(center, 1))
+        with torch.no_grad():
+            ref = model(hidden_states=x, timestep=t, encoder_hidden_states=text, return_dict=False)[0]
+        for attn, proc in originals: attn.set_processor(proc)
+        twin.detach()
+        torch.testing.assert_close(got, ref, rtol=0, atol=0)
+        assert all(type(blk.attn1.processor) is WanAttnProcessor for blk in model.blocks), "processors not restored"
+    assert center.nope_calls == 2, center.nope_calls            # layer 1 once per forward (exempt-step element is masked, not skipped)
+    # (c) exempt step everywhere -> identical to no NoPE; empty mask -> no wrapper at all
+    center.nope_calls = 0
+    plain = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(0,), exempt_steps=(0,), selection={"mask_q": means, "mask_k": means}); plain.init_from_calibration(calib)
+    torch.testing.assert_close(run(center, ([0, 0], [0, 1])), run(plain, ([0, 0], [0, 1])), rtol=0, atol=0)
+    assert center.nope_calls == 0
+    plain.attach(model); assert plain.wrapped == []; plain.detach()
+    # (b) all-NoPE, no replacement, no exemptions: permuting the token grid permutes the output
+    allnope = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(),
+                            selection={"mask_q": torch.zeros_like(means), "mask_k": torch.zeros_like(means), "mask_nope": torch.ones_like(means)})
+    def tokens(lat):                      # [B,16,2,4,4] -> [B, 8 tokens, 16, 1, 2, 2] patches (1,2,2)
+        return lat.view(2, 16, 2, 2, 2, 2, 2).permute(0, 2, 3, 5, 1, 4, 6).reshape(2, 8, 16, 1, 2, 2)
+    def untokens(tok):
+        return tok.view(2, 2, 2, 2, 16, 1, 2, 2).permute(0, 4, 1, 5, 2, 6, 3, 7).reshape(2, 16, 2, 4, 4)
+    perm = torch.randperm(8)
+    xp = untokens(tokens(x)[:, perm])
+    y = run(allnope, ([2, 2], [0, 1]))
+    allnope.attach(model); allnope.set_context([2, 2], [0, 1])
+    with torch.no_grad():
+        yp = model(hidden_states=xp, timestep=t, encoder_hidden_states=text, return_dict=False)[0]
+    allnope.detach()
+    torch.testing.assert_close(tokens(yp), tokens(y)[:, perm], rtol=1e-4, atol=1e-4)
+    # sanity: with RoPE in place the same permutation is not an equivariance
+    plain_off = LearnedCenter(layers=L, steps=S, heads=H, mode="off")
+    y0 = run(plain_off, ([2, 2], [0, 1])); plain_off.attach(model); plain_off.set_context([2, 2], [0, 1])
+    with torch.no_grad():
+        y0p = model(hidden_states=xp, timestep=t, encoder_hidden_states=text, return_dict=False)[0]
+    plain_off.detach()
+    assert (tokens(y0p) - tokens(y0)[:, perm]).abs().max() > 1e-3, "RoPE should break permutation equivariance"
+    # legacy state dict (no mask_nope) loads as no-NoPE; disjointness enforced
+    legacy = {k: v for k, v in plain.state_dict().items() if k != "mask_nope"}
+    again = LearnedCenter(layers=L, steps=S, heads=H); again.load_state_dict(legacy); assert not again.uses_nope
+    try:
+        LearnedCenter(layers=L, steps=S, heads=H, selection={"mask_q": means, "mask_k": means, "mask_nope": means}); raise AssertionError("overlap accepted")
+    except ValueError:
+        pass
+    print("test_nope OK")
+
+
+def test_wide():
+    """Widened head: (a) exact agreement with an independent reference (complex-number rotation, explicit softmax);
+    (b) exempt batch elements and exempt layers equal the native model; (c) mode off installs nothing; (d) mode
+    delete (position channel zeroed) is permutation-equivariant when nothing is exempt; (e) checkpoint round trip."""
+    from diffusers.models.transformers.transformer_wan import _get_qkv_projections, WanAttnProcessor
+    model = build_tiny()
+    L, S, B, H, D, n = 2, STEPS, 2, 2, 128, 32
+    torch.manual_seed(21)
+    content = torch.zeros(L, S, B, H, 64, dtype=torch.bool)
+    for idx in torch.cartesian_prod(*[torch.arange(k) for k in (L, S, B, H)]):
+        content[tuple(idx.tolist())][torch.randperm(64)[:n]] = True
+    allp = torch.ones_like(content)
+    sel = {"mask_q": allp, "mask_k": allp, "mask_nope": content, "wide": True}
+    calib = {"mean_q": 0.3 * torch.randn(L, S, B, H, D), "mean_k": 0.3 * torch.randn(L, S, B, H, D)}
+    x = torch.randn(2, 16, 2, 4, 4); text = torch.randn(2, 8, 64); t = torch.tensor([500.0, 500.0])
+
+    class Reference:
+        def __init__(self, center, layer): self.center, self.layer = center, layer
+        def __call__(self, attn, hidden_states, encoder_hidden_states=None, attention_mask=None, rotary_emb=None, **kw):
+            c = self.center
+            q, k, v = _get_qkv_projections(attn, hidden_states, None)
+            q, k, v = (tt.unflatten(2, (attn.heads, -1)).double() for tt in (attn.norm_q(q), attn.norm_k(k), v))
+            cos, sin = rotary_emb
+            phase = torch.complex(cos[0, :, 0, 0::2].double(), sin[0, :, 0, 1::2].double())     # [T, 64]
+            Bq, T = q.shape[:2]
+            outs = []
+            for b in range(Bq):
+                st, br = int(c.step[b]), int(c.branch[b])
+                heads = []
+                for h in range(attn.heads):
+                    if bool(c.step_active[st]):
+                        pq = (c.mu_q[self.layer, st, br, h].double() if c.mode == "mean" else torch.zeros(D, dtype=torch.float64)).expand(T, D)
+                        pk = (c.mu_k[self.layer, st, br, h].double() if c.mode == "mean" else torch.zeros(D, dtype=torch.float64)).expand(T, D)
+                        sel_dims = c.mask_nope[self.layer, st, br, h].nonzero().flatten()
+                        tq, tk = q[b, :, h, sel_dims], k[b, :, h, sel_dims]
+                    else:
+                        pq, pk = q[b, :, h], k[b, :, h]
+                        tq = tk = torch.zeros(T, 0, dtype=torch.float64)
+                    rot = lambda z: torch.view_as_real(torch.view_as_complex(z.reshape(T, 64, 2).contiguous()) * phase).reshape(T, D)
+                    logits = (rot(pq) @ rot(pk).T + tq @ tk.T) / D ** 0.5
+                    heads.append(torch.softmax(logits, -1) @ v[b, :, h])
+                outs.append(torch.stack(heads, 1))
+            out = torch.stack(outs).flatten(2, 3).to(hidden_states.dtype)
+            return attn.to_out[1](attn.to_out[0](out))
+
+    def run(center, ctx, inp=x):
+        center.attach(model); center.set_context(*ctx)
+        with torch.no_grad():
+            y = model(hidden_states=inp, timestep=t, encoder_hidden_states=text, return_dict=False)[0]
+        center.detach(); return y
+    def run_reference(center, ctx):
+        center.set_context(*ctx)
+        originals = [(blk.attn1, blk.attn1.processor) for blk in model.blocks]
+        for l, blk in enumerate(model.blocks):
+            if bool(center.layer_active[l]) and center.mode != "off":
+                blk.attn1.set_processor(Reference(center, l))
+        with torch.no_grad():
+            y = model(hidden_states=x, timestep=t, encoder_hidden_states=text, return_dict=False)[0]
+        for attn, proc in originals: attn.set_processor(proc)
+        return y
+    with torch.no_grad():
+        native = model(hidden_states=x, timestep=t, encoder_hidden_states=text, return_dict=False)[0]
+    center = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(0,), exempt_steps=(0,), selection=sel); center.init_from_calibration(calib)
+    assert center.is_wide and center.content_pairs == n and center.uses_nope
+    assert torch.equal(center.content_index[1, 2, 1, 0], center.mask_nope[1, 2, 1, 0].nonzero().flatten())
+    for mode in ("mean", "delete"):
+        center.mode = mode
+        for ctx in (([2, 3], [0, 1]), ([2, 0], [1, 0])):
+            center.calls = center.nope_calls = 0
+            got = run(center, ctx)
+            torch.testing.assert_close(got, run_reference(center, ctx), rtol=1e-4, atol=1e-4)
+            assert (center.calls, center.nope_calls) == (2, 1), (center.calls, center.nope_calls)
+            assert all(type(blk.attn1.processor) is WanAttnProcessor for blk in model.blocks)
+            if ctx[0][1] == 0:                      # exempt step element must be native
+                torch.testing.assert_close(got[1], native[1], rtol=1e-5, atol=1e-5)
+                assert (got[0] - native[0]).abs().max() > 1e-3
+    center.mode = "off"; center.attach(model); assert center.wrapped == []; center.detach()
+    # (d) position channel zeroed, nothing exempt: permutation-equivariant in the token grid
+    blind = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(), mode="delete", selection=sel)
+    def tokens(lat): return lat.view(2, 16, 2, 2, 2, 2, 2).permute(0, 2, 3, 5, 1, 4, 6).reshape(2, 8, 16, 1, 2, 2)
+    def untokens(tok): return tok.view(2, 2, 2, 2, 16, 1, 2, 2).permute(0, 4, 1, 5, 2, 6, 3, 7).reshape(2, 16, 2, 4, 4)
+    perm = torch.randperm(8); xp = untokens(tokens(x)[:, perm])
+    y = run(blind, ([2, 2], [0, 1])); yp = run(blind, ([2, 2], [0, 1]), xp)
+    torch.testing.assert_close(tokens(yp), tokens(y)[:, perm], rtol=1e-4, atol=1e-4)
+    # with the position channel (means) the equivariance must break
+    seeing = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(), selection=sel)
+    seeing.init_from_calibration({k: 3 * v for k, v in calib.items()})      # unit-scale constants, as real means are
+    y = run(seeing, ([2, 2], [0, 1])); yp = run(seeing, ([2, 2], [0, 1]), xp)
+    assert (tokens(yp) - tokens(y)[:, perm]).abs().max() > 1e-3
+    # (e) checkpoint round trip keeps wide, content index and masks; legacy records load as not wide
+    again = LearnedCenter.from_checkpoint({"state_dict": center.state_dict(), "mode": "mean"})
+    assert again.is_wide and again.content_pairs == n and torch.equal(again.content_index, center.content_index) and torch.equal(again.mu_q, center.mu_q)
+    legacy = {k: v for k, v in LearnedCenter(layers=L, steps=S, heads=H).state_dict().items() if k not in ("wide", "content_index", "mask_nope")}
+    old = LearnedCenter(layers=L, steps=S, heads=H); old.load_state_dict(legacy); assert not old.is_wide and old.content_pairs == 0
+    try:
+        LearnedCenter(layers=L, steps=S, heads=H, selection={"mask_q": allp, "mask_k": allp, "mask_nope": content.clone().index_fill_(-1, torch.tensor([0]), True), "wide": True}); raise AssertionError("unequal content counts accepted")
+    except ValueError:
+        pass
+    print("test_wide OK")
+
+
 def write_fake_trajectories(root):
     from diffusers import UniPCMultistepScheduler
     sched = UniPCMultistepScheduler(num_train_timesteps=1000, prediction_type="flow_prediction", use_flow_sigmas=True, flow_shift=3.0, solver_order=2)
@@ -242,18 +447,28 @@ def test_training_stages():
         assert "TRAINING COMPLETE 2" in out2 and "VAL" in out2, out2[-800:]
         assert (tmp / "s2" / "student" / "transformer" / "diffusion_pytorch_model.safetensors").exists()
         assert (tmp / "s2" / "validation.jsonl").exists() and (tmp / "s2" / "history.jsonl").exists()
+        # fine-tune-then-drop screen: the saved student with its own masks, means (mean) or zeros (delete)
+        proc = subprocess.run([sys.executable, str(ROOT / "scripts" / "screen_selections.py"), "--traj", str(traj), "--prompts", str(cfg), "--snapshot", str(tiny),
+                               "--student", str(tmp / "s2" / "student"), "--modes", "mean", "delete", "--out", str(tmp / "screen-student"), "--val-prompts", "2"],
+                              cwd=ROOT, capture_output=True, text=True)
+        assert proc.returncode == 0, proc.stderr[-3000:]
+        swap = json.loads((tmp / "screen-student" / "complete.json").read_text())
+        assert set(swap["arms"]) == {"student/mean", "student/delete"} and all(0 <= v < 1e6 for a in swap["arms"].values() for v in a["mean"])
+        assert json.loads((tmp / "screen-student" / "meta.json").read_text())["student_center_mode"] == "mean"
         from safetensors.torch import load_file
 
         resumed = tmp / "s2-resume"
         saved_ema = resumed / "ema-checkpoints" / "step-000002" / "learned_center.pt"
         flags = ["--stage", "2", "--out", str(resumed), "--steps", "4", "--init-student", str(tmp / "s1" / "student"),
-                 "--ema", "0.9", "--ema-checkpoints", "--resume-state-with-ema"] + common
+                 "--ema", "0.9", "--ema-checkpoints", "--resume-state-with-ema", "--skip-final-resume-state",
+                 "--resume-state-every", "4"] + common
         assert "TRAINING PAUSED 2 2" in run(flags + ["--stop-after", "2"], ROOT)
         early_ema = saved_ema.read_bytes()
         with (resumed / "validation.jsonl").open("a") as stream:
             stream.write('{"step": 4}\n{"step":')
         assert "START_OPTIMIZER_STEP 3" in run(flags + ["--resume"], ROOT)
         assert saved_ema.read_bytes() == early_ema
+        assert json.loads((resumed / "checkpoint" / "latest.json").read_text())["step"] == 2
         for name in ("history", "validation"):
             def scores(path):
                 return [{k: v for k, v in json.loads(line).items() if k not in {"elapsed_s", "optimizer_step_seconds"}}
@@ -376,10 +591,20 @@ def test_statistics_selection_screen():
         assert proc.returncode == 0, proc.stderr[-3000:]
         sel = torch.load(sel_dir / "selection.pt")
         for name, v in sel["variants"].items():
-            assert tuple(v["mask_q"].shape) == (2, STEPS, 2, 2, 64) and (v["mask_q"].sum(-1) == 22).all() and (v["mask_k"].sum(-1) == 22).all(), name
+            n = {"split": 42, "wide": 64}.get(name, 22)
+            assert tuple(v["mask_q"].shape) == (2, STEPS, 2, 2, 64) and (v["mask_q"].sum(-1) == n).all() and (v["mask_k"].sum(-1) == n).all(), name
+        wide = sel["variants"]["wide"]
+        assert wide["wide"] is True and (wide["mask_nope"].sum(-1) == 32).all()
+        summed_all = (sel["damage_q"] + sel["damage_k"])[1, 2, 1, 0]
+        assert set(summed_all.topk(32, largest=True).indices.tolist()) == set(wide["mask_nope"][1, 2, 1, 0].nonzero().flatten().tolist()), "wide content = highest damage"
+        wstatic = LearnedCenter.from_checkpoint(torch.load(sel_dir / "static-wide" / "learned_center.pt")); assert wstatic.is_wide and wstatic.content_pairs == 32
         assert torch.equal(sel["variants"]["shared"]["mask_q"], sel["variants"]["shared"]["mask_k"])
         pooled_m = sel["variants"]["pooled"]["mask_q"]
         assert torch.equal(pooled_m, sel["variants"]["pooled"]["mask_k"]) and torch.equal(pooled_m, pooled_m[:, 0:1, 0:1].expand_as(pooled_m))
+        split = sel["variants"]["split"]
+        assert (split["mask_q"].sum(-1) == 42).all() and (split["mask_nope"].sum(-1) == 22).all() and not (split["mask_q"] & split["mask_nope"]).any() and (split["mask_q"] | split["mask_nope"]).all()
+        assert torch.equal(split["mask_q"], split["mask_k"]) and (split["mask_q"] & sel["variants"]["shared"]["mask_q"]).sum() == sel["variants"]["shared"]["mask_q"].sum(), "split means must contain the shared set"
+        st = LearnedCenter.from_checkpoint(torch.load(sel_dir / "static-split" / "learned_center.pt")); assert st.uses_nope
         summed = (sel["damage_q"] + sel["damage_k"]).sum((1, 2))[1, 0]
         assert set(summed.topk(22, largest=False).indices.tolist()) == set(pooled_m[1, 0, 0, 0].nonzero().flatten().tolist())
         assert torch.equal(sel["variants"]["fixed_high"]["mask_q"][0, 0, 0, 0].nonzero().flatten(), torch.tensor(sorted(set(HIGH_DIMS.tolist()[::2]) | set())) // 2) or True
@@ -404,9 +629,11 @@ def test_statistics_selection_screen():
         assert summary["arms"]["fixed_high/mean"]["mean"][2] != summary["arms"]["fixed_high/delete"]["mean"][2]
         proc = subprocess.run([sys.executable, str(ROOT / "scripts" / "screen_selections.py"), "--traj", str(tmp / "traj"), "--prompts", str(cfg), "--snapshot", str(tiny),
                                "--selection", str(sel_dir / "selection.pt"), "--statistics", str(sel_dir / "pair-statistics.pt"), "--out", str(tmp / "screen-narrow"),
-                               "--val-prompts", "1", "--variants", "shared", "pooled", "--modes", "delete", "narrow", "--all-steps"], cwd=ROOT, capture_output=True, text=True)
+                               "--val-prompts", "1", "--variants", "shared", "pooled", "split", "--modes", "delete", "narrow", "--all-steps"], cwd=ROOT, capture_output=True, text=True)
         assert proc.returncode == 0, proc.stderr[-3000:]
         narrow = json.loads((tmp / "screen-narrow" / "complete.json").read_text())
+        assert narrow["arms"]["split/delete"]["mean"][2] != narrow["arms"]["shared/delete"]["mean"][2]
+        narrow["arms"] = {k: v for k, v in narrow["arms"].items() if not k.startswith("split/")}
         meta = json.loads((tmp / "screen-narrow" / "meta.json").read_text())
         assert meta["exempt_layers"] == [0] and meta["exempt_steps"] == []
         assert set(narrow["arms"]) == {"shared/delete", "shared/narrow", "pooled/delete", "pooled/narrow"}
@@ -421,6 +648,8 @@ if __name__ == "__main__":
     test_replacement_exact()
     test_narrow_projection()
     test_narrow_selected()
+    test_nope()
+    test_wide()
     test_masks_and_legacy_checkpoint()
     test_statistics_selection_screen()
     test_stage1_checkpoint_only_mu_differs()

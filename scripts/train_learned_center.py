@@ -433,7 +433,7 @@ def save_student(student, center, out_dir, snapshot, rank, world, no_fsdp, ema=N
             save_file(tensors, str(pending), metadata={"format": "pt"})
             pending.replace(target / "diffusion_pytorch_model.safetensors")
             write_json(target / "config.json", json.loads((Path(snapshot) / "transformer" / "config.json").read_text()))
-            save_torch(target.parent / "learned_center.pt", {"state_dict": center.state_dict(), "mode": center.mode})
+            save_torch(target.parent / "learned_center.pt", {"state_dict": center.state_dict(), "mode": center.mode, "wide": center.is_wide})
     if world > 1:
         dist.barrier()
 
@@ -612,7 +612,7 @@ def main():
     parser.add_argument("--init-student", help="directory with transformer/ + learned_center.pt from a previous stage")
     parser.add_argument("--calibration", help="means for mu init: traj/calibration.pt (44-wide) or pair-statistics.pt (full 128-wide); default <traj>/calibration.pt")
     parser.add_argument("--selection", help="selection.pt from scripts/select_pairs.py (per-cell Q/K pair masks)")
-    parser.add_argument("--variant", default="separate", help="variant inside --selection: fixed_high | separate | shared")
+    parser.add_argument("--variant", default="separate", help="variant inside --selection: fixed_high | separate | shared | pooled | split | wide")
     parser.add_argument("--center-mode", choices=("mean", "delete", "narrow", "off"), default="mean")
     parser.add_argument("--include-layer0", action="store_true")
     parser.add_argument("--include-step1", action="store_true")
@@ -646,6 +646,10 @@ def main():
                         help="retain an EMA model at each save instead of writing and rotating full optimizer states")
     parser.add_argument("--resume-state-with-ema", action="store_true",
                         help="also keep the latest full Stage 2 optimizer, EMA and RNG checkpoint")
+    parser.add_argument("--skip-final-resume-state", action="store_true",
+                        help="export the final EMA without writing an extra full optimizer checkpoint")
+    parser.add_argument("--resume-state-every", type=int,
+                        help="interval for full optimizer checkpoints, a multiple of the EMA save interval")
     parser.add_argument("--log-every", type=int, default=10)
     parser.add_argument("--seed", type=int, default=20261114)
     parser.add_argument("--no-fsdp", action="store_true")
@@ -666,6 +670,11 @@ def main():
         parser.error("--guided-gate requires unique validation steps and earlier measured reference steps on a fresh Stage 2 or 3 run")
     if args.resume_state_with_ema and (args.stage != 2 or not args.ema_checkpoints):
         parser.error("--resume-state-with-ema requires --ema-checkpoints in Stage 2")
+    if args.skip_final_resume_state and not args.resume_state_with_ema:
+        parser.error("--skip-final-resume-state requires --resume-state-with-ema")
+    if args.resume_state_every is not None and (not args.resume_state_with_ema or args.resume_state_every <= 0
+                                                or args.save_every <= 0 or args.resume_state_every % args.save_every):
+        parser.error("--resume-state-every requires resumable EMA saves and a positive multiple of --save-every")
     if args.ema_checkpoints and (args.stage == 1 or args.ema <= 0 or (args.resume and not args.resume_state_with_ema)):
         parser.error("--ema-checkpoints requires EMA in Stage 2 or 3 and --resume-state-with-ema to resume")
     if args.rollout_worker_budget < 0 or (args.rollout_worker_budget and (
@@ -728,6 +737,8 @@ def main():
 
     if args.stage == 1:
         # the teacher module doubles as the student attention; only mu trains
+        if center.is_wide:
+            raise SystemExit("stage 1 (layer-local attention loss) is not defined for the widened head; use stage 2")
         center.attach(teacher)
         opt_model, ema, taps = None, None, None
         student = None
@@ -877,7 +888,7 @@ def main():
             if args.stage == 1:
                 if rank == 0:
                     (out / "student").mkdir(exist_ok=True)
-                    save_torch(out / "student" / "learned_center.pt", {"state_dict": center.state_dict(), "mode": center.mode})
+                    save_torch(out / "student" / "learned_center.pt", {"state_dict": center.state_dict(), "mode": center.mode, "wide": center.is_wide})
             else:
                 if last_step == args.steps or args.ema_checkpoints:
                     tag = "student" if last_step == args.steps else f"ema-checkpoints/step-{last_step:06d}"
@@ -889,7 +900,10 @@ def main():
                     for h in history:
                         f.write(json.dumps(h) + "\n")
                 history.clear()
-            if args.resume_state_with_ema:
+            full_state_due = (args.resume_state_every is None or last_step % args.resume_state_every == 0
+                              or last_step == stop_at or budget_stop or gate_stop)
+            if (args.resume_state_with_ema and full_state_due
+                    and (last_step < args.steps or not args.skip_final_resume_state)):
                 save_training_state(student, opt_model, center, opt_center, last_step, out, rank, world,
                                     args.no_fsdp, ema, rng, save_torch_rng=True)
         if budget_stop or gate_stop:

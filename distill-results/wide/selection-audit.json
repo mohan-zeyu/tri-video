@@ -1,0 +1,32 @@
+{
+ "shared_masks_tensor_equal_to_original": true,
+ "wide_flag": true,
+ "wide_means_pairs_per_cell": {
+  "min": 64,
+  "max": 64
+ },
+ "wide_k_equals_q_means": true,
+ "wide_content_pairs_per_cell": {
+  "min": 32,
+  "max": 32
+ },
+ "cells": 14400,
+ "static_wide": {
+  "is_wide": true,
+  "content_pairs": 32,
+  "layers_active": 30,
+  "of_layers": 30,
+  "steps_active": 20,
+  "of_steps": 20,
+  "content_index_shape": [
+   30,
+   20,
+   2,
+   12,
+   64
+  ],
+  "content_index_matches_mask": true
+ },
+ "content_is_top32_by_damage_q_plus_k_every_cell": true,
+ "scope": "Per layer-step-branch-head cell (30 x 20 x 2 x 12 = 14400 cells), pair-level masks (64 rotary pairs per head); damage = selection criterion pooled over the 64 calibration prompts; no exemptions."
+}

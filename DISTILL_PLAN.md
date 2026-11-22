@@ -353,3 +353,29 @@ deleting rows of `to_q`/`to_k` does. `LearnedCenter` narrow mode now takes the p
 `select_pairs.py` adds the step/branch-invariant `pooled` selection (the only kind a weight drop can realise);
 `screen_selections.py` screens `narrow` arms (`--all-steps` for the weight-removal scope). The procedure, training-free
 first and the matched 2,500-step fine-tune second, is in `DISTILL_REMOVAL_PROMPT.md`.
+
+### Content/position split extension (19 November)
+
+Every swap so far suggested that the untouched pairs still carried position through RoPE, so the constants were never
+the positional channel. `LearnedCenter` now takes a `mask_nope`: pairs that keep their content but receive no rotary
+embedding (the attention processor is wrapped, `NoPEProcessor`). The `split` selection puts learned means on the 42
+lowest-damage pairs and NoPE on the 22 highest, so the constants become the only positional signal (a per-head
+additive relative-position bias) and zeroing them removes position entirely. The procedure, training-free screen,
+5,000-step fine-tune, benchmark, zero swap and bias-table diagnostic, is in `DISTILL_NOPE_PROMPT.md`.
+
+### No-exemption run (20 November)
+
+Layer 0 and step 1 were exempt in every arm as first-run insurance; the no-exemption screen showed the cost on the
+selected pairs is small (0.037 → 0.041 guided). The user decided to lift the exemptions. `DISTILL_NOEXEMPT_PROMPT.md`
+repeats the shared22 means student with all 30 layers and 20 steps active (2,400 interventions per video), benchmarks
+it, and runs its fine-tune-then-drop swap.
+
+### Widened head (20 November)
+
+The senior's design, as clarified: per head, Q and K become 192 dims, the full 128-dim mean vector under normal RoPE
+(a content-free position channel over all 64 frequencies) concatenated with the 64 coordinates of the 32
+highest-damage pairs taken from the real projection without RoPE (a pure content channel); V, to_out and the
+1/sqrt(128) scale unchanged. `LearnedCenter(wide=True)` with `WideHeadProcessor` implements it functionally (the
+appended rows are gathered from the projection output, which equals copying those rows of to_q/to_k); the `wide`
+selection variant picks the content pairs. Mode `delete` zeroes the position channel. Nothing exempt. The procedure
+is in `DISTILL_WIDE_PROMPT.md`.

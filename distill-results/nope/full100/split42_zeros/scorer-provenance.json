@@ -1,0 +1,120 @@
+{
+  "dimensions": [
+    {
+      "dimension": "subject_consistency",
+      "aggregation": "Original VBench frame aggregation within each video, paired means over 100 prompts separately per arm. MUSIQ per-video raw scores require division by 100 for official scale.",
+      "batches": [
+        {
+          "source_file": "/dev/shm/tri-vbench-source/vbench/subject_consistency.py",
+          "source_sha256": "55f5c9a3e5be543380a709b94712903fa67a76340c3c0cb2414ac090dbd1b78d",
+          "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+          "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student",
+          "elapsed_seconds": 77.10360741615295,
+          "raw_batch_sha256": "deba3107b96079bd306d8deb429be2d51caaee6f15cb2044683705de03a690c7",
+          "file": "batch-000-results.json",
+          "per_video_rows": 200
+        }
+      ]
+    },
+    {
+      "dimension": "background_consistency",
+      "aggregation": "Original VBench frame aggregation within each video, paired means over 100 prompts separately per arm. MUSIQ per-video raw scores require division by 100 for official scale.",
+      "batches": [
+        {
+          "source_file": "/dev/shm/tri-vbench-source/vbench/background_consistency.py",
+          "source_sha256": "7def92057819df0dad01c857eecf3b39b8b555c8cdfe881a672cc2b19dc226b4",
+          "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+          "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student",
+          "elapsed_seconds": 68.73006176948547,
+          "raw_batch_sha256": "85921cd915b7a2e9b3615689a026a7f4b7e291064cf7dab934f621cb43b7fd28",
+          "file": "batch-000-results.json",
+          "per_video_rows": 200
+        }
+      ]
+    },
+    {
+      "dimension": "motion_smoothness",
+      "aggregation": "Original VBench frame aggregation within each video, paired means over 100 prompts separately per arm. MUSIQ per-video raw scores require division by 100 for official scale.",
+      "batches": [
+        {
+          "source_file": "/dev/shm/tri-vbench-source/vbench/motion_smoothness.py",
+          "source_sha256": "5ddc43f246b64e23d10540b8f9e6c302686e6a1ac9fa4e9942b5bd043d89e0b9",
+          "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+          "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student",
+          "elapsed_seconds": 48.63581562042236,
+          "raw_batch_sha256": "2effce9540da11db5340c91730c238d91a2650e066e97cd16db4028582a98093",
+          "file": "batch-000-results.json",
+          "per_video_rows": 200
+        }
+      ]
+    },
+    {
+      "dimension": "dynamic_degree",
+      "aggregation": "Original VBench frame aggregation within each video, paired means over 100 prompts separately per arm. MUSIQ per-video raw scores require division by 100 for official scale.",
+      "batches": [
+        {
+          "source_file": "/dev/shm/tri-vbench-source/vbench/dynamic_degree.py",
+          "source_sha256": "2e93d3a7af38bfbe459c19c9d127894f687424a0bc534dbf7e6571d17b24dff7",
+          "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+          "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student",
+          "elapsed_seconds": 101.2566270828247,
+          "raw_batch_sha256": "cf815a22f8bc27faab44ef2b4f504e68eee3cb3a9745a28961ca30d907b8f57d",
+          "file": "batch-000-results.json",
+          "per_video_rows": 200
+        }
+      ]
+    },
+    {
+      "dimension": "aesthetic_quality",
+      "aggregation": "Original VBench frame aggregation within each video, paired means over 100 prompts separately per arm. MUSIQ per-video raw scores require division by 100 for official scale.",
+      "batches": [
+        {
+          "source_file": "/dev/shm/tri-vbench-source/vbench/aesthetic_quality.py",
+          "source_sha256": "baa1894c2543483901a444af9aabe0701b1f937bf304141c53019a45b27abc57",
+          "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+          "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student",
+          "elapsed_seconds": 72.45575404167175,
+          "raw_batch_sha256": "c8a1b0d1fcff08b88a7b3a2afcf7eaf31fbae3da55689112bc5d11d84dd0cecb",
+          "file": "batch-000-results.json",
+          "per_video_rows": 200
+        }
+      ]
+    },
+    {
+      "dimension": "imaging_quality",
+      "aggregation": "Original VBench frame aggregation within each video, paired means over 100 prompts separately per arm. MUSIQ per-video raw scores require division by 100 for official scale.",
+      "batches": [
+        {
+          "source_file": "/dev/shm/tri-vbench-source/vbench/imaging_quality.py",
+          "source_sha256": "ac6c648cb4d5e82cd29c63be04977e9288c3540558cf12f979e66bef3e1f9e3a",
+          "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+          "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student",
+          "elapsed_seconds": 101.2465353012085,
+          "raw_batch_sha256": "8726fa13ed89fe82e54610cdd95c7dfc7c4a1f7854e276168b0d49a1efe13e49",
+          "file": "batch-000-results.json",
+          "per_video_rows": 200
+        }
+      ]
+    },
+    {
+      "dimension": "overall_consistency",
+      "aggregation": "Original VBench frame aggregation within each video, paired means over 100 prompts separately per arm. MUSIQ per-video raw scores require division by 100 for official scale.",
+      "batches": [
+        {
+          "source_file": "/dev/shm/tri-vbench-source/vbench/overall_consistency.py",
+          "source_sha256": "325beb4503699b08d441a467710240097c15c2267fe92dbed1ed8cdfaa96103e",
+          "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+          "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student",
+          "elapsed_seconds": 71.84974527359009,
+          "raw_batch_sha256": "f6ff9d313fcbc60f0c1f5559a552a94f7ce0568b0e102195fa5ffd7e79735668",
+          "file": "batch-000-results.json",
+          "per_video_rows": 200
+        }
+      ]
+    }
+  ],
+  "teacher_scores_reused": true,
+  "teacher_videos_regenerated": false,
+  "paired_scope": "100 original prompt-and-seed pairs; teacher video hashes, manifest and scorer revision verified before reuse. 10000 paired prompt resamples, NumPy seed 20261109.",
+  "video_scope": "One seed per prompt, 45 frames at 480x480, 20 UniPC denoising steps, CFG5, shift3, empty negative conditioning; fixed benchmark protocol."
+}

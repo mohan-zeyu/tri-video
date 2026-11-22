@@ -595,6 +595,171 @@ Pre-norm removal stages A+B ran in the separate lab checkout `/mnt/data/liuzeyu/
 
 Removal C1 received SIGKILL on rank 0 at 02:16 Singapore time on 18 November after logging update 1,700 and charged 24,920 GPU-seconds. The latest durable train state is the update-1,500 EMA in `out/distill-narrow-shared22/ema-checkpoints/step-001500/`, with exact shared Q/K mask and exemption checks plus SHA-256. The run used EMA-only saves and exact optimizer resume is unavailable. At update 1,500 the guided error was 0.027917 versus 0.028333 for post-norm deletion over 160 matched full-latent states from eight prompts × 20 steps at CFG 5. An exact rerun from teacher weights is approved with up to seven additional GPU-hours overall. The rerun uses `out/distill-narrow-shared22-rerun/` with EMA exports and the latest matching full training checkpoint. The CPU restart test matched the uninterrupted run’s final weights and validation curve. C2 follows the rerun’s full benchmark. Evidence is in `distill-results/removal/narrow-shared22/interrupted/`.
 
+Shared22 pre-norm removal (C1) completed 2,500 updates. Guided relative squared velocity error changed from 0.097438 to 0.021373 on the same eight held-out prompts × 20 cached teacher states, over all latent coordinates with both branches combined at CFG 5. The 100 matched EMA videos recorded 2,204 intervention calls each and were scored on seven dimensions with audited references. Against shared22 post-norm deletion the paired outcome was aesthetics -0.00091 [-0.01040, +0.00861], imaging -0.00134 [-0.01071, +0.00798], and text–video consistency -0.00344 [-0.00871, +0.00169], using 10,000 prompt resamples and NumPy seed 20261109. Its EMA checkpoints are durable under `out/distill-narrow-shared22-rerun/`. The training and benchmark used 41,948 GPU-seconds and evidence is in `distill-results/removal/narrow-shared22/`. C1’s last full optimizer checkpoint is at update 2,000. The wall-time guard stopped the final optimizer write after all 2,500 updates and the final EMA were saved and independently verified. The allocator peak was unavailable. C2 follows with 40,963 GPU-seconds from the approved combined budget and full resumable saves at 1,000 and 2,000.
+
+Pooled C2 stopped around 19:52 Singapore time on 18 November after rank 0 received SIGKILL. The last logged update was 660. The verified update-500 EMA is at `out/distill-narrow-pooled/ema-checkpoints/step-000500/`. Its guided error was 0.035505 over all latent coordinates at eight prompts × 20 cached teacher states at CFG 5. The job ended before its first planned optimizer save. The 100-prompt benchmark awaits a recovery decision. After 9,984 GPU-seconds on C2, 30,979 GPU-seconds remain in the combined approved budget. Evidence is in `distill-results/removal/narrow-pooled/interrupted/`.
+
+The inference-only swap ran in `/mnt/data/liuzeyu/tri-video-swap-d5784b7`. CPU tests passed and both frozen EMA exports and shared22 masks were verified. At 32 prompts × 20 cached teacher states, the two swaps raised whole-latent guided error from 0.01937 to 0.02112 for shared22 and from 0.01992 to 0.02113 for deletion, with both branches combined at CFG 5. Each swap generated 100 original prompt–and–seed videos with 2,204 intervention calls across 29 layers, 19 steps, both branches and Q/K. On the paired 100-video benchmark, zeroing shared22 reduced subject and background consistency and motion smoothness. Inserting means into deletion reduced dynamic degree, aesthetics, imaging and text–video consistency. All named drops have paired intervals below zero. The two arms used 7455.4 GPU-seconds including both screens and score runs. The seven-dimension results and same-seed agreement are in `distill-results/swap/`, and raw videos are in `out/learned-center-wan-swap/` on 5090.
+
+The fixed-high inference-only swap ran in `/mnt/data/liuzeyu/tri-video-fh-e300ac2`. The three Stage 3 EMA SHA-256 checks passed and the legacy center loaded the exact default Q/K masks. Guided full-latent error was 0.027988 with trained means and 0.286806 with zeros at 32 prompts × 20 cached teacher states and CFG 5. The `fh_zeros` arm completed all 100 original prompt-and-seed videos, with 2,204 intervention calls per video over 29 layers, 19 steps, both branches, and Q/K. The fixed-high EMA was much more sensitive to an inference-only drop than shared22. On 100 matched videos, replacing the fixed-high means with zeros reduced aesthetics by 0.16334, imaging by 0.28447, and text–video consistency by 0.16901. Subject and background consistency also fell by 0.04005 and 0.01297, respectively. All five paired intervals were below zero. Motion smoothness spanned zero and dynamic degree rose by 0.16000 with an interval above zero, indicating more motion by that metric. The corresponding shared22 quality intervals for aesthetics, imaging, and text–video consistency all spanned zero, and the shared22 subject consistency drop was 0.00803. In the cached-state screen, the fixed-high zeros-to-means guided error ratio grew from 1.463× on frozen teacher weights to 10.248× after Stage 3 fine-tuning, while shared22's ratio was 1.162× on teacher weights and 1.090× after fine-tuning. The screen, seven-dimension paired comparison and same-seed agreement are under `distill-results/swap/`. The run used 3872.8 GPU-seconds.
+
+The v000 saturation check used one prompt and seed 2026110900, full native Q/K, CFG 5, shift 3 and 45 frames at 480×480. Mean HSV saturation across every decoded pixel in all 45 frames was 0.834686 for 20 steps/empty negative, 0.635064 for 20/official negative, 0.492842 for 50/empty and 0.698105 for 50/official. The original baseline was reused. Three fresh videos and pre-encode RGB statistics support a sampling effect for this seed, with composition changes. The official native 1.3B recommendation is 50 steps, CFG 6, shift 8, 832×480, 81 frames, using the built-in negative prompt. The official Diffusers example uses CFG 5 and explicit negative conditioning, with a 50-step default and shift 3 for 480P. The native code replaces an empty negative input with its default text. This differs from the benchmark's empty Diffusers conditioning. Exact protocol, source links, hashes and the frame comparison are in `distill-results/v000-saturation/`. The lab videos are in `/mnt/data/liuzeyu/tri-video-removal-f34fc19/out/baseline-color-check/same-seed/`. Total measured allocation was 234 GPU-seconds.
+
+
+The content/position split study runs separately in `/mnt/data/liuzeyu/tri-video-nope-2979d3e` from branch commit `d00e0a6` (contains `2979d3e`). CPU tests passed. Selection v3 exactly reproduced shared22, and every cell has 42 means / 22 disjoint NoPE pairs covering 64; shared22 is contained in the means set. The pooled C2 recovery and shared22 extension are untouched. Stage B completed on idle GPUs 4 and 1, using 2,104.288 GPU-seconds. Guided full-latent relative squared velocity errors over 32 held-out prompts × 20 teacher entering states at CFG 5 were shared/mean 0.032195, shared/delete 0.037419, split/mean 0.443576 and split/delete 0.478554. All were finite. C takes the direct Stage 2 teacher initialization path, omitting the optional means-only warm start; the 5,000-update schedule is retained and the first invocation stops with resumable state at the required update-1,000 gate. The 25 GPU-hour allocation is separate; Stage C must stop and ask if guided validation error exceeds 0.08 at update 1,000. Artifacts and full computation scopes are under `distill-results/nope/`.
+
+
+NoPE C is paused at the complete update-3,000 checkpoint for a budget decision. The update-1,000 guided gate passed at 0.077772; update 3,000 reached 0.059991, averaging whole-latent relative squared velocity errors over eight held-out prompts × 20 cached teacher states, with both branches combined at CFG 5. The run preserved its original 5,000-update schedule and resumed optimizer, sampler, Torch CPU/CUDA RNG and EMA state at update 1,000. All logged losses and validation values were finite. Mean norms over all 128 stored coordinates and all 14,400 cells grew by Q 0.30885% / K 0.30071% from update 1 to 3,000. Long network checkpoint writes caused a budget review; the save interval at 3,000 was 22.19 minutes. The full state at `out/distill-split42/checkpoint/step-003000/` and the corresponding EMA were verified before an intentional SIGTERM; the elastic exit status 1 is a planned resource pause. GPU allocations are released. The study used 14.932382 GPU-hours, including B, and the measured allocation rate plus the brief D/E estimates project 26.80 GPU-hours to finish. ASK for up to 2.5 additional GPU-hours (27.5 total), or keep 25 and obtain a reduced-scope decision. C has 2,000 updates remaining; D and E have not run. Evidence and the comparison curve are in `distill-results/nope/progress-3000/`. The pooled C2 recovery and shared22 extension were not changed.
+
+
+The user replied yes to the NoPE budget ASK on 19 November 2026 (Asia/Singapore), authorizing 2.5 additional GPU-hours, 27.5 total. Exact optimizer/RNG/EMA resume from the verified update-3,000 state is queued on two idle GPUs with the original 5,000-update recipe. The remaining C, D and E stay in scope; all earlier EMA exports, the pooled C2 recovery and shared22 extension remain preserved. Approval evidence is `distill-results/nope/budget-approval.json`.
+
+
+NoPE C was unexpectedly interrupted after stdout update 4,590 by rank-0 SIGKILL at 01:47:44 Singapore time on 20 November 2026. Cause remains unconfirmed: no CUDA OOM traceback, kernel logs inaccessible and no readable cgroup memory counters. The last complete full optimizer/sampler/CPU+CUDA RNG/EMA state is update 4,000; independently audited update-4,500 EMA and all earlier EMA exports are preserved. Canonical history/validation are saved through 4,500, with 453 finite logged training rows and 19 finite validation rows. Guided error at 4,500 was 0.053698: whole-latent relative squared velocity error averaged over eight held-out prompts × 20 teacher entering states, both CFG branches combined at guidance 5, using live weights. Masks remain 42 shared Q/K means / 22 NoPE pairs in all 14,400 cells; layer 0 and first-step exemptions remain native. D/E videos and scores have not run. B plus all C attempts used 22.159132 GPU-hours; 5.340868 remain under the approved 27.5 cap. Exact replay from 4,000 plus D/E projects 29.004 total GPU-hours from measured worker allocation and the brief's benchmark estimates. ASK for up to 2.5 more GPU-hours (30 total) to finish the exact 5,000-update recipe, or approval to benchmark the preserved 4,500 EMA without more training as a reduced scope inside 27.5. No GPU restart or recipe change was made. Full evidence and curve: `distill-results/nope/progress-interrupted-4590/`. Protected C2 recovery and shared22 extension were untouched.
+
+
+The user replied "ok" to the interruption budget ASK on 20 November 2026 (Asia/Singapore), approving up to 2.5 additional GPU-hours, **30 GPU-hours total**, for exact recovery from full checkpoint 4,000 through the original 5,000-update target, then D and E. Recipe and masks remain unchanged. The previous 4,500 EMA and later history are archived by the existing restart procedure before replay, with no deletion. Approval evidence is `distill-results/nope/budget-approval-30.json`. The restart considers only idle GPUs 1, 0 and 6, selecting two; GPU 4 is excluded because it reported nonzero utilization. Protected studies remain untouched.
+
+
+NoPE C completed all 5,000 original Stage 2 updates with the original schedule and exact optimizer/sampler/CPU+CUDA RNG/EMA restoration at 1,000, 3,000 and 4,000. Final live-weight guided relative squared velocity error was 0.053630, averaged over whole latents on eight held-out prompts × 20 cached teacher states after combining both branches at CFG 5; initial error was 0.439942. All canonical logged losses and validations were finite. Final EMA and full resumable checkpoint at 5,000 were audited, all 42-means / 22-NoPE masks and exemptions unchanged. B+C used 26.746757 GPU-hours of the user-approved 30. All old EMA exports and interrupted attempts are preserved; real-GPU replay is not bitwise identical, and its single-update scalar comparison is retained. Evidence and full curve: `distill-results/nope/training/`. D then E follow on idle GPUs; protected tasks untouched.
+
+
+NoPE phase D completed: `split42`, 100 original prompt/seed videos, 20-step frozen protocol, seven VBench dimensions, 2,204 means/zero interventions and 1,102 NoPE calls per video with masks/exemptions audited. Per-prompt paired comparisons use 10,000 prompt resamples (seed 20261109), audited teacher scores and video hashes. Aesthetics 0.299507, imaging 0.539214, text–video 0.104073 are averages over 100 videos (45 frames for the first two, eight midpoint frames for text–video). Final-latent relative L2 versus teacher 0.645951 averages full-coordinate ratios over 100 final-state pairs; PSNR 13.134 dB averages 4,500 aligned full-RGB frames. Evidence: `distill-results/nope/full100/split42/`. Protected studies and earlier EMA exports untouched.
+
+
+The split42 EMA fails this free-generation benchmark: aesthetics, imaging and text–video consistency are below the teacher, dense control, tuned shared22 and trained shared22 deletion, with every corresponding paired 95% interval below zero over the 100 original prompt/seed pairs. For example, split42 aesthetics is 0.299507 versus teacher 0.588595, imaging is 0.539214 versus 0.660679, and text–video is 0.104073 versus 0.232555. The frame aggregation and prompt-bootstrap scopes are those stated above. Dynamic degree averages 0.040000 versus 0.330000 for the teacher; the slightly higher smoothness score should not be read as better overall quality in this low-motion arm. Passing the cached-teacher-state gate did not establish good free-rollout video quality. E will measure the additional effect of zeroing the means against this already poor reference, which limits a clean claim that zeroing alone causes collapse.
+
+
+NoPE phase E completed: `split42_zeros`, 100 original prompt/seed videos, 20-step frozen protocol, seven VBench dimensions, 2,204 means/zero interventions and 1,102 NoPE calls per video with masks/exemptions audited. Per-prompt paired comparisons use 10,000 prompt resamples (seed 20261109), audited teacher scores and video hashes. Aesthetics 0.330283, imaging 0.418496, text–video 0.056721 are averages over 100 videos (45 frames for the first two, eight midpoint frames for text–video). Final-latent relative L2 versus teacher 0.749479 averages full-coordinate ratios over 100 final-state pairs; PSNR 12.104 dB averages 4,500 aligned full-RGB frames. Evidence: `distill-results/nope/full100/split42_zeros/`. Protected studies and earlier EMA exports untouched.
+
+
+CURRENT NoPE STATE: A–E complete; no study GPU jobs remain. C recovered the update-4,000 full optimizer/sampler/Torch CPU+CUDA RNG/EMA checkpoint and completed the original 5,000-update recipe. Final EMA and full resumable state are preserved at `out/distill-split42/student/` and `out/distill-split42/checkpoint/step-005000/` in `/mnt/data/liuzeyu/tri-video-nope-2979d3e`; nine earlier canonical EMA milestones and the interrupted 4,500 EMA archive remain intact. EMA hashes were unchanged after both benchmarks. Total study use 28.541502/30 approved GPU-hours, including every failed/replayed attempt and all B/D/E GPU work; CPU tests/statistics/diagnostics/agreement excluded. Both 100-prompt original-seed cohorts and all seven VBench dimensions are audited. Means/zeros aesthetics are 0.299507/0.330283, imaging 0.539214/0.418496 and text–video 0.104073/0.056721, equal prompt means over 100 videos with 45 frames for the first two and eight midpoint frames for text–video. Zero-minus-means paired intervals (10000 prompt resamples, seed20261109) are +0.030776 [0.017194,0.044369] aesthetics, −0.120718 [−0.150167,−0.091682] imaging and −0.047353 [−0.057224,−0.037764] text–video. The split42 means arm already fails teacher/dense/shared22/deletion comparisons, so the result is mixed additional degradation, not a clean uniform collapse from a good baseline. Native layer0 and first-step RoPE remain. E's 32-prompt ×20-state whole-latent guided errors are 0.059897 means and 0.101854 zeros, both branches at CFG5; the same first eight prompts give EMA0.054257 versus live-C0.053630. All 18 CPU bias-table contexts and individual-head figure are committed; selected-coordinate parameter relative L2 drift is Q0.061294/K0.065904 over all 1,110,816 active selected coordinates per side, without token averages. Evidence: `distill-results/nope/`. The SIGKILL cause and poor free-generation quality remain unresolved; no further recipe was tried. Protected studies unchanged.
+
+
+### Widened head (wide32), 20-21 November 2026
+
+Complete (A-E) per `DISTILL_WIDE_PROMPT.md`; report section "Widened head: 128 means under RoPE + 32 unrotated
+content pairs" in `DISTILL_REPORT.md`, evidence in `distill-results/wide/`. Lab root
+`/mnt/data/liuzeyu/tri-video-wide-67ed977` (pinned 1359c17): selection `out/distill-selection-v4/`, training
+`out/distill-wide32/` (final EMA `student/`, complete resume state `checkpoint/step-005000/`, EMA exports every 500),
+videos `out/learned-center-wan-wide32[-zeros]/`, runner logs `out/distill-wide-run/`. Headline: wide32 is far better
+than split42 but below shared22 on 100 videos (aesthetics -0.051, text-video -0.019); zeroing its position channel is
+catastrophic (aesthetics -0.193, imaging -0.314 vs wide32). 27.334 of 30 approved GPU-hours. Also fixed a SyntaxError
+in `generate_learned_center.py` (1359c17). During C the concurrent no-exemption training was SIGTERMed externally,
+30 s into wide32's update-1,000 full save (likely earlyoom, unconfirmed); it was resumed under a user-approved 18
+GPU-hour cap and reports separately. Open: other content widths and a zeros-trained wide arm (need approval);
+`memlog.sh` (passive, read-only) still logs host memory in the run directory.
+
+## Shared22 with nothing exempt
+
+CPU suite passed. A selects22 shared Q/K rotary pairs per all14400 layer-step-branch-head cells using existing64-prompt pooled statistics; constants are post-full-width RMSNorm/pre-RoPE, identical across all10800 video tokens in each cell. No exempt layer or step. No masks or calibration outputs overwritten.
+
+A scope:32 held-out prompts x20 teacher entering states, whole-latent relative squared velocity errors vs native bf16 teacher, equal prompt-state mean; conditional/unconditional separate, both combined at CFG5 for guided.
+
+| Arm | Conditional | Unconditional | Guided |
+|---|---:|---:|---:|
+| shared/mean | 0.006842 | 0.006987 | 0.034431 |
+| shared/delete | 0.010010 | 0.010069 | 0.039689 |
+
+Exempted shared means/delete guided references on the same32-prompt scope are0.03219502645661123/0.03741946758891572 (distill-results/nope/screen/complete.json); earlier no-exempt separate/mean is0.04098448762670159 (distill-results/selection/screen-noexempt/complete.json). These are distinct masks/conditions. Original A uses 0.349797 allocated GPU-hours. Budget cap13GPU-hours, idle GPU leases only, max2 per job. User requested unattended continuation after verified startup to conserve model credits; webhook hand-offs replace periodic model checks.
+
+
+### No-exemption runner stopped for attention
+
+Command '['python3', '/mnt/data/liuzeyu/tri-video-noexempt-6f273d8/out/distill-noexempt-run/gpu-worker.py', '--root', '/mnt/data/liuzeyu/tri-video-noexempt-6f273d8', '--name', 'train-b01', '--gpus', '2', '--candidates', '1,0,6,2,3,5', '--wall-limit', '18150', '--', '/dev/shm/tri-center-runtime/bin/python', '-m', 'torch.distributed.run', '--standalone', '--nproc_per_node', '2', 'scripts/train_learned_center.py', '--stage', '2', '--out', 'out/distill-s22-all', '--steps', '2500', '--accum', '2', '--lr', '1e-5', '--lr-center', '2e-4', '--warmup', '250', '--lambda-cfg', '1', '--lambda-feat', '0.1', '--ema', '0.999', '--clip', '1', '--val-every', '250', '--val-prompts', '8', '--val-at-start', '--save-every', '500', '--ema-checkpoints', '--resume-state-with-ema', '--resume-state-every', '1000', '--seed', '20261114', '--selection', 'out/distill-selection/selection.pt', '--variant', 'shared', '--calibration', 'out/distill-selection/pair-statistics.pt', '--center-mode', 'mean', '--include-layer0', '--include-step1', '--traj', '/tmp/tri-distill-pilot.EG6asH/traj', '--snapshot', '/dev/shm/tri-wan-snapshot', '--budget-seconds', '17550']' returned non-zero exit status 1.. Allocated GPU-hours 8.078830/13. All outputs preserved; see distill-results/noexempt/interruption.json and out/distill-noexempt-run/ logs. No further GPU work is launched by the runner.
+
+
+### No-exemption B: 2500-update fine-tune
+
+From teacher weights, original tuned shared22 recipe with --include-layer0 --include-step1, two ranks and accumulation2; seed20261114, model lr1e-5, means lr2e-4, warmup250, feature weight0.1, EMA0.999. All logged losses/validations finite. Full2500 optimizer/sampler/CPU+CUDA RNG/EMA save and final EMA masks audited. Whole-latent relative squared velocity errors average the first eight held-out prompts x20 teacher entering states; both branches combine at CFG5.
+
+| Update | Guided |
+|---:|---:|
+| 0 | 0.031922 |
+| 250 | 0.030385 |
+| 500 | 0.035585 |
+| 750 | 0.031774 |
+| 1000 | 0.028721 |
+| 1250 | 0.027883 |
+| 1500 | 0.028245 |
+| 1750 | 0.022584 |
+| 2000 | 0.022213 |
+| 2250 | 0.020564 |
+| 2500 | 0.020078 |
+
+![Validation curve](distill-results/noexempt/training/validation-curve.png)
+
+Median logged rank-mean optimizer seconds/update: 6.911287, excluding validation/saves. Peak allocator bytes per reported invocation/rank and all arguments are in training/summary.json and args.json. Mean-norm drift: {"q": {"first": 12.271143913269043, "last": 12.27061653137207, "percent": -0.004297740297887209}, "k": {"first": 12.71428394317627, "last": 12.713732719421387, "percent": -0.004335468338967363}}; scope: Per-cell Euclidean norm over all128 stored mean coordinates, equal average over all14400 cells including unused coordinates; no token/prompt average at measurement time. Allocated A+B GPU-hours: 15.189086, including startup, validation, saves/I/O and all attempts. All historical outputs retained.
+
+
+### No-exemption C: s22_all_means, 100 prompts
+
+One original seed per each of100 original prompts;20 UniPC steps, shift3, CFG5, empty negative,45frames480x480 at16fps. Shared22 Q/K means/zeros after full-width RMSNorm before RoPE, all10800 tokens per active cell; all30layers and20steps active, no exemptions, no NoPE. All100 videos audited at2400 replacement calls each. VBench scores are equal prompt averages of original within-video aggregation: aesthetics/MUSIQ all45 frames, text-video eight midpoint frames, other dimensions original VBench handling. Imaging divided by100. Frozen teacher videos/scores reused, not regenerated. Intervals are pointwise95% from10000 paired prompt resamples, NumPy seed20261109, one fixed seed per prompt; no across-seed uncertainty.
+
+| Dimension | Candidate | Candidate minus references, mean [95% CI] |
+|---|---:|---|
+| subject_consistency | 0.964203 | s22_all_means_minus_baseline: +0.000204 [-0.005767, +0.005880]; s22_all_means_minus_dense_control: -0.000081 [-0.004010, +0.003926]; s22_all_means_minus_shared22: -0.003287 [-0.006891, +0.000131]; s22_all_means_minus_shared22_delete: -0.002150 [-0.005663, +0.001312] |
+| background_consistency | 0.977130 | s22_all_means_minus_baseline: +0.000664 [-0.002719, +0.003881]; s22_all_means_minus_dense_control: -0.000546 [-0.003169, +0.001892]; s22_all_means_minus_shared22: -0.001247 [-0.003821, +0.001264]; s22_all_means_minus_shared22_delete: -0.001204 [-0.003233, +0.000692] |
+| motion_smoothness | 0.986207 | s22_all_means_minus_baseline: +0.001745 [+0.000299, +0.003322]; s22_all_means_minus_dense_control: +0.000701 [-0.000860, +0.002473]; s22_all_means_minus_shared22: -0.000176 [-0.000862, +0.000493]; s22_all_means_minus_shared22_delete: -0.000127 [-0.000879, +0.000624] |
+| dynamic_degree | 0.270000 | s22_all_means_minus_baseline: -0.060000 [-0.140000, +0.020000]; s22_all_means_minus_dense_control: +0.020000 [-0.050000, +0.090000]; s22_all_means_minus_shared22: -0.010000 [-0.060000, +0.040000]; s22_all_means_minus_shared22_delete: +0.000000 [-0.050000, +0.050000] |
+| aesthetic_quality | 0.587182 | s22_all_means_minus_baseline: -0.001413 [-0.013543, +0.010953]; s22_all_means_minus_dense_control: +0.009119 [-0.001919, +0.020228]; s22_all_means_minus_shared22: +0.003686 [-0.007249, +0.014825]; s22_all_means_minus_shared22_delete: +0.009394 [+0.000182, +0.018940] |
+| imaging_quality | 0.671702 | s22_all_means_minus_baseline: +0.011022 [-0.006866, +0.028433]; s22_all_means_minus_dense_control: +0.001681 [-0.015285, +0.017837]; s22_all_means_minus_shared22: -0.007153 [-0.018713, +0.004116]; s22_all_means_minus_shared22_delete: -0.008489 [-0.019778, +0.002521] |
+| overall_consistency | 0.233914 | s22_all_means_minus_baseline: +0.001359 [-0.005146, +0.007986]; s22_all_means_minus_dense_control: -0.000450 [-0.006936, +0.005713]; s22_all_means_minus_shared22: -0.000134 [-0.005125, +0.005050]; s22_all_means_minus_shared22_delete: -0.000692 [-0.006004, +0.004455] |
+
+Paired differences versus exempted shared22 include zero for ['subject_consistency', 'background_consistency', 'motion_smoothness', 'dynamic_degree', 'aesthetic_quality', 'imaging_quality', 'overall_consistency']; exclude zero for []. This is detection on these100 prompt/seed pairs, not proof of equivalence.
+
+Teacher agreement: mean full-coordinate final-latent relative L2 0.563031 over100 final-state pairs (step20, no intermediate-step average); frame PSNR 14.254dB over4500 aligned decoded frames, all RGB pixels/channels per-frame then equal dB average.
+
+
+
+### No-exemption C: s22_all_zeros, 100 prompts
+
+One original seed per each of100 original prompts;20 UniPC steps, shift3, CFG5, empty negative,45frames480x480 at16fps. Shared22 Q/K means/zeros after full-width RMSNorm before RoPE, all10800 tokens per active cell; all30layers and20steps active, no exemptions, no NoPE. All100 videos audited at2400 replacement calls each. VBench scores are equal prompt averages of original within-video aggregation: aesthetics/MUSIQ all45 frames, text-video eight midpoint frames, other dimensions original VBench handling. Imaging divided by100. Frozen teacher videos/scores reused, not regenerated. Intervals are pointwise95% from10000 paired prompt resamples, NumPy seed20261109, one fixed seed per prompt; no across-seed uncertainty.
+
+| Dimension | Candidate | Candidate minus references, mean [95% CI] |
+|---|---:|---|
+| subject_consistency | 0.955522 | s22_all_zeros_minus_baseline: -0.008477 [-0.015773, -0.001639]; s22_all_zeros_minus_s22_all_means: -0.008681 [-0.015403, -0.003157]; s22_all_zeros_minus_s22_zeros: -0.003942 [-0.009757, +0.001392] |
+| background_consistency | 0.972344 | s22_all_zeros_minus_baseline: -0.004122 [-0.007377, -0.000982]; s22_all_zeros_minus_s22_all_means: -0.004786 [-0.007857, -0.002052]; s22_all_zeros_minus_s22_zeros: -0.002686 [-0.005185, -0.000378] |
+| motion_smoothness | 0.984424 | s22_all_zeros_minus_baseline: -0.000039 [-0.001544, +0.001579]; s22_all_zeros_minus_s22_all_means: -0.001784 [-0.002416, -0.001207]; s22_all_zeros_minus_s22_zeros: -0.000674 [-0.001470, +0.000082] |
+| dynamic_degree | 0.390000 | s22_all_zeros_minus_baseline: +0.060000 [-0.020000, +0.140000]; s22_all_zeros_minus_s22_all_means: +0.120000 [+0.060000, +0.190000]; s22_all_zeros_minus_s22_zeros: +0.070000 [+0.000000, +0.140000] |
+| aesthetic_quality | 0.578991 | s22_all_zeros_minus_baseline: -0.009604 [-0.023531, +0.004327]; s22_all_zeros_minus_s22_all_means: -0.008191 [-0.018619, +0.002252]; s22_all_zeros_minus_s22_zeros: +0.000068 [-0.011080, +0.011411] |
+| imaging_quality | 0.664556 | s22_all_zeros_minus_baseline: +0.003877 [-0.013585, +0.021320]; s22_all_zeros_minus_s22_all_means: -0.007145 [-0.018235, +0.003237]; s22_all_zeros_minus_s22_zeros: -0.004988 [-0.018429, +0.008360] |
+| overall_consistency | 0.236756 | s22_all_zeros_minus_baseline: +0.004201 [-0.002246, +0.010553]; s22_all_zeros_minus_s22_all_means: +0.002842 [-0.002622, +0.008456]; s22_all_zeros_minus_s22_zeros: +0.003174 [-0.001242, +0.007615] |
+
+This is an inference-only means-to-zeros swap on identical trained weights; interpret its paired changes dimension by dimension, not as a new zero-trained control.
+
+Teacher agreement: mean full-coordinate final-latent relative L2 0.562306 over100 final-state pairs (step20, no intermediate-step average); frame PSNR 14.284dB over4500 aligned decoded frames, all RGB pixels/channels per-frame then equal dB average.
+
+
+
+### No-exemption study complete
+
+All four swaps, each on100 original prompt/seed pairs with10000 paired prompt resamples seed20261109; decoded-video scores with within-video frame scopes stated above:
+
+| Swap | Aesthetics | Imaging | Text-video | Subject |
+|---|---:|---:|---:|---:|
+| Shared22 exempted | -0.004572 [-0.016253,+0.006629] | -0.009310 [-0.021441,+0.003594] | -0.000466 [-0.004960,+0.004237] | -0.008026 [-0.011886,-0.004642] |
+| Fixed high | -0.163339 [-0.182423,-0.144891] | -0.284466 [-0.314808,-0.253312] | -0.169008 [-0.183127,-0.154921] | -0.040046 [-0.048728,-0.031019] |
+| Split42 | +0.030776 [+0.017194,+0.044369] | -0.120718 [-0.150167,-0.091682] | -0.047353 [-0.057224,-0.037764] | -0.000305 [-0.008526,+0.007682] |
+| Shared22 no exemptions | -0.008191 [-0.018619,+0.002252] | -0.007145 [-0.018235,+0.003237] | +0.002842 [-0.002622,+0.008456] | -0.008681 [-0.015403,-0.003157] |
+
+Trained-student screen (32 prompts x20 teacher states, whole-latent ratios, both CFG branches combined at5): {"student/mean": [0.0023714893834039684, 0.002332464066830653, 0.019325562404992523], "student/delete": [0.003279625959294208, 0.0032788750341296692, 0.02113469421310583]}. Columns conditional/unconditional/guided. Total allocated study GPU-hours 16.853779/18 (cap raised from 13 by the user after the external SIGTERM). Full2500 optimizer/sampler/RNG/EMA state and all prior outputs preserved. Evidence under distill-results/noexempt/. No additional recipe or zeros-trained arm was run.
+
+
+### Shared32 with nothing exempt, 21-22 November 2026
+
+Complete; report section "Shared32 with nothing exempt: half of the rotary pairs as means" in `DISTILL_REPORT.md`,
+evidence in `distill-results/shared32/`. Run by the new one-command interface `scripts/center_study.py
+configs/studies/shared32.json` (CPU tests `scripts/test_center_study.py`); a new pair count or variant is a copied
+spec with `means_pairs`/`variant`/`name`/`approved_gpu_hours` changed, and the zeros arm is automatic. Lab root
+`/mnt/data/liuzeyu/tri-video-s32-31ef4d2`: everything under `out/study-shared32/` (selection, screens, training with
+final EMA `student/` and complete resume state at update 2,500, bench-mean/bench-delete videos, run/ledger.tsv).
+Headline (100 videos, paired 95% CIs): s32_means is teacher-level except aesthetics -0.019 and dynamic degree -0.12;
+it is 0.018 below s22_all_means in aesthetics. The inference-only zeros swap costs aesthetics -0.037, imaging -0.042,
+text-video -0.015 vs s32_means (s22_all's swap was within noise on those three). Trained-student guided velocity error
+0.0240 means / 0.0279 zeros (32 held-out prompts x 20 states, whole latent, CFG 5). 12.798 of 18 approved GPU-hours.
+Open: zeros-trained arm, other pair counts (need approval).
+
 ## 17. Per-pair attention-score attribution
 
 The attribution branch `claude/practical-lovelace-yham5v` uses the dedicated 5090 checkout `/mnt/data/liuzeyu/tri-score-attribution-e8657af` and the pinned §11 runtime with `WAN_SNAPSHOT`. Attribution and learned-center CPU tests both printed `ALL TESTS OK` at `e8657af`. Collection read the existing teacher trajectories at `/tmp/tri-distill-pilot.EG6asH/traj` and used idle GPUs. The earlier checkouts and jobs remained untouched.

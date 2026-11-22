@@ -11,6 +11,21 @@ repo's original high-frequency third. A selection produced by scripts/select_pai
 own per-cell sets. mu_q/mu_k are fp32 parameters of shape [layers, steps, branches, heads, 128]; entries
 outside the mask are unused.
 
+A third, optional mask S_nope (same for Q and K) marks pairs that keep their content but receive NO rotary
+embedding (NoPE): the attention processor is wrapped so that RoPE multiplies those pairs by 1 instead of
+e^{i w pos}. With S_q = S_k = S_mean and S_nope = the complement, the logit splits into a pure content term
+(the NoPE pairs, position-blind) and a pure position term (the constant pairs under RoPE, a per-head additive bias
+sum_f |mu_q,f||mu_k,f| cos(w_f delta + phi_f), computed by position_bias_tables). Setting the constants to zero
+then removes every positional signal from that attention layer.
+
+Widened head ("wide" selections, LearnedCenter(wide=True)): instead of splitting the 128 coordinates, Q and K are
+widened per head to 128 + 2n: the full 128-dim constant vector under normal RoPE (a content-free position channel
+over all 64 frequencies) concatenated with the 2n coordinates of the n content pairs (mask_nope; the highest-damage
+pairs), taken from the real projection output after QK-norm and NOT rotated. V and to_out stay 128-wide; the logit
+scale stays 1/sqrt(128). WideHeadProcessor replaces the attention processor of active layers; no norm hooks are
+used. Mode "delete" zeros the position channel (content-only attention). At deployment the position channel is a
+per-head bias table (position_bias_tables) and attention runs on 2n content dims.
+
 Modes: "mean" (learned constants on the mask), "delete" (post-norm zeros on the mask), "narrow" (pre-norm
 zeros on the mask, i.e. the projection output is zeroed before Wan's RMSNorm, so the norm statistics are taken
 over the remaining coordinates), "off" (dense attention).
@@ -50,9 +65,11 @@ def high_pair_mask():
 
 class LearnedCenter(nn.Module):
     def __init__(self, layers=30, steps=20, branches=2, heads=12, head_dim=128,
-                 exempt_layers=(0,), exempt_steps=(0,), mode="mean", selection=None):
+                 exempt_layers=(0,), exempt_steps=(0,), mode="mean", selection=None, wide=None, content_pairs=None):
         """selection: optional dict with 'mask_q' and 'mask_k', bool tensors of shape
-        [layers, steps, branches, heads, 64] (pairs) or [..., 128] (coordinates)."""
+        [layers, steps, branches, heads, 64] (pairs) or [..., 128] (coordinates); optionally 'mask_nope' (content
+        pairs without RoPE) and 'wide' (bool: widened head, see module docstring). wide/content_pairs may also be
+        given directly (content_pairs sizes the content index when no selection is passed, e.g. before a load)."""
         super().__init__()
         self.layers, self.steps, self.branches, self.heads, self.head_dim = layers, steps, branches, heads, head_dim
         if head_dim != 2 * PAIRS:
@@ -62,10 +79,34 @@ class LearnedCenter(nn.Module):
         self.mu_k = nn.Parameter(torch.zeros(shape))
         default = pair_mask_to_dims(high_pair_mask()).expand(shape).clone()
         mask_q, mask_k = default, default.clone()
+        mask_nope = torch.zeros(shape, dtype=torch.bool)
+        if wide is None:
+            wide = bool(selection.get("wide", False)) if selection is not None else False
         if selection is not None:
             mask_q, mask_k = (self._coerce_mask(selection[k], shape) for k in ("mask_q", "mask_k"))
+            if selection.get("mask_nope") is not None:
+                mask_nope = self._coerce_mask(selection["mask_nope"], shape)
+                if not wide and bool((mask_nope & (mask_q | mask_k)).any()):
+                    raise ValueError("a NoPE pair cannot also be a replaced pair")
         self.register_buffer("mask_q", mask_q)
         self.register_buffer("mask_k", mask_k)
+        self.register_buffer("mask_nope", mask_nope)
+        self.register_buffer("wide", torch.tensor(bool(wide)))
+        if wide:
+            counts = mask_nope[..., 0::2].sum(-1)
+            if selection is not None:
+                if content_pairs is None:
+                    content_pairs = int(counts.flatten()[0])
+                if content_pairs < 1 or not bool((counts == content_pairs).all()):
+                    raise ValueError("wide mode needs the same positive number of content pairs in every cell")
+                index = torch.nonzero(mask_nope.reshape(-1, head_dim))[:, 1].reshape(*shape[:-1], 2 * content_pairs)
+            else:
+                if not content_pairs:
+                    raise ValueError("wide=True without a selection needs content_pairs")
+                index = torch.zeros(*shape[:-1], 2 * content_pairs, dtype=torch.long)
+            self.register_buffer("content_index", index)       # [L,S,B,H,2n] coordinate indices, sorted
+        else:
+            self.register_buffer("content_index", torch.zeros(*shape[:-1], 0, dtype=torch.long))
         layer_active = torch.ones(layers, dtype=torch.bool)
         layer_active[list(exempt_layers)] = False
         step_active = torch.ones(steps, dtype=torch.bool)
@@ -77,8 +118,10 @@ class LearnedCenter(nn.Module):
         self.step = None      # LongTensor [B], zero-based denoising step per batch element
         self.branch = None    # LongTensor [B], 0 = conditional, 1 = unconditional
         self.handles = []
+        self.wrapped = []      # (attention module, original processor) pairs replaced by NoPE wrappers
         self.rollout = None
         self.calls = 0
+        self.nope_calls = 0
 
     @staticmethod
     def _coerce_mask(mask, shape):
@@ -173,6 +216,17 @@ class LearnedCenter(nn.Module):
         self.detach()
         if len(transformer.blocks) != self.layers:
             raise ValueError(f"model has {len(transformer.blocks)} blocks, module has {self.layers}")
+        if self.is_wide:
+            if self.mode not in ("mean", "delete", "off"):
+                raise ValueError("wide head supports modes mean, delete and off")
+            for layer, block in enumerate(transformer.blocks):
+                if self.mode != "off" and bool(self.layer_active[layer]):
+                    attn = block.attn1
+                    original = attn.processor
+                    attn.set_processor(WideHeadProcessor(original, self, layer))
+                    self.wrapped.append((attn, original))
+            self.handles.append(transformer.register_forward_pre_hook(self._transformer_pre_hook, with_kwargs=True))
+            return self
         hook_prefix = "to_" if self.mode == "narrow" else "norm_"
         for layer, block in enumerate(transformer.blocks):
             if self.mode == "narrow" and not bool(self.layer_active[layer]):
@@ -180,8 +234,48 @@ class LearnedCenter(nn.Module):
             for side in ("q", "k"):
                 module = getattr(block.attn1, hook_prefix + side)
                 self.handles.append(module.register_forward_hook(self._hook(layer, side)))
+            if self.uses_nope and bool(self.layer_active[layer]) and self.mode != "off":
+                attn = block.attn1
+                original = attn.processor
+                attn.set_processor(NoPEProcessor(original, self, layer))
+                self.wrapped.append((attn, original))
         self.handles.append(transformer.register_forward_pre_hook(self._transformer_pre_hook, with_kwargs=True))
         return self
+
+    @property
+    def uses_nope(self):
+        return bool(self.mask_nope.any())
+
+    @property
+    def is_wide(self):
+        return bool(self.wide)
+
+    @property
+    def content_pairs(self):
+        return int(self.content_index.shape[-1] // 2)
+
+    def context_for(self, batch, device):
+        """(step, branch, active) LongTensors/BoolTensor of length batch for the current context."""
+        if self.step is None or self.branch is None:
+            raise RuntimeError("LearnedCenter context not set")
+        step = self.step.to(device)
+        branch = self.branch.to(device)
+        if step.numel() != batch:
+            raise RuntimeError(f"context batch {step.numel()} != tensor batch {batch}")
+        return step, branch, self.step_active.to(device)[step]
+
+    def nope_mask_for(self, layer, batch, device):
+        """[B, heads, 128] bool: pairs that must not be rotated for the current context, or None if nothing to do."""
+        if self.step is None or self.branch is None:
+            raise RuntimeError("LearnedCenter context not set")
+        step = self.step.to(device)
+        branch = self.branch.to(device)
+        if step.numel() != batch:
+            raise RuntimeError(f"context batch {step.numel()} != tensor batch {batch}")
+        active = self.step_active.to(device)[step]
+        if not bool(active.any()):
+            return None
+        return self.mask_nope[layer][step, branch] & active.view(batch, 1, 1)
 
     def _hook(self, layer, side):
         def apply(module, inputs, output):
@@ -192,6 +286,9 @@ class LearnedCenter(nn.Module):
         for handle in self.handles:
             handle.remove()
         self.handles = []
+        for attn, original in self.wrapped:
+            attn.set_processor(original)
+        self.wrapped = []
 
     # ---- initialization and checkpoints --------------------------------------------------------------
     @torch.no_grad()
@@ -220,6 +317,12 @@ class LearnedCenter(nn.Module):
             key = prefix + name
             if key not in state_dict:
                 state_dict[key] = pair_mask_to_dims(high_pair_mask()).expand(self.mu_q.shape).clone()
+        if prefix + "mask_nope" not in state_dict:
+            state_dict[prefix + "mask_nope"] = torch.zeros(self.mu_q.shape, dtype=torch.bool)
+        if prefix + "wide" not in state_dict:
+            state_dict[prefix + "wide"] = torch.tensor(False)
+        if prefix + "content_index" not in state_dict:
+            state_dict[prefix + "content_index"] = torch.zeros(*self.mu_q.shape[:-1], 0, dtype=torch.long)
         super()._load_from_state_dict(state_dict, prefix, *args, **kwargs)
 
     @classmethod
@@ -227,13 +330,16 @@ class LearnedCenter(nn.Module):
         """Build a module matching a saved {"state_dict", "mode"} record (either layout)."""
         state = saved["state_dict"]
         layers, steps, branches, heads = state["mu_q"].shape[:4]
-        module = cls(layers=layers, steps=steps, branches=branches, heads=heads, mode=mode or saved.get("mode", "mean"), **kwargs)
+        wide = bool(state["wide"]) if "wide" in state else bool(saved.get("wide", False))
+        content_pairs = int(state["content_index"].shape[-1] // 2) if wide and "content_index" in state else None
+        module = cls(layers=layers, steps=steps, branches=branches, heads=heads, mode=mode or saved.get("mode", "mean"),
+                     wide=wide, content_pairs=content_pairs, **kwargs)
         module.load_state_dict(state)
         return module
 
     def selected_pairs(self, side):
-        """[layers, steps, branches, heads, 64] bool: pairs replaced on this side (ignoring exemptions)."""
-        return (self.mask_q if side == "q" else self.mask_k)[..., 0::2]
+        """[layers, steps, branches, heads, 64] bool: pairs replaced on this side, or NoPE pairs for side "nope" (ignoring exemptions)."""
+        return {"q": self.mask_q, "k": self.mask_k, "nope": self.mask_nope}[side][..., 0::2]
 
     def position_bias_tables(self, layer, step, branch, rope_freqs):
         """Equivalent additive logit tables implied by the constants on pairs selected on BOTH sides (analysis).
@@ -251,3 +357,110 @@ class LearnedCenter(nn.Module):
             zs = z[:, sel]
             tables[axis] = lambda delta, w=w, zs=zs: (zs * torch.exp(1j * w * float(delta))).real.sum(-1)
         return tables
+
+
+class NoPEProcessor:
+    """Wraps a Wan attention processor so that the pairs in LearnedCenter.mask_nope receive no rotary embedding.
+
+    The wrapper rewrites the rotary tensors passed to the original processor: on NoPE coordinates cos -> 1 and
+    sin -> 0 (tuple format, diffusers >= 0.35, freqs [1, T, 1, 128] against q/k [B, T, H, 128]) or the complex
+    factor -> 1 (older format, freqs [1, 1, T, 64] against q/k [B, H, T, 128]). Every other pair sees the native
+    rotary values and dtype, so non-NoPE pairs are bit-identical to the unwrapped model. The mask is per batch
+    element (step, branch) and per head, as the other masks.
+    """
+
+    def __init__(self, original, center, layer):
+        self.original = original
+        self.center = center
+        self.layer = layer
+
+    def __call__(self, attn, hidden_states, encoder_hidden_states=None, attention_mask=None, rotary_emb=None, **kwargs):
+        if rotary_emb is not None and self.center.mode != "off":
+            batch, tokens = hidden_states.shape[0], hidden_states.shape[1]
+            nope = self.center.nope_mask_for(self.layer, batch, hidden_states.device)       # [B, H, 128] or None
+            if nope is not None and bool(nope.any()):
+                rotary_emb = self.rewrite(rotary_emb, nope, batch, tokens)
+                self.center.nope_calls += 1
+        return self.original(attn, hidden_states, encoder_hidden_states, attention_mask, rotary_emb, **kwargs)
+
+    @staticmethod
+    def rewrite(rotary_emb, nope, batch, tokens):
+        if isinstance(rotary_emb, (tuple, list)):
+            cos, sin = rotary_emb
+            if cos.dim() != 4 or cos.shape[1] != tokens:
+                raise RuntimeError(f"unexpected rotary layout {tuple(cos.shape)}")
+            m = nope[:, None, :, :]                                                     # [B, 1, H, 128]
+            cos = torch.where(m, torch.ones((), dtype=cos.dtype, device=cos.device), cos.to(nope.device))
+            sin = torch.where(m, torch.zeros((), dtype=sin.dtype, device=sin.device), sin.to(nope.device))
+            return (cos, sin)
+        freqs = rotary_emb
+        if not torch.is_complex(freqs) or freqs.dim() != 4 or freqs.shape[2] != tokens:
+            raise RuntimeError(f"unexpected rotary layout {tuple(freqs.shape)}")
+        m = nope[..., 0::2][:, :, None, :]                                              # [B, H, 1, 64]
+        return torch.where(m, torch.ones((), dtype=freqs.dtype, device=freqs.device), freqs)
+
+
+class WideHeadProcessor:
+    """Widened-head attention (see module docstring): per head, Q and K are [constant 128 under RoPE | 2n content
+    coordinates without RoPE]; V and to_out are native; logit scale 1/sqrt(128). Exempt batch elements (inactive
+    step) and exempt layers (never wrapped) run the native computation: native rotated Q/K in the first 128
+    coordinates and zeros in the tail. Tuple rotary format (diffusers >= 0.35) only. Counts 2 replacement calls
+    (q and k) and 1 processor call per invocation, so the generator's call checks keep their formulas."""
+
+    def __init__(self, original, center, layer):
+        self.original = original
+        self.center = center
+        self.layer = layer
+
+    @staticmethod
+    def rotate(x, rotary_emb):
+        if not isinstance(rotary_emb, (tuple, list)):
+            raise RuntimeError("wide head needs the (cos, sin) rotary format")
+        freqs_cos, freqs_sin = rotary_emb
+        x1, x2 = x.unflatten(-1, (-1, 2)).unbind(-1)
+        cos = freqs_cos[..., 0::2].to(x.device)
+        sin = freqs_sin[..., 1::2].to(x.device)
+        out = torch.empty_like(x)
+        out[..., 0::2] = x1 * cos - x2 * sin
+        out[..., 1::2] = x1 * sin + x2 * cos
+        return out.type_as(x)
+
+    def __call__(self, attn, hidden_states, encoder_hidden_states=None, attention_mask=None, rotary_emb=None, **kwargs):
+        c = self.center
+        if c.mode == "off" or rotary_emb is None or encoder_hidden_states is not None:
+            return self.original(attn, hidden_states, encoder_hidden_states, attention_mask, rotary_emb, **kwargs)
+        from diffusers.models.attention_dispatch import dispatch_attention_fn
+        from diffusers.models.transformers.transformer_wan import _get_qkv_projections
+        q, k, v = _get_qkv_projections(attn, hidden_states, encoder_hidden_states)
+        q = attn.norm_q(q)
+        k = attn.norm_k(k)
+        B, T = q.shape[:2]
+        H, D = c.heads, c.head_dim
+        q = q.unflatten(2, (H, -1))
+        k = k.unflatten(2, (H, -1))
+        v = v.unflatten(2, (H, -1))
+        step, branch, active = c.context_for(B, q.device)
+        act = active.view(B, 1, 1, 1)
+        if c.mode == "mean":
+            pos_q = c.mu_q[self.layer][step, branch].to(q.dtype)          # [B, H, D]
+            pos_k = c.mu_k[self.layer][step, branch].to(k.dtype)
+        else:                                                              # delete: position channel removed
+            pos_q = torch.zeros(B, H, D, dtype=q.dtype, device=q.device)
+            pos_k = torch.zeros(B, H, D, dtype=k.dtype, device=k.device)
+        pos_q = self.rotate(torch.where(act, pos_q.unsqueeze(1).expand(B, T, H, D), q), rotary_emb)
+        pos_k = self.rotate(torch.where(act, pos_k.unsqueeze(1).expand(B, T, H, D), k), rotary_emb)
+        index = c.content_index[self.layer][step, branch].unsqueeze(1).expand(B, T, H, -1)     # [B, T, H, 2n]
+        tail_q = torch.where(act, torch.gather(q, -1, index), torch.zeros((), dtype=q.dtype, device=q.device))
+        tail_k = torch.where(act, torch.gather(k, -1, index), torch.zeros((), dtype=k.dtype, device=k.device))
+        q_wide = torch.cat([pos_q, tail_q], -1)
+        k_wide = torch.cat([pos_k, tail_k], -1)
+        v_wide = torch.nn.functional.pad(v, (0, q_wide.shape[-1] - D))     # same head width for every attention backend
+        out = dispatch_attention_fn(q_wide, k_wide, v_wide, attn_mask=attention_mask, dropout_p=0.0, is_causal=False,
+                                    scale=D ** -0.5, backend=getattr(self.original, "_attention_backend", None),
+                                    parallel_config=getattr(self.original, "_parallel_config", None))
+        out = out[..., :D].flatten(2, 3).type_as(q)
+        out = attn.to_out[0](out)
+        out = attn.to_out[1](out)
+        c.calls += 2
+        c.nope_calls += 1
+        return out

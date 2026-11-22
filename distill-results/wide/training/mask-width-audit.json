@@ -1,0 +1,17 @@
+{
+ "wide": true,
+ "content_pairs_per_cell": 32,
+ "means_pairs_per_cell": 64,
+ "cells": 14400,
+ "layers_active": 30,
+ "steps_active": 20,
+ "exempt_layers": [],
+ "exempt_steps": [],
+ "masks_tensor_equal_to_selection_v4_wide": true,
+ "complete_resume_step": 5000,
+ "expected_calls_per_video": {
+  "replacement": 2400,
+  "processor": 1200
+ },
+ "scope": "Final EMA learned_center.pt, all 30 x 20 x 2 x 12 layer-step-branch-head cells; masks over the 64 rotary pairs per head; no exemptions."
+}

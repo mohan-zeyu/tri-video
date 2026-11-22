@@ -1,0 +1,12 @@
+{
+  "approved_gpu_hours_total": 30,
+  "additional_gpu_hours": 2.5,
+  "original_gpu_hours": 25,
+  "source": "User replied ok in the lab chat to the request for 2.5 additional GPU-hours (30 total) for exact recovery from 4000, original target 5000, then D and E.",
+  "question_commit": "25816337cf4a5a54748fbe478b691dd27f2e719a",
+  "recorded_unix": 1795145864.6099832,
+  "recipe_changes_approved": false,
+  "fine_tune_ranks": 2,
+  "max_total_gpus": 4,
+  "previous_gpu_hours_total": 27.5
+}

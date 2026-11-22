@@ -741,6 +741,684 @@ Each validation row averages full-latent relative squared velocity error over ei
 
 The prescribed EMA checkpoints at updates 500, 1,000 and 1,500 remain in `out/distill-narrow-shared22/ema-checkpoints/` on the lab host. The most recent export has exact shared Q/K masks and the matched layer-0 and step-1 exemptions, with its weights and center file checksummed. An exact resume requires the live weights, full optimizer and sampler state. The EMA-only run saved smoothed model exports. The approved recovery is a new exact C1 run from teacher weights, with up to seven additional GPU-hours for the combined study. C1 keeps the original training inputs, seed, optimizer and schedule. Its save mode retains every scheduled EMA export and the latest resumable checkpoint, including live model and optimizer weights, EMA buffers and rank-local random states. The CPU test recovered the same final weights and validation curve as an uninterrupted run. The rerun writes to `out/distill-narrow-shared22-rerun/`. Pooled C2 follows the rerun’s full benchmark. The saved training records and the interruption audit are in `distill-results/removal/narrow-shared22/interrupted/`.
 
+### C1 · Shared22 pre-norm removal after 2,500 updates
+
+Starting from teacher weights, this arm used the matched Stage 2 learning rate, warmup, feature and velocity losses, EMA, seed and optimizer. Two ranks used two microbatches each, for four cached teacher prompt-and-step samples per update. Both Q/K masks and both exemption buffers match shared22 post-norm deletion exactly. This comparison moves the same selected coordinates from after RMSNorm to before it, with layer 0 and step 1 exempt.
+
+The current training weights were validated on the first eight held-out prompts and all 20 entering teacher states. Relative squared velocity error normalizes the squared difference over all latent coordinates by the corresponding teacher velocity energy for each state. Guided combines both branches at CFG 5 before applying that ratio. Each row averages 160 equal-weight teacher states for each column.
+
+| Update | Pre-norm conditional | Pre-norm unconditional | Pre-norm guided | Post-norm shared22 guided |
+|---|---:|---:|---:|---:|
+| 0 | 0.029271 | 0.033403 | 0.097438 | 0.034872 |
+| 250 | 0.004715 | 0.005566 | 0.029992 | 0.029633 |
+| 500 | 0.004882 | 0.005696 | 0.033184 | 0.031879 |
+| 750 | 0.005117 | 0.004999 | 0.031525 | 0.030278 |
+| 1,000 | 0.004848 | 0.005404 | 0.030361 | 0.030603 |
+| 1,250 | 0.004044 | 0.003659 | 0.027766 | 0.026632 |
+| 1,500 | 0.003755 | 0.003651 | 0.027420 | 0.028333 |
+| 1,750 | 0.003174 | 0.002849 | 0.024078 | 0.024191 |
+| 2,000 | 0.002908 | 0.002473 | 0.023520 | 0.022847 |
+| 2,250 | 0.002622 | 0.002246 | 0.021800 | 0.021362 |
+| 2,500 | 0.002472 | 0.002167 | 0.021373 | 0.020530 |
+
+Training used GPUs 3 and 5 and completed 2,500 updates in one run with finite logged losses. Median optimizer-update time was 6.870 s across 251 logged steps, averaging the two rank timings for each recorded update and excluding validation and saving. GPU device usage reached 24,487 and 24,483 MiB in the recorded snapshots on GPUs 3 and 5. The timeout prevented the trainer from emitting its final PyTorch allocator peak, and driver accounting was disabled. All 2,500 updates and the final EMA were saved before the wall-time guard stopped the job while writing the final optimizer checkpoint. The EMA was independently opened, mask-checked, and checksummed before evaluation. The last complete optimizer checkpoint is at 2,000. The four intermediate and final EMA exports are preserved in `out/distill-narrow-shared22-rerun/` in the lab removal checkout.
+
+The full benchmark generated one video per original fixed seed for each of 100 prompts, with seven pinned VBench dimensions. Every video passed the MP4 checksum and 45-frame, 480×480, 16 fps audits and recorded finite latents at all 20 steps. Every video recorded 2,204 intervention calls over 29 active layers, 19 steps, both CFG branches and Q/K. Each dimension averages 100 per-video scores. Aesthetics and imaging use all 45 frames. Text–video consistency uses eight midpoint frames and the prompt.
+
+| Dimension | Shared22 pre-norm removal | Teacher | Dense | Tuned shared22 | Shared22 post-norm deletion |
+|---|---:|---:|---:|---:|---:|
+| Subject consistency | 0.962257 | 0.963999 | 0.964285 | 0.967490 | 0.966353 |
+| Background consistency | 0.974716 | 0.976466 | 0.977676 | 0.978377 | 0.978334 |
+| Motion smoothness | 0.985579 | 0.984463 | 0.985506 | 0.986384 | 0.986335 |
+| Dynamic degree | 0.300000 | 0.330000 | 0.250000 | 0.280000 | 0.270000 |
+| Aesthetics | 0.576878 | 0.588595 | 0.578063 | 0.583495 | 0.577787 |
+| Imaging | 0.678851 | 0.660679 | 0.670020 | 0.678854 | 0.680191 |
+| Text–video consistency | 0.231167 | 0.232555 | 0.234363 | 0.234047 | 0.234605 |
+
+Differences are this pre-norm removal arm minus the reference, with percentile 95% intervals from 10,000 paired prompt resamples on the 100 matched prompt-and-seed units, NumPy seed 20261109.
+
+| Dimension | vs. Teacher | vs. Dense | vs. Tuned shared22 | vs. Shared22 post-norm deletion |
+|---|---:|---:|---:|---:|
+| Subject consistency | -0.00174 [-0.00934, +0.00513] | -0.00203 [-0.00693, +0.00219] | -0.00523 [-0.01001, -0.00098] | -0.00410 [-0.00827, -0.00009] |
+| Background consistency | -0.00175 [-0.00544, +0.00173] | -0.00296 [-0.00563, -0.00052] | -0.00366 [-0.00637, -0.00113] | -0.00362 [-0.00612, -0.00138] |
+| Motion smoothness | +0.00112 [-0.00006, +0.00236] | +0.00007 [-0.00103, +0.00123] | -0.00080 [-0.00160, -0.00011] | -0.00076 [-0.00175, +0.00005] |
+| Dynamic degree | -0.03000 [-0.11000, +0.05000] | +0.05000 [-0.01000, +0.11000] | +0.02000 [-0.03000, +0.08000] | +0.03000 [-0.03000, +0.09000] |
+| Aesthetics | -0.01172 [-0.02343, -0.00005] | -0.00118 [-0.01227, +0.01010] | -0.00662 [-0.01782, +0.00478] | -0.00091 [-0.01040, +0.00861] |
+| Imaging | +0.01817 [+0.00184, +0.03516] | +0.00883 [-0.00305, +0.02102] | -0.00000 [-0.01404, +0.01357] | -0.00134 [-0.01071, +0.00798] |
+| Text–video consistency | -0.00139 [-0.00745, +0.00486] | -0.00320 [-0.00917, +0.00269] | -0.00288 [-0.00848, +0.00289] | -0.00344 [-0.00871, +0.00169] |
+
+Shared pre-norm minus matched post-norm deletion on the 100 videos measured aesthetics -0.00091 [-0.01040, +0.00861], imaging -0.00134 [-0.01071, +0.00798], and text–video consistency -0.00344 [-0.00871, +0.00169]. The paired intervals on all three quality measures span zero, as do the intervals for motion smoothness and dynamic degree. Subject and background consistency were lower by 0.00410 and 0.00362, with intervals below zero. Those dimensions compare frame embeddings across 44 transitions per video, averaged over the same 100 videos. This comparison holds the mask, exemptions, teacher initialization and fine-tuning recipe fixed.
+
+Across those same 100 pairs, mean whole-final-latent L2 versus the teacher was 499.304 and relative L2 was 0.567666. Relative L2 divides by the teacher latent norm per matched prompt before averaging. PSNR averaged 14.098 dB over 4,500 aligned decoded frames. Training used 37,956 GPU-seconds and benchmarking used 3,992, for 41,948 GPU-seconds (11.652 GPU-hours) for this arm. Training and benchmark artifacts are in `distill-results/removal/narrow-shared22/`. Lab videos are in `out/learned-center-wan-narrow_shared22-full100/`.
+
+The study charges C1’s interrupted attempt separately. Scoring used 493 seconds beyond the first C1 benchmark allowance, with the extra time charged to the approved combined budget. After A+B, the interrupted attempt and the completed C1 rerun, the C2 allocation is 40,963 GPU-seconds (11.379 GPU-hours). C2 uses the same scheduled EMA saves every 500 updates and writes full resumable optimizer checkpoints at updates 1,000 and 2,000. The CPU restart test passed with this save policy.
+
+### C2 · Pooled pre-norm removal interrupted
+
+The fresh matched C2 run on GPUs 3 and 5 logged update 660 of 2,500. Rank 0 received SIGKILL around 19:52 Singapore time on 18 November, and the launcher terminated the peer. The source of the signal is unconfirmed. Losses were finite through the last log. Its latest durable EMA is at update 500, before the first full optimizer save scheduled at update 1,000. The 100-prompt benchmark remains pending.
+
+At update 500, guided relative squared velocity error was 0.035505, down from 0.121886 at initialization. Each value averages whole-latent errors on 160 states from eight held-out prompts × 20 cached teacher entering states, using both branches at CFG 5. The saved EMA has exactly the intended pooled Q/K masks, shared across steps and branches, with layer 0 exempt and all 20 steps active. The full paired benchmark will require a recovery decision.
+
+C2 charged 9,984 GPU-seconds (2.773 GPU-hours), leaving 30,979 GPU-seconds (8.605 GPU-hours) of the approved 31.5 GPU-hours. This accounts for A+B, both C1 attempts, C1 scoring, and the interrupted C2 run. The lab EMA stays under `out/distill-narrow-pooled/ema-checkpoints/step-000500/`. Checksums, training logs through the last EMA and the interruption audit are in `distill-results/removal/narrow-pooled/interrupted/`.
+
+## Fine-tune, then drop: swapping means and zeros in the trained students
+
+Both frozen EMA exports passed the published SHA-256 checks and have identical shared22 masks and exemptions. Each swap changes both coordinates of 22 selected rotary pairs on each of Q and K, for every video token. It applies the per-layer, step, CFG-branch and head mask after full-width QK RMSNorm and before RoPE. Layer 0 and denoising step 1 are exempt. Each within-EMA comparison holds the transformer and center export fixed.
+
+The stored mean norms are averages of the Euclidean norm over all 128 coordinates in each of 14,400 layer–step–branch–head cells, including exempt cells. Shared22 reports Q 12.270763 and K 12.713887. Deletion stores the calibration means and reports Q 12.271144 and K 12.714284.
+
+### Cached teacher-state screen
+
+Each row averages the relative squared velocity error over the full latent for each of 32 held-out prompts × 20 cached teacher entering states. Conditional and unconditional use their corresponding native bf16 teacher velocities. Guided combines both branches at CFG 5 before computing the error-to-energy ratio. Exempt steps contribute observations.
+
+| Arm | Conditional | Unconditional | Guided CFG 5 | First eight guided CFG 5 |
+|---|---:|---:|---:|---:|
+| Shared22 with trained means | 0.002411 | 0.002321 | 0.019374 | 0.020765 |
+| Shared22 with zeros | 0.003290 | 0.003233 | 0.021122 | 0.022121 |
+| Deletion with zeros | 0.002491 | 0.002420 | 0.019923 | 0.020852 |
+| Deletion with calibration means | 0.003079 | 0.002968 | 0.021128 | 0.022323 |
+
+On the first eight prompts and 160 states, the as-trained EMA runs measured 0.020765 for shared22 and 0.020852 for deletion. The respective live-weight training references at update 2,500 were 0.020696 and 0.020530.
+
+### Matched 100-prompt video benchmark
+
+Each arm uses one original fixed seed per prompt for 100 prompts. The frozen teacher and both as-trained reference rows were reused. All 200 new videos passed checksums and 45-frame, 480×480, 16 fps checks and recorded finite latents at all 20 steps. Each video logged 2,204 intervention calls, from 29 active layers × 19 active steps × two CFG branches × Q and K. The text encoder stayed resident on its GPU between prompts. On the first prompt, each swapped arm produced bitwise-identical final latents and identical MP4 hashes with both residency settings. The resident render was retained in the benchmark.
+
+Each dimension averages 100 per-video scores. Aesthetics and imaging use all 45 frames. Text–video consistency uses eight midpoint frames and the prompt. Subject and background consistency use 44 frame transitions, motion smoothness uses 22 reconstructions, and dynamic degree uses 22 flow transitions on subsampled frames.
+
+| Dimension | Teacher | Shared22 means | Shared22 zeros | Deletion zeros | Deletion with means |
+|---|---:|---:|---:|---:|---:|
+| Subject consistency | 0.963999 | 0.967490 | 0.959464 | 0.966353 | 0.968874 |
+| Background consistency | 0.976466 | 0.978377 | 0.975030 | 0.978334 | 0.978233 |
+| Motion smoothness | 0.984463 | 0.986384 | 0.985098 | 0.986335 | 0.986576 |
+| Dynamic degree | 0.330000 | 0.280000 | 0.320000 | 0.270000 | 0.200000 |
+| Aesthetics | 0.588595 | 0.583495 | 0.578923 | 0.577787 | 0.563431 |
+| Imaging | 0.660679 | 0.678854 | 0.669544 | 0.680191 | 0.665028 |
+| Text–video consistency | 0.232555 | 0.234047 | 0.233582 | 0.234605 | 0.227792 |
+
+The 95% percentile intervals use 10,000 paired resamples of the 100 prompt-and-seed units, NumPy seed 20261109.
+
+| Dimension | Shared22 zeros − means | Deletion means − zeros | Shared22 zeros − teacher | Deletion means − teacher |
+|---|---:|---:|---:|---:|
+| Subject consistency | -0.00803 [-0.01189, -0.00464] | +0.00252 [-0.00067, +0.00636] | -0.00453 [-0.01178, +0.00256] | +0.00488 [-0.00210, +0.01172] |
+| Background consistency | -0.00335 [-0.00566, -0.00103] | -0.00010 [-0.00177, +0.00159] | -0.00144 [-0.00496, +0.00204] | +0.00177 [-0.00177, +0.00542] |
+| Motion smoothness | -0.00129 [-0.00185, -0.00074] | +0.00024 [-0.00027, +0.00075] | +0.00064 [-0.00081, +0.00218] | +0.00211 [+0.00068, +0.00361] |
+| Dynamic degree | +0.04000 [-0.01000, +0.10000] | -0.07000 [-0.14000, -0.01000] | -0.01000 [-0.09000, +0.07000] | -0.13000 [-0.21000, -0.05000] |
+| Aesthetics | -0.00457 [-0.01625, +0.00663] | -0.01436 [-0.02683, -0.00150] | -0.00967 [-0.02376, +0.00454] | -0.02516 [-0.03981, -0.01040] |
+| Imaging | -0.00931 [-0.02144, +0.00359] | -0.01516 [-0.02625, -0.00499] | +0.00887 [-0.00728, +0.02487] | +0.00435 [-0.01398, +0.02212] |
+| Text–video consistency | -0.00047 [-0.00496, +0.00424] | -0.00681 [-0.01271, -0.00184] | +0.00103 [-0.00521, +0.00752] | -0.00476 [-0.01215, +0.00232] |
+
+Removing learned means after fine-tuning reduced subject consistency by 0.00803, background consistency by 0.00335, and motion smoothness by 0.00129. Their paired intervals were below zero. The paired intervals for aesthetics, imaging quality, dynamic degree, and text–video consistency spanned zero. Inserting calibration means into the zero-trained EMA reduced dynamic degree by 0.07000, aesthetics by 0.01436, imaging quality by 0.01516, and text–video consistency by 0.00681, with paired intervals below zero. These are effects of switching the selected values after training. The original matched fine-tunes produced comparable scores with learned means and zeros across all seven dimensions. Together the results support choosing zeros before fine-tuning when the aim is to remove the selected pairs.
+
+Same-seed relative final-latent L2 against the teacher was 0.557865 for shared22 with zeros and 0.597051 for deletion with means. Each ratio uses the L2 norm of the full final-latent difference divided by the teacher latent norm before averaging over the 100 pairs. Mean decoded-frame PSNR over 4,500 aligned RGB frames per arm was 14.268 and 13.690 dB, respectively.
+
+The CPU suite passed. The two screens and video benchmark used 7455.4 GPU-seconds (2.071 GPU-hours), with at most two GPUs in any wave. The audited artifacts are in `distill-results/swap/`. Lab videos and full generation records are in `out/learned-center-wan-swap/` in the swap checkout.
+
+### Fixed-high Stage 3 EMA with its means removed
+
+The preserved Stage 3 EMA passed SHA-256 verification for the legacy 44-coordinate center file, transformer weights, and config. The loaded masks select temporal pairs 0–7, height pairs 22–28, and width pairs 43–49 on both Q and K for every head, using the flattened 64-pair index. The intervention sets both coordinates of those 22 pairs to zero for every video token, after full-width QK RMSNorm and before RoPE. Layer 0 and the first denoising step are exempt. Both arms use the same Stage 3 EMA weights from update 5,000.
+
+The following screen uses the same 32 held-out prompts × 20 cached teacher entering states as A. Each number is the equal mean over 640 full-latent relative squared velocity errors against the native bf16 teacher. The guided column combines both CFG branches at guidance 5 before taking each ratio. All rows include observations at the exempt step. The deletion EMA's mean row uses calibration means. The fixed-high EMA with its trained means scored 0.027988 guided. Its live-weight final training validation on the same states was 0.028238.
+
+| Transformer and mask | Selected values | Conditional | Unconditional | Guided CFG 5 | Guided zeros / means |
+|---|---|---:|---:|---:|---:|
+| Frozen teacher, fixed high | Means | 0.099291 | 0.098567 | 0.283408 | — |
+| Frozen teacher, fixed high | Zeros | 0.308276 | 0.307376 | 0.414549 | 1.463× |
+| Frozen teacher, shared22 | Means | 0.006686 | 0.006748 | 0.032195 | — |
+| Frozen teacher, shared22 | Zeros | 0.009840 | 0.009837 | 0.037419 | 1.162× |
+| Fixed-high Stage 3 EMA | Means | 0.005906 | 0.005730 | 0.027988 | — |
+| Fixed-high Stage 3 EMA | Zeros | 0.252905 | 0.251435 | 0.286806 | 10.248× |
+| Shared22 EMA | Means | 0.002411 | 0.002321 | 0.019374 | — |
+| Shared22 EMA | Zeros | 0.003290 | 0.003233 | 0.021122 | 1.090× |
+| Deletion EMA | Means | 0.003079 | 0.002968 | 0.021128 | — |
+| Deletion EMA | Zeros | 0.002491 | 0.002420 | 0.019923 | 0.943× |
+
+For context, RMS concentration for a pair is its pooled mean norm divided by its pooled root-mean-square vector norm. The per-cell mean and energy use all tokens for 64 calibration prompts. Averaging those ratios over the 22 selected pairs and all 14,400 layer–step–branch–head cells gives fixed-high Q/K values of 0.7244/0.7392 and shared22 values of 0.4505/0.4553. The previously reported 0.4816/0.4886 values describe the separate Q/K selection.
+
+The 100-prompt test used one original seed per prompt, the frozen teacher videos, and the existing fixed-high Stage 3 means arm. Each new video was 45 frames at 480×480 and 16 fps, with finite latents at all 20 steps. It made 2,204 intervention calls across 29 layers, 19 steps, both branches, and Q and K. The first same-seed prompt produced bitwise-identical final latents and identical MP4 hashes with encoder offload and with GPU residency. The benchmark retained the resident version and used the same setting for the remaining prompts.
+
+Each VBench mean averages 100 videos with the frame sampling described above. The paired 95% percentile intervals use 10,000 resamples of the 100 matched prompt-and-seed units, NumPy seed 20261109.
+
+| Dimension | Teacher | Fixed-high means | Fixed-high zeros | Zeros − fixed-high means | Zeros − teacher |
+|---|---:|---:|---:|---:|---:|
+| Subject consistency | 0.963999 | 0.958942 | 0.918897 | -0.04005 [-0.04873, -0.03102] | -0.04510 [-0.05385, -0.03579] |
+| Background consistency | 0.976466 | 0.974867 | 0.961895 | -0.01297 [-0.01810, -0.00761] | -0.01457 [-0.01989, -0.00926] |
+| Motion smoothness | 0.984463 | 0.985119 | 0.985614 | +0.00049 [-0.00321, +0.00436] | +0.00115 [-0.00270, +0.00517] |
+| Dynamic degree | 0.330000 | 0.210000 | 0.370000 | +0.16000 [+0.05000, +0.27000] | +0.04000 [-0.08000, +0.16000] |
+| Aesthetics | 0.588595 | 0.517914 | 0.354575 | -0.16334 [-0.18242, -0.14489] | -0.23402 [-0.25291, -0.21497] |
+| Imaging | 0.660679 | 0.652749 | 0.368282 | -0.28447 [-0.31481, -0.25331] | -0.29240 [-0.32337, -0.26185] |
+| Text–video consistency | 0.232555 | 0.219662 | 0.050654 | -0.16901 [-0.18313, -0.15492] | -0.18190 [-0.19489, -0.16857] |
+
+The fixed-high EMA was much more sensitive to an inference-only drop than shared22. On 100 matched videos, replacing the fixed-high means with zeros reduced aesthetics by 0.16334, imaging by 0.28447, and text–video consistency by 0.16901. Subject and background consistency also fell by 0.04005 and 0.01297, respectively. All five paired intervals were below zero. Motion smoothness spanned zero and dynamic degree rose by 0.16000 with an interval above zero, indicating more motion by that metric. The corresponding shared22 quality intervals for aesthetics, imaging, and text–video consistency all spanned zero, and the shared22 subject consistency drop was 0.00803. In the cached-state screen, the fixed-high zeros-to-means guided error ratio grew from 1.463× on frozen teacher weights to 10.248× after Stage 3 fine-tuning, while shared22's ratio was 1.162× on teacher weights and 1.090× after fine-tuning. This measures **fine-tune, then drop**. A fixed-high zeros-then-fine-tune arm would be needed to determine whether fixed-high means are necessary after adapting to zeros.
+
+Same-seed teacher-relative final-latent L2 was 0.823514, averaging the full-latent difference norm divided by the teacher latent norm over 100 pairs. Mean PSNR was 11.336 dB across 4,500 aligned decoded RGB frames. C used 3872.8 GPU-seconds (1.076 GPU-hours). Artifacts are in `distill-results/swap/screen-fh/` and `distill-results/swap/full100/fh_zeros/`. Lab videos and full records are under `out/learned-center-wan-swap/` in the fixed-high checkout.
+
+
+## Baseline saturation and sampling sensitivity
+
+A same-seed check on 19 November 2026 tested the teacher on v000 (“lemur eating grass leaves”, seed 2026110900) with 20 or 50 denoising steps and empty or official negative conditioning. The original baseline video was reused. Full native Q/K was active throughout. All settings used CFG 5, UniPC flow shift 3 and 45 frames at 480×480. Mean HSV saturation averaged every pixel across all 45 decoded frames. The four means were 0.834686 (20/empty), 0.635064 (20/official), 0.492842 (50/empty), and 0.698105 (50/official). The 50-step empty-negative sample showed the clearest visual improvement. The negative prompt helped at 20 steps, while its use at 50 steps increased saturation and changed the composition. This is one prompt and one seed.
+
+The native implementation uses 50 text-to-video steps and recommends CFG 6 with shift 8 for the 1.3B model, at 832×480 with 81 frames. It fills an empty negative input with its built-in negative text. The official Diffusers example supplies negative conditioning explicitly and uses CFG 5, with a 50-step default and shift 3 for 480P. These are two documented inference recipes. The new comparison keeps the benchmark's other settings, so it measures the requested changes within that configuration.
+
+The original benchmark fixed 20 steps and empty negative conditioning, and later experiments reused its frozen protocol. The initial protocol lacked a sampling-quality comparison. Existing benchmark conclusions have that configuration as their scope. New schedules and conditioning require matching inputs, calibrated means and step-indexed masks across the compared arms.
+
+The measured tables, official-source links, precise protocol, video hashes and frame comparison are in [the saturation findings](distill-results/v000-saturation/README.md). The experiment used 234 GPU-seconds including the model-card download retry.
+
+
+## Content/position split: means on 42 pairs, NoPE on 22
+
+This study partitions every Q/K head into the 42 pairs with the lowest shared pooled-mean replacement damage and the remaining 22 pairs. The 42 pairs use pooled constants after full-width QK RMSNorm, before RoPE, identically at every video token in each layer–step–branch–head cell. The complementary 22 retain content and use identity rotary factors (NoPE). Layer 0 and the first denoising step remain native. The proposed fine-tune starts from teacher weights; its inference-only zeros ablation will zero the same 42 pairs in the trained EMA.
+
+CPU tests passed in the existing runtime, including NoPE reference/permutation checks, selection masks, the three training stages and exact restart. Selection v3 reproduced the original shared22 Q/K masks tensor-exactly. All 14,400 cells have identical Q/K means sets of 42 pairs, disjoint from the 22 NoPE pairs and covering all 64; the shared22 containment fraction is 1.0. Calibration uses 64 prompts: per-prompt means and pair energies average all 10,800 video tokens after RMSNorm and before RoPE, then pool equally over prompts, retaining separate layer, denoising step, CFG branch and head.
+
+The following fractions count selected pairs over all 14,400 cells, including cells exempt at runtime. Each row partitions its own means or NoPE set across the three frequency thirds of each spatial/temporal axis. They are mask composition fractions, without token or prompt averaging at this reporting stage.
+
+| Set | t high/middle/low | h high/middle/low | w high/middle/low |
+|---|---|---|---|
+| 42 means pairs | 0.1225 / 0.1240 / 0.1028 | 0.0882 / 0.1259 / 0.1032 | 0.0904 / 0.1404 / 0.1027 |
+| 22 NoPE pairs | 0.1299 / 0.0815 / 0.1219 | 0.1499 / 0.0779 / 0.1211 | 0.1456 / 0.0502 / 0.1221 |
+
+Of the original 22 fixed-high pairs, 0.425287 fall in the NoPE set, pooled across all cells. The training-free screen completed; its results follow below.
+
+Artifacts: `distill-results/nope/{selection-report.json,mask-audit.json,cpu-tests.log}`. The lab checkout is `/mnt/data/liuzeyu/tri-video-nope-2979d3e`; earlier outputs are read through separate paths. The study uses a maximum of 25 GPU-hours, at most two training ranks plus two screen/benchmark workers. The pooled C2 recovery and shared22 extension are protected.
+
+
+### Training-free screen (B)
+
+Each error is the mean of 640 per-state, full-latent relative squared velocity errors: 32 held-out prompts × 20 cached teacher entering states. Conditional and unconditional errors are separate; guided errors combine both velocities at CFG 5 before taking the ratio. Native teacher targets are bf16. All rows include the exempt first step, with layer 0 native at every step; Q/K changes apply at all 10,800 tokens in 29 active layers and 19 steps. Sampling and cached conditioning retain the frozen 20-step, empty-negative benchmark protocol.
+
+| Training-free arm | Conditional | Unconditional | Guided CFG 5 |
+|---|---:|---:|---:|
+| shared/mean | 0.006686 | 0.006748 | 0.032195 |
+| shared/delete | 0.009840 | 0.009837 | 0.037419 |
+| split/mean | 0.387592 | 0.385888 | 0.443576 |
+| split/delete | 0.415090 | 0.414248 | 0.478554 |
+
+All errors were finite. Shared22 reproduces the audited 0.032195 means / 0.037419 zeros screen. Two idle GPU workers used 2104.288 GPU-seconds (0.584524 GPU-hours), including model loading and shutdown. No training-free videos were generated.
+
+The optional means-only warm start is eligible because split/mean exceeds 0.3; it is omitted to retain more of the 25 GPU-hour budget for the specified full fine-tune and both 100-prompt benchmarks. C starts directly from teacher weights and calibrated split means. Its learning-rate schedule spans all 5,000 updates. The first invocation uses `--stop-after 1000` so the 0.08 guided-error gate can be inspected after a resumable optimizer/sampler/RNG/EMA save; a passing run resumes the same state for updates 1,001–5,000. This changes invocation boundaries, not optimizer updates or the recipe.
+
+
+### C interim: update 3,000 and budget ASK
+
+C started directly from teacher weights and the calibrated split means, with two ranks, accumulation 2 (four prompt–state samples per update, both CFG branches for each), a 5,000-update schedule, transformer learning rate 1e-5, means learning rate 1e-3, 250-update warmup, guided-loss weight 1, feature-loss weight 0.1, EMA 0.999 and clipping 1. Layer 0 and the first denoising step retain native attention. The optional means-only warm start was omitted.
+
+Live-weight validation compares full output latents with the native bf16 teacher at the same 160 cached entering states: eight held-out prompts × 20 denoising steps. Each row averages the per-state relative squared error equally; the guided column combines both branches at CFG 5 before taking the ratio. These are the same eight prompts at every checkpoint, shared with the shared22 and deletion validation curves.
+
+| Update | Conditional | Unconditional | Guided CFG 5 |
+|---:|---:|---:|---:|
+| 0 | 0.388294 | 0.386433 | 0.439942 |
+| 250 | 0.083288 | 0.085384 | 0.119650 |
+| 500 | 0.059953 | 0.062642 | 0.093083 |
+| 750 | 0.050674 | 0.052441 | 0.085051 |
+| 1000 | 0.044731 | 0.045743 | 0.077772 |
+| 1250 | 0.040755 | 0.040938 | 0.075413 |
+| 1500 | 0.037468 | 0.038264 | 0.072081 |
+| 1750 | 0.036187 | 0.036060 | 0.068370 |
+| 2000 | 0.033307 | 0.033249 | 0.063562 |
+| 2250 | 0.031734 | 0.031718 | 0.063497 |
+| 2500 | 0.030991 | 0.030605 | 0.063942 |
+| 2750 | 0.029908 | 0.030355 | 0.061492 |
+| 3000 | 0.028661 | 0.028897 | 0.059991 |
+
+The update-1,000 gate passed at 0.077772, below 0.08. Its full optimizer, sampler, Torch CPU/CUDA RNG and EMA state was saved and resumed for updates 1,001–3,000. The final live-weight guided error at this pause is 0.059991. All 302 logged training samples and all 13 validation rows were finite.
+
+![Split42 interim validation beside shared22 and deletion](distill-results/nope/progress-3000/validation-curve.png)
+
+The median logged optimizer-update duration was 7.107891 seconds, from 302 logged samples, reducing rank durations to their mean first. It excludes validation, export, full-save and logging time. Mean-norm drift from logged update 1 to 3,000 was Q 12.271144 → 12.309043 (+0.30885%) and K 12.714284 → 12.752518 (+0.30071%). These norms include all 128 stored coordinates in each cell and average all 14,400 layer–step–branch–head cells, including exempt cells and unused coordinates. They measure mean-vector magnitudes, without prompt or token averaging at measurement time.
+
+The completed first 1,000-update invocation reported allocator peaks of 23,391,334,912 bytes on rank 0 (21.785 GiB) and 23,387,980,288 bytes on rank 1 (21.782 GiB). Those are peaks for that invocation. The later invocation was intentionally terminated after its complete update-3,000 save and did not print a final allocator peak.
+
+The update-3,000 full save contains 22,782,015,301 bytes (21.22 GiB), including both distributed state shards, center optimizer and both rank RNG files. Its atomic latest pointer is at update 3,000; the center checkpoint step and 42-means / 22-NoPE masks were independently checked. The interval from the update-3,000 EMA-center file modification to the post-full-save pause was 1331.4 seconds (22.19 minutes), including full-save I/O and pause detection. Both ranks were observed waiting on storage I/O, with host memory available. The local disk had about 36 GiB free, less than the roughly 42.43 GiB required for two such full versions to coexist under the current save procedure. Storage and checkpoint-retention semantics were preserved.
+
+Training was paused for the budget ASK immediately after the full update-3,000 save. The intentional SIGTERM produced the elastic launcher’s exit status 1, recorded with its planned-pause marker. Both GPU allocations were released. The logical target remains 5,000 updates, and all earlier EMA exports are preserved. The pooled C2 recovery and shared22 extension were untouched.
+
+Measured allocation so far is 53756.576 GPU-seconds (14.932382 GPU-hours): 2104.288 for B and 51652.288 for C through the pause. Allocation sums each worker’s elapsed wall time times its GPU count, including loading, validation, saves, I/O waits and shutdown. Scaling C’s measured 3,000-update allocation to 5,000 and adding measured B plus the brief’s 2.3 GPU-hour estimate for D+E projects **26.80 GPU-hours**. This is an estimate of completion cost, not completed computation. The approved cap is 25 GPU-hours. **ASK:** approve up to 2.5 additional GPU-hours (27.5 total) to finish C and both 100-prompt benchmarks, or retain the 25-hour cap and choose a reduced scope. No D/E video generation or scoring has run, and no additional GPU work is authorized by this report.
+
+Interim evidence is under `distill-results/nope/progress-3000/`, including original/resumed arguments, complete logged curves, checkpoint audit, update-3,000 EMA hashes, the planned-pause marker and budget projection. On the lab host, exact resume state is `out/distill-split42/checkpoint/step-003000/`; the preserved EMA is `out/distill-split42/ema-checkpoints/step-003000/`, both in `/mnt/data/liuzeyu/tri-video-nope-2979d3e`.
+
+
+The user approved the additional 2.5 GPU-hours in the lab chat on 19 November 2026 (Asia/Singapore), raising the total cap to 27.5 GPU-hours. C resumes the verified update-3,000 optimizer, sampler, Torch CPU/CUDA RNG and EMA state with the original 5,000-update schedule and two-rank recipe. The approval changes the allocation cap; no model or loss hyperparameters change. The approval record is `distill-results/nope/budget-approval.json`.
+
+
+### C interruption after update 4,590: recovery and budget decision
+
+The exact update-3,000 resume ran on idle GPUs 4 and 1, retaining the original 5,000-update horizon, optimizer, sampler, Torch CPU/CUDA RNG and EMA state. Rank 0 then received SIGKILL at 01:47:44 on 20 November 2026 (Asia/Singapore), after the update-4,500 validation. The last stdout optimizer update was 4,590; canonical history and validation files were flushed through 4,500. This was an unexpected interruption, separate from the earlier intentional budget pause. The elastic launcher subsequently terminated rank 1 and exited with status 1. No new GPU work was started after the interruption.
+
+The last complete resumable checkpoint is update **4,000**, not 4,590. Its atomic latest pointer, center optimizer step, distributed shard/metadata files and both rank RNG files were independently checked on CPU. It contains 22,782,015,237 bytes. The latest preserved EMA is update **4,500**; its three export-file SHA-256 values and masks were audited. All 14,400 layer–step–branch–head cells retain 42 shared Q/K means pairs and 22 complementary NoPE pairs, with layer 0 and the first step exempt. The masks apply identically to all 10,800 video tokens at each active cell. Earlier EMA exports remain preserved. Exact continuation must use the 4,000 optimizer checkpoint; starting from the 4,500 EMA with a new optimizer would change the recipe.
+
+The additional live-weight validation rows below use the same first eight held-out prompts × 20 cached teacher entering states. Each error is a whole-latent squared velocity-difference norm divided by the corresponding teacher squared norm, averaged equally over the prompt–state cases. Conditional and unconditional errors are separate; guided predictions combine both branches at CFG 5 before measuring the ratio. These are cached-state validation results, not EMA video scores or per-pair Q/K errors.
+
+| Update | Conditional | Unconditional | Guided |
+|---:|---:|---:|---:|
+| 3250 | 0.027841 | 0.027500 | 0.058001 |
+| 3500 | 0.028563 | 0.027738 | 0.059687 |
+| 3750 | 0.026694 | 0.026528 | 0.056629 |
+| 4000 | 0.026948 | 0.026529 | 0.055715 |
+| 4250 | 0.025963 | 0.025934 | 0.054435 |
+| 4500 | 0.025709 | 0.025557 | 0.053698 |
+
+![Split42 validation through the interruption](distill-results/nope/progress-interrupted-4590/validation-curve.png)
+
+All 453 canonical logged training rows and all 19 validation rows are finite; the final stdout update 4,590 also has finite losses. Mean norms from logged update 1 to saved history update 4,500 changed from Q 12.271144 to 12.317051 (+0.37411%) and K 12.714284 to 12.760779 (+0.36569%). These are Euclidean norms across all 128 stored mean coordinates per cell, equally averaged over all 14,400 layer–step–branch–head cells including exempt cells and unused coordinates, without token or prompt averaging at measurement time. The interrupted invocation's median logged optimizer-update duration was 6.998470 seconds, from rank-mean update timings after 3,000; it excludes validation, exports, full saves and logging. A final allocator peak was not printed by this interrupted invocation.
+
+**The SIGKILL cause is unconfirmed.** There is no Python/CUDA OOM exception. Kernel `dmesg` access was denied; the available journal excludes system messages and returned no entries for the failure interval. The current SSH session exposes no readable cgroup memory counters. These observations do not prove an OOM or identify who sent the signal. No speculative change to the training recipe or checkpoint implementation has been applied.
+
+The interrupted invocation consumed 26,016.297 GPU-seconds. Total B+C allocation is now **79,772.873 GPU-seconds / 22.159132 GPU-hours**, leaving **5.340868 GPU-hours** under the user-approved **27.5** cap. Accounting includes all attempts, model initialization, validation, checkpoint/storage waits and shutdown: elapsed worker wall time multiplied by the allocated GPU count. Scaling the interrupted invocation's allocated cost over its 1,590 updates to the 1,000 updates that must be replayed from checkpoint 4,000 estimates **4.545 GPU-hours** for recovery; adding the brief's **2.3 GPU-hours** for D+E projects **29.004 GPU-hours total**. This estimate includes the observed full-save overhead; it is not completed computation or a performance claim.
+
+**ASK:** approve up to **2.5 additional GPU-hours (30 total)** to resume the exact update-4,000 state through 5,000 and then complete D+E, or approve a reduced scope using the preserved update-4,500 EMA for D+E without further training. The reduced-scope option would retain the 27.5-hour cap but would not satisfy the original 5,000-update recipe. Neither change has been applied. The brief requires ASK before exceeding the budget or changing the recipe. No split42 videos or VBench scores have been produced yet; D and E are pending. Protected pooled C2 recovery and shared22 extension outputs were untouched.
+
+Evidence is under `distill-results/nope/progress-interrupted-4590/`: raw invocation arguments/status, failure tail, canonical history and validation, the complete-checkpoint audit, EMA hashes, measured allocation and projection, and the updated comparison curve. Lab recovery paths are `out/distill-split42/checkpoint/step-004000/` and `out/distill-split42/ema-checkpoints/step-004500/` in `/mnt/data/liuzeyu/tri-video-nope-2979d3e`.
+
+
+The user replied "ok" to the interruption budget ASK on 20 November 2026 (Asia/Singapore), approving up to 2.5 additional GPU-hours, **30 GPU-hours total**, for exact recovery from full checkpoint 4,000 through the original 5,000-update target, then D and E. Recipe and masks remain unchanged. The previous 4,500 EMA and later history are archived by the existing restart procedure before replay, with no deletion. Approval evidence is `distill-results/nope/budget-approval-30.json`. The restart considers only idle GPUs 1, 0 and 6, selecting two; GPU 4 is excluded because it reported nonzero utilization. Protected studies remain untouched.
+
+
+### C completed: 5,000 updates with full resumable state
+
+Split42 completed the original Stage 2 recipe from teacher weights, without the optional Stage 1 warm start. The update-1,000 gate passed, and the original 5,000-update learning-rate schedule was retained through optimizer/sampler/Torch CPU+CUDA RNG/EMA restores at updates 1,000, 3,000 and 4,000. The last restore recovered from the rank-0 SIGKILL; its cause remains unconfirmed. All earlier EMA exports and interrupted attempts were preserved. No model, loss, split, calibration or exemption settings changed. Two idle GPU ranks with accumulation 2 give four prompt-state samples per update, each using both CFG branches.
+
+The final live-weight validation guided error is **0.053630**, versus **0.439942** at update zero. Scope: the same eight held-out prompts × 20 cached teacher entering states, whole-latent squared velocity-difference norm divided by teacher squared norm per case, equally averaged over prompt-state cases. Conditional and unconditional branches are separate below; guided predictions combine both branches at guidance 5 before evaluating. The training-free Stage B screen uses 32 prompts, so its 0.443576 value has a different prompt scope. These cached-state measurements use live weights and are not EMA video-quality measurements.
+
+| Update | Conditional | Unconditional | Guided |
+|---:|---:|---:|---:|
+| 0 | 0.388294 | 0.386433 | 0.439942 |
+| 250 | 0.083288 | 0.085384 | 0.119650 |
+| 500 | 0.059953 | 0.062642 | 0.093083 |
+| 750 | 0.050674 | 0.052441 | 0.085051 |
+| 1000 | 0.044731 | 0.045743 | 0.077772 |
+| 1250 | 0.040755 | 0.040938 | 0.075413 |
+| 1500 | 0.037468 | 0.038264 | 0.072081 |
+| 1750 | 0.036187 | 0.036060 | 0.068370 |
+| 2000 | 0.033307 | 0.033249 | 0.063562 |
+| 2250 | 0.031734 | 0.031718 | 0.063497 |
+| 2500 | 0.030991 | 0.030605 | 0.063942 |
+| 2750 | 0.029908 | 0.030355 | 0.061492 |
+| 3000 | 0.028661 | 0.028897 | 0.059991 |
+| 3250 | 0.027841 | 0.027500 | 0.058001 |
+| 3500 | 0.028563 | 0.027738 | 0.059687 |
+| 3750 | 0.026694 | 0.026528 | 0.056629 |
+| 4000 | 0.026948 | 0.026529 | 0.055715 |
+| 4250 | 0.025966 | 0.025926 | 0.054420 |
+| 4500 | 0.025713 | 0.025566 | 0.053734 |
+| 4750 | 0.025564 | 0.025386 | 0.053449 |
+| 5000 | 0.025404 | 0.025122 | 0.053630 |
+
+![Completed split42 validation alongside shared22 and deletion](distill-results/nope/training/validation-curve.png)
+
+All 504 canonical logged training samples and all 21 validation rows were finite. The full update-5,000 optimizer, sampler, both rank RNG and EMA checkpoint and final EMA export were independently checked. Final export checksums are in `distill-results/nope/training/final-ema.sha256`. The Q/K masks are tensor-equal to selection v3: 42 shared means pairs / 22 complementary NoPE pairs in every cell, disjoint and covering 64, with layer 0 and the first denoising step native. In active cells, each mean is constant across all 10,800 video tokens.
+
+The median logged rank-mean optimizer-update duration was 7.103248 seconds, excluding validation, model export, full-checkpoint I/O and logging. All C attempts together allocated 94184.036 GPU-seconds; including B gives 26.746757 GPU-hours against the user-approved 30-hour cap. Allocated cost sums each worker's elapsed wall time times its GPU count, including startup, validation, checkpoint/storage waits and shutdown. Previously reported peak PyTorch allocations were 21.785 / 21.782 GiB for the completed first invocation. Per-invocation final peaks, where printed, are retained in `training-summary.json`; interrupted invocations did not report a final peak.
+
+Mean-norm drift from logged update 1 to 5000 was Q 12.271144 → 12.318420 (+0.38527%) and K 12.714284 → 12.762206 (+0.37692%). Scope: each cell's Euclidean norm over all 128 stored mean coordinates, equally averaged over all 14,400 layer–step–branch–head cells, including exempt cells and unused coordinates; no prompt/token average at measurement time. The later position-bias diagnostic separately measures movement on the active selected coordinates.
+
+State restoration is exact in what was loaded, but real-GPU replay was not bitwise identical: at common update 4010, guided training loss differed by 0.00006587, with the same recorded learning-rate multiplier and mean norms. This is a single sampled training update, not held-out validation. The CPU exact-restart test passed before the study. No claim of bitwise GPU reproducibility or diagnosis of this small replay discrepancy is made. The interrupted update-4,500 EMA is archived, and the replayed update-4,500 milestone is retained.
+
+Stages D and E below benchmark the final EMA, its inference-only zero-means screen and videos, and its CPU position-bias tables. The frozen teacher videos and audited scores are reused. The pooled C2 recovery and shared22 extension remain untouched.
+
+
+### D: final split42 EMA, 100-prompt benchmark
+
+Scope: all 100 original benchmark prompts, one original fixed seed per prompt, 45 frames at 480×480 and 16 fps, 20 UniPC denoising steps, shift 3, CFG 5, empty negative conditioning. Final EMA weights; 42 shared Q/K mean pairs and 22 complementary NoPE pairs per cell, layer 0 and the first denoising step native. Means are post-full-width RMSNorm/pre-RoPE and identical across all 10,800 tokens in each active cell. All 100 videos passed finite-latent, 2,204 replacement-call and 1,102 NoPE-call audits; each record reports 42.0 Q/K pairs, 22.0 NoPE pairs and the exemptions. Teacher videos were hard-linked and audited teacher scores reused, never regenerated.
+
+Scores below are decoded-video VBench measurements, not Q/K-pair statistics or cached-state velocity errors. They average each dimension's original within-video aggregation equally over the 100 prompts. Aesthetics and MUSIQ imaging use all 45 frames per video; text–video consistency uses eight midpoint frames per video; remaining dimensions retain the original VBench implementation and its frame handling. Imaging scores are divided by 100 to use the official normalized scale. Paired intervals are percentile 95% intervals from 10,000 paired prompt resamples, NumPy seed 20261109, retaining each prompt's one seed and all compared arms together; they do not estimate variation across new seeds. Exact prompt/seed manifests, teacher hashes and scorer-source revisions were checked for every reused reference.
+
+| Dimension | Teacher | Dense | Tuned shared22 | Trained shared22 deletion | Split42 EMA |
+|---|---:|---:|---:|---:|---:|
+| Aesthetics | 0.588595 | 0.578063 | 0.583495 | 0.577787 | 0.299507 |
+| Imaging | 0.660679 | 0.670020 | 0.678854 | 0.680191 | 0.539214 |
+| Text–video | 0.232555 | 0.234363 | 0.234047 | 0.234605 | 0.104073 |
+| Subject consistency | 0.963999 | 0.964285 | 0.967490 | 0.966353 | 0.934688 |
+| Background consistency | 0.976466 | 0.977676 | 0.978377 | 0.978334 | 0.971790 |
+| Motion smoothness | 0.984463 | 0.985506 | 0.986384 | 0.986335 | 0.985618 |
+| Dynamic degree | 0.330000 | 0.250000 | 0.280000 | 0.270000 | 0.040000 |
+
+| Dimension | Split42 − teacher | Split42 − dense | Split42 − shared22 | Split42 − shared22 deletion |
+|---|---:|---:|---:|---:|
+| Aesthetics | -0.28909 [-0.30570, -0.27239] | -0.27856 [-0.29635, -0.26093] | -0.28399 [-0.30260, -0.26533] | -0.27828 [-0.29638, -0.26017] |
+| Imaging | -0.12147 [-0.14492, -0.09742] | -0.13081 [-0.15423, -0.10742] | -0.13964 [-0.16449, -0.11451] | -0.14098 [-0.16261, -0.11915] |
+| Text–video | -0.12848 [-0.14196, -0.11579] | -0.13029 [-0.14268, -0.11828] | -0.12997 [-0.14289, -0.11762] | -0.13053 [-0.14304, -0.11864] |
+| Subject consistency | -0.02931 [-0.03660, -0.02171] | -0.02960 [-0.03617, -0.02303] | -0.03280 [-0.03912, -0.02652] | -0.03167 [-0.03864, -0.02474] |
+| Background consistency | -0.00468 [-0.00848, -0.00079] | -0.00589 [-0.00906, -0.00265] | -0.00659 [-0.01019, -0.00280] | -0.00654 [-0.00964, -0.00353] |
+| Motion smoothness | +0.00116 [-0.00047, +0.00298] | +0.00011 [-0.00151, +0.00202] | -0.00077 [-0.00201, +0.00053] | -0.00072 [-0.00192, +0.00055] |
+| Dynamic degree | -0.29000 [-0.38000, -0.20000] | -0.21000 [-0.29000, -0.13000] | -0.24000 [-0.33000, -0.16000] | -0.23000 [-0.31000, -0.15000] |
+
+
+Same-seed agreement versus the frozen teacher: mean final-latent relative L2 **0.645951** over 100 prompt pairs, using all latent coordinates after the final (20th) denoising step, without averaging intermediate steps. Mean finite frame PSNR is **13.134 dB** over 4,500 aligned decoded frames; each frame uses every RGB channel/pixel and dB values are averaged equally. Identical frames with infinite PSNR: 0.
+
+Phase D allocated 2530.646 GPU-seconds, summing elapsed wall time on each leased idle GPU across all generation/parity/scorer jobs. Caches/initialization and worker teardown are included; CPU-only diagnostics and agreement use no GPUs. Raw videos and records remain on 5090. Published per-prompt scores, paired intervals, selection records, agreement, allocation ledger and scorer provenance are in `distill-results/nope/full100/split42/`; the committed summary omits its model identifier and records the raw summary SHA-256.
+
+
+The split42 EMA fails this free-generation benchmark: aesthetics, imaging and text–video consistency are below the teacher, dense control, tuned shared22 and trained shared22 deletion, with every corresponding paired 95% interval below zero over the 100 original prompt/seed pairs. For example, split42 aesthetics is 0.299507 versus teacher 0.588595, imaging is 0.539214 versus 0.660679, and text–video is 0.104073 versus 0.232555. The frame aggregation and prompt-bootstrap scopes are those stated above. Dynamic degree averages 0.040000 versus 0.330000 for the teacher; the slightly higher smoothness score should not be read as better overall quality in this low-motion arm. Passing the cached-teacher-state gate did not establish good free-rollout video quality. E measures the additional effect of zeroing the means against this already poor reference, which limits a clean claim that zeroing alone causes collapse.
+
+
+### E: zero the trained split42 means
+
+Scope: all 100 original benchmark prompts, one original fixed seed per prompt, 45 frames at 480×480 and 16 fps, 20 UniPC denoising steps, shift 3, CFG 5, empty negative conditioning. Final EMA weights; 42 shared Q/K pairs zeroed and 22 complementary NoPE pairs retaining content per cell, layer 0 and the first denoising step native. The zero replacement is post-full-width RMSNorm/pre-RoPE and identical across all 10,800 tokens in each active cell. All 100 videos passed finite-latent, 2,204 replacement-call and 1,102 NoPE-call audits; each record reports 42.0 Q/K pairs, 22.0 NoPE pairs and the exemptions. Teacher videos were hard-linked and audited teacher scores reused, never regenerated.
+
+Scores below are decoded-video VBench measurements, not Q/K-pair statistics or cached-state velocity errors. They average each dimension's original within-video aggregation equally over the 100 prompts. Aesthetics and MUSIQ imaging use all 45 frames per video; text–video consistency uses eight midpoint frames per video; remaining dimensions retain the original VBench implementation and its frame handling. Imaging scores are divided by 100 to use the official normalized scale. Paired intervals are percentile 95% intervals from 10,000 paired prompt resamples, NumPy seed 20261109, retaining each prompt's one seed and all compared arms together; they do not estimate variation across new seeds. Exact prompt/seed manifests, teacher hashes and scorer-source revisions were checked for every reused reference.
+
+This is inference-only deletion of the 42 trained means pairs. The other 22 content pairs keep NoPE, and all weights and exemptions are unchanged. No new optimization was performed. Direct rotary position terms are removed only from self-attention in the 29 active layers at 19 active denoising steps; native positional attention remains in the exempt layer and step.
+
+The trained-EMA screen uses 32 held-out prompts × 20 cached teacher entering states, versus the native bf16 teacher, whole-latent relative squared velocity errors equally averaged over prompt-state cases. Conditional/unconditional errors are separate; guidance combines both branches at 5 before the guided ratio. These numbers use the same 32-prompt scope as B, whereas C live validation used eight prompts.
+
+| EMA screen arm | Conditional | Unconditional | Guided |
+|---|---:|---:|---:|
+| student/mean | 0.031498 | 0.031353 | 0.059897 |
+| student/delete | 0.066756 | 0.065230 | 0.101854 |
+
+| Dimension | Teacher | Split42 EMA means | Same EMA, means zeroed | Zeros − means, 95% CI | Zeros − teacher, 95% CI |
+|---|---:|---:|---:|---:|---:|
+| Aesthetics | 0.588595 | 0.299507 | 0.330283 | +0.03078 [+0.01719, +0.04437] | -0.25831 [-0.27798, -0.23880] |
+| Imaging | 0.660679 | 0.539214 | 0.418496 | -0.12072 [-0.15017, -0.09168] | -0.24218 [-0.27450, -0.21017] |
+| Text–video | 0.232555 | 0.104073 | 0.056721 | -0.04735 [-0.05722, -0.03776] | -0.17583 [-0.18941, -0.16275] |
+| Subject consistency | 0.963999 | 0.934688 | 0.934383 | -0.00031 [-0.00853, +0.00768] | -0.02962 [-0.03899, -0.02034] |
+| Background consistency | 0.976466 | 0.971790 | 0.969448 | -0.00234 [-0.00616, +0.00125] | -0.00702 [-0.01186, -0.00226] |
+| Motion smoothness | 0.984463 | 0.985618 | 0.979540 | -0.00608 [-0.00821, -0.00410] | -0.00492 [-0.00767, -0.00224] |
+| Dynamic degree | 0.330000 | 0.040000 | 0.360000 | +0.32000 [+0.23000, +0.41000] | +0.03000 [-0.08000, +0.14000] |
+
+The inference-only swaps use 100 original prompt/seed pairs per model, each with its own trained means versus zeros, without retraining. All intervals below use the paired protocol above.
+
+| Trained student, inference-only zero swap | Δ aesthetics | Δ imaging | Δ text–video |
+|---|---:|---:|---:|
+| Shared22 | -0.00457 [-0.01625, +0.00663] | -0.00931 [-0.02144, +0.00359] | -0.00047 [-0.00496, +0.00424] |
+| Fixed-high | -0.16334 [-0.18242, -0.14489] | -0.28447 [-0.31481, -0.25331] | -0.16901 [-0.18313, -0.15492] |
+| Split42 | +0.03078 [+0.01719, +0.04437] | -0.12072 [-0.15017, -0.09168] | -0.04735 [-0.05722, -0.03776] |
+
+
+CPU position-bias tables are under `distill-results/nope/bias-tables/`: layers 5, 15 and 25 (zero-based), denoising steps 2, 10 and 18 (one-based), both CFG branches and all 12 heads separately. Each t/h/w table sums only the selected constant pairs on that axis, scaled by 1/√128, as an additive QK logit contribution for query-minus-key grid offsets −11…11 (t) or −29…29 (h/w). It does not average tokens, prompts, heads, branches or steps. Summing the three axes yields the full constant-pair bias. Frequencies use native theta 10,000 with 22/21/21 t/h/w pairs and were cross-checked against the runtime rotary module. Initial means pool all-token post-RMSNorm/pre-RoPE vectors equally over 64 calibration prompts; trained means are the final EMA.
+
+![Individual-head position biases before and after training](distill-results/nope/bias-tables/trained-vs-calibration.png)
+
+The figure shows one head (0), conditional branch, denoising step 10, separately for the three layers and axes; JSON retains every requested head/context. The selected-coordinate parameter relative L2 drift is Q 0.061294 and K 0.065904. This ratio pools the 84 selected coordinates in every active layer–step–branch–head cell and divides the norm of the EMA-minus-calibration parameter vector by the calibration norm. It is not the average full-width per-cell norm change reported in C and has no token/prompt average at measurement time.
+
+
+Same-seed agreement versus the frozen teacher: mean final-latent relative L2 **0.749479** over 100 prompt pairs, using all latent coordinates after the final (20th) denoising step, without averaging intermediate steps. Mean finite frame PSNR is **12.104 dB** over 4,500 aligned decoded frames; each frame uses every RGB channel/pixel and dB values are averaged equally. Identical frames with infinite PSNR: 0.
+
+Phase E allocated 3930.436 GPU-seconds, summing elapsed wall time on each leased idle GPU across all generation/parity/scorer jobs and the trained-student screen. Caches/initialization and worker teardown are included; CPU-only diagnostics and agreement use no GPUs. Raw videos and records remain on 5090. Published per-prompt scores, paired intervals, selection records, agreement, allocation ledger and scorer provenance are in `distill-results/nope/full100/split42_zeros/`; the committed summary omits its model identifier and records the raw summary SHA-256.
+
+
+### Outcome and final state
+
+**The trained split42 means arm is not a successful replacement for the teacher or the earlier shared22 models under this recipe.** On the 100 original prompt/seed pairs, its aesthetics, imaging and text–video scores are below the teacher, dense, tuned shared22 and trained shared22 deletion, with every corresponding paired interval below zero. Its passing cached-state gate and final live validation error 0.053630 did not translate into good free-generation video quality.
+
+**Zeroing the means produces mixed, substantial changes rather than a uniform collapse from a good baseline.** Against split42 means over the same 100 prompt/seed pairs, zeroing improves aesthetics by +0.030776 [0.017194, 0.044369], reduces imaging by −0.120718 [−0.150167, −0.091682], text–video consistency by −0.047353 [−0.057224, −0.037764] and motion smoothness by −0.006078 [−0.008207, −0.004102]. Dynamic degree rises by +0.320000 [0.230000, 0.410000], while subject/background consistency intervals span zero. The intervals are pointwise 95% paired prompt-bootstrap intervals under the protocol above; aesthetics/imaging use all 45 frames per video, text–video eight midpoint frames, and motion measures the original VBench video aggregation. Both means and zeros remain far below teacher quality. These results show sensitivity to the constant-pair position-bias channel in imaging, text alignment and smoothness, but the already poor means arm prevents a clean “good model → collapsed model” test of the proposed deduction. Native RoPE remains in the exempt layer and first denoising step, so the experiment does not remove every positional pathway from the entire network.
+
+The final EMA retains the cached-state accuracy seen in C: on the exact first eight held-out prompts × 20 teacher states, its guided whole-latent relative squared velocity error is 0.054257, versus live weights' 0.053630 at update 5,000. Both combine CFG branches at 5. This eight-prompt comparison is separate from E's 32-prompt mean/zero screen (0.059897 / 0.101854); all 32 IDs match B, all per-state errors are finite, and both modes' first exempt state errors are exactly equal in every prompt and all three conditional/unconditional/guided columns. The source audit is `distill-results/nope/screen-trained/ema-first8-audit.json` and `audit.json`. The video failure therefore coexists with verified cached-state accuracy and the expected intervention/exemption behavior; its underlying cause is not isolated by this study.
+
+The bias tables are analytic CPU calculations from saved fp32 means. Frequencies were constructed in fp64 and cross-checked against the native rotary module; `position_bias_tables` casts them to fp32 and evaluates the phase and pair products in complex64. They sum only the constant-pair contribution, rather than measuring a full-token bf16 attention forward. Their 18 contexts retain all heads separately; the figure is the prespecified individual head 0 at step 10. Saved mean-vector directions moved even though average norm magnitudes changed little: the selected-coordinate EMA-minus-calibration relative L2 values are 0.061294 (Q) and 0.065904 (K), pooling 1,110,816 active selected coordinates per side without a token/prompt average. This differs from C's full-width per-cell norm-magnitude drift.
+
+All requested A–E work is complete. Measured NoPE-study allocation is **28.541502 GPU-hours / 30 approved** (102749.406 GPU-seconds), including all failed/replayed C work, loading, validation, checkpoint I/O, parity checks, both 100-video cohorts and all scorers. **1.458498 GPU-hours remain unused.** CPU-only selection/tests, bias diagnostics and frame agreement are excluded. Only idle GPU leases were used, at most two study GPUs concurrently; recovery excluded GPU 4's unexplained utilization. No study training/generation/scoring processes remain active. Protected pooled C2 recovery and shared22 extension were untouched.
+
+The final EMA's three SHA-256 values were rechecked after both benchmarks and match the C manifest. The nine 500-update milestones through 4,500, final update-5,000 `student/` export and interrupted update-4,500 archive are all preserved. The final full optimizer/model/EMA checkpoint at `out/distill-split42/checkpoint/step-005000/` contains 22,782,015,301 bytes; its center optimizer counters are 5,000, distributed metadata contains model/optimizer/EMA groups, and both rank sampler/Torch CPU/CUDA RNG records were checked. Recovery remains available without a fresh optimizer. Full audit: `distill-results/nope/training/full-checkpoint-5000-audit.json`; budget/export closure: `distill-results/nope/study-summary.json`. All bulk models, videos and records stay under `/mnt/data/liuzeyu/tri-video-nope-2979d3e` on 5090.
+
+Open issues are the unresolved cause of the earlier rank-0 SIGKILL and the failure of this split42 recipe on free-generation video quality. Runtime recovery used the complete update-4,000 optimizer/sampler/RNG/EMA state and retained the original schedule through 5,000. No additional training or alternative split was run. The publication-only export-count audit was corrected to recognize that the trainer writes its final EMA to `student/`, with no duplicate `ema-checkpoints/step-005000/`; no model file was missing or changed.
+
+
+## Widened head: 128 means under RoPE + 32 unrotated content pairs
+
+Brief `DISTILL_WIDE_PROMPT.md`, run 20-21 November 2026 in lab checkout `tri-video-wide-67ed977` (pinned to 1359c17);
+full evidence, exact flags and runner sources in `distill-results/wide/` (its `README.md` has every table).
+
+**Architecture.** Per self-attention head, layer, denoising step and CFG branch, Q and K are widened to 192 dims:
+`[RoPE(mu) (128, constant over tokens) | the 32 highest-damage pairs' real post-QK-norm values (64, not rotated)]`,
+logit scale 1/sqrt(128), V and to_out unchanged. The first block is a content-free per-head relative-position bias
+over all 64 frequencies; the second is a pure content channel. Mode `delete` zeroes the position channel
+(content-only attention on the same student). **Nothing exempt:** all 30 layers and 20 steps, 2,400 replacement and
+1,200 processor calls per video, audited on every video.
+
+**Selection (A).** Selection v4 (`--pairs 22 --content-pairs 32 --include-layer0 --include-step1`, damage pooled over
+64 calibration prompts): shared masks tensor-equal to the original; 64 means pairs and exactly 32 content pairs in all
+14,400 cells; 49.8% of fixed-high pair slots fall in the content set, and the 22 split42 NoPE pairs are inside the
+32 in every cell.
+
+**Screens (B and E1).** Whole-latent relative squared velocity error vs the bf16 teacher, equal mean over 32
+held-out prompts x 20 teacher entering states, guided = both branches combined at CFG 5, nothing exempt:
+
+| Arm | Guided | Means |
+|---|---:|---|
+| shared/mean | 0.034431 | pooled calibration |
+| shared/delete | 0.039689 | — |
+| wide/mean | 0.151673 | pooled calibration |
+| wide/delete (content only) | 0.571677 | — |
+| wide32 student/mean | 0.031038 | trained EMA |
+| wide32 student/delete | 0.389783 | — |
+
+**Fine-tune (C).** Stage 2 from teacher weights, 5,000 updates, two ranks x accumulation 2, model lr 1e-5, means lr
+1e-3, EMA 0.999. Update-1,000 gate passed (guided 0.0449 <= 0.10, live weights, first 8 held-out prompts x 20 states,
+CFG 5); resumed from the complete update-1,000 save after the user raised the cap from 28 to 30 GPU-hours. Guided
+validation 0.1466 -> 0.0316 (min 0.0302 at 4,750), beside shared22 0.0301 -> 0.0207 and split42 0.440 -> 0.0536
+(both with layer 0 / step 1 exempt). Median 8.15 s per update (about 1.15x the shared22 recipe on the same GPUs),
+peak allocator 21.86 GiB per rank. Mean norms +0.30% (Q and K; live, all 14,400 cells, 128 coordinates).
+
+![Widened-head validation](distill-results/wide/training/validation-curve.png)
+
+**Videos (D and E2).** 100 original prompts, one fixed seed each, frozen protocol (20 UniPC steps, shift 3, CFG 5,
+empty negative, 45 frames at 480x480); VBench equal prompt means with VBench's own within-video aggregation
+(aesthetics and imaging all 45 frames, text-video eight midpoint frames). Paired mean [pointwise 95%, 10,000 prompt
+resamples, seed 20261109]:
+
+| Dimension | Teacher | wide32 | wide32_zeros | wide32 − shared22 | wide32 − split42 | wide32_zeros − wide32 |
+|---|---:|---:|---:|---|---|---|
+| Aesthetics | 0.5886 | 0.5323 | 0.3394 | -0.0512 [-0.0696, -0.0322] | +0.2328 [+0.2129, +0.2530] | -0.1929 [-0.2130, -0.1733] |
+| Imaging (/100) | 0.6607 | 0.6603 | 0.3463 | -0.0185 [-0.0387, +0.0015] | +0.1211 [+0.0998, +0.1424] | -0.3140 [-0.3423, -0.2846] |
+| Text-video | 0.2326 | 0.2147 | 0.0426 | -0.0193 [-0.0270, -0.0117] | +0.1106 [+0.0980, +0.1238] | -0.1721 [-0.1859, -0.1583] |
+| Subject | 0.9640 | 0.9589 | 0.9189 | -0.0086 [-0.0142, -0.0032] | +0.0242 [+0.0188, +0.0295] | -0.0400 [-0.0486, -0.0306] |
+| Background | 0.9765 | 0.9729 | 0.9602 | -0.0055 [-0.0092, -0.0020] | +0.0011 [-0.0024, +0.0046] | -0.0128 [-0.0183, -0.0070] |
+| Motion smoothness | 0.9845 | 0.9868 | 0.9832 | +0.0004 [-0.0006, +0.0015] | +0.0012 [+0.0000, +0.0023] | -0.0036 [-0.0065, -0.0006] |
+| Dynamic degree | 0.3300 | 0.2000 | 0.5100 | -0.0800 [-0.1500, -0.0100] | +0.1600 [+0.0900, +0.2300] | +0.3100 [+0.2100, +0.4200] |
+
+Final-latent relative L2 vs the teacher (step-20 state, all coordinates, prompt ratios averaged) / frame PSNR over all
+4,500 decoded frames: wide32 0.6344 / 13.257 dB, wide32_zeros 0.8613 / 11.181 dB (shared22 0.5591 / 14.194 dB,
+split42 0.6460 / 13.134 dB).
+
+**Swap table** (zeros minus each model's own trained-means videos, same prompts, seeds and statistics):
+
+| Swap | Aesthetics | Imaging | Text-video | Subject |
+|---|---|---|---|---|
+| Shared22 (layer 0 / step 1 exempt) | -0.0046 [-0.0163, +0.0066] | -0.0093 [-0.0214, +0.0036] | -0.0005 [-0.0050, +0.0042] | -0.0080 [-0.0119, -0.0046] |
+| Fixed high | -0.1633 [-0.1824, -0.1449] | -0.2845 [-0.3148, -0.2533] | -0.1690 [-0.1831, -0.1549] | -0.0400 [-0.0487, -0.0310] |
+| Split42 (layer 0 / step 1 exempt) | +0.0308 [+0.0172, +0.0444] | -0.1207 [-0.1502, -0.0917] | -0.0474 [-0.0572, -0.0378] | -0.0003 [-0.0085, +0.0077] |
+| wide32 (nothing exempt) | -0.1929 [-0.2130, -0.1733] | -0.3140 [-0.3423, -0.2846] | -0.1721 [-0.1859, -0.1583] | -0.0400 [-0.0486, -0.0306] |
+
+**Position bias (E3).** Trained vs calibration `position_bias_tables` for layers 5/15/25, steps 2/10/18, both branches,
+all heads (`distill-results/wide/bias-tables/`): the trained means drifted 2.40% (Q) / 2.21% (K) in relative L2
+(all cells and coordinates pooled), and the trained bias nearly overlays the calibration bias.
+
+![Widened-head position bias](distill-results/wide/bias-tables/trained-vs-calibration.png)
+
+**Verdict.** The widened student does not reach shared22 quality: on 100 videos it is 0.051 lower in aesthetics and
+0.019 lower in text-video than tuned shared22 (intervals exclude zero), although it is far better than split42 on every
+dimension and its imaging is level with the teacher. Zeroing its position channel, so that no layer has any
+positional input, is catastrophic and as severe as the fixed-high swap: position-blind attention fails, and the
+fine-tune-then-drop test fails for this architecture. The learned position channel stays close to its pooled-mean
+initialisation. The study allocated 27.334 GPU-hours of the approved 30 (B 0.611, C 24.855, D 0.725, E 1.143; wall
+time x GPUs including loading, validation, saves and scorers). No speed claims; no other content widths or a
+zeros-trained wide arm were run.
+
+## Shared22 with nothing exempt
+
+CPU suite passed. A selects22 shared Q/K rotary pairs per all14400 layer-step-branch-head cells using existing64-prompt pooled statistics; constants are post-full-width RMSNorm/pre-RoPE, identical across all10800 video tokens in each cell. No exempt layer or step. No masks or calibration outputs overwritten.
+
+A scope:32 held-out prompts x20 teacher entering states, whole-latent relative squared velocity errors vs native bf16 teacher, equal prompt-state mean; conditional/unconditional separate, both combined at CFG5 for guided.
+
+| Arm | Conditional | Unconditional | Guided |
+|---|---:|---:|---:|
+| shared/mean | 0.006842 | 0.006987 | 0.034431 |
+| shared/delete | 0.010010 | 0.010069 | 0.039689 |
+
+Exempted shared means/delete guided references on the same32-prompt scope are0.03219502645661123/0.03741946758891572 (distill-results/nope/screen/complete.json); earlier no-exempt separate/mean is0.04098448762670159 (distill-results/selection/screen-noexempt/complete.json). These are distinct masks/conditions. Original A uses 0.349797 allocated GPU-hours. Budget cap13GPU-hours, idle GPU leases only, max2 per job. User requested unattended continuation after verified startup to conserve model credits; webhook hand-offs replace periodic model checks.
+
+
+### No-exemption runner stopped for attention
+
+Command '['python3', '/mnt/data/liuzeyu/tri-video-noexempt-6f273d8/out/distill-noexempt-run/gpu-worker.py', '--root', '/mnt/data/liuzeyu/tri-video-noexempt-6f273d8', '--name', 'train-b01', '--gpus', '2', '--candidates', '1,0,6,2,3,5', '--wall-limit', '18150', '--', '/dev/shm/tri-center-runtime/bin/python', '-m', 'torch.distributed.run', '--standalone', '--nproc_per_node', '2', 'scripts/train_learned_center.py', '--stage', '2', '--out', 'out/distill-s22-all', '--steps', '2500', '--accum', '2', '--lr', '1e-5', '--lr-center', '2e-4', '--warmup', '250', '--lambda-cfg', '1', '--lambda-feat', '0.1', '--ema', '0.999', '--clip', '1', '--val-every', '250', '--val-prompts', '8', '--val-at-start', '--save-every', '500', '--ema-checkpoints', '--resume-state-with-ema', '--resume-state-every', '1000', '--seed', '20261114', '--selection', 'out/distill-selection/selection.pt', '--variant', 'shared', '--calibration', 'out/distill-selection/pair-statistics.pt', '--center-mode', 'mean', '--include-layer0', '--include-step1', '--traj', '/tmp/tri-distill-pilot.EG6asH/traj', '--snapshot', '/dev/shm/tri-wan-snapshot', '--budget-seconds', '17550']' returned non-zero exit status 1.. Allocated GPU-hours 8.078830/13. All outputs preserved; see distill-results/noexempt/interruption.json and out/distill-noexempt-run/ logs. No further GPU work is launched by the runner.
+
+
+### No-exemption B: 2500-update fine-tune
+
+From teacher weights, original tuned shared22 recipe with --include-layer0 --include-step1, two ranks and accumulation2; seed20261114, model lr1e-5, means lr2e-4, warmup250, feature weight0.1, EMA0.999. All logged losses/validations finite. Full2500 optimizer/sampler/CPU+CUDA RNG/EMA save and final EMA masks audited. Whole-latent relative squared velocity errors average the first eight held-out prompts x20 teacher entering states; both branches combine at CFG5.
+
+| Update | Guided |
+|---:|---:|
+| 0 | 0.031922 |
+| 250 | 0.030385 |
+| 500 | 0.035585 |
+| 750 | 0.031774 |
+| 1000 | 0.028721 |
+| 1250 | 0.027883 |
+| 1500 | 0.028245 |
+| 1750 | 0.022584 |
+| 2000 | 0.022213 |
+| 2250 | 0.020564 |
+| 2500 | 0.020078 |
+
+![Validation curve](distill-results/noexempt/training/validation-curve.png)
+
+Median logged rank-mean optimizer seconds/update: 6.911287, excluding validation/saves. Peak allocator bytes per reported invocation/rank and all arguments are in training/summary.json and args.json. Mean-norm drift: {"q": {"first": 12.271143913269043, "last": 12.27061653137207, "percent": -0.004297740297887209}, "k": {"first": 12.71428394317627, "last": 12.713732719421387, "percent": -0.004335468338967363}}; scope: Per-cell Euclidean norm over all128 stored mean coordinates, equal average over all14400 cells including unused coordinates; no token/prompt average at measurement time. Allocated A+B GPU-hours: 15.189086, including startup, validation, saves/I/O and all attempts. All historical outputs retained.
+
+
+### No-exemption C: s22_all_means, 100 prompts
+
+One original seed per each of100 original prompts;20 UniPC steps, shift3, CFG5, empty negative,45frames480x480 at16fps. Shared22 Q/K means/zeros after full-width RMSNorm before RoPE, all10800 tokens per active cell; all30layers and20steps active, no exemptions, no NoPE. All100 videos audited at2400 replacement calls each. VBench scores are equal prompt averages of original within-video aggregation: aesthetics/MUSIQ all45 frames, text-video eight midpoint frames, other dimensions original VBench handling. Imaging divided by100. Frozen teacher videos/scores reused, not regenerated. Intervals are pointwise95% from10000 paired prompt resamples, NumPy seed20261109, one fixed seed per prompt; no across-seed uncertainty.
+
+| Dimension | Candidate | Candidate minus references, mean [95% CI] |
+|---|---:|---|
+| subject_consistency | 0.964203 | s22_all_means_minus_baseline: +0.000204 [-0.005767, +0.005880]; s22_all_means_minus_dense_control: -0.000081 [-0.004010, +0.003926]; s22_all_means_minus_shared22: -0.003287 [-0.006891, +0.000131]; s22_all_means_minus_shared22_delete: -0.002150 [-0.005663, +0.001312] |
+| background_consistency | 0.977130 | s22_all_means_minus_baseline: +0.000664 [-0.002719, +0.003881]; s22_all_means_minus_dense_control: -0.000546 [-0.003169, +0.001892]; s22_all_means_minus_shared22: -0.001247 [-0.003821, +0.001264]; s22_all_means_minus_shared22_delete: -0.001204 [-0.003233, +0.000692] |
+| motion_smoothness | 0.986207 | s22_all_means_minus_baseline: +0.001745 [+0.000299, +0.003322]; s22_all_means_minus_dense_control: +0.000701 [-0.000860, +0.002473]; s22_all_means_minus_shared22: -0.000176 [-0.000862, +0.000493]; s22_all_means_minus_shared22_delete: -0.000127 [-0.000879, +0.000624] |
+| dynamic_degree | 0.270000 | s22_all_means_minus_baseline: -0.060000 [-0.140000, +0.020000]; s22_all_means_minus_dense_control: +0.020000 [-0.050000, +0.090000]; s22_all_means_minus_shared22: -0.010000 [-0.060000, +0.040000]; s22_all_means_minus_shared22_delete: +0.000000 [-0.050000, +0.050000] |
+| aesthetic_quality | 0.587182 | s22_all_means_minus_baseline: -0.001413 [-0.013543, +0.010953]; s22_all_means_minus_dense_control: +0.009119 [-0.001919, +0.020228]; s22_all_means_minus_shared22: +0.003686 [-0.007249, +0.014825]; s22_all_means_minus_shared22_delete: +0.009394 [+0.000182, +0.018940] |
+| imaging_quality | 0.671702 | s22_all_means_minus_baseline: +0.011022 [-0.006866, +0.028433]; s22_all_means_minus_dense_control: +0.001681 [-0.015285, +0.017837]; s22_all_means_minus_shared22: -0.007153 [-0.018713, +0.004116]; s22_all_means_minus_shared22_delete: -0.008489 [-0.019778, +0.002521] |
+| overall_consistency | 0.233914 | s22_all_means_minus_baseline: +0.001359 [-0.005146, +0.007986]; s22_all_means_minus_dense_control: -0.000450 [-0.006936, +0.005713]; s22_all_means_minus_shared22: -0.000134 [-0.005125, +0.005050]; s22_all_means_minus_shared22_delete: -0.000692 [-0.006004, +0.004455] |
+
+Paired differences versus exempted shared22 include zero for ['subject_consistency', 'background_consistency', 'motion_smoothness', 'dynamic_degree', 'aesthetic_quality', 'imaging_quality', 'overall_consistency']; exclude zero for []. This is detection on these100 prompt/seed pairs, not proof of equivalence.
+
+Teacher agreement: mean full-coordinate final-latent relative L2 0.563031 over100 final-state pairs (step20, no intermediate-step average); frame PSNR 14.254dB over4500 aligned decoded frames, all RGB pixels/channels per-frame then equal dB average.
+
+
+
+### No-exemption C: s22_all_zeros, 100 prompts
+
+One original seed per each of100 original prompts;20 UniPC steps, shift3, CFG5, empty negative,45frames480x480 at16fps. Shared22 Q/K means/zeros after full-width RMSNorm before RoPE, all10800 tokens per active cell; all30layers and20steps active, no exemptions, no NoPE. All100 videos audited at2400 replacement calls each. VBench scores are equal prompt averages of original within-video aggregation: aesthetics/MUSIQ all45 frames, text-video eight midpoint frames, other dimensions original VBench handling. Imaging divided by100. Frozen teacher videos/scores reused, not regenerated. Intervals are pointwise95% from10000 paired prompt resamples, NumPy seed20261109, one fixed seed per prompt; no across-seed uncertainty.
+
+| Dimension | Candidate | Candidate minus references, mean [95% CI] |
+|---|---:|---|
+| subject_consistency | 0.955522 | s22_all_zeros_minus_baseline: -0.008477 [-0.015773, -0.001639]; s22_all_zeros_minus_s22_all_means: -0.008681 [-0.015403, -0.003157]; s22_all_zeros_minus_s22_zeros: -0.003942 [-0.009757, +0.001392] |
+| background_consistency | 0.972344 | s22_all_zeros_minus_baseline: -0.004122 [-0.007377, -0.000982]; s22_all_zeros_minus_s22_all_means: -0.004786 [-0.007857, -0.002052]; s22_all_zeros_minus_s22_zeros: -0.002686 [-0.005185, -0.000378] |
+| motion_smoothness | 0.984424 | s22_all_zeros_minus_baseline: -0.000039 [-0.001544, +0.001579]; s22_all_zeros_minus_s22_all_means: -0.001784 [-0.002416, -0.001207]; s22_all_zeros_minus_s22_zeros: -0.000674 [-0.001470, +0.000082] |
+| dynamic_degree | 0.390000 | s22_all_zeros_minus_baseline: +0.060000 [-0.020000, +0.140000]; s22_all_zeros_minus_s22_all_means: +0.120000 [+0.060000, +0.190000]; s22_all_zeros_minus_s22_zeros: +0.070000 [+0.000000, +0.140000] |
+| aesthetic_quality | 0.578991 | s22_all_zeros_minus_baseline: -0.009604 [-0.023531, +0.004327]; s22_all_zeros_minus_s22_all_means: -0.008191 [-0.018619, +0.002252]; s22_all_zeros_minus_s22_zeros: +0.000068 [-0.011080, +0.011411] |
+| imaging_quality | 0.664556 | s22_all_zeros_minus_baseline: +0.003877 [-0.013585, +0.021320]; s22_all_zeros_minus_s22_all_means: -0.007145 [-0.018235, +0.003237]; s22_all_zeros_minus_s22_zeros: -0.004988 [-0.018429, +0.008360] |
+| overall_consistency | 0.236756 | s22_all_zeros_minus_baseline: +0.004201 [-0.002246, +0.010553]; s22_all_zeros_minus_s22_all_means: +0.002842 [-0.002622, +0.008456]; s22_all_zeros_minus_s22_zeros: +0.003174 [-0.001242, +0.007615] |
+
+This is an inference-only means-to-zeros swap on identical trained weights; interpret its paired changes dimension by dimension, not as a new zero-trained control.
+
+Teacher agreement: mean full-coordinate final-latent relative L2 0.562306 over100 final-state pairs (step20, no intermediate-step average); frame PSNR 14.284dB over4500 aligned decoded frames, all RGB pixels/channels per-frame then equal dB average.
+
+
+
+### No-exemption study complete
+
+All four swaps, each on100 original prompt/seed pairs with10000 paired prompt resamples seed20261109; decoded-video scores with within-video frame scopes stated above:
+
+| Swap | Aesthetics | Imaging | Text-video | Subject |
+|---|---:|---:|---:|---:|
+| Shared22 exempted | -0.004572 [-0.016253,+0.006629] | -0.009310 [-0.021441,+0.003594] | -0.000466 [-0.004960,+0.004237] | -0.008026 [-0.011886,-0.004642] |
+| Fixed high | -0.163339 [-0.182423,-0.144891] | -0.284466 [-0.314808,-0.253312] | -0.169008 [-0.183127,-0.154921] | -0.040046 [-0.048728,-0.031019] |
+| Split42 | +0.030776 [+0.017194,+0.044369] | -0.120718 [-0.150167,-0.091682] | -0.047353 [-0.057224,-0.037764] | -0.000305 [-0.008526,+0.007682] |
+| Shared22 no exemptions | -0.008191 [-0.018619,+0.002252] | -0.007145 [-0.018235,+0.003237] | +0.002842 [-0.002622,+0.008456] | -0.008681 [-0.015403,-0.003157] |
+
+Trained-student screen (32 prompts x20 teacher states, whole-latent ratios, both CFG branches combined at5): {"student/mean": [0.0023714893834039684, 0.002332464066830653, 0.019325562404992523], "student/delete": [0.003279625959294208, 0.0032788750341296692, 0.02113469421310583]}. Columns conditional/unconditional/guided. Total allocated study GPU-hours 16.853779/18 (cap raised from 13 by the user after the external SIGTERM). Full2500 optimizer/sampler/RNG/EMA state and all prior outputs preserved. Evidence under distill-results/noexempt/. No additional recipe or zeros-trained arm was run.
+
+## Shared32 with nothing exempt: half of the rotary pairs as means
+
+User-assigned 21 November 2026 (18 GPU-hours approved, recipe of the no-exemption shared22 study `s22_all`, trainer
+unchanged). Run 21-22 November 2026 by `scripts/center_study.py` from `configs/studies/shared32.json` in lab checkout
+`/mnt/data/liuzeyu/tri-video-s32-31ef4d2`; full evidence and the auto-generated report in `distill-results/shared32/`.
+
+**What is replaced.** In every self-attention layer (all 30), denoising step (all 20), CFG branch and head, the same 32
+of the 64 rotary pairs on Q and K (64 of 128 dimensions per side) are replaced, after QK-RMSNorm and before RoPE, by a
+learned constant that is identical across all 10,800 video tokens. The 32 pairs per cell are the lowest-damage pairs
+by pooled damage_q + damage_k over the 64 calibration prompts (selection audit: 32 Q, 32 K and 32 Q-K intersection
+pairs in all 14,400 cells); shared22 is a subset in every cell. Mode `delete` (the `s32_zeros` arm) sets those same
+pairs to zero at inference on the identical trained weights. Every video recorded 2,400 replacement calls (30 layers x
+20 steps x 2 branches x 2 sides) and was audited against the final EMA hash, masks and empty exemption lists.
+
+**Velocity error.** Whole-latent relative squared velocity error vs the bf16 teacher; each number is the equal mean
+over the same 32 held-out prompts (d0064-d0095) x 20 teacher entering states (one state per denoising step);
+conditional and unconditional branches separately, guided = both combined at CFG 5. Training-free arms use the pooled
+calibration means (64 prompts x 10,800 tokens per cell); trained arms use the final EMA weights and means.
+
+| Arm | Pairs | Means | Conditional | Unconditional | Guided |
+|---|---:|---|---:|---:|---:|
+| shared/mean | 22 | pooled | 0.006842 | 0.006987 | 0.034431 |
+| shared/delete | 22 | — | 0.010010 | 0.010069 | 0.039689 |
+| shared/mean | 32 | pooled | 0.020686 | 0.020958 | 0.059044 |
+| shared/delete | 32 | — | 0.034511 | 0.035247 | 0.075852 |
+| s22_all student/mean | 22 | trained EMA | 0.002371 | 0.002332 | 0.019326 |
+| s22_all student/delete | 22 | — | 0.003280 | 0.003279 | 0.021135 |
+| s32 student/mean | 32 | trained EMA | 0.003545 | 0.003468 | 0.023981 |
+| s32 student/delete | 32 | — | 0.006230 | 0.006240 | 0.027866 |
+
+Guided error by denoising step (step k = the k-th teacher entering state, mean over the same 32 prompts):
+
+| Arm | 1 | 2 | 3 | 4 | 5 | 10 | 15 | 20 | Mean of 20 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 22 pooled mean | 0.0428 | 0.0817 | 0.0749 | 0.0540 | 0.0455 | 0.0256 | 0.0193 | 0.0401 | 0.0344 |
+| 32 pooled mean | 0.1061 | 0.1453 | 0.1166 | 0.0889 | 0.0716 | 0.0410 | 0.0318 | 0.0721 | 0.0590 |
+| 32 delete (free) | 0.1034 | 0.1607 | 0.1333 | 0.1031 | 0.0866 | 0.0546 | 0.0456 | 0.1261 | 0.0759 |
+| s22_all mean | 0.0557 | 0.0613 | 0.0449 | 0.0288 | 0.0210 | 0.0109 | 0.0083 | 0.0217 | 0.0193 |
+| s32 mean | 0.0751 | 0.0739 | 0.0587 | 0.0350 | 0.0266 | 0.0132 | 0.0101 | 0.0248 | 0.0240 |
+| s32 delete | 0.0703 | 0.0797 | 0.0654 | 0.0409 | 0.0307 | 0.0164 | 0.0134 | 0.0342 | 0.0279 |
+
+**Fine-tune.** Stage 2 from teacher weights, 2,500 updates, two ranks x accumulation 2, model lr 1e-5, means lr 2e-4,
+warmup 250, feature weight 0.1, EMA 0.999, seed 20261114. Guided validation (live weights, first 8 held-out prompts x
+20 states, whole latent, CFG 5) fell 0.0542 -> 0.0242, beside s22_all 0.0319 -> 0.0201 on the same scope. One attempt
+(19,050 s on two GPUs), no external kills; median 6.95 s per update (rank-mean optimizer time, excluding validation
+and saves); peak CUDA allocation 21.54 GiB per rank. Mean norms changed by -0.001% (Q and K; live per-cell norm over
+all 128 stored coordinates, equal average over all cells, first vs last update).
+
+![Shared32 validation](distill-results/shared32/training/validation-curve.png)
+
+**Videos.** 100 original prompts, one fixed seed each, frozen protocol (20 UniPC steps, shift 3, CFG 5, empty
+negative, 45 frames at 480x480); frozen teacher reused. VBench equal prompt means with VBench's within-video aggregation
+(aesthetics and imaging all 45 frames, text-video eight midpoint frames, imaging /100; dynamic degree = fraction of the
+100 videos judged dynamic). Paired mean [pointwise 95%, 10,000 prompt resamples, NumPy seed 20261109; one seed per
+prompt, no across-seed uncertainty]:
+
+| Dimension | Teacher | s32_means | s32_zeros | means − teacher | zeros − teacher | zeros − means | means − s22_all_means | zeros − s22_all_zeros |
+|---|---:|---:|---:|---|---|---|---|---|
+| Aesthetics | 0.5886 | 0.5692 | 0.5323 | -0.0194 [-0.0330, -0.0058] | -0.0563 [-0.0733, -0.0395] | -0.0369 [-0.0506, -0.0237] | -0.0180 [-0.0290, -0.0071] | -0.0467 [-0.0602, -0.0333] |
+| Imaging | 0.6607 | 0.6769 | 0.6354 | +0.0162 [-0.0021, +0.0337] | -0.0253 [-0.0437, -0.0066] | -0.0415 [-0.0545, -0.0288] | +0.0052 [-0.0066, +0.0170] | -0.0292 [-0.0421, -0.0168] |
+| Text-video | 0.2326 | 0.2314 | 0.2169 | -0.0012 [-0.0077, +0.0054] | -0.0157 [-0.0234, -0.0083] | -0.0145 [-0.0202, -0.0090] | -0.0025 [-0.0082, +0.0032] | -0.0199 [-0.0263, -0.0137] |
+| Subject | 0.9640 | 0.9652 | 0.9470 | +0.0012 [-0.0067, +0.0088] | -0.0170 [-0.0262, -0.0084] | -0.0182 [-0.0238, -0.0129] | +0.0010 [-0.0037, +0.0060] | -0.0085 [-0.0144, -0.0025] |
+| Background | 0.9765 | 0.9758 | 0.9683 | -0.0006 [-0.0044, +0.0030] | -0.0082 [-0.0126, -0.0041] | -0.0076 [-0.0111, -0.0043] | -0.0013 [-0.0034, +0.0008] | -0.0041 [-0.0071, -0.0010] |
+| Motion smoothness | 0.9845 | 0.9863 | 0.9829 | +0.0019 [+0.0004, +0.0035] | -0.0016 [-0.0034, +0.0004] | -0.0034 [-0.0047, -0.0022] | +0.0001 [-0.0012, +0.0012] | -0.0015 [-0.0030, -0.0002] |
+| Dynamic degree | 0.3300 | 0.2100 | 0.2600 | -0.1200 [-0.2000, -0.0400] | -0.0700 [-0.1600, +0.0200] | +0.0500 [-0.0200, +0.1300] | -0.0600 [-0.1200, +0.0000] | -0.1300 [-0.2000, -0.0600] |
+
+Final-latent relative L2 vs the teacher (step-20 state, all coordinates, prompt ratios averaged) / frame PSNR over all
+4,500 decoded frames: s32_means 0.5818 / 13.910 dB, s32_zeros 0.5757 / 14.161 dB (s22_all_means 0.5630 / 14.254 dB,
+s22_all_zeros 0.5623 / 14.284 dB).
+
+**Swap row** (zeros minus the same model's trained-means videos), to extend the swap table above:
+
+| Swap | Aesthetics | Imaging | Text-video | Subject |
+|---|---|---|---|---|
+| Shared32 no exemptions | -0.0369 [-0.0506, -0.0237] | -0.0415 [-0.0545, -0.0288] | -0.0145 [-0.0202, -0.0090] | -0.0182 [-0.0238, -0.0129] |
+
+**Verdict.** Fine-tuning recovers most of the training-free damage of replacing half the pairs: the training-free
+shared32 screen (0.0590 guided) is 1.7x shared22's, and the earlier 30-prompt training-free shared32 videos (layer 0 /
+step 1 exempt, a different cohort) lost 0.18 aesthetics, whereas the trained s32_means is at teacher level on
+text-video, imaging, subject and background over 100 videos. It is not free: aesthetics is 0.019 below the teacher and
+0.018 below s22_all_means, and fewer videos are dynamic (21 vs 33 of 100). Zeroing the 32 pairs at inference, nearly
+free at 22 pairs (no aesthetics, imaging or text-video interval excluded zero), now costs 0.037 aesthetics, 0.042
+imaging and 0.015 text-video against the same model's means, a moderate drop far smaller than the fixed-high or wide32
+swaps. In all eight screen arms the largest per-step errors fall in steps 1-3 (plus step 20 for training-free
+shared32 delete) and the smallest in steps 13-17. 12.798 of 18 approved GPU-hours
+(allocated wall time x GPUs of every GPU job, including loading, validation, saves and scorers). No zeros-trained arm,
+other pair counts or seeds were run.
+
 ## Per-pair attention-score attribution
 
 The frozen bf16 Wan2.1 teacher replayed the stored entering states for the splits below. One cell is one prompt × layer × denoising step × CFG branch × attention head. Layer, step, head and pair indices are zero-based. Every cell uses all 10,800 queries × all 10,800 keys of its full 128-dimensional post-RoPE head, over the complete video grid. A share pools only the queries and keys of that cell. The tables give distributions over the named cells or counts. Item 6 explicitly labels the quantiles across queries within one cell.

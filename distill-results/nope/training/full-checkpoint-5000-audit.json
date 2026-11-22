@@ -1,0 +1,35 @@
+{
+  "step": 5000,
+  "center_optimizer_steps": [
+    5000,
+    5000
+  ],
+  "rng_files": {
+    "0": {
+      "sampler": true,
+      "torch_cpu_rng_bytes": 5056,
+      "cuda_rng_bytes": 16
+    },
+    "1": {
+      "sampler": true,
+      "torch_cpu_rng_bytes": 5056,
+      "cuda_rng_bytes": 16
+    }
+  },
+  "distributed_payload_groups": [
+    "ema",
+    "model",
+    "optim"
+  ],
+  "distributed_metadata_entries": 4139,
+  "files": {
+    "center.pt": 49772545,
+    "rng-rank00.pt": 10837,
+    "rng-rank01.pt": 10773,
+    "model/.metadata": 1777603,
+    "model/__0_0.distcp": 11359414916,
+    "model/__1_0.distcp": 11371028627
+  },
+  "checkpoint_bytes": 22782015301,
+  "scope": "CPU audit of full optimizer/EMA/model checkpoint metadata, center optimizer update counts, both rank sampler and Torch CPU/CUDA RNG records. No training or GPU computation."
+}

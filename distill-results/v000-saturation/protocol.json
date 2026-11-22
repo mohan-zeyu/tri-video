@@ -1,0 +1,22 @@
+{
+  "prompt": {
+    "id": "v000",
+    "text": "lemur eating grass leaves",
+    "category": "animal",
+    "seed": 2026110900,
+    "audit": true
+  },
+  "negative_prompt_official": "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards",
+  "negative_prompt_source": "https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B-Diffusers/raw/0fad780a534b6463e45facd96134c9f345acfa5b/README.md",
+  "model_revision": "0fad780a534b6463e45facd96134c9f345acfa5b",
+  "cfg": 5,
+  "frames": 45,
+  "height": 480,
+  "width": 480,
+  "fps": 16,
+  "vae_dtype": "float32",
+  "transformer_dtype": "bfloat16",
+  "scheduler": "UniPCMultistepScheduler",
+  "flow_shift": 3,
+  "qk_intervention": "none"
+}
