@@ -17,6 +17,13 @@ over prompts, layers, steps, branches or heads; within a cell every token is a q
 Alternative source --sweep-root out/full-sweep-wan-20261101: the saved conditional-branch captures of p00-p03
 (pXX/step-NNN/layer-NNN.pt). Those records have a branch dimension of size 1 (conditional only).
 
+--student DIR analyzes a trained learned-center student instead of the teacher: its transformer/ weights with its
+own learned_center.pt attached in the mode it was trained in (or --student-mode), replayed on the SAME stored
+teacher entering states, as scripts/screen_selections.py --student does. The Q/K analyzed are the ones the
+student attends with, i.e. after the selected pairs were replaced by its constants (mean) or zeros (delete).
+Those records also hold replaced_q / replaced_k, bool [layer, step, branch, head, 64]: the pairs replaced in
+each cell with the student's exemptions applied, and the check that those pairs are constant over tokens.
+
 At the first analyzed step, three layers of every prompt recompute the attention output from the hooked
 Q/K/V and the replicated rotation and compare it with the module's real output (attention_output_validation),
 so the analyzed tensors are verified to be the ones the model attends with. One GPU per worker, resumable,
@@ -139,6 +146,26 @@ def metadata(args, **extra):
                 dimensions="[layer, step, branch, head, ...]; step index 0 = first denoising step")
 
 
+def load_student(path, mode, model_class, device):
+    """Student transformer with its learned-center hooks attached; returns (model, center, replaced masks)."""
+    from learned_center import LearnedCenter
+    student = resolve(path)
+    model = model_class.from_pretrained(student, subfolder="transformer", torch_dtype=torch.bfloat16).to(device).eval()
+    saved = torch.load(student / "learned_center.pt", map_location="cpu")
+    center = LearnedCenter.from_checkpoint(saved, mode=mode).to(device)
+    if center.mode not in ("mean", "delete") or center.is_wide or center.uses_nope:
+        raise SystemExit("--student supports plain mean or delete students (no narrow, NoPE or widened head)")
+    center.attach(model)                 # registered before the analysis hooks, so they see the replaced Q/K
+    active = (center.layer_active[:, None] & center.step_active[None, :])[:, :, None, None, None].cpu()
+    replaced = {side: (center.selected_pairs(side).cpu() & active) for side in ("q", "k")}
+    return model, center, replaced
+
+
+def constant_check(fields, replaced):
+    """Largest |E||x_f|| - ||E x_f||| over the replaced pairs: zero when a pair is the same vector at every token."""
+    return {side: float(((fields["norm_" + side] - fields["center_norm_" + side]).abs() * replaced[side]).max()) for side in ("q", "k")}
+
+
 def replay(args, out, device):
     """Both CFG branches of every stored entering state of the selected distillation prompts."""
     from diffusers import WanTransformer3DModel
@@ -146,8 +173,12 @@ def replay(args, out, device):
     prompts = json.loads(resolve(args.prompts).read_text())["prompts"]
     ids = args.ids or [p["id"] for p in prompts if p["split"] == args.split]
     store = TrajectoryStore(resolve(args.traj), ids)
-    model = WanTransformer3DModel.from_pretrained(args.snapshot, subfolder="transformer", torch_dtype=torch.bfloat16,
-                                                  local_files_only=True).to(device).eval()
+    center, replaced = None, None
+    if args.student:
+        model, center, replaced = load_student(args.student, args.student_mode, WanTransformer3DModel, device)
+    else:
+        model = WanTransformer3DModel.from_pretrained(args.snapshot, subfolder="transformer", torch_dtype=torch.bfloat16,
+                                                      local_files_only=True).to(device).eval()
     steps = list(range(store.steps)) if args.steps is None else args.steps
     done = 0
     for pid in store.ids:
@@ -166,6 +197,8 @@ def replay(args, out, device):
                 for step in steps:
                     item = store.item(pid, step)
                     hooks.step = step
+                    if center is not None:
+                        center.set_context(torch.tensor([step, step]), torch.tensor([0, 1]))
                     x = item["x"].to(device=device, dtype=torch.bfloat16).unsqueeze(0).expand(2, -1, -1, -1, -1).contiguous()
                     text = torch.cat([item["positive"], item["negative"]]).to(device=device, dtype=torch.bfloat16)
                     t = torch.full((2,), float(item["timestep"]), device=device)
@@ -173,10 +206,18 @@ def replay(args, out, device):
             finally:
                 hooks.close()
             fields = record.finish(len(model.blocks) * len(steps) * 2)
+            source = "teacher replay of stored entering states, bf16, both CFG branches in one batch"
+            if center is not None:
+                constant = constant_check(fields, replaced)
+                if max(constant.values()) > 1e-2:
+                    raise RuntimeError(f"replaced pairs are not constant over tokens: {constant}")
+                fields.update(replaced_q=replaced["q"], replaced_k=replaced["k"], student=str(args.student), student_mode=center.mode,
+                              replaced_pairs_constant_max_deviation=constant)
+                source = (f"trained student ({center.mode} on its selected pairs) replayed on stored TEACHER entering states, "
+                          "bf16, both CFG branches in one batch")
             fields.update(metadata(args, prompt_id=pid, branches=list(BRANCHES), steps_analyzed=steps,
                                    timesteps=store.timesteps, attention_output_validation=hooks.validation,
-                                   seconds=time.time() - started,
-                                   source="teacher replay of stored entering states, bf16, both CFG branches in one batch"))
+                                   seconds=time.time() - started, source=source))
             save_torch(target, fields)
             print("COMPLETE", pid, round(time.time() - started, 1), flush=True)
             done += 1
@@ -235,6 +276,8 @@ def main():
     parser.add_argument("--split", default="calib")
     parser.add_argument("--ids", nargs="+", help="explicit prompt ids instead of a split")
     parser.add_argument("--snapshot", default=os.environ.get("WAN_SNAPSHOT"))
+    parser.add_argument("--student", help="student directory (transformer/ + learned_center.pt): analyze that student")
+    parser.add_argument("--student-mode", choices=["mean", "delete"], help="default: the mode stored with the student")
     parser.add_argument("--sweep-root", help="analyze saved full-sweep captures instead of replaying trajectories")
     parser.add_argument("--out", default="out/distill-score-attribution")
     parser.add_argument("--steps", nargs="+", type=int, help="0-based step indices; default every step")

@@ -42,6 +42,13 @@ DIMS = {"layer": 1, "step": 2, "branch": 3}                      # axes of [prom
 # where center_var_own exceeds CENTER_R_FLOOR x (|E q_f| |E k_f|)^2 / d, the largest square the center contribution
 # can take; at the floor the rounding noise in r is below 0.01. Undefined entries are NaN and are counted.
 CENTER_R_FLOOR = 1e-10
+# attn_score_share is the plain percentage of the attention score: of the raw logit that a cell's queries give to
+# the keys they attend (softmax-weighted, summed over queries), the part contributed by a pair. Unlike adv_share it
+# is not row-centred, so it includes the per-query constant that softmax ignores, and it is a ratio to a total that
+# can be near zero or negative when pairs cancel. It is undefined (NaN, counted) where that total is not above
+# SCORE_SHARE_FLOOR x the sum of the pairs' absolute contributions.
+SCORE_SHARE_FLOOR = 0.01
+NAN_ALLOWED = ("center_pair_r", "attn_score_share")
 
 
 def resolve(path):
@@ -62,7 +69,12 @@ def shares(record, center_r_floor=CENTER_R_FLOOR):
 def _shares(f, amplitude, own_sum, center_var, center_r_floor):
     center_square = (f["center_norm_q"] * f["center_norm_k"]) ** 2 / (2 * f["var_own"].shape[-1])
     defined = (f["center_var_own"] > center_r_floor * center_square) & (f["var_own"] > 0)
+    raw = f["adv"] + f["mean_contribution"]                       # mean over queries of sum_j p[i,j] c_f[i,j]
+    total = raw.sum(-1, keepdims=True)
+    usable = total > SCORE_SHARE_FLOOR * np.abs(raw).sum(-1, keepdims=True)
     return {
+        "attn_score_share": np.where(usable, raw / np.where(usable, total, 1.0), np.nan),
+        "attn_score_total": total[..., 0],
         "var_cov_share": f["var_cov"] / f["row_var"][..., None],
         "var_own_share": f["var_own"] / own_sum[..., None],
         "adv_share": f["adv"] / f["adv_total"][..., None],
@@ -109,9 +121,9 @@ def breakdown(x, per_pair=False, skip_nan=False):
 
 
 def check_finite(data):
-    """Every derived quantity must be finite; center_pair_r may be NaN (undefined) but never infinite."""
+    """Every derived quantity must be finite; the NAN_ALLOWED ones may be NaN (undefined) but never infinite."""
     for name, value in data.items():
-        bad = np.isinf(value) if name == "center_pair_r" else ~np.isfinite(value)
+        bad = np.isinf(value) if name in NAN_ALLOWED else ~np.isfinite(value)
         if bad.any():
             where = [int(i) for i in np.argwhere(bad)[0]]
             raise FloatingPointError(f"{name}: {int(bad.sum())} non-finite entries of {value.size}; first at "

@@ -13,7 +13,9 @@
 4. step_similarity_pair_score_attribution.py: the step-to-step similarity of each trajectory's 64 shares,
    recomputed here for one pair of steps over all trajectories, per layer and per branch.
 6. selection_score_share.py: shares of named pair sets and of a set difference, recomputed here and compared with
-   the analyzer's selection overlay.
+   the analyzer's selection overlay; the plain attention-score percentage; and a trained student (--student):
+   replaced pairs constant over tokens, exempt cells identical to the teacher, one active cell recomputed with the
+   replacement attached, and the replaced pairs' shares in the student and in the teacher on the same cells.
 5. plot_step_trajectories_pair_score_attribution.py: every plotted number is one cell-pair value, and the drawn
    heads and pairs follow the stated selection rule.
 
@@ -298,15 +300,82 @@ def test_collector_and_analysis():
         sets = json.loads((out / "selection-shares-test.json").read_text())
         adv = np.stack([(r["adv"].double() / r["adv_total"].double()[..., None]).numpy() for r in records])
         m22, m32 = mask_q.numpy(), mask_32.numpy()
-        assert sets["entries"] == report["cells"] and sets["sets"]["s32"]["pairs_per_cell"] == [32.0] * 7 and sets["sets"]["added"]["pairs_per_cell"] == [10.0] * 7
-        assert sets["set_sources"]["added"]["pairs_of_b_outside_a"] == 0 and sets["sets"]["sep"]["pairs_per_cell"][0] >= 22
+        assert sets["entries"] == report["cells"] and sets["sets"]["s32"]["pairs_per_active_cell"] == [32.0] * 7 and sets["sets"]["added"]["pairs_per_active_cell"] == [10.0] * 7
+        assert sets["set_sources"]["added"]["pairs_of_b_outside_a"] == 0 and sets["sets"]["sep"]["pairs_per_active_cell"][0] >= 22
         assert np.allclose(sets["sets"]["s32"]["adv_share"]["all"], np.quantile((adv * m32).sum(-1), levels), atol=1e-6)
         assert np.allclose(sets["sets"]["added"]["var_cov_share"]["all"], np.quantile((share * (m32 & ~m22)).sum(-1), levels), atol=1e-6)
         assert np.allclose(sets["sets"]["s22"]["var_cov_share"]["by_layer"][1], np.quantile((share * m22).sum(-1)[:, 1], levels), atol=1e-6)
         assert np.allclose(sets["sets"]["s22"]["var_cov_share"]["all"], report["selection"]["shared"]["union_var_cov_share"]["all"], atol=1e-9)
         assert np.allclose(sets["sets"]["sep"]["deleted_logit_variance"]["all"], report["selection"]["separate"]["union_deleted_logit_variance"]["all"], atol=1e-9)
         assert np.allclose(sets["sets"]["s32"]["reference"]["smallest_possible_var_own_share"]["all"], np.quantile(np.sort(own, -1)[..., :32].sum(-1), levels), atol=1e-6)
-        assert "reference" not in sets["sets"]["sep"] and "| s32 | 32 | adv_share |" in (out / "SELECTION-SHARES-test.md").read_text()
+        assert "reference" not in sets["sets"]["sep"] and f"| s32 | 32 | {report['cells']:,} | adv_share |" in (out / "SELECTION-SHARES-test.md").read_text()
+
+        def score_share(recs, mask):
+            """Plain percentage of the attention-weighted raw logit carried by the masked pairs, per prompt x cell."""
+            raw = np.stack([(r["adv"].double() + r["mean_contribution"].double()).numpy() for r in recs])
+            total = raw.sum(-1)
+            value = (raw * mask).sum(-1) / total
+            value[~(total > .01 * np.abs(raw).sum(-1))] = np.nan
+            return value
+        expected = score_share(records, m32)
+        assert sets["sets"]["s32"]["entries"] == report["cells"] and np.allclose(sets["sets"]["s32"]["attn_score_share"]["all"], np.nanquantile(expected, levels), atol=1e-6)
+        assert sets["sets"]["s32"]["attn_score_share_undefined_entries"] == int(np.isnan(expected).sum())
+
+        # a trained student: its own masks, means and exemptions; replayed on the same stored teacher states
+        from learned_center import LearnedCenter
+        student = write_tiny_snapshot(tmp / "student")
+        center = LearnedCenter(layers=2, steps=STEPS, heads=2, exempt_layers=(0,), exempt_steps=(0,), mode="mean", selection={"mask_q": mask_q, "mask_k": mask_q.clone()})
+        torch.manual_seed(8)
+        with torch.no_grad():
+            center.init_from_calibration({"mean_q": torch.randn(2, STEPS, 2, 2, 128), "mean_k": torch.randn(2, STEPS, 2, 2, 128)})
+        torch.save({"state_dict": center.state_dict(), "mode": "mean"}, student / "learned_center.pt")
+        student_stats = tmp / "student-attribution"
+        run("collect_pair_score_attribution.py", ["--traj", tmp / "traj", "--prompts", cfg, "--snapshot", tiny, "--student", student, "--out", student_stats, "--chunk", 3])
+        srecs = [torch.load(f) for f in sorted(student_stats.glob("*.pt"))]
+        srec = srecs[1]
+        assert len(srecs) == 4 and srec["student_mode"] == "mean" and "student" in srec["source"]
+        assert not srec["replaced_q"][0].any() and not srec["replaced_q"][:, 0].any() and (srec["replaced_q"][1, 1:].sum(-1) == 22).all()
+        assert torch.equal(srec["replaced_q"][1, 2], mask_q[1, 2]) and max(srec["replaced_pairs_constant_max_deviation"].values()) < 1e-3
+        on, off = mask_q[1, 2, 1, 0], ~mask_q[1, 2, 1, 0]
+        assert torch.allclose(srec["norm_q"][1, 2, 1, 0][on], srec["center_norm_q"][1, 2, 1, 0][on], atol=1e-4)                   # constants: |mean| = mean |.|
+        assert (srec["norm_q"][1, 2, 1, 0][off] - srec["center_norm_q"][1, 2, 1, 0][off]).min() > 1e-3                            # untouched pairs still vary
+        assert torch.equal(srec["var_cov"][0], records[1]["var_cov"][0]) and torch.equal(srec["adv"][1, 0], records[1]["adv"][1, 0])   # exempt layer and step = teacher
+        assert not torch.allclose(srec["var_cov"][1, 2], records[1]["var_cov"][1, 2])
+        assert all(v["relative_max_err"] <= 1e-3 for v in srec["attention_output_validation"].values())
+        # the active cell (layer 1, step 2, unconditional) recomputed with the same replacement attached first
+        model = WanTransformer3DModel.from_pretrained(student, subfolder="transformer", torch_dtype=torch.bfloat16).eval()
+        live = LearnedCenter.from_checkpoint(torch.load(student / "learned_center.pt")).attach(model)
+        live.set_context(torch.tensor([2, 2]), torch.tensor([0, 1]))
+        seen = {}
+        handles = [getattr(model.blocks[1].attn1, "norm_" + s_).register_forward_hook(lambda m, i, o, s_=s_: seen.__setitem__(s_, o.detach().clone())) for s_ in ("q", "k")]
+        handles.append(model.rope.register_forward_hook(lambda m, i, o: seen.__setitem__("rope", o)))
+        with torch.inference_mode():
+            model(hidden_states=item["x"].bfloat16().unsqueeze(0).expand(2, -1, -1, -1, -1).contiguous(), timestep=torch.full((2,), float(item["timestep"])),
+                  encoder_hidden_states=torch.cat([item["positive"], item["negative"]]).bfloat16(), return_dict=False)
+        [h.remove() for h in handles]
+        live.detach()
+        cos, sin = seen["rope"][0][0, :, 0, 0::2].float(), seen["rope"][1][0, :, 0, 1::2].float()
+        q, k = [seen[s_][1].float().view(-1, 2, 128).transpose(0, 1) for s_ in ("q", "k")]
+        ref = brute(rotate(q, cos, sin, torch.bfloat16), rotate(k, cos, sin, torch.bfloat16))
+        close(srec["var_cov"][1, 2, 1], ref["g"].sum(2), 1e-4)
+        close(srec["adv"][1, 2, 1], ref["adv"].mean(1), 1e-4)
+        close(srec["adv"][1, 2, 1] + srec["mean_contribution"][1, 2, 1], (ref["p"][..., None] * ref["contrib"]).sum(2).mean(1), 1e-4)
+        # shares of the replaced pairs in the student, and of the same pairs and cells in the teacher
+        run("selection_score_share.py", ["--stats", student_stats, "--record-masks", "replaced", "--out", out, "--tag", "student"])
+        run("selection_score_share.py", ["--stats", stats, "--masks-from-record", "replaced", student_stats / "d0000.pt", "--out", out, "--tag", "teacher-same-pairs"])
+        in_student = json.loads((out / "selection-shares-student.json").read_text())["sets"]["replaced"]
+        in_teacher = json.loads((out / "selection-shares-teacher-same-pairs.json").read_text())["sets"]["replaced"]
+        replaced = (srec["replaced_q"] | srec["replaced_k"]).numpy()
+        cells = replaced.any(-1)
+        assert in_student["active_cells_per_prompt"] == int(cells.sum()) == 1 * (STEPS - 1) * 2 * 2 and in_student["entries"] == 4 * int(cells.sum()) == in_teacher["entries"]
+        assert in_student["pairs_per_active_cell"] == [22.0] * 7 and in_student["attn_score_share"]["by_layer"][0][3] is None
+        for got, recs in ((in_student, srecs), (in_teacher, records)):
+            value = score_share(recs, replaced)[:, cells]
+            assert np.allclose(got["attn_score_share"]["all"], np.nanquantile(value, levels), atol=1e-6)
+            assert got["attn_score_share_undefined_entries"] == int(np.isnan(value).sum())
+            adv_ = np.stack([(r["adv"].double() / r["adv_total"].double()[..., None]).numpy() for r in recs])
+            assert np.allclose(got["adv_share"]["all"], np.quantile((adv_ * replaced).sum(-1)[:, cells], levels), atol=1e-6)
+        assert "no active cells" in (out / "SELECTION-SHARES-student.md").read_text()
 
         # step similarity: each trajectory (prompt x layer x branch x head) compared with itself at two steps
         run("step_similarity_pair_score_attribution.py", ["--stats", stats, "--out", out])

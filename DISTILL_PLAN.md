@@ -396,3 +396,12 @@ A read-only addition to the attribution study. `scripts/selection_score_share.py
 shares over named pair sets read from selection files, and reports quantiles over prompt × cell entries. The brief
 `DISTILL_SCORE_SHARED32_PROMPT.md` applies it to shared22, shared32 and the ten pairs shared32 adds, on the existing
 calibration and held-out records. CPU only.
+
+### Score share of the replaced pairs inside the students (22 November)
+
+`collect_pair_score_attribution.py --student` replays a trained learned-center student, with its means attached,
+on the stored teacher entering states and records the same per-cell attribution plus the pairs it replaced.
+`selection_score_share.py` then reports, as quantiles over prompt × cell entries, the share of those pairs in the
+student and in the teacher on the same cells, including `attn_score_share`, the plain percentage of the
+attention-weighted raw logit. The brief `DISTILL_SCORE_STUDENTS_PROMPT.md` covers the shared22, shared32 and
+fixed-high students on the first 16 held-out prompts, within 4 GPU-hours.
