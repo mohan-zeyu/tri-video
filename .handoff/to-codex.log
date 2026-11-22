@@ -1,1 +1,2 @@
 2026-11-20T12:22:46Z	claude	-	Brief: shared22 with nothing exempt, then its fine-tune-then-drop swap
+2026-11-22T11:17:44Z	claude	-	Brief: per-head pair score shares across denoising steps (figures and step similarity, CPU only)

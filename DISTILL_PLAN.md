@@ -379,3 +379,13 @@ highest-damage pairs taken from the real projection without RoPE (a pure content
 appended rows are gathered from the projection output, which equals copying those rows of to_q/to_k); the `wide`
 selection variant picks the content pairs. Mode `delete` zeroes the position channel. Nothing exempt. The procedure
 is in `DISTILL_WIDE_PROMPT.md`.
+
+### Score shares across denoising steps (22 November)
+
+A read-only follow-up to the per-pair attention-score attribution on branch `claude/practical-lovelace-yham5v`.
+The published analysis compares steps only as populations of cells. Two CPU scripts read the existing per-prompt
+records: `plot_step_trajectories_pair_score_attribution.py` draws individual pairs against the step for four
+representative heads of every layer (one prompt, one branch, one cell-pair value per point), and
+`step_similarity_pair_score_attribution.py` reports, as quantiles over the prompt × layer × branch × head
+trajectories, how similar a head's 64 shares are between every two steps. No GPU work and no new collection. The
+procedure is in `DISTILL_SCORE_STEPS_PROMPT.md`.
