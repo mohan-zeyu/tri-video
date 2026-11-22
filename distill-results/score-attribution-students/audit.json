@@ -1,0 +1,227 @@
+{
+ "brief": "d8013edad1491fb43d4e5d77293a3ac9abaa7938 DISTILL_SCORE_STUDENTS_PROMPT.md",
+ "prompts": "held-out d0064-d0079 (16), replayed on the stored teacher entering states, 20 steps, both CFG branches",
+ "records": {
+  "shared22": "/mnt/data/liuzeyu/tri-score-steps-cb076e9/out/distill-score-attribution-student-shared22/ (16 .pt)",
+  "shared32": "/mnt/data/liuzeyu/tri-score-steps-cb076e9/out/distill-score-attribution-student-shared32/ (16 .pt)",
+  "fixedhigh": "/mnt/data/liuzeyu/tri-score-steps-cb076e9/out/distill-score-attribution-student-fixedhigh/ (16 .pt)"
+ },
+ "exports": {
+  "shared22": {
+   "path": "/mnt/data/liuzeyu/tri-video-selection-67c101b/out/distill-shared22-export/student",
+   "exempt": "layer 0, step index 0",
+   "sha256": {
+    "learned_center.pt": "3864d0b7b306d3b732f96192d77a224cc6fba725a3ca16cbe98b20acc35b61b9",
+    "transformer/config.json": "52669ea7e3f7954e403c37d6fe2c853728821b8feae11a582b40f9541b86a402",
+    "transformer/diffusion_pytorch_model.safetensors": "c22bdfbdd6d5fa5e7b5b508516c41d768ad53edbe6872156e454e12e25c8ff36"
+   },
+   "verified_against": "learned_center.pt matches distill-results/swap/input-audit.json s22.center_sha256 (the only shared22 export hash recorded in the repository; distill-results/shared22/full100/selection-records.json and summary.json hold video and code hashes, not export hashes). All three files match ema-sha256.txt beside the export on the lab disk (not in Git). The weights differ from the shared22 5,000-update extension and the shared22 delete EMAs."
+  },
+  "shared32": {
+   "path": "/mnt/data/liuzeyu/tri-video-s32-31ef4d2/out/study-shared32/train/student",
+   "exempt": "none",
+   "sha256": {
+    "learned_center.pt": "a2e2060833d8a624fbacccb81064bd880f5e26884fdaaaf1bbc318efcb352cf3",
+    "transformer/config.json": "52669ea7e3f7954e403c37d6fe2c853728821b8feae11a582b40f9541b86a402",
+    "transformer/diffusion_pytorch_model.safetensors": "be743d0c16541e1dbea385047e36670f496db5a24a94a4d0e8765e9fe8daeccc"
+   },
+   "verified_against": "all three match distill-results/shared32/training/final-ema.sha256"
+  },
+  "fixedhigh": {
+   "path": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/distill-controls-preserved/s3/student",
+   "exempt": "layer 0, step index 0",
+   "sha256": {
+    "learned_center.pt": "002151bdaef969835d910628ab761dd1b263bfac87ab3a954f41119246cad046",
+    "transformer/config.json": "52669ea7e3f7954e403c37d6fe2c853728821b8feae11a582b40f9541b86a402",
+    "transformer/diffusion_pytorch_model.safetensors": "ecbfa52e7a3768cc0d5cc3a8862099803e03a5af1bb350752a42b1ddc44db4c5"
+   },
+   "verified_against": "all three match distill-results/swap/fh-ema-audit.json manifest_sha256_entries"
+  }
+ },
+ "pilot": {
+  "student": "shared22",
+  "prompt": "d0064",
+  "gpu_uuid": "GPU-37b043fc-e2c1-7a4c-2e56-d90d9aea39e4",
+  "record_seconds": 139.6236755847931,
+  "worker_wall_seconds": 148.217372807,
+  "peak_device_memory_mib_sampled_at_500ms": 7593,
+  "projected_gpu_hours_for_B": 1.862
+ },
+ "gpu_time": {
+  "scope": "worker wall time x 1 GPU per job, including model load; idle GPUs only, one student per GPU",
+  "jobs": {
+   "pilot-shared22": {
+    "gpu_uuid": "GPU-37b043fc-e2c1-7a4c-2e56-d90d9aea39e4",
+    "worker_wall_seconds": 148.22,
+    "exit_code": 0
+   },
+   "B-shared22": {
+    "gpu_uuid": "GPU-2fd4aa9c-58f6-0bea-efbf-d4a65cc3e8cd",
+    "worker_wall_seconds": 2116.79,
+    "exit_code": 0
+   },
+   "B-shared32": {
+    "gpu_uuid": "GPU-37b043fc-e2c1-7a4c-2e56-d90d9aea39e4",
+    "worker_wall_seconds": 2253.92,
+    "exit_code": 0
+   },
+   "B-fixedhigh": {
+    "gpu_uuid": "GPU-54aab195-984c-7336-8529-2469f43de4fd",
+    "worker_wall_seconds": 2260.59,
+    "exit_code": 0
+   }
+  },
+  "total_gpu_seconds": 6779.51,
+  "total_gpu_hours": 1.8832,
+  "budget_gpu_hours": 4
+ },
+ "per_student_checks": {
+  "shared22": {
+   "scope": "maxima over the 16 records; validation = six recomputed attention outputs per record (step index 0, layers 0/15/29, both branches); constancy = max deviation of the replaced pairs from one vector over tokens",
+   "records": 16,
+   "filled_all": true,
+   "student_mode": [
+    "mean"
+   ],
+   "attention_output_validation_max_relative_err": 0,
+   "replaced_pairs_constant_max_deviation": {
+    "q": 3.337860107421875e-06,
+    "k": 1.6689300537109375e-06
+   },
+   "replaced_masks_identical_across_prompts": true,
+   "replaced_q_equals_replaced_k": true,
+   "active_cells_per_prompt": 13224,
+   "pairs_per_active_cell": [
+    22
+   ],
+   "pair_set_check_passed": true
+  },
+  "shared32": {
+   "scope": "maxima over the 16 records; validation = six recomputed attention outputs per record (step index 0, layers 0/15/29, both branches); constancy = max deviation of the replaced pairs from one vector over tokens",
+   "records": 16,
+   "filled_all": true,
+   "student_mode": [
+    "mean"
+   ],
+   "attention_output_validation_max_relative_err": 0,
+   "replaced_pairs_constant_max_deviation": {
+    "q": 4.291534423828125e-06,
+    "k": 2.1457672119140625e-06
+   },
+   "replaced_masks_identical_across_prompts": true,
+   "replaced_q_equals_replaced_k": true,
+   "active_cells_per_prompt": 14400,
+   "pairs_per_active_cell": [
+    32
+   ],
+   "pair_set_check_passed": true
+  },
+  "fixedhigh": {
+   "scope": "maxima over the 16 records; validation = six recomputed attention outputs per record (step index 0, layers 0/15/29, both branches); constancy = max deviation of the replaced pairs from one vector over tokens",
+   "records": 16,
+   "filled_all": true,
+   "student_mode": [
+    "mean"
+   ],
+   "attention_output_validation_max_relative_err": 0,
+   "replaced_pairs_constant_max_deviation": {
+    "q": 4.57763671875e-05,
+    "k": 6.103515625e-05
+   },
+   "replaced_masks_identical_across_prompts": true,
+   "replaced_q_equals_replaced_k": true,
+   "active_cells_per_prompt": 13224,
+   "pairs_per_active_cell": [
+    22
+   ],
+   "pair_set_check_passed": true
+  }
+ },
+ "validation_note": "For shared22 and fixedhigh the six validation cells are at the exempt step index 0, so they contain no replaced pairs; for shared32 they do.",
+ "tables": {
+  "shared22-student": {
+   "entries": 211584,
+   "pairs_per_active_cell": [
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0
+   ],
+   "attn_score_share_undefined_entries": 19,
+   "undefined_percent": 0.008979885057471264
+  },
+  "shared22-teacher": {
+   "entries": 211584,
+   "pairs_per_active_cell": [
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0
+   ],
+   "attn_score_share_undefined_entries": 14,
+   "undefined_percent": 0.0066167574107683005
+  },
+  "shared32-student": {
+   "entries": 230400,
+   "pairs_per_active_cell": [
+    32.0,
+    32.0,
+    32.0,
+    32.0,
+    32.0,
+    32.0,
+    32.0
+   ],
+   "attn_score_share_undefined_entries": 89,
+   "undefined_percent": 0.038628472222222224
+  },
+  "shared32-teacher": {
+   "entries": 230400,
+   "pairs_per_active_cell": [
+    32.0,
+    32.0,
+    32.0,
+    32.0,
+    32.0,
+    32.0,
+    32.0
+   ],
+   "attn_score_share_undefined_entries": 57,
+   "undefined_percent": 0.024739583333333332
+  },
+  "fixedhigh-student": {
+   "entries": 211584,
+   "pairs_per_active_cell": [
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0
+   ],
+   "attn_score_share_undefined_entries": 21,
+   "undefined_percent": 0.00992513611615245
+  },
+  "fixedhigh-teacher": {
+   "entries": 211584,
+   "pairs_per_active_cell": [
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0
+   ],
+   "attn_score_share_undefined_entries": 14,
+   "undefined_percent": 0.0066167574107683005
+  }
+ }
+}

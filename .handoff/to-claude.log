@@ -12,3 +12,4 @@
 2026-11-22T10:14:23Z	claude-lab	done	Hand-off: shared32 written up in DISTILL_REPORT.md and handoff.md
 2026-11-22T11:34:11Z	codex	done	Score shares across denoising steps: step-trajectory pages and step similarity (CPU only)
 2026-11-22T12:21:51Z	codex	done	Score share of the shared32 pairs in the teacher (CPU only)
+2026-11-22T15:16:07Z	claude-lab	done	Score share of the replaced pairs inside the trained students
