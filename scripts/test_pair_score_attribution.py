@@ -10,6 +10,8 @@
    the selection overlay recomputed for the whole population, the --cell lookup, an undefined center_pair_r
    (center-model variance at rounding noise) counted instead of overflowing, and a non-finite share stopping
    the analysis.
+4. step_similarity_pair_score_attribution.py: the step-to-step similarity of each trajectory's 64 shares,
+   recomputed here for one pair of steps over all trajectories, per layer and per branch.
 
 Run from the repository root:  python scripts/test_pair_score_attribution.py
 """
@@ -284,6 +286,24 @@ def test_collector_and_analysis():
             raise AssertionError("a non-finite share must stop the analysis")
         except FloatingPointError as error:
             assert "var_cov_share" in str(error)
+        # step similarity: each trajectory (prompt x layer x branch x head) compared with itself at two steps
+        run("step_similarity_pair_score_attribution.py", ["--stats", stats, "--out", out])
+        sim = json.loads((out / "step-similarity.json").read_text())
+        assert sim["trajectories"] == 4 * 2 * 2 * 2 and sim["step_pairs"] == [[0, 1], [1, 2], [2, 3], [1, 3], [0, 3]]
+        a, b = share[:, :, 0], share[:, :, 3]                                                                          # steps 0 and 3: [prompt, layer, branch, head, pair]
+        ca, cb = a - a.mean(-1, keepdims=True), b - b.mean(-1, keepdims=True)
+        pearson = (ca * cb).sum(-1) / np.sqrt((ca ** 2).sum(-1) * (cb ** 2).sum(-1))
+        table = sim["measures"]["var_cov_share"]
+        assert np.allclose(table["pearson"]["all"][0][3], np.quantile(pearson, levels), atol=1e-5)
+        assert np.allclose(table["moved_share"]["all"][0][3], np.quantile(.5 * np.abs(a - b).sum(-1), levels), atol=1e-5)
+        assert np.allclose(table["pearson"]["by_layer"][1][4], np.quantile(pearson[:, 1], levels), atol=1e-5)          # layer 1, step pair (0, 3)
+        assert np.allclose(table["pearson"]["by_branch"][1][4], np.quantile(pearson[:, :, 1], levels), atol=1e-5)
+        top = lambda x: set(np.argsort(x)[-5:].tolist())
+        common = [len(top(a[i]) & top(b[i])) for i in np.ndindex(a.shape[:-1])]
+        assert np.allclose(table["top5"]["all"][0][3], np.quantile(common, levels))
+        assert np.allclose(table["pearson"]["all"][2][2], 1, atol=1e-9) and np.allclose(table["top22"]["all"][1][1], 22) and np.allclose(table["moved_share"]["all"][3][3], 0)
+        assert np.allclose(table["spearman"]["all"][0][3], np.array(table["spearman"]["all"][3][0]))
+        assert (out / "figures" / "step-similarity-adv_share.png").exists() and "1 vs 4" in (out / "STEP-SIMILARITY.md").read_text()
         run("analyze_pair_score_attribution.py", ["--stats", tmp / "sweep-attribution", "--out", tmp / "sweep-analysis", "--no-figures"])
         assert json.loads((tmp / "sweep-analysis" / "report.json").read_text())["shape"]["branches"] == 1
     print("test_collector_and_analysis OK")
