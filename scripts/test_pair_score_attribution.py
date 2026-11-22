@@ -12,6 +12,7 @@
    the analysis.
 4. step_similarity_pair_score_attribution.py: the step-to-step similarity of each trajectory's 64 shares,
    recomputed here for one pair of steps over all trajectories, per layer and per branch.
+5. plot_step_trajectories_pair_score_attribution.py: the per-head values it plots are single cells.
 
 Run from the repository root:  python scripts/test_pair_score_attribution.py
 """
@@ -304,6 +305,19 @@ def test_collector_and_analysis():
         assert np.allclose(table["pearson"]["all"][2][2], 1, atol=1e-9) and np.allclose(table["top22"]["all"][1][1], 22) and np.allclose(table["moved_share"]["all"][3][3], 0)
         assert np.allclose(table["spearman"]["all"][0][3], np.array(table["spearman"]["all"][3][0]))
         assert (out / "figures" / "step-similarity-adv_share.png").exists() and "1 vs 4" in (out / "STEP-SIMILARITY.md").read_text()
+        # per-head share against step, one panel per layer: the plotted numbers are single cells
+        traj = tmp / "trajectories"
+        run("plot_step_trajectories_pair_score_attribution.py", ["--stats", stats, "--out", traj, "--prompts", "d0001", "--measure", "var_cov_share",
+                                                                   "--sets", "high", "w", "largest", "pairs:3,5"])
+        rows = [l.split(",") for l in (traj / "d0001-unconditional-var_cov_share-pairs-3_5.csv").read_text().splitlines()[1:]]
+        assert len(rows) == 2 * 2 * STEPS
+        value = {(int(a), int(b), int(c)): float(d) for a, b, c, d in rows}                                             # (layer, head, 1-based step)
+        assert abs(value[1, 0, 3] - share[1, 1, 2, 1, 0, [3, 5]].sum()) < 1e-5
+        high = {tuple(map(int, l.split(",")[:3])): float(l.split(",")[3]) for l in (traj / "d0001-conditional-var_cov_share-high.csv").read_text().splitlines()[1:]}
+        assert abs(high[0, 1, 4] - share[1, 0, 3, 0, 1, list(range(0, 8)) + list(range(22, 29)) + list(range(43, 50))].sum()) < 1e-5
+        largest = (traj / "d0001-conditional-var_cov_share-largest.csv").read_text().splitlines()[1].split(",")
+        assert abs(float(largest[3]) - share[1, 0, 0, 0, 0].max()) < 1e-5
+        assert (traj / "d0001-unconditional-var_cov_share-w.png").exists() and len(list(traj.glob("*.png"))) == 8
         run("analyze_pair_score_attribution.py", ["--stats", tmp / "sweep-attribution", "--out", tmp / "sweep-analysis", "--no-figures"])
         assert json.loads((tmp / "sweep-analysis" / "report.json").read_text())["shape"]["branches"] == 1
     print("test_collector_and_analysis OK")
