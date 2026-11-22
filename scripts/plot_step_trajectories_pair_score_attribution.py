@@ -76,7 +76,7 @@ def draw(panels, steps, heads_total, title, path):
                          "axes.grid": True, "grid.color": grid, "grid.linewidth": .8, "axes.axisbelow": True})
     columns = min(2, len(panels))
     rows = -(-len(panels) // columns)
-    fig, axes = plt.subplots(rows, columns, figsize=(6.3 * columns + .4, 3.25 * rows + 1.7), squeeze=False, sharex=True)
+    fig, axes = plt.subplots(rows, columns, figsize=(6.3 * columns + .4, 3.25 * rows + 1.95), squeeze=False, sharex=True)
     x = [s + 1 for s in steps]
     for ax, (head, position, pairs, values) in zip(axes.flat, panels):
         used = {}
@@ -105,7 +105,7 @@ def draw(panels, steps, heads_total, title, path):
     for ax in axes[:, 0]:
         ax.set_ylabel("score share of the pair")
     fig.suptitle(title, x=.012, ha="left", fontsize=9.6, y=.995, va="top", linespacing=1.4)
-    fig.subplots_adjust(left=.075, right=.9, top=1 - 1.5 / fig.get_figheight(), bottom=.52 / fig.get_figheight(), wspace=.34, hspace=.24)
+    fig.subplots_adjust(left=.075, right=.9, top=1 - 1.75 / fig.get_figheight(), bottom=.52 / fig.get_figheight(), wspace=.34, hspace=.24)
     fig.savefig(path, dpi=170)
     plt.close(fig)
 
@@ -146,7 +146,8 @@ def main():
                               for c, pair in enumerate(pairs) for s in range(len(steps))]
                 if not args.csv_only:
                     title = (f"Layer {layer}: {args.measure} of individual pairs against denoising step, {len(panels)} of the {x.shape[1]} heads\n"
-                             f"prompt {record['prompt_id']}, {branch} branch, {record['source']}. {args.measure} = {MEASURES[args.measure]}.\n"
+                             f"prompt {record['prompt_id']}, {branch} branch, {record['source']}.\n"
+                             f"{args.measure} = {MEASURES[args.measure]}.\n"
                              "Each point is one cell and one pair (this prompt, layer, step, head): pooled over every query x every key, full "
                              "128-dim post-RoPE logits; no averaging, pairs not summed.\n"
                              "Heads: evenly spaced through the order of the head's largest pair share (median over steps). "
