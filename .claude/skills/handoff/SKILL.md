@@ -1,11 +1,12 @@
 ---
 name: handoff
-description: Research-agent side of the hand-off with the lab agent (Codex) in this repository. Use when a pull-request comment titled "Hand-off to claude" arrives, when the user says to check the repo for results, or when a brief the user approved is ready to go to the lab agent.
+description: Research-agent side of the hand-off with the lab agent (Claude Code on the lab host) in this repository. Use when a pull-request comment titled "Hand-off to claude" arrives, when the user says to check the repo for results, or when a brief the user approved is ready to go to the lab agent.
 ---
 
 # Hand-off (research agent)
 
-The protocol is in `AGENTS.md`, "Hand-off protocol". You are `claude`; the lab agent is `codex`.
+The protocol is in `AGENTS.md`, "Hand-off protocol". You are `claude`; the lab agent is `claude-lab` (Claude Code on the lab host; it was
+addressed as `codex` on this branch up to brief `ffc819f`).
 The user stays in charge of direction: you carry briefs out and results in, you do not chain rounds.
 
 ## Results arrived (wake-up or "check the repo")
@@ -37,7 +38,7 @@ Only for a task the user assigned or approved in conversation. Never as a reacti
 1. Write `DISTILL_<TOPIC>_PROMPT.md` (why, definitions, stages with exact commands, gates, ASK points, GPU-hour
    budget, deliverables), the code it needs, CPU tests that pass here, and a note in `DISTILL_PLAN.md`.
 2. `git add` those files, then
-   `python3 scripts/handoff.py send --as claude --to codex --brief DISTILL_<TOPIC>_PROMPT.md -m "<subject>" -m "<the short prompt you would have given the user to paste: which stages, where to ASK, when to commit>" --trailer "<attribution line>"`.
+   `python3 scripts/handoff.py send --as claude --to claude-lab --brief DISTILL_<TOPIC>_PROMPT.md -m "<subject>" -m "<the short prompt you would have given the user to paste: which stages, where to ASK, when to commit>" --trailer "<attribution line>"`.
    The lab agent pins its checkout to this commit, so a later fix needs a new hand-off, not a quiet push.
 3. Tell the user it is sent, with the commit hash. No notification needed; they are in the conversation.
 
