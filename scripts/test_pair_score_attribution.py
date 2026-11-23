@@ -507,6 +507,14 @@ def test_cell_pair_scores():
         assert len(table) == len(rows) and abs(float(table[5]["att_pos"]) - pairs[5]["att_pos"]) < 1e-7 and table[64]["row"] == "logit"
         text = (folder / "PAIR-SCORES.md").read_text()
         assert "layer 1, denoising step 3" in text and "unconditional branch, head 1" in text and text.count("\n| ") >= 64 + 5
+        # figures of the cell: the one-query maps are single query-key scores of the captured tensors
+        run("plot_cell_pair_scores.py", [folder, "--grid", 2, 2, 2, "--query", 1, 0, 1, "--map-pairs", 3, 47])
+        assert sorted(f.name for f in (folder / "figures").glob("*.png")) == ["1-positive-negative.png", "2-shares.png", "3-distributions.png", "4-one-query-maps.png"]
+        maps = list(csv.DictReader(open(folder / "figures" / "4-one-query-maps.csv")))
+        assert len(maps) == 4 + 2                                                                                       # frame 1 (4 keys) and row 0 of frame 0 (2 keys)
+        for m in maps:
+            key = (int(m["key_frame"]) * 2 + int(m["key_row"])) * 2 + int(m["key_column"])
+            assert abs(float(m["pair_47"]) - float(contrib[5, key, 47])) < 1e-6 and abs(float(m["attention"]) - float(p[5, key])) < 1e-6
     print("test_cell_pair_scores OK")
 
 
