@@ -11,8 +11,10 @@ the model named in the cell's `source`. Nothing is pooled over prompts, layers, 
   3-distributions.png       per pair: quantiles of the score over all query-key combinations, and quantiles
                             across queries of each query's attention-weighted score. Nothing is summed over queries.
   4-one-query-maps.png      ONE query token (default the grid centre): its attention and the score of a few pairs
-                            over the keys of its frame and of its row. Recomputed from cell.npz; the plotted
-                            numbers are saved as 4-one-query-maps.csv.
+                            over the keys of its frame and of its row. Recomputed from cell.npz; the numbers of
+                            all 64 pairs on those two slices are saved as 4-one-query-maps.csv.
+  5-one-query-maps-{t,h,w}.png            the same for every pair, one page per axis, one colour scale for all 64
+  6-one-query-maps-own-scale-{t,h,w}.png  the same with each pair on its own colour scale (pattern, not size)
 
   python scripts/plot_cell_pair_scores.py distill-results/score-attribution-cell/d0000-L00-S01-conditional-H01
 """
@@ -208,76 +210,137 @@ def figure_distributions(plt, folder, meta, sets, column, tokens):
     plt.close(fig)
 
 
-def figure_maps(plt, folder, meta, tensors, pairs, query, grid):
-    from matplotlib.colors import LinearSegmentedColormap
+def one_query(tensors, meta, query, grid):
+    """Attention [frames, rows, columns] of ONE query token and the score of each of the 64 pairs over every key."""
     frames, height, width = grid
     native = getattr(torch, meta["dtype"]) if meta["dtype"] != "float32" else None
     qr = rotate(tensors["q"][None], tensors["cos"], tensors["sin"], native)[0]
     kr = rotate(tensors["k"][None], tensors["cos"], tensors["sin"], native)[0]
     scale = 1 / math.sqrt(qr.shape[1])
+    index = (query[0] * height + query[1]) * width + query[2]
+    attention = torch.softmax((qr[index] @ kr.T * scale).double(), 0).reshape(grid).numpy()
+    score = np.stack([((qr[index, 2 * f:2 * f + 2] @ kr[:, 2 * f:2 * f + 2].T) * scale).double().reshape(grid).numpy() for f in range(qr.shape[1] // 2)])
+    return index, attention, score
+
+
+def colour_maps():
+    from matplotlib.colors import LinearSegmentedColormap
+    return (LinearSegmentedColormap.from_list("score", [NEGATIVE, NEUTRAL, POSITIVE]),
+            LinearSegmentedColormap.from_list("attention", [NEUTRAL, "#86b6ef", "#2a78d6", "#0d366b"]))
+
+
+def map_pair(top, bottom, volume, cmap, vmin, vmax, query, grid, title, first):
+    """One item: the keys of the query's frame (top) and the keys of the query's row in every frame (bottom)."""
+    frames, height, width = grid
     t0, h0, w0 = query
-    index = (t0 * height + h0) * width + w0
-    logit = (qr[index] @ kr.T * scale).double()
-    attention = torch.softmax(logit, 0).reshape(grid).numpy()
-    score = {f: ((qr[index, 2 * f:2 * f + 2] @ kr[:, 2 * f:2 * f + 2].T) * scale).double().reshape(grid).numpy() for f in pairs}
-    limit = max(float(np.abs(s).max()) for s in score.values())
-    diverging = LinearSegmentedColormap.from_list("score", [NEGATIVE, NEUTRAL, POSITIVE])
-    sequential = LinearSegmentedColormap.from_list("attention", [NEUTRAL, "#86b6ef", "#2a78d6", "#0d366b"])
-    columns = 1 + len(pairs)
-    fig, axes = plt.subplots(2, columns, figsize=(2.05 * columns + .6, 6.6), gridspec_kw={"height_ratios": [height, frames * 1.6], "hspace": .32, "wspace": .12})
-    items = [("attention", attention, sequential, 0, float(attention.max()))] + [
-        (f"{AXES[f]} pair {f}", score[f], diverging, -limit, limit) for f in pairs]
-    images = {}
-    for col, (name, volume, cmap, vmin, vmax) in enumerate(items):
-        top, bottom = axes[0, col], axes[1, col]
-        images[col] = top.imshow(volume[t0], cmap=cmap, vmin=vmin, vmax=vmax, origin="upper", interpolation="nearest")
-        bottom.imshow(volume[:, h0], cmap=cmap, vmin=vmin, vmax=vmax, origin="upper", interpolation="nearest", aspect=1.6)
-        top.plot(w0, h0, marker="+", color=INK, markersize=9, markeredgewidth=1.4)
-        bottom.plot(w0, t0, marker="+", color=INK, markersize=9, markeredgewidth=1.4)
-        if col:
-            total = float(volume.sum() * 0 + (attention * volume).sum())
-            top.set_title(f"{name}\nweighted by attention: {total:+.3f}", fontsize=8.6)
-        else:
-            top.set_title("attention of this query\n(sums to 1 over all keys)", fontsize=8.6)
-        for ax in (top, bottom):
-            ax.grid(visible=False)
-            ax.set_xticks([0, width - 1])
-            ax.set_xticklabels(["0", str(width - 1)], fontsize=7)
-            for side in ax.spines.values():
-                side.set_visible(False)
-        top.set_yticks([0, height - 1] if col == 0 else [])
-        bottom.set_yticks([0, frames - 1] if col == 0 else [])
-        top.tick_params(length=0, labelsize=7)
-        bottom.tick_params(length=0, labelsize=7)
-        bottom.set_xlabel("key column w", fontsize=8)
-    axes[0, 0].set_ylabel(f"key row h  (keys of frame {t0})", fontsize=8.5)
-    axes[1, 0].set_ylabel(f"key frame t  (keys of row {h0})", fontsize=8.5)
-    fig.subplots_adjust(left=.06, right=.985, bottom=.2)
-    bar = fig.add_axes([.42, .075, .4, .022])
-    fig.colorbar(images[1], cax=bar, orientation="horizontal")
-    bar.set_xlabel("score the pair adds to the logit of this query and that key (same colour scale for every pair; red negative, blue positive)", fontsize=8.5)
+    image = top.imshow(volume[t0], cmap=cmap, vmin=vmin, vmax=vmax, origin="upper", interpolation="nearest")
+    bottom.imshow(volume[:, h0], cmap=cmap, vmin=vmin, vmax=vmax, origin="upper", interpolation="nearest", aspect=1.6)
+    top.plot(w0, h0, marker="+", color=INK, markersize=9, markeredgewidth=1.4)
+    bottom.plot(w0, t0, marker="+", color=INK, markersize=9, markeredgewidth=1.4)
+    top.set_title(title, fontsize=8.4, linespacing=1.25)
+    for ax in (top, bottom):
+        ax.grid(visible=False)
+        ax.set_xticks([0, width - 1])
+        ax.set_xticklabels(["0", str(width - 1)], fontsize=7)
+        ax.tick_params(length=0, labelsize=7)
+        for side in ax.spines.values():
+            side.set_visible(False)
+    top.set_yticks([0, height - 1] if first else [])
+    bottom.set_yticks([0, frames - 1] if first else [])
+    if first:
+        top.set_ylabel(f"key row h  (frame {t0})", fontsize=8.5)
+        bottom.set_ylabel(f"key frame t  (row {h0})", fontsize=8.5)
+    return image
+
+
+def colour_bars(fig, attention_image, score_image, note):
+    inch = 1 / fig.get_figheight()
+    bar = fig.add_axes([.06, .62 * inch, .2, .15 * inch])
+    fig.colorbar(attention_image, cax=bar, orientation="horizontal")
+    bar.set_xlabel("attention weight", fontsize=8.5)
     bar.tick_params(labelsize=7.5)
-    bar2 = fig.add_axes([.06, .075, .2, .022])
-    fig.colorbar(images[0], cax=bar2, orientation="horizontal")
-    bar2.set_xlabel("attention weight", fontsize=8.5)
-    bar2.tick_params(labelsize=7.5)
+    if score_image is not None:
+        bar = fig.add_axes([.42, .62 * inch, .4, .15 * inch])
+        fig.colorbar(score_image, cax=bar, orientation="horizontal")
+        bar.set_xlabel(note, fontsize=8.5)
+        bar.tick_params(labelsize=7.5)
+    else:
+        fig.text(.42, .62 * inch, note, fontsize=8.5, color=INK2, va="bottom", ha="left")
+
+
+def query_scope(meta, query, index, grid, tail):
+    frames, height, width = grid
     cell = (f"ONE query token of ONE cell: prompt {meta['prompt_id']}, layer {meta['layer']}, denoising step {meta['step']}, {meta['branch']} branch, "
-            f"head {meta['head']}, {meta['source'].split(',')[0]}. Query at frame {t0}, row {h0}, column {w0} (the cross), token {index} of "
-            f"{frames * height * width:,}. Top row: the {height} × {width} keys of the query's own frame. Bottom row: the {frames} × {width} keys of the "
-            "query's own row in every frame. Nothing is pooled: every pixel is one query-key score. Pairs that look blank have scores too small "
-            f"to show on the common scale (±{limit:.2f}).")
-    finish(fig, "What a pair's score looks like across keys, for one query\n" + "\n".join(textwrap.wrap(cell, 150)),
-           folder / "figures" / "4-one-query-maps.png", .55)
+            f"head {meta['head']}, {meta['source'].split(',')[0]}. Query at frame {query[0]}, row {query[1]}, column {query[2]} (the cross), token "
+            f"{index} of {frames * height * width:,}. Top maps: the {height} × {width} keys of the query's own frame. Bottom maps: the {frames} × {width} "
+            "keys of the query's own row in every frame. The horizontal axis of every map is the key column w. Nothing is pooled: every pixel is one query-key score. " + tail)
+    return "\n".join(textwrap.wrap(cell, 150))
+
+
+def figure_maps(plt, folder, meta, tensors, pairs, query, grid):
+    index, attention, score = one_query(tensors, meta, query, grid)
+    limit = max(float(np.abs(score[f]).max()) for f in pairs)
+    diverging, sequential = colour_maps()
+    columns = 1 + len(pairs)
+    fig, axes = plt.subplots(2, columns, figsize=(2.05 * columns + .6, 6.6), gridspec_kw={"height_ratios": [grid[1], grid[0] * 1.6], "hspace": .32, "wspace": .12})
+    first = map_pair(axes[0, 0], axes[1, 0], attention, sequential, 0, float(attention.max()), query, grid, "attention of this query\n(sums to 1 over all keys)", True)
+    for col, f in enumerate(pairs, 1):
+        image = map_pair(axes[0, col], axes[1, col], score[f], diverging, -limit, limit, query, grid,
+                         f"{AXES[f]} pair {f}\nweighted by attention: {float((attention * score[f]).sum()):+.3f}", False)
+    for ax in axes[1]:
+        ax.set_xlabel("key column w", fontsize=8)
+    fig.subplots_adjust(left=.06, right=.985, bottom=.2)
+    colour_bars(fig, first, image, "score the pair adds to the logit of this query and that key (same colour scale for every pair; red negative, blue positive)")
+    title = query_scope(meta, query, index, grid, f"Pairs that look blank have scores too small to show on the common scale (±{limit:.2f}).")
+    finish(fig, "What a pair's score looks like across keys, for one query\n" + title, folder / "figures" / "4-one-query-maps.png", .55)
     plt.close(fig)
+    frames, height, width = grid
     with open(folder / "figures" / "4-one-query-maps.csv", "w", newline="") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["slice", "key_frame", "key_row", "key_column", "attention", *[f"pair_{f}" for f in pairs]])
+        writer.writerow(["slice", "key_frame", "key_row", "key_column", "attention", *[f"pair_{f}" for f in range(len(score))]])
         for t in range(frames):
             for h in range(height):
                 for w in range(width):
-                    if t == t0 or h == h0:
-                        writer.writerow(["frame" if t == t0 else "row", t, h, w, f"{attention[t, h, w]:.8g}", *[f"{score[f][t, h, w]:.8g}" for f in pairs]])
+                    if t == query[0] or h == query[1]:
+                        writer.writerow(["frame" if t == query[0] else "row", t, h, w, f"{attention[t, h, w]:.8g}", *[f"{s[t, h, w]:.8g}" for s in score]])
     return {"query_token": index, "colour_limit": limit, "attention_weighted": {f: float((attention * score[f]).sum()) for f in pairs}}
+
+
+def figure_all_maps(plt, folder, meta, tensors, sets, query, grid, own_scale):
+    """Every pair, one page per axis (t, h, w). Common colour scale over the 64 pairs, or each pair on its own scale."""
+    index, attention, score = one_query(tensors, meta, query, grid)
+    limit = float(np.abs(score).max())
+    diverging, sequential = colour_maps()
+    columns, written = 8, []
+    for axis in ("t", "h", "w"):
+        pairs = [f for f in range(len(score)) if AXES[f] == axis]
+        blocks = -(-(1 + len(pairs)) // columns)
+        fig = plt.figure(figsize=(2.05 * columns + .6, 4.25 * blocks + 2.3))
+        spec = fig.add_gridspec(3 * blocks, columns, height_ratios=[10, grid[1], grid[0] * 1.6] * blocks, hspace=.2, wspace=.12)   # title room, frame map, row map
+        slot = lambda i: (fig.add_subplot(spec[3 * (i // columns) + 1, i % columns]), fig.add_subplot(spec[3 * (i // columns) + 2, i % columns]))
+        first = map_pair(*slot(0), attention, sequential, 0, float(attention.max()), query, grid, "attention of this query\n(sums to 1 over all keys)\n ", True)
+        image = None
+        for i, f in enumerate(pairs, 1):
+            own = float(np.abs(score[f]).max())
+            names = [name for name, mask in sets.items() if mask[f]]
+            chosen = "no option" if not names else "all options" if len(names) == len(sets) > 1 else ", ".join(names)
+            top, bottom = slot(i)
+            image = map_pair(top, bottom, score[f], diverging, -(own if own_scale else limit), own if own_scale else limit, query, grid,
+                             f"{axis} pair {f}" + (f"  ·  scale ±{own:.3g}" if own_scale else "") + f"\nweighted by attention: {float((attention * score[f]).sum()):+.4f}\n"
+                             f"selected by: {chosen}", i % columns == 0)
+        fig.subplots_adjust(left=.06, right=.985, bottom=1.15 / fig.get_figheight())
+        if own_scale:
+            colour_bars(fig, first, None, "Each pair has its OWN colour scale: red = −scale, gray = 0, blue = +scale, with the scale printed in the pair's title.\n"
+                        "Colours are not comparable between pairs.")
+            tail = "Each pair is drawn on its own colour scale, so the pattern of weak pairs is visible but sizes cannot be compared between panels."
+        else:
+            colour_bars(fig, first, image, "score the pair adds to the logit of this query and that key (same colour scale for all 64 pairs; red negative, blue positive)")
+            tail = f"All 64 pairs share one colour scale (±{limit:.2f}); pairs that look blank have scores too small to show on it."
+        name = f"{'6-one-query-maps-own-scale' if own_scale else '5-one-query-maps'}-{axis}.png"
+        finish(fig, f"Score of every {axis} pair across keys, for one query\n" + query_scope(meta, query, index, grid, tail), folder / "figures" / name, .12)
+        plt.close(fig)
+        written.append(name)
+    return written
 
 
 def main():
@@ -304,6 +367,8 @@ def main():
     figure_distributions(plt, folder, meta, sets, column, tokens)
     query = args.query or [frames // 2, height // 2, width // 2]
     info = figure_maps(plt, folder, meta, tensors, args.map_pairs, query, tuple(args.grid))
+    for own_scale in (False, True):
+        figure_all_maps(plt, folder, meta, tensors, sets, query, tuple(args.grid), own_scale)
     print("WROTE", sorted(p.name for p in (folder / "figures").iterdir()), info)
 
 

@@ -509,7 +509,10 @@ def test_cell_pair_scores():
         assert "layer 1, denoising step 3" in text and "unconditional branch, head 1" in text and text.count("\n| ") >= 64 + 5
         # figures of the cell: the one-query maps are single query-key scores of the captured tensors
         run("plot_cell_pair_scores.py", [folder, "--grid", 2, 2, 2, "--query", 1, 0, 1, "--map-pairs", 3, 47])
-        assert sorted(f.name for f in (folder / "figures").glob("*.png")) == ["1-positive-negative.png", "2-shares.png", "3-distributions.png", "4-one-query-maps.png"]
+        assert sorted(f.name for f in (folder / "figures").glob("*.png")) == [
+            "1-positive-negative.png", "2-shares.png", "3-distributions.png", "4-one-query-maps.png",
+            *[f"5-one-query-maps-{a}.png" for a in "htw"], *[f"6-one-query-maps-own-scale-{a}.png" for a in "htw"]]
+        assert len(maps_header := open(folder / "figures" / "4-one-query-maps.csv").readline().split(",")) == 5 + 64         # every pair is in the CSV
         maps = list(csv.DictReader(open(folder / "figures" / "4-one-query-maps.csv")))
         assert len(maps) == 4 + 2                                                                                       # frame 1 (4 keys) and row 0 of frame 0 (2 keys)
         for m in maps:

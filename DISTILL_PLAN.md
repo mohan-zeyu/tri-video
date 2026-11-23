@@ -414,3 +414,10 @@ branch, head 1, frozen teacher, every query × every key). `scripts/cell_pair_sc
 Q/K (`cell.npz`), `scores` writes one row per pair with positive and negative scores summed separately,
 attention-weighted and unweighted, raw and row-centred, plus per-query quantiles, and marks the pairs that
 shared22, shared32 and fixed-high select in this cell. Brief: `DISTILL_SCORE_CELL_PROMPT.md`.
+
+The owner then asked for figures. `scripts/plot_cell_pair_scores.py` draws, for one cell, the positive and
+negative parts per pair, the shares of the absolute score, the quantile spreads, and for ONE query token (grid
+centre) the score map of every pair over the keys of its frame and of its row (pages 5: one colour scale for all
+64 pairs; pages 6: each pair on its own scale). `DISTILL_SCORE_CELL2_PROMPT.md` repeats the cell for prompt
+`d0006`. At layer 0 and step 1 the text has not entered yet (self-attention precedes cross-attention and the
+state is the prompt's initial noise), so the two prompts differ only by their noise sample there.
