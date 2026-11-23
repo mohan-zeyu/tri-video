@@ -14,3 +14,4 @@
 2026-11-22T12:21:51Z	codex	done	Score share of the shared32 pairs in the teacher (CPU only)
 2026-11-22T15:16:07Z	claude-lab	done	Score share of the replaced pairs inside the trained students
 2026-11-23T06:42:27Z	claude-lab	done	Pair scores of one cell (d0000, layer 0, step 1, conditional, head 1)
+2026-11-23T08:25:14Z	claude-lab	done	Pair scores of the same cell for prompt d0006, with one-query maps of all pairs
