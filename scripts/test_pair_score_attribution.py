@@ -518,6 +518,11 @@ def test_cell_pair_scores():
         for m in maps:
             key = (int(m["key_frame"]) * 2 + int(m["key_row"])) * 2 + int(m["key_column"])
             assert abs(float(m["pair_47"]) - float(contrib[5, key, 47])) < 1e-6 and abs(float(m["attention"]) - float(p[5, key])) < 1e-6
+        # a cell compared with itself: every pair's score map correlates at 1 and the shares coincide
+        run("compare_cell_pair_scores.py", [folder, folder, "--grid", 2, 2, 2, "--out", tmp / "compare"])
+        same = list(csv.DictReader(open(tmp / "compare" / f"{folder.name}--vs--{folder.name}.csv")))
+        assert len(same) == 64 and all(abs(float(r["map_correlation_min_27_queries"]) - 1) < 1e-9 and r["centred_share_a"] == r["centred_share_b"] for r in same)
+        assert abs(float(same[7]["centred_share_a"]) - pairs[7]["ctr_att_abs_share"]) < 1e-7 and (tmp / "compare" / f"{folder.name}--vs--{folder.name}.png").exists()
     print("test_cell_pair_scores OK")
 
 
