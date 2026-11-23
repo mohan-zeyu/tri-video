@@ -22,6 +22,7 @@
 Run from the repository root:  python scripts/test_pair_score_attribution.py
 """
 
+import csv
 import json
 import math
 import os
@@ -415,8 +416,103 @@ def test_collector_and_analysis():
     print("test_collector_and_analysis OK")
 
 
+def test_cell_pair_scores():
+    """cell_pair_scores.py: one cell captured from a tiny random Wan, every column against explicit sums."""
+    from diffusers import WanTransformer3DModel
+    from train_learned_center import TrajectoryStore
+    import cell_pair_scores as C
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        write_fake_trajectories(tmp / "traj")
+        tiny = write_tiny_snapshot(tmp / "tiny")
+        torch.manual_seed(11)
+        mask = torch.rand(2, STEPS, 2, 2, 64) < .3
+        other = torch.rand(2, STEPS, 2, 2, 64) < .3
+        torch.save({"variants": {"shared": {"mask_q": mask, "mask_k": mask.clone()}, "separate": {"mask_q": mask, "mask_k": other}}}, tmp / "selection.pt")
+        layer, step, branch, head = 1, 3, 1, 1                                    # step is 1-based: the third stored state
+        out = run("cell_pair_scores.py", ["capture", "--traj", tmp / "traj", "--snapshot", tiny, "--id", "d0002", "--layer", layer, "--step", step,
+                                          "--branch", "unconditional", "--head", head, "--out", tmp / "cell",
+                                          "--set", "a", tmp / "selection.pt", "shared", "--set", "b", tmp / "selection.pt", "separate"])
+        folder = tmp / "cell" / "d0002-L01-S03-unconditional-H01"
+        assert "CAPTURED" in out and (folder / "cell.npz").exists()
+        run("cell_pair_scores.py", ["scores", folder, "--cpu"])
+        report = json.loads((folder / "pair-scores.json").read_text())
+        assert report["cell"]["attention_output_validation"]["relative_max_err"] <= 1e-3 and report["cell"]["dtype"] == "bfloat16"
+        sets = {"a": mask[layer, step - 1, branch, head], "b": mask[layer, step - 1, branch, head] | other[layer, step - 1, branch, head]}
+        assert all(report["sets"][name] == torch.nonzero(m).flatten().tolist() for name, m in sets.items())
+
+        # the same cell from tensors hooked here
+        model = WanTransformer3DModel.from_pretrained(tiny, subfolder="transformer", torch_dtype=torch.bfloat16).eval()
+        item = TrajectoryStore(tmp / "traj", ["d0002"]).item("d0002", step - 1)
+        seen = {}
+        handles = [getattr(model.blocks[layer].attn1, "norm_" + s).register_forward_hook(lambda m, i, o, s=s: seen.__setitem__(s, o.detach().clone())) for s in ("q", "k")]
+        handles.append(model.rope.register_forward_hook(lambda m, i, o: seen.__setitem__("rope", o)))
+        with torch.inference_mode():
+            x = item["x"].bfloat16().unsqueeze(0).expand(2, -1, -1, -1, -1).contiguous()
+            model(hidden_states=x, timestep=torch.full((2,), float(item["timestep"])),
+                  encoder_hidden_states=torch.cat([item["positive"], item["negative"]]).bfloat16(), return_dict=False)
+        [h.remove() for h in handles]
+        cos, sin = seen["rope"][0][0, :, 0, 0::2].float(), seen["rope"][1][0, :, 0, 1::2].float()
+        q, k = [seen[s][branch].float().view(-1, 2, 128).transpose(0, 1) for s in ("q", "k")]                          # [heads, tokens, 128]
+        tensors, loaded_sets, meta = C.load_cell(folder)
+        close(tensors["q"], q[head], 0)
+        close(tensors["k"], k[head], 0)
+        ref = brute(rotate(q, cos, sin, torch.bfloat16), rotate(k, cos, sin, torch.bfloat16))
+        contrib, p = ref["contrib"][head], ref["p"][head]                                                               # [query, key, pair], [query, key]
+        n = p.shape[0]
+        levels = torch.tensor(C.LEVELS, dtype=torch.float64)
+
+        def expected(x):
+            centred = x - x.mean(1, keepdim=True)
+            per_query = (p * x).sum(1)
+            e = {"all_pos": x.clamp(min=0).sum() / n ** 2, "all_neg": x.clamp(max=0).sum() / n ** 2, "all_pos_frac": (x > 0).double().mean(),
+                 "att_pos": (p * x.clamp(min=0)).sum() / n, "att_neg": (p * x.clamp(max=0)).sum() / n, "att_pos_mass": (p * (x > 0)).sum() / n,
+                 "all_net": x.mean(), "all_abs": x.abs().mean(), "att_net": per_query.mean(), "att_abs": (p * x.abs()).sum() / n,
+                 "qry_pos_frac": (per_query > 0).double().mean(), "ctr_all_abs": centred.abs().mean(),
+                 "ctr_att_pos": (p * centred.clamp(min=0)).sum() / n, "ctr_att_neg": (p * centred.clamp(max=0)).sum() / n,
+                 "ctr_att_net": (p * centred).sum() / n, "ctr_att_abs": (p * centred.abs()).sum() / n}
+            e.update({f"qry_{name}": v for name, v in zip(C.LEVEL_NAMES, torch.quantile(per_query, levels))})
+            e.update({f"all_{name}": v for name, v in zip(C.LEVEL_NAMES, torch.quantile(x.flatten(), levels))})
+            return {key: float(v) for key, v in e.items()}
+
+        def check(row, x):
+            want = expected(x)
+            for key, value in want.items():
+                assert abs(row[key] - value) < 2e-5 * max(1, abs(value)), (row["row"], row["name"], key, row[key], value)
+            return want
+
+        rows = report["rows"]
+        pairs = [r for r in rows if r["row"] == "pair"]
+        assert len(pairs) == 64 and [r["name"] for r in pairs] == [str(f) for f in range(64)] and len(rows) == 64 + 1 + 2 * 2
+        wanted = [check(r, contrib[:, :, f]) for f, r in enumerate(pairs)]
+        assert any(w["att_pos"] > 1e-4 and w["att_neg"] < -1e-4 for w in wanted)                                        # both signs really occur
+        for column in ("all_abs", "att_abs", "ctr_all_abs", "ctr_att_abs", "att_net", "ctr_att_net"):
+            whole = sum(w[column] for w in wanted)
+            assert all(abs(r[column + "_share"] - w[column] / whole) < 1e-4 for r, w in zip(pairs, wanted)), column
+            assert abs(sum(r[column + "_share"] for r in pairs) - 1) < 1e-9
+        check(next(r for r in rows if r["row"] == "logit"), ref["logits"][head])
+        for name, m in sets.items():
+            assert [r[f"in_{name}"] for r in pairs] == m.int().tolist()
+            added = next(r for r in rows if r["row"] == "sum of pair rows" and r["name"] == name)
+            assert added["pairs"] == int(m.sum())
+            for column in (*C.ADDITIVE, *C.SHARES):
+                assert abs(added[column] - sum(r[column] for r, inside in zip(pairs, m) if inside)) < 1e-12, column
+            check(next(r for r in rows if r["row"] == "set score" and r["name"] == name), contrib[:, :, m].sum(-1))
+        # the two earlier quantities are the signed columns of this table
+        direct = attribute(q.bfloat16(), k.bfloat16(), cos, sin)                                                        # bf16 input: rotated tensors are rounded as in the model
+        close(torch.tensor([r["ctr_att_net"] for r in pairs]), direct["adv"][head], 2e-5)
+        close(torch.tensor([r["att_net"] for r in pairs]), direct["adv"][head] + direct["mean_contribution"][head], 2e-5)
+        assert report["info"]["largest_abs_difference_between_logit_and_sum_of_pair_scores"] < 1e-4 and report["info"]["tokens"] == n
+        table = list(csv.DictReader(open(folder / "pair-scores.csv")))
+        assert len(table) == len(rows) and abs(float(table[5]["att_pos"]) - pairs[5]["att_pos"]) < 1e-7 and table[64]["row"] == "logit"
+        text = (folder / "PAIR-SCORES.md").read_text()
+        assert "layer 1, denoising step 3" in text and "unconditional branch, head 1" in text and text.count("\n| ") >= 64 + 5
+    print("test_cell_pair_scores OK")
+
+
 if __name__ == "__main__":
     os.environ.setdefault("OMP_NUM_THREADS", "4")
+    test_cell_pair_scores()
     test_attribute_against_brute_force()
     test_constant_tokens_are_the_center_model()
     test_bf16_and_query_stride()

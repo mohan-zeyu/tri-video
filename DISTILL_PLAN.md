@@ -405,3 +405,12 @@ on the stored teacher entering states and records the same per-cell attribution 
 student and in the teacher on the same cells, including `attn_score_share`, the plain percentage of the
 attention-weighted raw logit. The brief `DISTILL_SCORE_STUDENTS_PROMPT.md` covers the shared22, shared32 and
 fixed-high students on the first 16 held-out prompts, within 4 GPU-hours.
+
+## One-cell pair scores (23 November 2026)
+
+The owner found the quantile tables too general and pointed out that `attn_score_share` lets positive and
+negative pair scores cancel. First step back to detail: one cell only (prompt d0000, layer 0, step 1, conditional
+branch, head 1, frozen teacher, every query × every key). `scripts/cell_pair_scores.py capture` keeps that head's
+Q/K (`cell.npz`), `scores` writes one row per pair with positive and negative scores summed separately,
+attention-weighted and unweighted, raw and row-centred, plus per-query quantiles, and marks the pairs that
+shared22, shared32 and fixed-high select in this cell. Brief: `DISTILL_SCORE_CELL_PROMPT.md`.
