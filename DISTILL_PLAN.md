@@ -421,3 +421,8 @@ centre) the score map of every pair over the keys of its frame and of its row (p
 64 pairs; pages 6: each pair on its own scale). `DISTILL_SCORE_CELL2_PROMPT.md` repeats the cell for prompt
 `d0006`. At layer 0 and step 1 the text has not entered yet (self-attention precedes cross-attention and the
 state is the prompt's initial noise), so the two prompts differ only by their noise sample there.
+
+`DISTILL_SCORE_CELL3_PROMPT.md` (23 November 2026): the owner asked for the same single-cell study at a middle
+step (layer 0, step 10) and at a middle layer (layer 15, step 1), other settings unchanged, for both prompts
+`d0000` and `d0006`. The comparison between the two prompts is computed in the research session from the
+committed `cell.npz` files.
