@@ -2,3 +2,4 @@
 2026-11-23T06:35:49Z	claude	-	Brief: pair scores of one cell (d0000, layer 0, step 1, head 1)
 2026-11-23T08:19:42Z	claude	-	Brief: the same cell for prompt d0006, with one-query maps of all pairs
 2026-11-23T10:22:34Z	claude	-	Brief: single-cell pair scores at a middle step and a middle layer, both prompts
+2026-11-23T10:41:24Z	claude	-	Brief: single-cell pair scores at the last layer and the last step, both prompts

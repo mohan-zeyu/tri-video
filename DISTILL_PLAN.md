@@ -426,3 +426,6 @@ state is the prompt's initial noise), so the two prompts differ only by their no
 step (layer 0, step 10) and at a middle layer (layer 15, step 1), other settings unchanged, for both prompts
 `d0000` and `d0006`. The comparison between the two prompts is computed in the research session from the
 committed `cell.npz` files.
+
+`DISTILL_SCORE_CELL4_PROMPT.md` (23 November 2026): the owner asked for the last layer and the last step. Six
+cells, prompts `d0000` and `d0006`: layer 29 at step 1, layer 0 at step 20, and layer 29 at step 20.
