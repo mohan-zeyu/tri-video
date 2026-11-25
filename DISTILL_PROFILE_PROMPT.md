@@ -179,6 +179,47 @@ mean. Keep the raw rows (one per arm, rank, update, phase) in `phase-times.jsonl
 5. P4a and P4b move the total by about what the `loss`/tap and `ema` phases predict. Report the differences
    whether or not they agree.
 
+## Part 2: the rest of the process
+
+Part 1 above covers the optimizer update. These items cover everything else in a study, so that the result is a
+complete cost sheet. Do Part 1 first.
+
+Already known at job level, do not re-measure: the shared32 study, `distill-results/shared32/ledger.tsv`,
+allocated wall seconds x GPUs per job, 46,074 GPU-seconds (12.80 GPU-hours) in total.
+
+| Job | GPU-seconds | Share |
+|---|---:|---:|
+| Fine-tune, 2,500 updates on 2 GPUs | 38,100 | 82.7% |
+| Two velocity screens (training-free and trained, 32 prompts x 20 states each) | 2,523 | 5.5% |
+| Rendering 200 videos (two 100-prompt arms) | 3,606 | 7.8% |
+| VBench scoring, 7 dimensions x 2 arms | 1,659 | 3.6% |
+| Encoder parity probes | 186 | 0.4% |
+
+Inside the fine-tune, updates are 35,035 GPU-seconds (mean of 251 logged update times, 7.007 s, x 2,500 x 2 GPUs)
+and 3,065 are something else: start-up, eleven validation passes, five EMA exports, three full resume saves,
+shutdown. That remainder has never been split, and neither has the inside of a render, a scoring or a screen job.
+
+| Item | What to measure | How | GPU cost |
+|---|---|---|---|
+| E1 Memory | peak allocated and reserved memory per phase and rank | reset the peak counters at each phase boundary in P1 | none |
+| E2 Energy | mean power per card while idle and during each arm; energy per update and per 2,500-update run | from `gpu-telemetry.csv` | none |
+| E3 Run overhead | start-up (process start to first update: imports, model load, FSDP setup, trajectory index); one validation pass with a cold and a warm teacher cache; one EMA export; one full resume-state save; one resume load; shutdown; bytes written and MB/s | arm P6, two ranks, real code paths, writing only under `out/distill-profile/` and deleting its own checkpoints after recording sizes | about 0.3 GPU-hours |
+| E4 Scaling | teacher forward time and peak memory against token count (latents 12x60x60, 12x40x40, 6x60x60, 6x40x40) and against batch size (2, 4, 8 at the reference size); fitted exponent in tokens | one GPU, no gradient, random latents with stored text embeddings, 20 forwards per point after 3 warm-ups | about 0.2 GPU-hours |
+| E4b Rank scaling | P1 on four ranks: samples per GPU-second against two ranks | only if four idle cards are available; skip otherwise and say so | about 0.4 GPU-hours |
+| E5 Benchmark anatomy | per video: pipeline load, text encoding, 20-step denoising, VAE decode, file write; per scorer: model load against per-video scoring | 8 evaluation prompts with an existing student EMA, written to a scratch arm under `out/distill-profile/`, never into an existing benchmark directory; reuse per-video seconds already in generation records where present | about 0.3 GPU-hours |
+| E6a Interruption ledger | for every fine-tune in the repo: GPU-seconds allocated over all attempts, updates completed, useful time (updates x mean logged update time x ranks), and the rest split into lost updates, restart overhead, validation and saves | committed ledgers, status files and lab logs; CPU only | none |
+| E6b Wall-clock timeline | start and end of every job of the shared32 study, gaps between jobs, calendar hours against GPU-hours | lab logs; CPU only | none |
+| E6c Capture utilisation | distinct (prompt, step) states drawn in a 2,500-update run against the 70,900 stored training states | replay the seeded sampler on CPU | none |
+
+Preliminary figures for E6a, to be verified, not quoted: the split42 fine-tune was charged 24.855 GPU-hours for
+5,000 updates whose logged update time sums to about 19.9 (mean 7.172 s over 504 logged updates x 5,000 x 2 GPUs);
+the no-exemption fine-tune had 54,681 GPU-seconds allocated through stage B against about 35,000 of updates.
+Both runs were interrupted. If the gap holds, interruptions cost more than anything Part 1 can recover.
+
+Final product of Part 2: one cost sheet for a study with the current recipe, every job split into loading,
+compute, input/output and idle, in GPU-seconds and wall-clock, as `distill-results/profile/cost-sheet.json` and a
+table in the README.
+
 ## What the result decides
 
 Fill this table from the measurements. Each bound is the share of one update that the change could remove at most.
@@ -196,14 +237,14 @@ State the bounds; do not implement or time any of the changes. That is a later, 
 
 ## Budget and rules
 
-About 3 GPU-hours expected (nine short arms, most of the time is model loading); hard cap 4 GPU-hours, counted as
-allocated wall time x GPUs including loading. Idle GPUs only, at most two at a time, no other study's outputs
+About 4.5 GPU-hours expected (Part 1 about 3: nine short arms, most of the time is model loading; Part 2 about
+1.5); hard cap 6 GPU-hours, counted as allocated wall time x GPUs including loading. Idle GPUs only, at most two at a time, no other study's outputs
 touched, no baseline regenerated, nothing deleted outside `out/distill-profile/`. **ASK** before exceeding the cap,
 if no two idle cards are available, if losses are non-finite, or if anything in the recipe has to change to make an
 arm run (P3 and P4d excepted, as described). No model identifiers in committed files. Timings are descriptive
 measurements on this host on the day of the run; make no claim about the speed of anything that was not run.
 
-Commit after the code and CPU tests pass, after P0 to P2, and at the end.
+Commit after the code and CPU tests pass, after P0 to P2, after Part 1, and at the end.
 
 ## Deliverables
 
@@ -216,5 +257,7 @@ Commit after the code and CPU tests pass, after P0 to P2, and at the end.
    telemetry summary, the five checks, and the decision table. Every number with its scope.
 4. A measured version of the third bar, same layout as `estimate-before-profiling.png`, as
    `distill-results/profile/measured-update-breakdown.png`.
-5. A `handoff.md` section 16 paragraph, and a final commit message that says what ran, what failed and how it was
+5. Part 2: `cost-sheet.json`, the E1 to E6 tables in the README with scope lines, and a report subsection "Cost
+   of a whole study" with the interruption ledger and the wall-clock timeline.
+6. A `handoff.md` section 16 paragraph, and a final commit message that says what ran, what failed and how it was
    handled, the headline shares, and open issues.
