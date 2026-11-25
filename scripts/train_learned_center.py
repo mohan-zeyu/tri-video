@@ -222,12 +222,17 @@ def forward_both_branches(model, center, item, device, step_index, student=False
         return model(hidden_states=x, timestep=timestep, encoder_hidden_states=text, return_dict=False)[0]
 
 
-def distillation_loss(student, teacher, center, item, device, args, taps):
-    """Returns (loss, metrics) for one (prompt, step) sample, both CFG branches as a batch of 2."""
+def distillation_loss(student, teacher, center, item, device, args, taps, prof=None):
+    """Returns (loss, metrics) for one (prompt, step) sample, both CFG branches as a batch of 2.
+    prof: optional update_profile.UpdateProfiler (--profile); marks the teacher_forward / student_forward / loss phases."""
     with torch.no_grad():
         v_t = forward_both_branches(teacher, None, item, device, item["step"]).float()
         feats_t = {l: f.detach() for l, f in taps["teacher"].features.items()}
+    if prof is not None:
+        prof.mark("teacher_forward")
     v_s = forward_both_branches(student, center, item, device, item["step"], student=True).float()
+    if prof is not None:
+        prof.mark("student_forward")
     feats_s = taps["student"].features
     l_vel = rel_sq(v_s, v_t)                                     # [2]
     guided_t = v_t[1] + args.guidance * (v_t[0] - v_t[1])
@@ -238,6 +243,8 @@ def distillation_loss(student, teacher, center, item, device, args, taps):
         l_feat = torch.stack([rel_sq(feats_s[l], feats_t[l]).mean() for l in feats_s]).mean()
     loss = l_vel.sum() + args.lambda_cfg * l_cfg + args.lambda_feat * l_feat
     metrics = {"vel_cond": l_vel[0].item(), "vel_uncond": l_vel[1].item(), "cfg": l_cfg.item(), "feat": l_feat.item()}
+    if prof is not None:
+        prof.mark("loss")
     return loss, metrics
 
 
@@ -657,6 +664,16 @@ def main():
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--stop-after", type=int, help="checkpoint and stop at this optimizer step, retaining the full-run LR schedule")
     parser.add_argument("--budget-seconds", type=float, help="wall-time budget for this invocation; stop at a checkpoint before it is spent")
+    profile = parser.add_argument_group("profile mode (Stage 2): time updates, write no student/EMA/resume state, run no validation")
+    profile.add_argument("--profile", metavar="ARM", help="profile mode; --out must be a new directory under out/distill-profile/")
+    profile.add_argument("--profile-timers", choices=("none", "phases", "blocks"), default="blocks",
+                         help="none: update wall time only; phases: synchronized phase boundaries; blocks: phases + per-block CUDA events")
+    profile.add_argument("--profile-warmup", type=int, default=5, help="updates run and discarded before the measured ones")
+    profile.add_argument("--profile-updates", type=int, default=30, help="measured updates")
+    profile.add_argument("--profile-torch-updates", type=int, default=0, help="torch.profiler on this many updates after warm-up, rank 0")
+    profile.add_argument("--profile-floor", action="store_true",
+                         help="compute floor: one GPU, --no-fsdp, bf16 student parameters and gradients, same loss and backward, "
+                              "no optimizer step, no EMA, no clipping (numerics differ from training)")
     args = parser.parse_args()
     if args.stop_after is not None and not 1 <= args.stop_after <= args.steps:
         parser.error("--stop-after must be between 1 and --steps")
@@ -682,9 +699,21 @@ def main():
         parser.error("--rollout-worker-budget requires stage 3 and an existing --rollout-lock-dir")
     if args.lr_center is None:
         args.lr_center = 1e-3 if args.stage == 1 else 2e-4
+    if args.profile:
+        profile_out = ROOT / args.out if not os.path.isabs(args.out) else Path(args.out)
+        if args.stage != 2 or args.resume or args.guided_gate or args.stop_after:
+            parser.error("--profile is for a fresh Stage 2 run without --resume, --guided-gate or --stop-after")
+        if "distill-profile" not in profile_out.resolve().parts or (profile_out.exists() and any(profile_out.iterdir())):
+            parser.error("--profile needs --out to be a new directory under a distill-profile/ directory")
+        if args.profile_warmup < 0 or args.profile_updates < 1 or args.profile_warmup + args.profile_updates > args.steps:
+            parser.error("--profile-warmup + --profile-updates must fit in --steps")
+        if args.profile_torch_updates and (args.profile_timers == "none" or args.profile_torch_updates > args.profile_updates):
+            parser.error("--profile-torch-updates needs phase timers and at most --profile-updates updates")
+    if args.profile_floor and not (args.profile and args.no_fsdp):
+        parser.error("--profile-floor requires --profile and --no-fsdp (one GPU)")
 
     rank, world, device = dist_init(args.no_fsdp)
-    global STUDENT_AUTOCAST
+    global STUDENT_AUTOCAST, PROFILE_OOM
     STUDENT_AUTOCAST = args.no_fsdp or world == 1
     out = ROOT / args.out if not os.path.isabs(args.out) else Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -704,6 +733,8 @@ def main():
     log(rank, f"trajectories: train {len(store.ids)}, val {len(val_store_ids)}, steps {store.steps}")
 
     teacher, student, snapshot = load_models(args, device)
+    if args.profile_floor:
+        student = student.to(torch.bfloat16)   # bf16 parameters and gradients: the compute floor, not training numerics
     layers, heads = len(teacher.blocks), teacher.config.num_attention_heads
     selection = None
     if args.selection:
@@ -753,6 +784,8 @@ def main():
         taps = {"teacher": FeatureTap(teacher, args.feat_layers if args.lambda_feat > 0 else []),
                 "student": FeatureTap(student, args.feat_layers if args.lambda_feat > 0 else [])}
     opt_center = torch.optim.Adam(center.parameters(), lr=args.lr_center)
+    if args.profile_floor:
+        ema = None
 
     start = load_training_state(student, opt_model, center, opt_center, out, world, args.no_fsdp, ema, rank, rng) if args.resume else 0
     if args.resume and args.resume_state_with_ema and rank == 0:
@@ -781,7 +814,7 @@ def main():
         result = validate_attention(teacher, center, store, val_store_ids, device, rank, world)
         if rank == 0:
             write_json(out / "attention-before.json", result)
-    if args.val_at_start and val_store_ids and args.stage != 1 and not args.resume:
+    if args.val_at_start and val_store_ids and args.stage != 1 and not args.resume and not args.profile:
         result = validate(student, teacher, center, store, val_store_ids, args, device, rank, world, val_cache)
         result["step"] = 0
         guided_validation[0] = result["mean"][2]
@@ -790,6 +823,17 @@ def main():
             with open(out / "validation.jsonl", "a") as f:
                 f.write(json.dumps(result) + "\n")
     stop_at = args.stop_after or args.steps
+    prof = None
+    if args.profile:
+        from update_profile import UpdateProfiler
+        stop_at = start + args.profile_warmup + args.profile_updates
+        prof = UpdateProfiler(device, args.profile_timers, out, rank, args.profile, args.profile_warmup, args.profile_updates,
+                              args.profile_torch_updates)
+        prof.first_step = start
+        PROFILE_OOM = (out, rank, device) if device.type == "cuda" else None
+        prof.attach_blocks(student)
+        if world > 1:
+            prof.patch_collectives()
     last_step = start
     budget_stop = False
     gate_stop = False
@@ -798,6 +842,8 @@ def main():
             with use_ema(student, center, ema):
                 rollouts(student, center, store, buffer, args, device, rank, world, step // args.rollout_every, rng)
         step_started = time.monotonic()
+        if prof is not None:
+            prof.begin_update(step)
         scale = lr_scale(step)
         for group in opt_center.param_groups:
             group["lr"] = args.lr_center * scale
@@ -809,24 +855,35 @@ def main():
             opt_model.zero_grad(set_to_none=True)
         metrics_acc = {}
         for _ in range(args.accum):
+            if prof is not None:
+                prof.mark("bookkeeping")
+                prof.begin_sample()
             use_onpolicy = (args.stage == 3 and buffer is not None and
                             rng.random() < args.onpolicy_frac * min(1.0, (step + 1) / max(1, args.onpolicy_ramp)))
             item = buffer.sample(rng) if use_onpolicy else None
             if item is None:
                 item = store.sample(rng)
+            if prof is not None:
+                prof.mark("data")
             if args.stage == 1:
                 item = store.item(item["pid"], rng.choice(active_steps))
             if args.stage == 1:
                 loss, per_layer = stage1_loss(teacher, center, item, device, backward_scale=1 / args.accum)
                 metrics = {"attn_total": loss, "attn_layer_median": float(torch.tensor(per_layer).median())}
             else:
-                loss, metrics = distillation_loss(student, teacher, center, item, device, args, taps)
-                (loss / args.accum).backward()
+                loss, metrics = distillation_loss(student, teacher, center, item, device, args, taps, prof=prof)
+                if prof is not None:
+                    with prof.backward():
+                        (loss / args.accum).backward()
+                else:
+                    (loss / args.accum).backward()
             if not all(math.isfinite(v) for v in metrics.values()):
                 raise FloatingPointError(f"nonfinite loss at step {step + 1}: {metrics}")
             metrics["onpolicy"] = float(item["source"] == "student")
             for k, v in metrics.items():
                 metrics_acc[k] = metrics_acc.get(k, 0.0) + v / args.accum
+        if prof is not None:
+            prof.mark("bookkeeping")
         # center grads are replicated: average across ranks. Every rank must join the collective, so a rank whose
         # sample hit an exempt step (no gradient on mu) contributes zeros.
         for p in center.parameters():
@@ -835,30 +892,42 @@ def main():
         if world > 1:
             for p in center.parameters():
                 dist.all_reduce(p.grad, op=dist.ReduceOp.AVG)
-        if opt_model is not None and args.clip > 0:
-            norm = torch.nn.utils.clip_grad_norm_(student.parameters(), args.clip)
-            metrics_acc["grad_norm"] = float(norm.full_tensor() if hasattr(norm, "full_tensor") else norm)
-        torch.nn.utils.clip_grad_norm_(center.parameters(), args.clip if args.clip > 0 else float("inf"))
-        opt_center.step()
-        if opt_model is not None:
-            opt_model.step()
+        if prof is not None:
+            prof.mark("center_sync")
+        if not args.profile_floor:
+            if opt_model is not None and args.clip > 0:
+                norm = torch.nn.utils.clip_grad_norm_(student.parameters(), args.clip)
+                metrics_acc["grad_norm"] = float(norm.full_tensor() if hasattr(norm, "full_tensor") else norm)
+            torch.nn.utils.clip_grad_norm_(center.parameters(), args.clip if args.clip > 0 else float("inf"))
+            if prof is not None:
+                prof.mark("clip")
+            opt_center.step()
+            if opt_model is not None:
+                opt_model.step()
+            if prof is not None:
+                prof.mark("optimizer")
         if ema is not None:
             reshard(student)
             with torch.no_grad():
                 for e, p in zip(ema, ema_parameters(student, center)):
                     e.lerp_(p.detach(), 1 - args.ema)
+            if prof is not None:
+                prof.mark("ema")
         metrics_acc["mu_norm_q"] = float(center.mu_q.detach().norm(dim=-1).mean())
         metrics_acc["mu_norm_k"] = float(center.mu_k.detach().norm(dim=-1).mean())
         if device.type == "cuda":
             torch.cuda.synchronize(device)
         metrics_acc["optimizer_step_seconds"] = time.monotonic() - step_started
+        if prof is not None:
+            prof.end_update(metrics_acc["optimizer_step_seconds"],
+                            {k: metrics_acc[k] for k in ("vel_cond", "vel_uncond", "cfg", "feat") if k in metrics_acc})
         last_step = step + 1
         if (step + 1) % args.log_every == 0 or step in (start, args.steps - 1):
             reduced = {k: float(all_reduce_mean(v, world)) for k, v in sorted(metrics_acc.items())}
             reduced.update({"step": step + 1, "lr_scale": scale, "elapsed_s": round(time.monotonic() - t0, 1)})
             history.append(reduced)
             log(rank, json.dumps(reduced))
-        if (step + 1) % args.val_every == 0 and val_store_ids and args.stage != 1:
+        if (step + 1) % args.val_every == 0 and val_store_ids and args.stage != 1 and not args.profile:
             result = validate(student, teacher, center, store, val_store_ids, args, device, rank, world, val_cache)
             result["step"] = step + 1
             guided_validation[last_step] = result["mean"][2]
@@ -884,7 +953,7 @@ def main():
                 stop_tensor = torch.tensor(int(budget_stop), device=device)
                 dist.all_reduce(stop_tensor, op=dist.ReduceOp.MAX)
                 budget_stop = bool(stop_tensor.item())
-        if last_step % args.save_every == 0 or last_step == stop_at or budget_stop or gate_stop:
+        if not args.profile and (last_step % args.save_every == 0 or last_step == stop_at or budget_stop or gate_stop):
             if args.stage == 1:
                 if rank == 0:
                     (out / "student").mkdir(exist_ok=True)
@@ -915,10 +984,29 @@ def main():
     if device.type == "cuda":
         print(json.dumps({"rank": rank, "peak_cuda_allocated_bytes": torch.cuda.max_memory_allocated(device),
                           "wall_seconds": time.monotonic() - t0}), flush=True)
+    if prof is not None:
+        prof.unpatch()
+        write_json(out / f"peak-memory-rank{rank}.json", {
+            "rank": rank, "world": world, "updates_run": last_step - start,
+            "peak_cuda_allocated_bytes": torch.cuda.max_memory_allocated(device) if device.type == "cuda" else None,
+            "peak_cuda_reserved_bytes": torch.cuda.max_memory_reserved(device) if device.type == "cuda" else None,
+            "wall_seconds": time.monotonic() - t0})
     log(rank, "TRAINING COMPLETE" if last_step == args.steps else "TRAINING PAUSED", args.stage, last_step)
     if world > 1:
         dist.destroy_process_group()
 
 
+PROFILE_OOM = None   # (out dir, rank, device) in --profile mode: an out-of-memory error is a result there (--no-checkpointing)
+
+
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except torch.cuda.OutOfMemoryError as error:
+        if PROFILE_OOM is not None:
+            oom_out, oom_rank, oom_device = PROFILE_OOM
+            write_json(oom_out / f"oom-rank{oom_rank}.json", {
+                "rank": oom_rank, "error": str(error)[:2000],
+                "peak_cuda_allocated_bytes": torch.cuda.max_memory_allocated(oom_device),
+                "peak_cuda_reserved_bytes": torch.cuda.max_memory_reserved(oom_device)})
+        raise
