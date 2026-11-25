@@ -429,3 +429,12 @@ committed `cell.npz` files.
 
 `DISTILL_SCORE_CELL4_PROMPT.md` (23 November 2026): the owner asked for the last layer and the last step. Six
 cells, prompts `d0000` and `d0006`: layer 29 at step 1, layer 0 at step 20, and layer 29 at step 20.
+
+## Text or noise seed? (25 November 2026)
+
+The comparison of prompts `d0000` and `d0006` confounds the text with the initial noise, because each prompt has
+its own seed. `DISTILL_SCORE_SEED_PROMPT.md` separates them with a 2 × 2 design: the two texts crossed with the
+two noise seeds (two control trajectories that must reproduce the stored ones, two crossed ones), nine settings
+(layers 0, 15, 29 × steps 1, 10, 20; conditional branch, head 1), and the six pairwise comparisons per setting
+grouped as same noise / different text, same text / different noise, and both differ. The owner asked that the
+lab agent write the code for this task and run it; the research session reviews code and results.
