@@ -1,0 +1,6402 @@
+[
+  {
+    "prompt": {
+      "id": "v000",
+      "text": "lemur eating grass leaves",
+      "category": "animal",
+      "seed": 2026110900,
+      "audit": true
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "97c169b5104b8c5442a1924b32f860d28e99787d1e75963997eddb58b17e9e70"
+  },
+  {
+    "prompt": {
+      "id": "v013",
+      "text": "a miniature house",
+      "category": "architecture",
+      "seed": 2026110913,
+      "audit": true
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "bb6a431ee75254d23fcd167be674ff03dfabb636437797bbe6b7222a596a6543"
+  },
+  {
+    "prompt": {
+      "id": "v026",
+      "text": "a broccoli soup on wooden table",
+      "category": "food",
+      "seed": 2026110926,
+      "audit": true
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "549672addc30b07d50d80a917e09f8ba1aa926fba33eb69ef9de696ed59f1d1c"
+  },
+  {
+    "prompt": {
+      "id": "v039",
+      "text": "a girl pushing the chair while her sister is on the chair",
+      "category": "human",
+      "seed": 2026110939,
+      "audit": true
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "2a087d16bf44a08086d8bbfbb79d2d9e8c218a604030ac0b271375703cabda16"
+  },
+  {
+    "prompt": {
+      "id": "v052",
+      "text": "modern office waiting room",
+      "category": "lifestyle",
+      "seed": 2026110952,
+      "audit": true
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "13cc290385f1fb1200c41539b0d84c0e337c81261e1a28caf4dc267a80a8e0b6"
+  },
+  {
+    "prompt": {
+      "id": "v064",
+      "text": "a man holding leaves looking at the camera",
+      "category": "plant",
+      "seed": 2026110964,
+      "audit": true
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "b0c8a8713ec22cf0a80b303822ff212ee6b3c9e94de03d2646547665c9bec5fb"
+  },
+  {
+    "prompt": {
+      "id": "v076",
+      "text": "fireworks display in the sky at night",
+      "category": "scenery",
+      "seed": 2026110976,
+      "audit": true
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "70fae3715e5ce31ee412300a04a9c7772a66722396b421275c3294bd3a4e6012"
+  },
+  {
+    "prompt": {
+      "id": "v088",
+      "text": "video of passengers riding a double decker bus during night",
+      "category": "vehicles",
+      "seed": 2026110988,
+      "audit": true
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "451446ea3b97e2b8b81eda16d20fa225dd80247f9c96d386fa05424f28c44b51"
+  },
+  {
+    "prompt": {
+      "id": "v001",
+      "text": "chameleon eating ant",
+      "category": "animal",
+      "seed": 2026110901,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "256be585e121a53912675947bb5e78e41ce3ad743e10f76e2d15c9893c4a2019"
+  },
+  {
+    "prompt": {
+      "id": "v014",
+      "text": "red paper lantern decorations hanging outside a building",
+      "category": "architecture",
+      "seed": 2026110914,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "47e5042aaba7327542e814eeebf44a8957117ccc52d57440343eb0dadc36ad39"
+  },
+  {
+    "prompt": {
+      "id": "v027",
+      "text": "a mother preparing food with her kids",
+      "category": "food",
+      "seed": 2026110927,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "f84b271b97acd48f39b407b3d9bb57a1c68a47838282816e5fed5d98d1a3915a"
+  },
+  {
+    "prompt": {
+      "id": "v040",
+      "text": "cab driver talking to passenger",
+      "category": "human",
+      "seed": 2026110940,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "3bb3934a125a753a76bdbfb913f6d30cf535636b2a86202af36ac845efa933eb"
+  },
+  {
+    "prompt": {
+      "id": "v053",
+      "text": "woman painting at home",
+      "category": "lifestyle",
+      "seed": 2026110953,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "eb244f5e7ad15d452a6e0647d3944dd9ac8ee2b902a1b9cdb0fb3d2ef8787480"
+  },
+  {
+    "prompt": {
+      "id": "v065",
+      "text": "green moss in forest nature",
+      "category": "plant",
+      "seed": 2026110965,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "309ed9123bc97d9530f31f392f66651d53c27b47834dd4501e6bc41cbca4cdd4"
+  },
+  {
+    "prompt": {
+      "id": "v077",
+      "text": "video of ocean during daytime",
+      "category": "scenery",
+      "seed": 2026110977,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "4c0cf9699c64fe09e488be0ba5dccc01a35f4de25760489d600d3fb0858cb221"
+  },
+  {
+    "prompt": {
+      "id": "v089",
+      "text": "cargo train traveling on the mountainside",
+      "category": "vehicles",
+      "seed": 2026110989,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "be50fc3814273af221e2fe4a29c0c6ccc346952edadae321cce060a45e025055"
+  },
+  {
+    "prompt": {
+      "id": "v002",
+      "text": "a raccoon climbing a tree",
+      "category": "animal",
+      "seed": 2026110902,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "8ee0776ba86f88908faa9568965e12e4a235094d611cd32deae416088a34ec73"
+  },
+  {
+    "prompt": {
+      "id": "v015",
+      "text": "modern wooden house interior",
+      "category": "architecture",
+      "seed": 2026110915,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "e32fae854ca5c9e16b27df2ce24006c918ad2e2138d0f21cb7b4d98ddde9fcc4"
+  },
+  {
+    "prompt": {
+      "id": "v028",
+      "text": "boy getting a dumpling using chopsticks",
+      "category": "food",
+      "seed": 2026110928,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "5feacd11de5ea9d6702e0ad44c75cd55be3baad2f1bfd8c65e4ff24aaebcc679"
+  },
+  {
+    "prompt": {
+      "id": "v041",
+      "text": "friends talking while on the basketball court",
+      "category": "human",
+      "seed": 2026110941,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "e939e5393de09c2addb2820add82bf1c5fb356fe07a1c2a4ea5405e734d5ac12"
+  },
+  {
+    "prompt": {
+      "id": "v054",
+      "text": "woman and man in pajamas working from home",
+      "category": "lifestyle",
+      "seed": 2026110954,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "c6c4ac4859e00e1a7fca9c48f3d108afd9ff64a69f539d0876436901862745a8"
+  },
+  {
+    "prompt": {
+      "id": "v066",
+      "text": "a shadow of a swaying plant",
+      "category": "plant",
+      "seed": 2026110966,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "c19affad90a6a6d7e81231136383eee000f6ef3f744d5e2f02f1ed3aa6c12f79"
+  },
+  {
+    "prompt": {
+      "id": "v078",
+      "text": "scenery of desert landscape",
+      "category": "scenery",
+      "seed": 2026110978,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "50c2009dd0872fcef1708dcae7aba9034b80793384a39c6d6b181e0ecab80da2"
+  },
+  {
+    "prompt": {
+      "id": "v090",
+      "text": "video of blinking traffic lights",
+      "category": "vehicles",
+      "seed": 2026110990,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "9fc91adc13d3bf1620e744813e671de61f9fcadd93df1150d1212a2114289a6a"
+  },
+  {
+    "prompt": {
+      "id": "v003",
+      "text": "koala eating leaves from a branch",
+      "category": "animal",
+      "seed": 2026110903,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "498cc4b4536f5304a5203b967886f6fcb79432b735c623a2f8c8c11955d5a0ca"
+  },
+  {
+    "prompt": {
+      "id": "v016",
+      "text": "silhouette of a building",
+      "category": "architecture",
+      "seed": 2026110916,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "72abcc9945dcf1de86cc1b7225bb36af1d614eb20711fa8b67ba0a0c0da4c693"
+  },
+  {
+    "prompt": {
+      "id": "v029",
+      "text": "fresh dim sum set up on a bamboo steam tray for cooking",
+      "category": "food",
+      "seed": 2026110929,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "9b14d9ffa499cd8b0ff71623c6ca95fb94fd64e8030f73abdeef312815fda758"
+  },
+  {
+    "prompt": {
+      "id": "v042",
+      "text": "brother and sister using hammock",
+      "category": "human",
+      "seed": 2026110942,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "5ffc77c5ea3710fb519fb2c7d63c02abe84cea28cc143c18cf1977ca975c24ad"
+  },
+  {
+    "prompt": {
+      "id": "v055",
+      "text": "a toolbox and a paint roller beside a huge package in a room",
+      "category": "lifestyle",
+      "seed": 2026110955,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "65b4ae9949b093c27a0f2d35eac80ac051d7e8de01e9b64ab41792835433066a"
+  },
+  {
+    "prompt": {
+      "id": "v067",
+      "text": "tree with golden leaves",
+      "category": "plant",
+      "seed": 2026110967,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "0c76a0b0128922010df73814a5fe63548810f1c4b18c5d6eed81c72b756a3d01"
+  },
+  {
+    "prompt": {
+      "id": "v079",
+      "text": "sun view through a spider web",
+      "category": "scenery",
+      "seed": 2026110979,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "8269f265ba38d2964de487e29e983da663409c549251758455d05b63156132f2"
+  },
+  {
+    "prompt": {
+      "id": "v091",
+      "text": "a modern railway station in malaysia use for public transportation",
+      "category": "vehicles",
+      "seed": 2026110991,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "d64af812dbd3a1ef63d92a09d651a82288d9c9cbff961e35b3d0288d36597290"
+  },
+  {
+    "prompt": {
+      "id": "v004",
+      "text": "paper cut out of a pair of hands a whale and a heart",
+      "category": "animal",
+      "seed": 2026110904,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "066a1966a692f4f15410f556c1f94e8ff44ba81065f3fbde98e1019cea4703eb"
+  },
+  {
+    "prompt": {
+      "id": "v017",
+      "text": "candle on a jar and a house figurine on a surface",
+      "category": "architecture",
+      "seed": 2026110917,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "9abe4a77cf04de4d76acd6dccfade38b5008e34f1e0981224f5407f780c109ba"
+  },
+  {
+    "prompt": {
+      "id": "v030",
+      "text": "a man eating a donut",
+      "category": "food",
+      "seed": 2026110930,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "1ca437dda4677c4cd2a1ef28da56de9368da5c71c8022638ba59d76e67c2f88c"
+  },
+  {
+    "prompt": {
+      "id": "v043",
+      "text": "couple dancing with body paint",
+      "category": "human",
+      "seed": 2026110943,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "804dc76e311a0bea385caf07350b764730ffae21528b0f3b77504a27026e96b3"
+  },
+  {
+    "prompt": {
+      "id": "v056",
+      "text": "video of a bathroom interior",
+      "category": "lifestyle",
+      "seed": 2026110956,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "d9fb9617907d7ca146e0b1d9e6fddcf0859c5ce5c1172a398f2ebc6ed461f1a8"
+  },
+  {
+    "prompt": {
+      "id": "v068",
+      "text": "forest trees and a medieval castle at sunset",
+      "category": "plant",
+      "seed": 2026110968,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "d290d2c064ba17e5cf3780fcc54978d9d264650d79e0f949b60e031037bafb47"
+  },
+  {
+    "prompt": {
+      "id": "v080",
+      "text": "scenic view from wooden pathway",
+      "category": "scenery",
+      "seed": 2026110980,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "4809df505ad6c7e4c8227c26ffde03494a1bc3062cfbe4359015c6074ffaf88d"
+  },
+  {
+    "prompt": {
+      "id": "v092",
+      "text": "drone view of an illuminated bridge across a river",
+      "category": "vehicles",
+      "seed": 2026110992,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "d732ab1be9d7f0d8d2e4165ba066854f62b1da8761645cedb5dec5a39f29ce92"
+  },
+  {
+    "prompt": {
+      "id": "v005",
+      "text": "a frog eating an ant",
+      "category": "animal",
+      "seed": 2026110905,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "91f83ec3683b7b28fa4626ba1b5f7e7540f95146c41442fa5824d0f4bae24d4d"
+  },
+  {
+    "prompt": {
+      "id": "v018",
+      "text": "house in village",
+      "category": "architecture",
+      "seed": 2026110918,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "61675ccfc12d526f16ca1e3e3f367ff22432211f70eec1c8362704860b600d15"
+  },
+  {
+    "prompt": {
+      "id": "v031",
+      "text": "preparing a cocktail drink",
+      "category": "food",
+      "seed": 2026110931,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "fbaed19e21202213b7c412a0f25a0c8af2c7e82cfe6cbfb0b5c8faedd4b58428"
+  },
+  {
+    "prompt": {
+      "id": "v044",
+      "text": "teacher writing on her notebook",
+      "category": "human",
+      "seed": 2026110944,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "8af8d42507df57c2731ffa8661db964450c6c4be1b15804472ac5a7b54b609cd"
+  },
+  {
+    "prompt": {
+      "id": "v057",
+      "text": "a woman in a locker room",
+      "category": "lifestyle",
+      "seed": 2026110957,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "d5096df17022bf940148067d96ac9d4ca00414d99a25ef0d77129ec0ef0e1146"
+  },
+  {
+    "prompt": {
+      "id": "v069",
+      "text": "flower field near the waterfall",
+      "category": "plant",
+      "seed": 2026110969,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "f6ca7239db4dec6a4c13ef9f0a69774a31b7e132b7b41a5ffee38c7bc6f2e708"
+  },
+  {
+    "prompt": {
+      "id": "v081",
+      "text": "close up view of swaying white flowers and leaves",
+      "category": "scenery",
+      "seed": 2026110981,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "1247d2bf8627d0ac0be0cee4bdc7e1876f66adbb930fbed833c7b7863c1ba519"
+  },
+  {
+    "prompt": {
+      "id": "v093",
+      "text": "man wearing motorcycle helmet looking at the camera",
+      "category": "vehicles",
+      "seed": 2026110993,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "41dbf6e0d0f6e79522756e4216ad49a5bb64799b39ae1846cf515c1a9e80cbd4"
+  },
+  {
+    "prompt": {
+      "id": "v006",
+      "text": "a tortoise covered with algae",
+      "category": "animal",
+      "seed": 2026110906,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "07edac1b8f04f850de351accfa561d5377646e0697fcbf7c1e58b88d1d75f27f"
+  },
+  {
+    "prompt": {
+      "id": "v019",
+      "text": "view of the sky through a building",
+      "category": "architecture",
+      "seed": 2026110919,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "3c2148ed4f51eb73da5ea963b1c09a1109347796aed382c78ddad227c48b4ef3"
+  },
+  {
+    "prompt": {
+      "id": "v032",
+      "text": "grilling a meat on a charcoal grill",
+      "category": "food",
+      "seed": 2026110932,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "db4d041471d698c3db00439e08c1c38790bcd64ed756ff6bf8b16655c54c2802"
+  },
+  {
+    "prompt": {
+      "id": "v045",
+      "text": "a group of campers with a cute dog",
+      "category": "human",
+      "seed": 2026110945,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "a55cbe43a434d3499ab2d8f693a4f5120f70a2c880c232af09a2b1c03376784b"
+  },
+  {
+    "prompt": {
+      "id": "v058",
+      "text": "aerial shot of interior of the warehouse",
+      "category": "lifestyle",
+      "seed": 2026110958,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "cfa7ee845dd00fad0871d2e69bd3e6745f27987f3f1ed440a257bc01088c84f2"
+  },
+  {
+    "prompt": {
+      "id": "v070",
+      "text": "a mossy fountain and green plants in a botanical garden",
+      "category": "plant",
+      "seed": 2026110970,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "8aee674d986f4eb84d9402bf755964231c92be8c09132d8d22d3361a82fbaa4f"
+  },
+  {
+    "prompt": {
+      "id": "v082",
+      "text": "a bonfire near river",
+      "category": "scenery",
+      "seed": 2026110982,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "8fdabd453c3bee59f9a11226c31897e2709027aacd7b3ec9ac8cf81a8e8a02fc"
+  },
+  {
+    "prompt": {
+      "id": "v094",
+      "text": "a woman in a halloween costume posing on a motorcycle",
+      "category": "vehicles",
+      "seed": 2026110994,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "2df5936d4bc4902fd9a96a71c4b9f28fcab3b155bb86516e970c5b73757f4fc6"
+  },
+  {
+    "prompt": {
+      "id": "v007",
+      "text": "a pig wallowing in mud",
+      "category": "animal",
+      "seed": 2026110907,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "99e505e35067c1faa09e0c74b48f86a79847d481faa884ca0594676aba62bc1f"
+  },
+  {
+    "prompt": {
+      "id": "v020",
+      "text": "aerial view of the highway and building in a city",
+      "category": "architecture",
+      "seed": 2026110920,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "76a12d0aa44ae931c75808d3063d820b2b1cdd0378b7d18f6a81c55672ea7143"
+  },
+  {
+    "prompt": {
+      "id": "v033",
+      "text": "an orange fruit cut in half",
+      "category": "food",
+      "seed": 2026110933,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "3e8128b83ec15538008fdc487dbe4dfc37eaff5ab84d7cad10dcc3e356705ddd"
+  },
+  {
+    "prompt": {
+      "id": "v046",
+      "text": "a man video recording the movie in theater",
+      "category": "human",
+      "seed": 2026110946,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "51e8a5af4fc09c3ce0e06a1ae9eed682b32f584ac48fef38677364377add7a84"
+  },
+  {
+    "prompt": {
+      "id": "v059",
+      "text": "sunlight inside a room",
+      "category": "lifestyle",
+      "seed": 2026110959,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "a54e13cd0baed5a7c7bbb66edc230559bff57865136d485be19be0fc2fbbc41f"
+  },
+  {
+    "prompt": {
+      "id": "v071",
+      "text": "a woman opening a book with a flower inside",
+      "category": "plant",
+      "seed": 2026110971,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "e979d94c84f7a6493e6ebccfeb33c7d00708fe79ae2cae986b213f38e376e4ce"
+  },
+  {
+    "prompt": {
+      "id": "v083",
+      "text": "view of the sea from an abandoned building",
+      "category": "scenery",
+      "seed": 2026110983,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "a8e9ee84e843c80fed6d1e5108d3cd7b170c671f30a7567f9011b8c973c3f56e"
+  },
+  {
+    "prompt": {
+      "id": "v095",
+      "text": "drone footage of a wreck ship on shore",
+      "category": "vehicles",
+      "seed": 2026110995,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "5692381889f4ce94a29a6603f0fc8ddc00e8e17a5ad601b421157346b306df5c"
+  },
+  {
+    "prompt": {
+      "id": "v008",
+      "text": "spider making a web",
+      "category": "animal",
+      "seed": 2026110908,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "5be564bad2fe25451ae773066b54781f9d00fdc34ba0dc2cf587eff3b563f970"
+  },
+  {
+    "prompt": {
+      "id": "v021",
+      "text": "city view reflected on a glass building",
+      "category": "architecture",
+      "seed": 2026110921,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "94ec3e42951a6daeb3730e55edc51ef6cba6a0c8862a4ee8e1f2a2e3535a0e1b"
+  },
+  {
+    "prompt": {
+      "id": "v034",
+      "text": "grilling a steak on a pan grill",
+      "category": "food",
+      "seed": 2026110934,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "a8f34532fabd9ae4fa7a23c4bcd0327da74996757f2f68a70ac452aa32f2c144"
+  },
+  {
+    "prompt": {
+      "id": "v047",
+      "text": "pregnant woman exercising with trainer",
+      "category": "human",
+      "seed": 2026110947,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "617b306edef50b3568c76ff9bdc49bc6b0efa29f20a2b79aa0279c792282bca5"
+  },
+  {
+    "prompt": {
+      "id": "v060",
+      "text": "a person sanitizing an office space using smoke machine",
+      "category": "lifestyle",
+      "seed": 2026110960,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "605aa06f0101ab4d8a396a2a215db1e36d9626cacac7e0b8623f055043291baf"
+  },
+  {
+    "prompt": {
+      "id": "v072",
+      "text": "trees in the forest during sunny day",
+      "category": "plant",
+      "seed": 2026110972,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "f98f5566088a14579bac9455f721138e2888b0c951cf71a66150667b25d7fd95"
+  },
+  {
+    "prompt": {
+      "id": "v084",
+      "text": "view of golden domed church",
+      "category": "scenery",
+      "seed": 2026110984,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "efdd660391dfee3528fcb227c607c263c2e9b54ce75f6f0820bafc314e6bd3f3"
+  },
+  {
+    "prompt": {
+      "id": "v096",
+      "text": "boat sailing in the middle of the ocean",
+      "category": "vehicles",
+      "seed": 2026110996,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "ad1704a2d1300a07c807c215189e5eb5b2b43cc6fdd6c0af36b479ebc25870ac"
+  },
+  {
+    "prompt": {
+      "id": "v009",
+      "text": "an american crocodile",
+      "category": "animal",
+      "seed": 2026110909,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "a388b2200ce3814e7f522ac506f17783a41521619a301ea4b45d8ba7c855d783"
+  },
+  {
+    "prompt": {
+      "id": "v022",
+      "text": "time lapse footage of the sun light in front of a small house porch",
+      "category": "architecture",
+      "seed": 2026110922,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "79e8ac6e10024117f39f5aa49d3fe453b8ba500bc2786a5de511adebc75471e6"
+  },
+  {
+    "prompt": {
+      "id": "v035",
+      "text": "girl peeling a banana",
+      "category": "food",
+      "seed": 2026110935,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "63fc5f319a7101dffc9a73128418f8c9cd0a1399e66ea34ec0391d23c68d6efe"
+  },
+  {
+    "prompt": {
+      "id": "v048",
+      "text": "a family wearing paper bag masks",
+      "category": "human",
+      "seed": 2026110948,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "43bfc3e8db3943149ab8c9ab639f284ff1cc2e2b3c4c5561d7e96182bd174f0a"
+  },
+  {
+    "prompt": {
+      "id": "v061",
+      "text": "a woman recording herself while exercising at home",
+      "category": "lifestyle",
+      "seed": 2026110961,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "40d827deca39e5dbc2db9b22a7a5563ce2587186f6affaac2594fa6a5641d08d"
+  },
+  {
+    "prompt": {
+      "id": "v073",
+      "text": "plucking leaves from plant",
+      "category": "plant",
+      "seed": 2026110973,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "7b3e63f08d00c4a0bfe8e3f8cd036b22a618f8f8fb601293bbbeabffa2c9ae03"
+  },
+  {
+    "prompt": {
+      "id": "v085",
+      "text": "waterfalls in between mountain",
+      "category": "scenery",
+      "seed": 2026110985,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "785f58a4ad5f8f7ba1dbf9d6c366a3f7946da6c9aea99f85895a05bea2a2cfc2"
+  },
+  {
+    "prompt": {
+      "id": "v097",
+      "text": "people in queue to military ship",
+      "category": "vehicles",
+      "seed": 2026110997,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "bf05375b81a1360045e2a0279911e409e470cbc981b6d0c83e32995ff12324be"
+  },
+  {
+    "prompt": {
+      "id": "v010",
+      "text": "cat licking another cat",
+      "category": "animal",
+      "seed": 2026110910,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "7e5418515545d10cc28d2983eddf4467d6ffcce3b23a7755d5a23d035c44698f"
+  },
+  {
+    "prompt": {
+      "id": "v023",
+      "text": "waterfall and house",
+      "category": "architecture",
+      "seed": 2026110923,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "175d23fafe307e8d30d9a5a02b0f4e559d189987c476547eec0e22866a1206fa"
+  },
+  {
+    "prompt": {
+      "id": "v036",
+      "text": "pancake with blueberry on the top",
+      "category": "food",
+      "seed": 2026110936,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "afca47ee5707f9460c423e9ae551fa52104a74cc9a102a4694232c4cf1074fd3"
+  },
+  {
+    "prompt": {
+      "id": "v049",
+      "text": "woman adding honey to the cinnamon rolls",
+      "category": "human",
+      "seed": 2026110949,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "0e2db66c8ec10d1ccb70f4b2df7240c905f9c286bf0a23b628c78e8daeb1ef22"
+  },
+  {
+    "prompt": {
+      "id": "v062",
+      "text": "a family stacking cardboard boxes in a room",
+      "category": "lifestyle",
+      "seed": 2026110962,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "435cabdbfedcf3f405532897a64a94fe2a49da4973789d169c20d612989912b0"
+  },
+  {
+    "prompt": {
+      "id": "v074",
+      "text": "reflection of tree branches",
+      "category": "plant",
+      "seed": 2026110974,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "109c9eabc4e8cf4425a33dccb3dd26b432bde0c9d963b589ff40388330f50531"
+  },
+  {
+    "prompt": {
+      "id": "v086",
+      "text": "close up view of lighted candles",
+      "category": "scenery",
+      "seed": 2026110986,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "c9ffb6ab019720e02f9bca222c43c25c04ef3ed78c79e21613487e1eeaeea33f"
+  },
+  {
+    "prompt": {
+      "id": "v098",
+      "text": "video of a kayak boat in a river",
+      "category": "vehicles",
+      "seed": 2026110998,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "18e7c139a70ed2ef20c735214de3d5a5e370bcc56f828fc11c8c696ed31aee6e"
+  },
+  {
+    "prompt": {
+      "id": "v011",
+      "text": "brown chicken hunting for its food",
+      "category": "animal",
+      "seed": 2026110911,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "2f184bed61197adc511a0476ac2e6b83dba6277e9b3b0da9136209369bb55ef7"
+  },
+  {
+    "prompt": {
+      "id": "v024",
+      "text": "a beach house built over a seawall protected from the sea waves",
+      "category": "architecture",
+      "seed": 2026110924,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "e1ac38e76742b7a4a60c25e4574feba1d25d77870e07a9645842b78765fbdbd7"
+  },
+  {
+    "prompt": {
+      "id": "v037",
+      "text": "a chef cutting sushi rolls",
+      "category": "food",
+      "seed": 2026110937,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "141206e8a71dfda85943afb28d16813c61ffb7496091f794c7e04e075c4e56c1"
+  },
+  {
+    "prompt": {
+      "id": "v050",
+      "text": "a child playing with water",
+      "category": "human",
+      "seed": 2026110950,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "0c05654ced0f16ca0be0fe0dca1e9375188c26c96d1d587aab60a12659e11a12"
+  },
+  {
+    "prompt": {
+      "id": "v063",
+      "text": "man doing handstand in indoor garden",
+      "category": "lifestyle",
+      "seed": 2026110963,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "dfffa2994818f998dfb1ad8ec53b4294c915181d1db3a531dbd90f68f6915280"
+  },
+  {
+    "prompt": {
+      "id": "v075",
+      "text": "a coconut tree by the house",
+      "category": "plant",
+      "seed": 2026110975,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "393598e42641480f126e11e37f9ea1f4b6fd89da4dbbd0db97dfc9fcd5399ce8"
+  },
+  {
+    "prompt": {
+      "id": "v087",
+      "text": "a dark clouds over shadowing the full moon",
+      "category": "scenery",
+      "seed": 2026110987,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "778e5f0e5f3b3b524ac3ad0a9883c4eb73a7de6c4afa90aa8d04f7cc2b70a249"
+  },
+  {
+    "prompt": {
+      "id": "v099",
+      "text": "a white yacht traveling on a river and passing under the bridge",
+      "category": "vehicles",
+      "seed": 2026110999,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "4558aaf3efe675c38cff6a2328073b4de4de089dda6824fd7679cd4f2d0852fb"
+  },
+  {
+    "prompt": {
+      "id": "v012",
+      "text": "wild rabbit in a green meadow",
+      "category": "animal",
+      "seed": 2026110912,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "125a23482c593748426b896ae18af4ac1bc249d4974e97c861d4c8b7253f2491"
+  },
+  {
+    "prompt": {
+      "id": "v025",
+      "text": "water tower on the desert",
+      "category": "architecture",
+      "seed": 2026110925,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "92db548266e812fba0aaf5fc71974e20812fe32e839bd23719be8d1acdea5670"
+  },
+  {
+    "prompt": {
+      "id": "v038",
+      "text": "little boy pretending to eat the watermelon",
+      "category": "food",
+      "seed": 2026110938,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "310e3a93ee17b080fe38d9c38ea15cd92aceaa9a34c1b1eec9156a5ff8092b2f"
+  },
+  {
+    "prompt": {
+      "id": "v051",
+      "text": "a man in a hoodie and woman with a red bandana talking to each other and smiling",
+      "category": "human",
+      "seed": 2026110951,
+      "audit": false
+    },
+    "arm": "s32_teacher3",
+    "center_mode": "mean",
+    "selection": {
+      "default_high_masks": false,
+      "cell_invariant_masks": false,
+      "pairs_per_cell_q": 32.0,
+      "pairs_per_cell_k": 32.0,
+      "q_k_intersection_mean": 32.0,
+      "nope_pairs_per_cell": 0.0,
+      "wide_head": false,
+      "content_pairs": 0
+    },
+    "exempt": {
+      "layers": [],
+      "steps": []
+    },
+    "intervention_calls": 2040,
+    "nope_calls": 0,
+    "teacher_steps": [
+      1,
+      2,
+      3
+    ],
+    "teacher_forwards": 6,
+    "student_forwards": 34,
+    "denoiser_by_step": [
+      "teacher",
+      "teacher",
+      "teacher",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student",
+      "student"
+    ],
+    "finite_step_latents": 20,
+    "frames": [
+      45,
+      480,
+      480,
+      3
+    ],
+    "video_sha256": "17066d0acca058b6468ce6f3ed2854c1f44ca5a016e6d2c7f777d9e93955cb83"
+  }
+]
