@@ -238,7 +238,7 @@ State the bounds; do not implement or time any of the changes. That is a later, 
 ## Budget and rules
 
 About 4.5 GPU-hours expected (Part 1 about 3: nine short arms, most of the time is model loading; Part 2 about
-1.5); hard cap 6 GPU-hours, counted as allocated wall time x GPUs including loading. Idle GPUs only, at most two at a time, no other study's outputs
+1.5); hard cap 6 GPU-hours, counted as allocated wall time x GPUs including loading. Idle GPUs only, at most two at a time (four for E4b), no other study's outputs
 touched, no baseline regenerated, nothing deleted outside `out/distill-profile/`. **ASK** before exceeding the cap,
 if no two idle cards are available, if losses are non-finite, or if anything in the recipe has to change to make an
 arm run (P3 and P4d excepted, as described). No model identifiers in committed files. Timings are descriptive
