@@ -1418,3 +1418,66 @@ swaps. In all eight screen arms the largest per-step errors fall in steps 1-3 (p
 shared32 delete) and the smallest in steps 13-17. 12.798 of 18 approved GPU-hours
 (allocated wall time x GPUs of every GPU job, including loading, validation, saves and scorers). No zeros-trained arm,
 other pair counts or seeds were run.
+
+## Teacher on the early steps
+
+The user assigned this on 25 November 2026, as Part 2 of `DISTILL_PROFILE_PROMPT.md`. It is inference only: no training and no new capture. It ran on 25-26 November 2026 by `scripts/hybrid_steps.py`. Evidence and full tables are in `distill-results/hybrid-steps/`.
+
+**What changed between arms.**
+- One UniPC sampler runs all 20 steps and swaps the denoiser between steps, so the multistep history carries across the hand-over.
+- On the named steps (1-based), the frozen bf16 teacher runs with `LearnedCenter` off.
+- On the other steps, the shared32 final EMA student runs with its trained means. Its checksums matched the audited hashes before rendering.
+- `s32_teacher3`: teacher on steps 1-3, student on steps 4-20. Per video: 6 teacher forwards, 2,040 replacement calls.
+- `s32_student3`: student on steps 1-3, teacher on steps 4-20. Per video: 34 teacher forwards, 360 replacement calls.
+- All 100 videos per arm passed the audit: finite latents at all 20 steps, 45×480×480 frames, call counts as above.
+- Two parity checks passed on prompts v000 and v013 before the 100-prompt runs (`torch.equal` on the final latents, identical MP4 SHA-256):
+  - teacher on all 20 steps reproduces the frozen baseline;
+  - teacher on no step reproduces `s32_means`.
+
+**Videos and statistics.**
+- The 100 original prompts with one fixed seed each, under the frozen protocol: 20 UniPC steps, shift 3, CFG 5, empty negative prompt, 45 frames at 480×480.
+- VBench values are equal means over prompts of VBench's within-video aggregation. Dynamic degree is the fraction of the 100 videos judged dynamic.
+- Paired differences are the mean [pointwise 95%] over 10,000 paired prompt resamples (NumPy seed 20261109).
+- There is one seed per prompt, so there is no uncertainty across seeds.
+
+| Dimension | Teacher | s32_means | s32_teacher3 | s32_student3 | teacher3 − teacher | student3 − teacher | teacher3 − s32_means | student3 − s32_means |
+|---|---:|---:|---:|---:|---|---|---|---|
+| Aesthetics | 0.5886 | 0.5692 | 0.5751 | 0.5929 | -0.0135 [-0.0227, -0.0042] | +0.0044 [-0.0086, +0.0171] | +0.0059 [-0.0060, +0.0179] | +0.0237 [+0.0125, +0.0348] |
+| Imaging | 0.6607 | 0.6769 | 0.6586 | 0.6808 | -0.0021 [-0.0119, +0.0077] | +0.0201 [+0.0027, +0.0369] | -0.0183 [-0.0363, +0.0002] | +0.0039 [-0.0062, +0.0135] |
+| Text-video | 0.2326 | 0.2314 | 0.2281 | 0.2355 | -0.0044 [-0.0091, -0.0001] | +0.0029 [-0.0039, +0.0099] | -0.0032 [-0.0089, +0.0022] | +0.0041 [-0.0007, +0.0089] |
+| Subject | 0.9640 | 0.9652 | 0.9616 | 0.9688 | -0.0024 [-0.0046, -0.0003] | +0.0048 [-0.0022, +0.0117] | -0.0036 [-0.0114, +0.0043] | +0.0036 [+0.0016, +0.0058] |
+| Background | 0.9765 | 0.9758 | 0.9753 | 0.9785 | -0.0012 [-0.0031, +0.0008] | +0.0020 [-0.0017, +0.0057] | -0.0005 [-0.0045, +0.0032] | +0.0027 [+0.0007, +0.0047] |
+| Motion smoothness | 0.9845 | 0.9863 | 0.9848 | 0.9861 | +0.0004 [-0.0001, +0.0009] | +0.0016 [+0.0003, +0.0031] | -0.0015 [-0.0029, -0.0001] | -0.0002 [-0.0008, +0.0003] |
+| Dynamic degree | 0.3300 | 0.2100 | 0.3000 | 0.2600 | -0.0300 [-0.0800, +0.0100] | -0.0700 [-0.1500, +0.0100] | +0.0900 [+0.0200, +0.1700] | +0.0500 [+0.0000, +0.1000] |
+
+The direct differences s32_teacher3 − s32_student3 are in `distill-results/hybrid-steps/README.md`. For example, aesthetics is -0.0179 [-0.0306, -0.0052].
+
+**Same-seed agreement with the teacher.** Final-latent relative L2 uses the step-20 state over all coordinates, one ratio per prompt, averaged over 100 prompts. Frame PSNR is over all 4,500 decoded frames.
+
+| Arm | Final-latent relative L2 | Frame PSNR (dB) |
+|---|---:|---:|
+| s32_means | 0.5818 | 13.910 |
+| s32_teacher3 | 0.2923 | 19.219 |
+| s32_student3 | 0.5895 | 13.824 |
+
+**Verdict: the "In between" row of the outcome table.**
+
+For s32_teacher3:
+- Dynamic degree returns inside the teacher's paired interval: 30 against 33 dynamic videos of 100.
+- Same-seed agreement is clearly better than s32_means: relative L2 is halved and PSNR is +5.3 dB.
+- Aesthetics stays below the teacher, with an interval that excludes zero. Of the -0.0194 aesthetics gap, teacher on steps 1-3 recovers only +0.0059 [-0.0060, +0.0179].
+
+The converse arm splits the effects by step group:
+- **Steps 1-3 set the trajectory.** The student's steps 1-3 alone take the video as far from the teacher's same-seed video as the full student does: 0.5895 against 0.5818, even though the teacher runs the other 17 steps.
+- **Steps 4-20 set the aesthetics.** With the teacher on steps 4-20, aesthetics is at teacher level, so the deficit comes from the student's steps 4-20.
+- **Dynamic degree depends on both.** Of the 12 dynamic videos the student loses, the teacher on steps 1-3 restores 9 and the teacher on steps 4-20 restores 5.
+
+Special-casing steps 1-3 at inference would therefore not close this student's aesthetics gap. A student trained only on steps 4-20 is not shown to be worth trying: this arm already runs the current student on those steps, and its aesthetics there remains below the teacher's. Training such a student, other step splits and other students were not run; they need approval.
+
+**GPU time.** 1.3042 GPU-hours, against a 3.0 guard within the 6 GPU-hour cap. This is allocated wall time × GPUs of every GPU job, including loading:
+
+| Job | GPU-seconds |
+|---|---:|
+| Parity | 155.656 |
+| s32_teacher3 (render and scoring) | 2,294.158 |
+| s32_student3 (render and scoring) | 2,245.448 |
