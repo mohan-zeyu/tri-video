@@ -62,6 +62,19 @@ class Hybrid(Study):
         super().__init__(spec(budget_hours))
         self.base = json.loads((self.p.root / self.lab['benchmark_config']).read_text())
 
+    def idle(self, samples=4, interval=15):
+        """Idle by the center_study rule on every one of `samples` reads `interval` s apart: a card that another
+        user's short jobs leave empty for a moment between launches is not leased."""
+        import time
+        out = super().idle()
+        for _ in range(samples - 1):
+            if not out:
+                break
+            time.sleep(interval)
+            now = super().idle()
+            out = {i: u for i, u in out.items() if now.get(i) == u}
+        return out
+
     def config_for(self, arm, teacher_steps, root):
         config = dict(self.base)
         config['modes'] = ['baseline', arm]
