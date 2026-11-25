@@ -386,6 +386,7 @@ The fine-tunes cost 10 GPU-hours per 2,500 updates. The study and run levels are
 first study's 71.5 GPU-hours; optimizer updates are about 97% of the no-exemption run's 10.06 GPU-hours), but the
 split inside one training sample (3.46 GPU-seconds, median update time divided by the 2 samples per rank) is only
 an estimate. `DISTILL_PROFILE_PROMPT.md` measures it: phase timers on the real two-rank recipe, FSDP communication,
-a single-card compute floor, four toggles and the anatomy of one forward, then the rest of a study (run overhead,
-memory, energy, scaling, benchmark anatomy, interruption ledger, wall-clock). No recipe change and no kept training; it
+a single-card compute floor, four toggles and the anatomy of one forward. Its second part is an inference-only
+benchmark of the shared32 student with the teacher on denoising steps 1-3 (and the converse), because steps 1-3 hold
+43% of the trained guided error (32 held-out prompts, final EMA). No recipe change and no kept training; it
 runs on branch `claude/profile-distill-update` and decides which speed-up, if any, is worth building.
