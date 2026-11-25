@@ -4,7 +4,8 @@ Repository `mohan-zeyu/tri-video`, branch `claude/profile-distill-update` (cut f
 `claude/magical-goodall-dmq9i1` at `a17b768`), lab host with RTX 5090s (32 GB).
 
 Two parts. Part 1 profiles one optimizer update. Part 2 is an inference-only benchmark: the teacher runs denoising
-steps 1-3 and the shared32 student runs steps 4-20. The parts are independent and can run in either order.
+steps 1-3 and the shared32 student runs steps 4-20. The parts are independent. **Run Part 2 first** (user's
+decision, 25 November 2026): commit and push its results, then do Part 1.
 
 This brief is for the executor the user launches on this branch. It is not a hand-off to `codex`: do not use
 `scripts/handoff.py send`. Commit and push to this branch; the draft pull request shows the result.
@@ -295,7 +296,9 @@ if no two idle cards are available, if losses are non-finite, or if anything in 
 arm run (P3 and P4d excepted, as described). No model identifiers in committed files. Timings are descriptive
 measurements on this host on the day of the run; make no claim about the speed of anything that was not run.
 
-Commit after the code and CPU tests pass, after P0 to P2, after Part 1, after the Part 2 checks, and at the end.
+Order: Part 2, then Part 1. Commit and push after the Part 2 code and CPU test pass, after the Part 2 parity
+checks, after each 100-prompt arm, when Part 2 is complete with its report section, then for Part 1 after its code
+and CPU test, after P0 to P2, and at the end.
 
 ## Deliverables
 
