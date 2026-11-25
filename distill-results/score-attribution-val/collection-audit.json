@@ -1,0 +1,565 @@
+{
+  "split": "val",
+  "records": "/mnt/data/liuzeyu/tri-score-attribution-e8657af/out/distill-score-attribution-val",
+  "input_manifest": "/mnt/data/liuzeyu/tri-video-selection-67c101b/configs/distill_prompts.json",
+  "manifest_sha256": "dc561e2571e2359239f1c5a62751483768ff5dd3a5ae349391e1909272c0d100",
+  "trajectory_cache": "/tmp/tri-distill-pilot.EG6asH/traj",
+  "cell_scope": {
+    "prompts": [
+      "d0064",
+      "d0065",
+      "d0066",
+      "d0067",
+      "d0068",
+      "d0069",
+      "d0070",
+      "d0071",
+      "d0072",
+      "d0073",
+      "d0074",
+      "d0075",
+      "d0076",
+      "d0077",
+      "d0078",
+      "d0079",
+      "d0080",
+      "d0081",
+      "d0082",
+      "d0083",
+      "d0084",
+      "d0085",
+      "d0086",
+      "d0087",
+      "d0088",
+      "d0089",
+      "d0090",
+      "d0091",
+      "d0092",
+      "d0093",
+      "d0094",
+      "d0095"
+    ],
+    "layer_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29
+    ],
+    "step_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "branches": [
+      "conditional",
+      "unconditional"
+    ],
+    "head_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "pairs_per_head": 64,
+    "logit": "every 10800 query x every 10800 key, full 128-dimensional post-RoPE",
+    "per_cell": "pooled shares over the full query/key grid and separately recorded across-query quantiles"
+  },
+  "record_count": 32,
+  "cells": 460800,
+  "record_bytes": 6755742688,
+  "record_replay_gpu_seconds": 4450.262853860855,
+  "worker_wall_gpu_seconds": 4589.186199509073,
+  "workers": [
+    {
+      "gpu": 1,
+      "uuid": "GPU-54aab195-984c-7336-8529-2469f43de4fd",
+      "worker_wall_seconds": 1576.6127763950499,
+      "exit_code": 0
+    },
+    {
+      "gpu": 2,
+      "uuid": "GPU-82c95dcf-686b-7980-0347-d5a7e2c73118",
+      "worker_wall_seconds": 1436.30291497102,
+      "exit_code": 0
+    },
+    {
+      "gpu": 6,
+      "uuid": "GPU-0249a4e6-0715-37a5-b8f9-6cf8cfc674d1",
+      "worker_wall_seconds": 1576.270508143003,
+      "exit_code": 0
+    }
+  ],
+  "attention_validation_entry_count": 192,
+  "attention_validation_max_relative_error": 0.0,
+  "attention_validation_scope": "within each prompt at step index 0 and layers 0, 15, 29 in both branches; maximum across all output tokens and projected channels of the recomputed full attention module",
+  "records_by_prompt": [
+    {
+      "prompt_id": "d0064",
+      "bytes": 211116959,
+      "replay_seconds": 139.73346757888794,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0065",
+      "bytes": 211116959,
+      "replay_seconds": 138.98323106765747,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0066",
+      "bytes": 211116959,
+      "replay_seconds": 139.07388758659363,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0067",
+      "bytes": 211116959,
+      "replay_seconds": 138.81544947624207,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0068",
+      "bytes": 211116959,
+      "replay_seconds": 139.3596649169922,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0069",
+      "bytes": 211116959,
+      "replay_seconds": 139.00780487060547,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0070",
+      "bytes": 211116959,
+      "replay_seconds": 138.9872965812683,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0071",
+      "bytes": 211116959,
+      "replay_seconds": 139.40729308128357,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0072",
+      "bytes": 211116959,
+      "replay_seconds": 139.1237337589264,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0073",
+      "bytes": 211116959,
+      "replay_seconds": 138.83497643470764,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0074",
+      "bytes": 211116959,
+      "replay_seconds": 138.94342255592346,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0075",
+      "bytes": 211116959,
+      "replay_seconds": 139.39487075805664,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0076",
+      "bytes": 211116959,
+      "replay_seconds": 138.85993313789368,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0077",
+      "bytes": 211116959,
+      "replay_seconds": 138.88940119743347,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0078",
+      "bytes": 211116959,
+      "replay_seconds": 139.2940058708191,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0079",
+      "bytes": 211116959,
+      "replay_seconds": 138.70655608177185,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0080",
+      "bytes": 211116959,
+      "replay_seconds": 138.77911829948425,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0081",
+      "bytes": 211116959,
+      "replay_seconds": 139.37678623199463,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0082",
+      "bytes": 211116959,
+      "replay_seconds": 138.78827381134033,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0083",
+      "bytes": 211116959,
+      "replay_seconds": 138.86878728866577,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0084",
+      "bytes": 211116959,
+      "replay_seconds": 139.5231602191925,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0085",
+      "bytes": 211116959,
+      "replay_seconds": 138.8624131679535,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0086",
+      "bytes": 211116959,
+      "replay_seconds": 138.96031284332275,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0087",
+      "bytes": 211116959,
+      "replay_seconds": 139.4558424949646,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0088",
+      "bytes": 211116959,
+      "replay_seconds": 138.934898853302,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0089",
+      "bytes": 211116959,
+      "replay_seconds": 138.86126804351807,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0090",
+      "bytes": 211116959,
+      "replay_seconds": 139.4439835548401,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0091",
+      "bytes": 211116959,
+      "replay_seconds": 138.9660279750824,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0092",
+      "bytes": 211116959,
+      "replay_seconds": 138.82835292816162,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0093",
+      "bytes": 211116959,
+      "replay_seconds": 139.46803092956543,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0094",
+      "bytes": 211116959,
+      "replay_seconds": 138.9084289073944,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    },
+    {
+      "prompt_id": "d0095",
+      "bytes": 211116959,
+      "replay_seconds": 138.8221733570099,
+      "attention_relative_max_error": {
+        "step0-layer0-conditional": 0.0,
+        "step0-layer0-unconditional": 0.0,
+        "step0-layer15-conditional": 0.0,
+        "step0-layer15-unconditional": 0.0,
+        "step0-layer29-conditional": 0.0,
+        "step0-layer29-unconditional": 0.0
+      }
+    }
+  ],
+  "failures": []
+}

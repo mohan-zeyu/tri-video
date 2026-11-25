@@ -1,0 +1,27 @@
+{
+  "brief_commit": "6f273d8b7491484ea2846a68db6e88daf58c262b",
+  "lab_checkout": "/mnt/data/liuzeyu/tri-video-noexempt-6f273d8",
+  "pipeline_status": "out/distill-noexempt-run/pipeline-status.json",
+  "logs": "out/distill-noexempt-run/",
+  "budget_gpu_hours": 13,
+  "max_training_ranks": 2,
+  "max_total_study_gpus": 4,
+  "selected_means_pairs_per_q_k_cell": 22,
+  "exempt_layers": [],
+  "exempt_steps": [],
+  "expected_interventions_per_video": 2400,
+  "user_direction": "User asked to execute the authenticated pending hand-off, then return after verifying it works to conserve model credits. Durable CPU supervision and terminal webhook hand-offs replace periodic model polling. Legacy model-polling automation was inspected and is already PAUSED.",
+  "stages": [
+    "CPU tests must pass before GPU work",
+    "A:32-prompt no-exemption mean/delete screen; stop on non-finite values",
+    "B:teacher initialization,2500 updates, exact brief flags, resumable1000-update saves",
+    "C:100-prompt mean benchmark,32-prompt trained mean/delete screen,100-prompt zero benchmark, paired comparisons and stage report commits"
+  ],
+  "stop_rules": [
+    "Never exceed13 allocated GPU-hours",
+    "GPU leases require no process,utilization0,memory<32MiB; avoid GPU4",
+    "No recipe changes or fresh optimizer after a SIGKILL",
+    "If checkpoint cannot resume or budget cannot finish, stop and hand off with evidence"
+  ],
+  "preservation": "Completed NoPE, shared22 extension and pooled recovery outputs remain untouched; new study output roots only."
+}

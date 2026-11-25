@@ -1,0 +1,24 @@
+{
+    "prompts": 64,
+    "spread": {
+        "q_t_cos_prompt_vs_pooled_median": 0.9709941148757935,
+        "q_t_cos_prompt_vs_pooled_p10": 0.8758836388587952,
+        "q_t_pooled_norm_over_mean_prompt_norm_median": 0.9573540091514587,
+        "q_h_cos_prompt_vs_pooled_median": 0.992556631565094,
+        "q_h_cos_prompt_vs_pooled_p10": 0.9694805145263672,
+        "q_h_pooled_norm_over_mean_prompt_norm_median": 0.9881638884544373,
+        "q_w_cos_prompt_vs_pooled_median": 0.9928339123725891,
+        "q_w_cos_prompt_vs_pooled_p10": 0.9668339490890503,
+        "q_w_pooled_norm_over_mean_prompt_norm_median": 0.9870843887329102,
+        "k_t_cos_prompt_vs_pooled_median": 0.978754460811615,
+        "k_t_cos_prompt_vs_pooled_p10": 0.8956434726715088,
+        "k_t_pooled_norm_over_mean_prompt_norm_median": 0.9674829244613647,
+        "k_h_cos_prompt_vs_pooled_median": 0.9932141900062561,
+        "k_h_cos_prompt_vs_pooled_p10": 0.969184160232544,
+        "k_h_pooled_norm_over_mean_prompt_norm_median": 0.9887778759002686,
+        "k_w_cos_prompt_vs_pooled_median": 0.9934459924697876,
+        "k_w_cos_prompt_vs_pooled_p10": 0.96717369556427,
+        "k_w_pooled_norm_over_mean_prompt_norm_median": 0.9882274270057678
+    },
+    "scope": "cosine between each prompt's all-token mean and the pooled mean, per layer/step/branch/head, within pair group; median and 10th percentile over all cells"
+}

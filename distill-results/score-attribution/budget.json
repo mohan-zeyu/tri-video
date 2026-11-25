@@ -1,0 +1,11 @@
+{
+  "pilot_gpu_seconds": 150.16,
+  "calibration_additional_gpu_seconds": 9056.66970451409,
+  "gpu_seconds_after_calibration": 9206.82970451409,
+  "held_out_projected_additional_gpu_seconds": 4482.114435176849,
+  "gpu_seconds_ceiling": 64800,
+  "disk_bytes_ceiling": 25000000000,
+  "held_out_gpu_seconds": 4589.186199509073,
+  "held_out_status": "complete",
+  "gpu_seconds_total": 13796.015904023163
+}

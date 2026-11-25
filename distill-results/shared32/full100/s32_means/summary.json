@@ -1,0 +1,6160 @@
+{
+  "config": {
+    "experiment": "wan-learned-center-20261114",
+    "frames": 45,
+    "height": 480,
+    "width": 480,
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "negative_prompt": "",
+    "fps": 16,
+    "center_policy": "shared32 EMA (shared, 32 means pairs per head, nothing exempt): trained means on the selected pairs.",
+    "high_pairs": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49
+    ],
+    "modes": [
+      "baseline",
+      "s32_means"
+    ],
+    "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+    "sampling_seed": 20261109,
+    "prompt_scope": "100 prompts sampled without replacement within eight official VBench content-category lists, 13 each animal/architecture/food/human and 12 each lifestyle/plant/scenery/vehicles. One independent deterministic seed per prompt, shared across six arms.",
+    "dimensions": [
+      "subject_consistency",
+      "background_consistency",
+      "motion_smoothness",
+      "dynamic_degree",
+      "aesthetic_quality",
+      "imaging_quality"
+    ],
+    "prompts": [
+      {
+        "id": "v000",
+        "text": "lemur eating grass leaves",
+        "category": "animal",
+        "seed": 2026110900,
+        "audit": true
+      },
+      {
+        "id": "v013",
+        "text": "a miniature house",
+        "category": "architecture",
+        "seed": 2026110913,
+        "audit": true
+      },
+      {
+        "id": "v026",
+        "text": "a broccoli soup on wooden table",
+        "category": "food",
+        "seed": 2026110926,
+        "audit": true
+      },
+      {
+        "id": "v039",
+        "text": "a girl pushing the chair while her sister is on the chair",
+        "category": "human",
+        "seed": 2026110939,
+        "audit": true
+      },
+      {
+        "id": "v052",
+        "text": "modern office waiting room",
+        "category": "lifestyle",
+        "seed": 2026110952,
+        "audit": true
+      },
+      {
+        "id": "v064",
+        "text": "a man holding leaves looking at the camera",
+        "category": "plant",
+        "seed": 2026110964,
+        "audit": true
+      },
+      {
+        "id": "v076",
+        "text": "fireworks display in the sky at night",
+        "category": "scenery",
+        "seed": 2026110976,
+        "audit": true
+      },
+      {
+        "id": "v088",
+        "text": "video of passengers riding a double decker bus during night",
+        "category": "vehicles",
+        "seed": 2026110988,
+        "audit": true
+      },
+      {
+        "id": "v001",
+        "text": "chameleon eating ant",
+        "category": "animal",
+        "seed": 2026110901,
+        "audit": false
+      },
+      {
+        "id": "v014",
+        "text": "red paper lantern decorations hanging outside a building",
+        "category": "architecture",
+        "seed": 2026110914,
+        "audit": false
+      },
+      {
+        "id": "v027",
+        "text": "a mother preparing food with her kids",
+        "category": "food",
+        "seed": 2026110927,
+        "audit": false
+      },
+      {
+        "id": "v040",
+        "text": "cab driver talking to passenger",
+        "category": "human",
+        "seed": 2026110940,
+        "audit": false
+      },
+      {
+        "id": "v053",
+        "text": "woman painting at home",
+        "category": "lifestyle",
+        "seed": 2026110953,
+        "audit": false
+      },
+      {
+        "id": "v065",
+        "text": "green moss in forest nature",
+        "category": "plant",
+        "seed": 2026110965,
+        "audit": false
+      },
+      {
+        "id": "v077",
+        "text": "video of ocean during daytime",
+        "category": "scenery",
+        "seed": 2026110977,
+        "audit": false
+      },
+      {
+        "id": "v089",
+        "text": "cargo train traveling on the mountainside",
+        "category": "vehicles",
+        "seed": 2026110989,
+        "audit": false
+      },
+      {
+        "id": "v002",
+        "text": "a raccoon climbing a tree",
+        "category": "animal",
+        "seed": 2026110902,
+        "audit": false
+      },
+      {
+        "id": "v015",
+        "text": "modern wooden house interior",
+        "category": "architecture",
+        "seed": 2026110915,
+        "audit": false
+      },
+      {
+        "id": "v028",
+        "text": "boy getting a dumpling using chopsticks",
+        "category": "food",
+        "seed": 2026110928,
+        "audit": false
+      },
+      {
+        "id": "v041",
+        "text": "friends talking while on the basketball court",
+        "category": "human",
+        "seed": 2026110941,
+        "audit": false
+      },
+      {
+        "id": "v054",
+        "text": "woman and man in pajamas working from home",
+        "category": "lifestyle",
+        "seed": 2026110954,
+        "audit": false
+      },
+      {
+        "id": "v066",
+        "text": "a shadow of a swaying plant",
+        "category": "plant",
+        "seed": 2026110966,
+        "audit": false
+      },
+      {
+        "id": "v078",
+        "text": "scenery of desert landscape",
+        "category": "scenery",
+        "seed": 2026110978,
+        "audit": false
+      },
+      {
+        "id": "v090",
+        "text": "video of blinking traffic lights",
+        "category": "vehicles",
+        "seed": 2026110990,
+        "audit": false
+      },
+      {
+        "id": "v003",
+        "text": "koala eating leaves from a branch",
+        "category": "animal",
+        "seed": 2026110903,
+        "audit": false
+      },
+      {
+        "id": "v016",
+        "text": "silhouette of a building",
+        "category": "architecture",
+        "seed": 2026110916,
+        "audit": false
+      },
+      {
+        "id": "v029",
+        "text": "fresh dim sum set up on a bamboo steam tray for cooking",
+        "category": "food",
+        "seed": 2026110929,
+        "audit": false
+      },
+      {
+        "id": "v042",
+        "text": "brother and sister using hammock",
+        "category": "human",
+        "seed": 2026110942,
+        "audit": false
+      },
+      {
+        "id": "v055",
+        "text": "a toolbox and a paint roller beside a huge package in a room",
+        "category": "lifestyle",
+        "seed": 2026110955,
+        "audit": false
+      },
+      {
+        "id": "v067",
+        "text": "tree with golden leaves",
+        "category": "plant",
+        "seed": 2026110967,
+        "audit": false
+      },
+      {
+        "id": "v079",
+        "text": "sun view through a spider web",
+        "category": "scenery",
+        "seed": 2026110979,
+        "audit": false
+      },
+      {
+        "id": "v091",
+        "text": "a modern railway station in malaysia use for public transportation",
+        "category": "vehicles",
+        "seed": 2026110991,
+        "audit": false
+      },
+      {
+        "id": "v004",
+        "text": "paper cut out of a pair of hands a whale and a heart",
+        "category": "animal",
+        "seed": 2026110904,
+        "audit": false
+      },
+      {
+        "id": "v017",
+        "text": "candle on a jar and a house figurine on a surface",
+        "category": "architecture",
+        "seed": 2026110917,
+        "audit": false
+      },
+      {
+        "id": "v030",
+        "text": "a man eating a donut",
+        "category": "food",
+        "seed": 2026110930,
+        "audit": false
+      },
+      {
+        "id": "v043",
+        "text": "couple dancing with body paint",
+        "category": "human",
+        "seed": 2026110943,
+        "audit": false
+      },
+      {
+        "id": "v056",
+        "text": "video of a bathroom interior",
+        "category": "lifestyle",
+        "seed": 2026110956,
+        "audit": false
+      },
+      {
+        "id": "v068",
+        "text": "forest trees and a medieval castle at sunset",
+        "category": "plant",
+        "seed": 2026110968,
+        "audit": false
+      },
+      {
+        "id": "v080",
+        "text": "scenic view from wooden pathway",
+        "category": "scenery",
+        "seed": 2026110980,
+        "audit": false
+      },
+      {
+        "id": "v092",
+        "text": "drone view of an illuminated bridge across a river",
+        "category": "vehicles",
+        "seed": 2026110992,
+        "audit": false
+      },
+      {
+        "id": "v005",
+        "text": "a frog eating an ant",
+        "category": "animal",
+        "seed": 2026110905,
+        "audit": false
+      },
+      {
+        "id": "v018",
+        "text": "house in village",
+        "category": "architecture",
+        "seed": 2026110918,
+        "audit": false
+      },
+      {
+        "id": "v031",
+        "text": "preparing a cocktail drink",
+        "category": "food",
+        "seed": 2026110931,
+        "audit": false
+      },
+      {
+        "id": "v044",
+        "text": "teacher writing on her notebook",
+        "category": "human",
+        "seed": 2026110944,
+        "audit": false
+      },
+      {
+        "id": "v057",
+        "text": "a woman in a locker room",
+        "category": "lifestyle",
+        "seed": 2026110957,
+        "audit": false
+      },
+      {
+        "id": "v069",
+        "text": "flower field near the waterfall",
+        "category": "plant",
+        "seed": 2026110969,
+        "audit": false
+      },
+      {
+        "id": "v081",
+        "text": "close up view of swaying white flowers and leaves",
+        "category": "scenery",
+        "seed": 2026110981,
+        "audit": false
+      },
+      {
+        "id": "v093",
+        "text": "man wearing motorcycle helmet looking at the camera",
+        "category": "vehicles",
+        "seed": 2026110993,
+        "audit": false
+      },
+      {
+        "id": "v006",
+        "text": "a tortoise covered with algae",
+        "category": "animal",
+        "seed": 2026110906,
+        "audit": false
+      },
+      {
+        "id": "v019",
+        "text": "view of the sky through a building",
+        "category": "architecture",
+        "seed": 2026110919,
+        "audit": false
+      },
+      {
+        "id": "v032",
+        "text": "grilling a meat on a charcoal grill",
+        "category": "food",
+        "seed": 2026110932,
+        "audit": false
+      },
+      {
+        "id": "v045",
+        "text": "a group of campers with a cute dog",
+        "category": "human",
+        "seed": 2026110945,
+        "audit": false
+      },
+      {
+        "id": "v058",
+        "text": "aerial shot of interior of the warehouse",
+        "category": "lifestyle",
+        "seed": 2026110958,
+        "audit": false
+      },
+      {
+        "id": "v070",
+        "text": "a mossy fountain and green plants in a botanical garden",
+        "category": "plant",
+        "seed": 2026110970,
+        "audit": false
+      },
+      {
+        "id": "v082",
+        "text": "a bonfire near river",
+        "category": "scenery",
+        "seed": 2026110982,
+        "audit": false
+      },
+      {
+        "id": "v094",
+        "text": "a woman in a halloween costume posing on a motorcycle",
+        "category": "vehicles",
+        "seed": 2026110994,
+        "audit": false
+      },
+      {
+        "id": "v007",
+        "text": "a pig wallowing in mud",
+        "category": "animal",
+        "seed": 2026110907,
+        "audit": false
+      },
+      {
+        "id": "v020",
+        "text": "aerial view of the highway and building in a city",
+        "category": "architecture",
+        "seed": 2026110920,
+        "audit": false
+      },
+      {
+        "id": "v033",
+        "text": "an orange fruit cut in half",
+        "category": "food",
+        "seed": 2026110933,
+        "audit": false
+      },
+      {
+        "id": "v046",
+        "text": "a man video recording the movie in theater",
+        "category": "human",
+        "seed": 2026110946,
+        "audit": false
+      },
+      {
+        "id": "v059",
+        "text": "sunlight inside a room",
+        "category": "lifestyle",
+        "seed": 2026110959,
+        "audit": false
+      },
+      {
+        "id": "v071",
+        "text": "a woman opening a book with a flower inside",
+        "category": "plant",
+        "seed": 2026110971,
+        "audit": false
+      },
+      {
+        "id": "v083",
+        "text": "view of the sea from an abandoned building",
+        "category": "scenery",
+        "seed": 2026110983,
+        "audit": false
+      },
+      {
+        "id": "v095",
+        "text": "drone footage of a wreck ship on shore",
+        "category": "vehicles",
+        "seed": 2026110995,
+        "audit": false
+      },
+      {
+        "id": "v008",
+        "text": "spider making a web",
+        "category": "animal",
+        "seed": 2026110908,
+        "audit": false
+      },
+      {
+        "id": "v021",
+        "text": "city view reflected on a glass building",
+        "category": "architecture",
+        "seed": 2026110921,
+        "audit": false
+      },
+      {
+        "id": "v034",
+        "text": "grilling a steak on a pan grill",
+        "category": "food",
+        "seed": 2026110934,
+        "audit": false
+      },
+      {
+        "id": "v047",
+        "text": "pregnant woman exercising with trainer",
+        "category": "human",
+        "seed": 2026110947,
+        "audit": false
+      },
+      {
+        "id": "v060",
+        "text": "a person sanitizing an office space using smoke machine",
+        "category": "lifestyle",
+        "seed": 2026110960,
+        "audit": false
+      },
+      {
+        "id": "v072",
+        "text": "trees in the forest during sunny day",
+        "category": "plant",
+        "seed": 2026110972,
+        "audit": false
+      },
+      {
+        "id": "v084",
+        "text": "view of golden domed church",
+        "category": "scenery",
+        "seed": 2026110984,
+        "audit": false
+      },
+      {
+        "id": "v096",
+        "text": "boat sailing in the middle of the ocean",
+        "category": "vehicles",
+        "seed": 2026110996,
+        "audit": false
+      },
+      {
+        "id": "v009",
+        "text": "an american crocodile",
+        "category": "animal",
+        "seed": 2026110909,
+        "audit": false
+      },
+      {
+        "id": "v022",
+        "text": "time lapse footage of the sun light in front of a small house porch",
+        "category": "architecture",
+        "seed": 2026110922,
+        "audit": false
+      },
+      {
+        "id": "v035",
+        "text": "girl peeling a banana",
+        "category": "food",
+        "seed": 2026110935,
+        "audit": false
+      },
+      {
+        "id": "v048",
+        "text": "a family wearing paper bag masks",
+        "category": "human",
+        "seed": 2026110948,
+        "audit": false
+      },
+      {
+        "id": "v061",
+        "text": "a woman recording herself while exercising at home",
+        "category": "lifestyle",
+        "seed": 2026110961,
+        "audit": false
+      },
+      {
+        "id": "v073",
+        "text": "plucking leaves from plant",
+        "category": "plant",
+        "seed": 2026110973,
+        "audit": false
+      },
+      {
+        "id": "v085",
+        "text": "waterfalls in between mountain",
+        "category": "scenery",
+        "seed": 2026110985,
+        "audit": false
+      },
+      {
+        "id": "v097",
+        "text": "people in queue to military ship",
+        "category": "vehicles",
+        "seed": 2026110997,
+        "audit": false
+      },
+      {
+        "id": "v010",
+        "text": "cat licking another cat",
+        "category": "animal",
+        "seed": 2026110910,
+        "audit": false
+      },
+      {
+        "id": "v023",
+        "text": "waterfall and house",
+        "category": "architecture",
+        "seed": 2026110923,
+        "audit": false
+      },
+      {
+        "id": "v036",
+        "text": "pancake with blueberry on the top",
+        "category": "food",
+        "seed": 2026110936,
+        "audit": false
+      },
+      {
+        "id": "v049",
+        "text": "woman adding honey to the cinnamon rolls",
+        "category": "human",
+        "seed": 2026110949,
+        "audit": false
+      },
+      {
+        "id": "v062",
+        "text": "a family stacking cardboard boxes in a room",
+        "category": "lifestyle",
+        "seed": 2026110962,
+        "audit": false
+      },
+      {
+        "id": "v074",
+        "text": "reflection of tree branches",
+        "category": "plant",
+        "seed": 2026110974,
+        "audit": false
+      },
+      {
+        "id": "v086",
+        "text": "close up view of lighted candles",
+        "category": "scenery",
+        "seed": 2026110986,
+        "audit": false
+      },
+      {
+        "id": "v098",
+        "text": "video of a kayak boat in a river",
+        "category": "vehicles",
+        "seed": 2026110998,
+        "audit": false
+      },
+      {
+        "id": "v011",
+        "text": "brown chicken hunting for its food",
+        "category": "animal",
+        "seed": 2026110911,
+        "audit": false
+      },
+      {
+        "id": "v024",
+        "text": "a beach house built over a seawall protected from the sea waves",
+        "category": "architecture",
+        "seed": 2026110924,
+        "audit": false
+      },
+      {
+        "id": "v037",
+        "text": "a chef cutting sushi rolls",
+        "category": "food",
+        "seed": 2026110937,
+        "audit": false
+      },
+      {
+        "id": "v050",
+        "text": "a child playing with water",
+        "category": "human",
+        "seed": 2026110950,
+        "audit": false
+      },
+      {
+        "id": "v063",
+        "text": "man doing handstand in indoor garden",
+        "category": "lifestyle",
+        "seed": 2026110963,
+        "audit": false
+      },
+      {
+        "id": "v075",
+        "text": "a coconut tree by the house",
+        "category": "plant",
+        "seed": 2026110975,
+        "audit": false
+      },
+      {
+        "id": "v087",
+        "text": "a dark clouds over shadowing the full moon",
+        "category": "scenery",
+        "seed": 2026110987,
+        "audit": false
+      },
+      {
+        "id": "v099",
+        "text": "a white yacht traveling on a river and passing under the bridge",
+        "category": "vehicles",
+        "seed": 2026110999,
+        "audit": false
+      },
+      {
+        "id": "v012",
+        "text": "wild rabbit in a green meadow",
+        "category": "animal",
+        "seed": 2026110912,
+        "audit": false
+      },
+      {
+        "id": "v025",
+        "text": "water tower on the desert",
+        "category": "architecture",
+        "seed": 2026110925,
+        "audit": false
+      },
+      {
+        "id": "v038",
+        "text": "little boy pretending to eat the watermelon",
+        "category": "food",
+        "seed": 2026110938,
+        "audit": false
+      },
+      {
+        "id": "v051",
+        "text": "a man in a hoodie and woman with a red bandana talking to each other and smiling",
+        "category": "human",
+        "seed": 2026110951,
+        "audit": false
+      }
+    ],
+    "arms": {
+      "baseline": "teacher, replacement off (reused from the completed benchmark)",
+      "static": "teacher weights + calibrated per-step means, no training (stage 0)",
+      "student_s1": "teacher weights + stage-1 trained means",
+      "student": "stage-3 distilled weights + trained means",
+      "dense_control": "stage-2/3 recipe without replacement (center mode off)",
+      "deletion": "stage-2/3 recipe with HIGH coordinates zeroed (center mode delete)"
+    },
+    "note": "Same 100 prompts and seeds as center_benchmark_wan.json so every arm pairs with the existing baseline/all/high videos."
+  },
+  "dimensions": {
+    "subject_consistency": {
+      "means": {
+        "baseline": 0.9639986982128836,
+        "s32_means": 0.9652052383429622
+      },
+      "paired": {
+        "s32_means_minus_baseline": {
+          "mean": 0.0012065401300787892,
+          "ci95": [
+            -0.006714683908969167,
+            0.008752788939174586
+          ],
+          "lower_prompts": 48,
+          "equal_prompts": 0,
+          "higher_prompts": 52
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9453127001236368,
+            "s32_means": 0.9697945453487076
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9946848500025022,
+            "s32_means": 0.9944181826773223
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9444492474406748,
+            "s32_means": 0.9713061510266123
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9522222223190161,
+            "s32_means": 0.9465285004018905
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9764614763923665,
+            "s32_means": 0.9707938755551974
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9769564009074009,
+            "s32_means": 0.982059757084106
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9766586950105247,
+            "s32_means": 0.9520403661793381
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9468544745874224,
+            "s32_means": 0.9329316596303022
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 0.9205445444042032,
+          "s32_means": 0.9723056371916424
+        },
+        "v013": {
+          "baseline": 0.9977922825650736,
+          "s32_means": 0.9982442977753553
+        },
+        "v026": {
+          "baseline": 0.9990251761945811,
+          "s32_means": 0.9994034950028766
+        },
+        "v039": {
+          "baseline": 0.9245662519877608,
+          "s32_means": 0.9232064505869692
+        },
+        "v052": {
+          "baseline": 0.9991650114005263,
+          "s32_means": 0.9993494288487867
+        },
+        "v064": {
+          "baseline": 0.9901054189963774,
+          "s32_means": 0.9826281212947585
+        },
+        "v076": {
+          "baseline": 0.9564466720277612,
+          "s32_means": 0.9061743142929944
+        },
+        "v088": {
+          "baseline": 0.8550103543834253,
+          "s32_means": 0.8616838705810633
+        },
+        "v001": {
+          "baseline": 0.772319669411941,
+          "s32_means": 0.9249177480285818
+        },
+        "v014": {
+          "baseline": 0.9983377795327794,
+          "s32_means": 0.9981482171199538
+        },
+        "v027": {
+          "baseline": 0.9859603988853368,
+          "s32_means": 0.9804315302859653
+        },
+        "v040": {
+          "baseline": 0.9711371524767443,
+          "s32_means": 0.9766828458417546
+        },
+        "v053": {
+          "baseline": 0.986072613434358,
+          "s32_means": 0.9720777428962968
+        },
+        "v065": {
+          "baseline": 0.9968196864832531,
+          "s32_means": 0.996591794219884
+        },
+        "v077": {
+          "baseline": 0.9780217619104818,
+          "s32_means": 0.9578499191186645
+        },
+        "v089": {
+          "baseline": 0.9085831818255511,
+          "s32_means": 0.769439114088362
+        },
+        "v002": {
+          "baseline": 0.9554466544227167,
+          "s32_means": 0.9207342036745765
+        },
+        "v015": {
+          "baseline": 0.9988845403898846,
+          "s32_means": 0.9992911883375861
+        },
+        "v028": {
+          "baseline": 0.9194851456718012,
+          "s32_means": 0.9549333507364447
+        },
+        "v041": {
+          "baseline": 0.9088831706480547,
+          "s32_means": 0.864298057149757
+        },
+        "v054": {
+          "baseline": 0.9933164302598346,
+          "s32_means": 0.9958692091432485
+        },
+        "v066": {
+          "baseline": 0.9686770811676979,
+          "s32_means": 0.982012040913105
+        },
+        "v078": {
+          "baseline": 0.9959501637653871,
+          "s32_means": 0.996554588729685
+        },
+        "v090": {
+          "baseline": 0.9147767709060148,
+          "s32_means": 0.869751281358979
+        },
+        "v003": {
+          "baseline": 0.9918735352429476,
+          "s32_means": 0.9887827025218443
+        },
+        "v016": {
+          "baseline": 0.999467593702403,
+          "s32_means": 0.9983151819218289
+        },
+        "v029": {
+          "baseline": 0.9976279972629114,
+          "s32_means": 0.9987651190974496
+        },
+        "v042": {
+          "baseline": 0.978300119665536,
+          "s32_means": 0.9644512791525234
+        },
+        "v055": {
+          "baseline": 0.9950024248524145,
+          "s32_means": 0.9988867376338352
+        },
+        "v067": {
+          "baseline": 0.9983419938520952,
+          "s32_means": 0.9879745292392644
+        },
+        "v079": {
+          "baseline": 0.995569228448651,
+          "s32_means": 0.9876410798593
+        },
+        "v091": {
+          "baseline": 0.9180228744040836,
+          "s32_means": 0.9381694041869857
+        },
+        "v004": {
+          "baseline": 0.8612034290351651,
+          "s32_means": 0.9673282714052633
+        },
+        "v017": {
+          "baseline": 0.9991021955555136,
+          "s32_means": 0.9993386681784283
+        },
+        "v030": {
+          "baseline": 0.978061399676583,
+          "s32_means": 0.946279453960332
+        },
+        "v043": {
+          "baseline": 0.9179961864243854,
+          "s32_means": 0.8884042257612402
+        },
+        "v056": {
+          "baseline": 0.9995285028761084,
+          "s32_means": 0.9993346631526947
+        },
+        "v068": {
+          "baseline": 0.9977522824298252,
+          "s32_means": 0.996624658730897
+        },
+        "v080": {
+          "baseline": 0.9965131689201702,
+          "s32_means": 0.9966417408802293
+        },
+        "v092": {
+          "baseline": 0.9979882470586083,
+          "s32_means": 0.9880073551427234
+        },
+        "v005": {
+          "baseline": 0.9758762148293582,
+          "s32_means": 0.9643294154243036
+        },
+        "v018": {
+          "baseline": 0.9918885969302871,
+          "s32_means": 0.9900774122639135
+        },
+        "v031": {
+          "baseline": 0.9818633225831118,
+          "s32_means": 0.9846203049475496
+        },
+        "v044": {
+          "baseline": 0.9930453456260941,
+          "s32_means": 0.9950158176097003
+        },
+        "v057": {
+          "baseline": 0.9553299898451025,
+          "s32_means": 0.9614843753251162
+        },
+        "v069": {
+          "baseline": 0.9872179356488314,
+          "s32_means": 0.994311973452568
+        },
+        "v081": {
+          "baseline": 0.9106283689087088,
+          "s32_means": 0.7202618213539774
+        },
+        "v093": {
+          "baseline": 0.993137692863291,
+          "s32_means": 0.9952307228337635
+        },
+        "v006": {
+          "baseline": 0.9488552239808169,
+          "s32_means": 0.9759155776013028
+        },
+        "v019": {
+          "baseline": 0.998791057955135,
+          "s32_means": 0.9958462850614027
+        },
+        "v032": {
+          "baseline": 0.9661113213409077,
+          "s32_means": 0.9828504865819757
+        },
+        "v045": {
+          "baseline": 0.9944954792206938,
+          "s32_means": 0.9380404596978967
+        },
+        "v058": {
+          "baseline": 0.996098046953028,
+          "s32_means": 0.9961137006228621
+        },
+        "v070": {
+          "baseline": 0.9815783053636551,
+          "s32_means": 0.9905133288015019
+        },
+        "v082": {
+          "baseline": 0.9956784932450815,
+          "s32_means": 0.988158913498575
+        },
+        "v094": {
+          "baseline": 0.9705411331220106,
+          "s32_means": 0.9701384841041132
+        },
+        "v007": {
+          "baseline": 0.9679593267765912,
+          "s32_means": 0.9658570255745541
+        },
+        "v020": {
+          "baseline": 0.9792253950780089,
+          "s32_means": 0.9890418601307002
+        },
+        "v033": {
+          "baseline": 0.8839823820374229,
+          "s32_means": 0.9984026002612981
+        },
+        "v046": {
+          "baseline": 0.9226382720199499,
+          "s32_means": 0.9611238993026994
+        },
+        "v059": {
+          "baseline": 0.9969803697683595,
+          "s32_means": 0.9925071190703999
+        },
+        "v071": {
+          "baseline": 0.8994228033856912,
+          "s32_means": 0.9532710408622568
+        },
+        "v083": {
+          "baseline": 0.9976794970306483,
+          "s32_means": 0.9974909716031768
+        },
+        "v095": {
+          "baseline": 0.9908044954592531,
+          "s32_means": 0.99064682491801
+        },
+        "v008": {
+          "baseline": 0.9611883319237016,
+          "s32_means": 0.9812419651584192
+        },
+        "v021": {
+          "baseline": 0.9991688484495337,
+          "s32_means": 0.9872059110890735
+        },
+        "v034": {
+          "baseline": 0.8840329078110781,
+          "s32_means": 0.9251309944824739
+        },
+        "v047": {
+          "baseline": 0.9743043434890833,
+          "s32_means": 0.9423979209227995
+        },
+        "v060": {
+          "baseline": 0.9077465459704399,
+          "s32_means": 0.921251734549349
+        },
+        "v072": {
+          "baseline": 0.9963159852407195,
+          "s32_means": 0.9965888268568299
+        },
+        "v084": {
+          "baseline": 0.9972662471912124,
+          "s32_means": 0.9958799271420999
+        },
+        "v096": {
+          "baseline": 0.9834139069372957,
+          "s32_means": 0.9864681532437151
+        },
+        "v009": {
+          "baseline": 0.9887213916941122,
+          "s32_means": 0.9892280453985388
+        },
+        "v022": {
+          "baseline": 0.9783290489153429,
+          "s32_means": 0.9869654855944894
+        },
+        "v035": {
+          "baseline": 0.9464158327742056,
+          "s32_means": 0.9867128662087701
+        },
+        "v048": {
+          "baseline": 0.9564749510450796,
+          "s32_means": 0.9621613093397834
+        },
+        "v061": {
+          "baseline": 0.9486254589124159,
+          "s32_means": 0.9411438662897457
+        },
+        "v073": {
+          "baseline": 0.922276878898794,
+          "s32_means": 0.9166138131510128
+        },
+        "v085": {
+          "baseline": 0.987431642006744,
+          "s32_means": 0.9903943978927352
+        },
+        "v097": {
+          "baseline": 0.9123170687393709,
+          "s32_means": 0.8757272789424116
+        },
+        "v010": {
+          "baseline": 0.981641409072009,
+          "s32_means": 0.9886747063560919
+        },
+        "v023": {
+          "baseline": 0.9979118074883114,
+          "s32_means": 0.9934912947091189
+        },
+        "v036": {
+          "baseline": 0.9990050311792981,
+          "s32_means": 0.9993084242398088
+        },
+        "v049": {
+          "baseline": 0.9632346901026639,
+          "s32_means": 0.9686676128344103
+        },
+        "v062": {
+          "baseline": 0.9613118720325556,
+          "s32_means": 0.9501250006935813
+        },
+        "v074": {
+          "baseline": 0.9859071922573176,
+          "s32_means": 0.9914449798789892
+        },
+        "v086": {
+          "baseline": 0.9117915494875475,
+          "s32_means": 0.9189100373875011
+        },
+        "v098": {
+          "baseline": 0.9264345473863862,
+          "s32_means": 0.961659928614443
+        },
+        "v011": {
+          "baseline": 0.9686078815297647,
+          "s32_means": 0.9748829101974313
+        },
+        "v024": {
+          "baseline": 0.995287612080574,
+          "s32_means": 0.9960208812897856
+        },
+        "v037": {
+          "baseline": 0.906266107477925,
+          "s32_means": 0.92617455734448
+        },
+        "v050": {
+          "baseline": 0.9059419110417366,
+          "s32_means": 0.964564246210185
+        },
+        "v063": {
+          "baseline": 0.9783604504032568,
+          "s32_means": 0.9213829284364526
+        },
+        "v075": {
+          "baseline": 0.9990612471645529,
+          "s32_means": 0.9961419776082039
+        },
+        "v087": {
+          "baseline": 0.9969275471839038,
+          "s32_means": 0.9685266823931173
+        },
+        "v099": {
+          "baseline": 0.9912234219637784,
+          "s32_means": 0.988257497549057
+        },
+        "v012": {
+          "baseline": 0.9948274892839518,
+          "s32_means": 0.9931308810006488
+        },
+        "v025": {
+          "baseline": 0.9967162913896821,
+          "s32_means": 0.995449691333554
+        },
+        "v038": {
+          "baseline": 0.8300031938336112,
+          "s32_means": 0.9439667801965367
+        },
+        "v051": {
+          "baseline": 0.9678710163994269,
+          "s32_means": 0.9558563808148558
+        }
+      }
+    },
+    "background_consistency": {
+      "means": {
+        "baseline": 0.9764660089666193,
+        "s32_means": 0.9758324085582386
+      },
+      "paired": {
+        "s32_means_minus_baseline": {
+          "mean": -0.0006336004083806834,
+          "ci95": [
+            -0.004420788851651283,
+            0.003019380049272003
+          ],
+          "lower_prompts": 57,
+          "equal_prompts": 0,
+          "higher_prompts": 43
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9722554667012674,
+            "s32_means": 0.9833160613800265
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9921418303376309,
+            "s32_means": 0.9913453855714598
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9740954845935315,
+            "s32_means": 0.9829933860085224
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9596544812609266,
+            "s32_means": 0.9577286726944931
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9839486786813447,
+            "s32_means": 0.9798371286103218
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9786057905717329,
+            "s32_means": 0.9827016194661459
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.986944025213068,
+            "s32_means": 0.9711849328243373
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9647253787878788,
+            "s32_means": 0.9565475926254735
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 0.95306396484375,
+          "s32_means": 0.9855457652698864
+        },
+        "v013": {
+          "baseline": 0.9913163618607954,
+          "s32_means": 0.9976473721590909
+        },
+        "v026": {
+          "baseline": 0.998046875,
+          "s32_means": 0.9969426935369318
+        },
+        "v039": {
+          "baseline": 0.9590176669034091,
+          "s32_means": 0.9574806906960227
+        },
+        "v052": {
+          "baseline": 0.9988847212357954,
+          "s32_means": 0.9968206232244318
+        },
+        "v064": {
+          "baseline": 0.9803355823863636,
+          "s32_means": 0.9545731977982954
+        },
+        "v076": {
+          "baseline": 0.9802079634232954,
+          "s32_means": 0.9388538707386364
+        },
+        "v088": {
+          "baseline": 0.9162930575284091,
+          "s32_means": 0.93328857421875
+        },
+        "v001": {
+          "baseline": 0.9321677468039773,
+          "s32_means": 0.9734108664772727
+        },
+        "v014": {
+          "baseline": 0.9942127574573864,
+          "s32_means": 0.99560546875
+        },
+        "v027": {
+          "baseline": 0.9930142489346591,
+          "s32_means": 0.9878761985085227
+        },
+        "v040": {
+          "baseline": 0.9652266068892046,
+          "s32_means": 0.9809070933948864
+        },
+        "v053": {
+          "baseline": 0.9877485795454546,
+          "s32_means": 0.9939075816761364
+        },
+        "v065": {
+          "baseline": 0.9983354048295454,
+          "s32_means": 0.9962713068181818
+        },
+        "v077": {
+          "baseline": 0.9830044833096591,
+          "s32_means": 0.9833817915482954
+        },
+        "v089": {
+          "baseline": 0.9463112571022727,
+          "s32_means": 0.88677978515625
+        },
+        "v002": {
+          "baseline": 0.9756580699573864,
+          "s32_means": 0.9718905362215909
+        },
+        "v015": {
+          "baseline": 0.9975086558948864,
+          "s32_means": 0.9912664240056818
+        },
+        "v028": {
+          "baseline": 0.9713190252130682,
+          "s32_means": 0.9756858132102273
+        },
+        "v041": {
+          "baseline": 0.9263194691051136,
+          "s32_means": 0.8794500177556818
+        },
+        "v054": {
+          "baseline": 0.9965265447443182,
+          "s32_means": 0.9902565696022727
+        },
+        "v066": {
+          "baseline": 0.9841586026278409,
+          "s32_means": 0.9898626154119318
+        },
+        "v078": {
+          "baseline": 0.9837812943892046,
+          "s32_means": 0.9827936345880682
+        },
+        "v090": {
+          "baseline": 0.94140625,
+          "s32_means": 0.8938487659801136
+        },
+        "v003": {
+          "baseline": 0.98736572265625,
+          "s32_means": 0.9932583895596591
+        },
+        "v016": {
+          "baseline": 0.9946122602982954,
+          "s32_means": 0.9952004172585227
+        },
+        "v029": {
+          "baseline": 0.9964544122869318,
+          "s32_means": 0.9934414950284091
+        },
+        "v042": {
+          "baseline": 0.9651933149857954,
+          "s32_means": 0.9598166725852273
+        },
+        "v055": {
+          "baseline": 0.9961492365056818,
+          "s32_means": 0.9980191317471591
+        },
+        "v067": {
+          "baseline": 0.99871826171875,
+          "s32_means": 0.9937577681107954
+        },
+        "v079": {
+          "baseline": 0.9901511452414773,
+          "s32_means": 0.9775224165482954
+        },
+        "v091": {
+          "baseline": 0.9732998934659091,
+          "s32_means": 0.9671131480823864
+        },
+        "v004": {
+          "baseline": 0.9446300159801136,
+          "s32_means": 0.9718683416193182
+        },
+        "v017": {
+          "baseline": 0.9973921342329546,
+          "s32_means": 0.9977638938210227
+        },
+        "v030": {
+          "baseline": 0.9814009232954546,
+          "s32_means": 0.9781660600142046
+        },
+        "v043": {
+          "baseline": 0.9462058327414773,
+          "s32_means": 0.9373834783380682
+        },
+        "v056": {
+          "baseline": 0.9992731267755682,
+          "s32_means": 0.9982022372159091
+        },
+        "v068": {
+          "baseline": 0.9677013050426136,
+          "s32_means": 0.9785933061079546
+        },
+        "v080": {
+          "baseline": 0.9926813299005682,
+          "s32_means": 0.9813065962357954
+        },
+        "v092": {
+          "baseline": 0.9946400035511364,
+          "s32_means": 0.9764182350852273
+        },
+        "v005": {
+          "baseline": 0.9882035688920454,
+          "s32_means": 0.9880870472301136
+        },
+        "v018": {
+          "baseline": 0.98907470703125,
+          "s32_means": 0.9873990145596591
+        },
+        "v031": {
+          "baseline": 0.9915272105823864,
+          "s32_means": 0.9878484552556818
+        },
+        "v044": {
+          "baseline": 0.9946677468039773,
+          "s32_means": 0.9943459250710227
+        },
+        "v057": {
+          "baseline": 0.9570201526988636,
+          "s32_means": 0.9764015891335227
+        },
+        "v069": {
+          "baseline": 0.9892689098011364,
+          "s32_means": 0.9881647283380682
+        },
+        "v081": {
+          "baseline": 0.9759632457386364,
+          "s32_means": 0.8957741477272727
+        },
+        "v093": {
+          "baseline": 0.9897128018465909,
+          "s32_means": 0.9911720969460227
+        },
+        "v006": {
+          "baseline": 0.9699485085227273,
+          "s32_means": 0.9845359108664773
+        },
+        "v019": {
+          "baseline": 0.9954057173295454,
+          "s32_means": 0.9949451793323864
+        },
+        "v032": {
+          "baseline": 0.9854625355113636,
+          "s32_means": 0.9877596768465909
+        },
+        "v045": {
+          "baseline": 0.9946011629971591,
+          "s32_means": 0.9750421697443182
+        },
+        "v058": {
+          "baseline": 0.9880260120738636,
+          "s32_means": 0.9876542524857954
+        },
+        "v070": {
+          "baseline": 0.9843084161931818,
+          "s32_means": 0.9898792613636364
+        },
+        "v082": {
+          "baseline": 0.99200439453125,
+          "s32_means": 0.9911609996448864
+        },
+        "v094": {
+          "baseline": 0.9635453657670454,
+          "s32_means": 0.9776111949573864
+        },
+        "v007": {
+          "baseline": 0.9768454811789773,
+          "s32_means": 0.9723011363636364
+        },
+        "v020": {
+          "baseline": 0.9810014204545454,
+          "s32_means": 0.9858342950994318
+        },
+        "v033": {
+          "baseline": 0.9639448686079546,
+          "s32_means": 0.9957663796164773
+        },
+        "v046": {
+          "baseline": 0.9606378728693182,
+          "s32_means": 0.97247314453125
+        },
+        "v059": {
+          "baseline": 0.9951671253551136,
+          "s32_means": 0.9953557794744318
+        },
+        "v071": {
+          "baseline": 0.9083973277698864,
+          "s32_means": 0.9713578657670454
+        },
+        "v083": {
+          "baseline": 0.9968650124289773,
+          "s32_means": 0.9866832386363636
+        },
+        "v095": {
+          "baseline": 0.9945956143465909,
+          "s32_means": 0.9863503196022727
+        },
+        "v008": {
+          "baseline": 0.9638283469460227,
+          "s32_means": 0.9834761186079546
+        },
+        "v021": {
+          "baseline": 0.9974143288352273,
+          "s32_means": 0.9923373135653409
+        },
+        "v034": {
+          "baseline": 0.9608487215909091,
+          "s32_means": 0.9696988192471591
+        },
+        "v047": {
+          "baseline": 0.9718405983664773,
+          "s32_means": 0.9588512073863636
+        },
+        "v060": {
+          "baseline": 0.9572088068181818,
+          "s32_means": 0.9130859375
+        },
+        "v072": {
+          "baseline": 0.9930142489346591,
+          "s32_means": 0.9908724698153409
+        },
+        "v084": {
+          "baseline": 0.9965376420454546,
+          "s32_means": 0.9924538352272727
+        },
+        "v096": {
+          "baseline": 0.9865778142755682,
+          "s32_means": 0.9886863014914773
+        },
+        "v009": {
+          "baseline": 0.9785822088068182,
+          "s32_means": 0.9833041104403409
+        },
+        "v022": {
+          "baseline": 0.9784934303977273,
+          "s32_means": 0.9831487482244318
+        },
+        "v035": {
+          "baseline": 0.9223854758522727,
+          "s32_means": 0.9725064364346591
+        },
+        "v048": {
+          "baseline": 0.9609707919034091,
+          "s32_means": 0.9776833274147727
+        },
+        "v061": {
+          "baseline": 0.9788152521306818,
+          "s32_means": 0.9720181551846591
+        },
+        "v073": {
+          "baseline": 0.9705255681818182,
+          "s32_means": 0.9672685102982954
+        },
+        "v085": {
+          "baseline": 0.9897238991477273,
+          "s32_means": 0.9908391779119318
+        },
+        "v097": {
+          "baseline": 0.9075594815340909,
+          "s32_means": 0.9252985174005682
+        },
+        "v010": {
+          "baseline": 0.9820501154119318,
+          "s32_means": 0.9924205433238636
+        },
+        "v023": {
+          "baseline": 0.9925648082386364,
+          "s32_means": 0.9902232776988636
+        },
+        "v036": {
+          "baseline": 0.9985573508522727,
+          "s32_means": 0.9987681995738636
+        },
+        "v049": {
+          "baseline": 0.95928955078125,
+          "s32_means": 0.9641612659801136
+        },
+        "v062": {
+          "baseline": 0.9809292879971591,
+          "s32_means": 0.9762018377130682
+        },
+        "v074": {
+          "baseline": 0.9857066761363636,
+          "s32_means": 0.9791981090198864
+        },
+        "v086": {
+          "baseline": 0.9662808504971591,
+          "s32_means": 0.9439919211647727
+        },
+        "v098": {
+          "baseline": 0.9712746360085227,
+          "s32_means": 0.9644109552556818
+        },
+        "v011": {
+          "baseline": 0.9901566938920454,
+          "s32_means": 0.9867109818892046
+        },
+        "v024": {
+          "baseline": 0.9920376864346591,
+          "s32_means": 0.9874323064630682
+        },
+        "v037": {
+          "baseline": 0.9647549715909091,
+          "s32_means": 0.9778775301846591
+        },
+        "v050": {
+          "baseline": 0.9309026544744318,
+          "s32_means": 0.9553000710227273
+        },
+        "v063": {
+          "baseline": 0.9716352982954546,
+          "s32_means": 0.9601218483664773
+        },
+        "v075": {
+          "baseline": 0.9827991832386364,
+          "s32_means": 0.9926202947443182
+        },
+        "v087": {
+          "baseline": 0.9961270419034091,
+          "s32_means": 0.9894575639204546
+        },
+        "v099": {
+          "baseline": 0.9914883700284091,
+          "s32_means": 0.9875932173295454
+        },
+        "v012": {
+          "baseline": 0.9968206232244318,
+          "s32_means": 0.9962990500710227
+        },
+        "v025": {
+          "baseline": 0.9968095259232954,
+          "s32_means": 0.9886863014914773
+        },
+        "v038": {
+          "baseline": 0.9355246803977273,
+          "s32_means": 0.9565762606534091
+        },
+        "v051": {
+          "baseline": 0.9406349875710227,
+          "s32_means": 0.9375776811079546
+        }
+      }
+    },
+    "motion_smoothness": {
+      "means": {
+        "baseline": 0.9844626893681503,
+        "s32_means": 0.9863158941178531
+      },
+      "paired": {
+        "s32_means_minus_baseline": {
+          "mean": 0.0018532047497029137,
+          "ci95": [
+            0.0003546529617173625,
+            0.0034535520102216984
+          ],
+          "lower_prompts": 40,
+          "equal_prompts": 0,
+          "higher_prompts": 60
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9802667871486039,
+            "s32_means": 0.9877717719117076
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.992835623251907,
+            "s32_means": 0.9929686066928713
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9861062995306255,
+            "s32_means": 0.9892828219347826
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9850464548585719,
+            "s32_means": 0.9850279049370655
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9913657451678414,
+            "s32_means": 0.9916054558555324
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9835274719424985,
+            "s32_means": 0.9881052999829104
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9840880893717266,
+            "s32_means": 0.9835304316741075
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9719313430636705,
+            "s32_means": 0.9714192325367647
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 0.9810146022108338,
+          "s32_means": 0.9859173567785701
+        },
+        "v013": {
+          "baseline": 0.9924647096475375,
+          "s32_means": 0.9954034065120156
+        },
+        "v026": {
+          "baseline": 0.9964502477285107,
+          "s32_means": 0.9971202924877863
+        },
+        "v039": {
+          "baseline": 0.9862373224173929,
+          "s32_means": 0.9814737937999274
+        },
+        "v052": {
+          "baseline": 0.9971341947869216,
+          "s32_means": 0.9972733959798145
+        },
+        "v064": {
+          "baseline": 0.9935903688127188,
+          "s32_means": 0.9935727910745527
+        },
+        "v076": {
+          "baseline": 0.9658262514338648,
+          "s32_means": 0.9653420399357133
+        },
+        "v088": {
+          "baseline": 0.9630592536888493,
+          "s32_means": 0.9723593190380109
+        },
+        "v001": {
+          "baseline": 0.9811320063378888,
+          "s32_means": 0.9860860973913976
+        },
+        "v014": {
+          "baseline": 0.9954624688469664,
+          "s32_means": 0.9962817180691722
+        },
+        "v027": {
+          "baseline": 0.9918461321239354,
+          "s32_means": 0.9911892662841651
+        },
+        "v040": {
+          "baseline": 0.9890078101789959,
+          "s32_means": 0.990732270107117
+        },
+        "v053": {
+          "baseline": 0.986470830651284,
+          "s32_means": 0.9919116530397935
+        },
+        "v065": {
+          "baseline": 0.995413324162788,
+          "s32_means": 0.996937168612184
+        },
+        "v077": {
+          "baseline": 0.9592888156998911,
+          "s32_means": 0.9708082226472239
+        },
+        "v089": {
+          "baseline": 0.9242595676949231,
+          "s32_means": 0.9039002906928766
+        },
+        "v002": {
+          "baseline": 0.9852661284000132,
+          "s32_means": 0.9875616585070476
+        },
+        "v015": {
+          "baseline": 0.9965703467992837,
+          "s32_means": 0.9971900659990427
+        },
+        "v028": {
+          "baseline": 0.9901742282403282,
+          "s32_means": 0.983706846085446
+        },
+        "v041": {
+          "baseline": 0.9500224389524328,
+          "s32_means": 0.9538839090455206
+        },
+        "v054": {
+          "baseline": 0.9957919542132931,
+          "s32_means": 0.9953908962995973
+        },
+        "v066": {
+          "baseline": 0.9865650035898198,
+          "s32_means": 0.9883105263727966
+        },
+        "v078": {
+          "baseline": 0.9961999988652869,
+          "s32_means": 0.9962803295929061
+        },
+        "v090": {
+          "baseline": 0.9014715919406483,
+          "s32_means": 0.9233266235681983
+        },
+        "v003": {
+          "baseline": 0.9892340057024493,
+          "s32_means": 0.9916875760773586
+        },
+        "v016": {
+          "baseline": 0.997206036570773,
+          "s32_means": 0.9967394984877368
+        },
+        "v029": {
+          "baseline": 0.9938255922686835,
+          "s32_means": 0.9966618985504555
+        },
+        "v042": {
+          "baseline": 0.9892556513872384,
+          "s32_means": 0.9895647126906317
+        },
+        "v055": {
+          "baseline": 0.9961212551887337,
+          "s32_means": 0.9970889826574569
+        },
+        "v067": {
+          "baseline": 0.9954177242708953,
+          "s32_means": 0.9924359650425827
+        },
+        "v079": {
+          "baseline": 0.9936124152575593,
+          "s32_means": 0.9909419589068793
+        },
+        "v091": {
+          "baseline": 0.9711957911426355,
+          "s32_means": 0.9666865380727206
+        },
+        "v004": {
+          "baseline": 0.9849243556376676,
+          "s32_means": 0.9911214158537994
+        },
+        "v017": {
+          "baseline": 0.9970965963247673,
+          "s32_means": 0.9973778687611408
+        },
+        "v030": {
+          "baseline": 0.9936272704578464,
+          "s32_means": 0.9939113350622235
+        },
+        "v043": {
+          "baseline": 0.980858729245065,
+          "s32_means": 0.98012752731564
+        },
+        "v056": {
+          "baseline": 0.9975488491429821,
+          "s32_means": 0.997529185595745
+        },
+        "v068": {
+          "baseline": 0.9911313095208621,
+          "s32_means": 0.9931682034293094
+        },
+        "v080": {
+          "baseline": 0.9826530702243018,
+          "s32_means": 0.9881414226517626
+        },
+        "v092": {
+          "baseline": 0.9969096876650492,
+          "s32_means": 0.9963403948595432
+        },
+        "v005": {
+          "baseline": 0.983362383537169,
+          "s32_means": 0.9879621052229814
+        },
+        "v018": {
+          "baseline": 0.9753164183707995,
+          "s32_means": 0.9820358277938701
+        },
+        "v031": {
+          "baseline": 0.9923765419204298,
+          "s32_means": 0.9940720762052717
+        },
+        "v044": {
+          "baseline": 0.9944585793597742,
+          "s32_means": 0.9956348658150129
+        },
+        "v057": {
+          "baseline": 0.9860577623147323,
+          "s32_means": 0.987996881344078
+        },
+        "v069": {
+          "baseline": 0.9852027876807288,
+          "s32_means": 0.9826970960627518
+        },
+        "v081": {
+          "baseline": 0.9715263083242557,
+          "s32_means": 0.9500305993451673
+        },
+        "v093": {
+          "baseline": 0.9944368864812339,
+          "s32_means": 0.9915545206455899
+        },
+        "v006": {
+          "baseline": 0.9661162758611441,
+          "s32_means": 0.986472301394253
+        },
+        "v019": {
+          "baseline": 0.9970541588268305,
+          "s32_means": 0.9965651173190235
+        },
+        "v032": {
+          "baseline": 0.9809588999162375,
+          "s32_means": 0.9869415486049218
+        },
+        "v045": {
+          "baseline": 0.9938600145655906,
+          "s32_means": 0.9834516875247574
+        },
+        "v058": {
+          "baseline": 0.985994700115947,
+          "s32_means": 0.9862896213462237
+        },
+        "v070": {
+          "baseline": 0.9762971282473427,
+          "s32_means": 0.9920803431063081
+        },
+        "v082": {
+          "baseline": 0.9868501472032415,
+          "s32_means": 0.9883820942781574
+        },
+        "v094": {
+          "baseline": 0.9857764942624777,
+          "s32_means": 0.9845903035667128
+        },
+        "v007": {
+          "baseline": 0.9757904919806727,
+          "s32_means": 0.9823204210714168
+        },
+        "v020": {
+          "baseline": 0.9838908571004159,
+          "s32_means": 0.9875488857632699
+        },
+        "v033": {
+          "baseline": 0.994174926088912,
+          "s32_means": 0.9967544261549316
+        },
+        "v046": {
+          "baseline": 0.9897563585198389,
+          "s32_means": 0.9914340445405856
+        },
+        "v059": {
+          "baseline": 0.9971388215797683,
+          "s32_means": 0.9967872423169605
+        },
+        "v071": {
+          "baseline": 0.9887228496670132,
+          "s32_means": 0.9934821839720737
+        },
+        "v083": {
+          "baseline": 0.9935399883227701,
+          "s32_means": 0.9924136751501947
+        },
+        "v095": {
+          "baseline": 0.9963073819279396,
+          "s32_means": 0.9933120229047006
+        },
+        "v008": {
+          "baseline": 0.9532482976723938,
+          "s32_means": 0.9874175525165874
+        },
+        "v021": {
+          "baseline": 0.9973360744392453,
+          "s32_means": 0.9963201203724336
+        },
+        "v034": {
+          "baseline": 0.9386881560705089,
+          "s32_means": 0.9640504784879019
+        },
+        "v047": {
+          "baseline": 0.9920628153986762,
+          "s32_means": 0.9841363277897438
+        },
+        "v060": {
+          "baseline": 0.9917406734316201,
+          "s32_means": 0.9866191484906253
+        },
+        "v072": {
+          "baseline": 0.9910391597242854,
+          "s32_means": 0.9880319581641579
+        },
+        "v084": {
+          "baseline": 0.9915300123890044,
+          "s32_means": 0.992056703421057
+        },
+        "v096": {
+          "baseline": 0.9875363879295405,
+          "s32_means": 0.9904531430522546
+        },
+        "v009": {
+          "baseline": 0.9796622459274114,
+          "s32_means": 0.9827486731592889
+        },
+        "v022": {
+          "baseline": 0.9878818363888063,
+          "s32_means": 0.9873190684417706
+        },
+        "v035": {
+          "baseline": 0.9922433467126328,
+          "s32_means": 0.9931368654890408
+        },
+        "v048": {
+          "baseline": 0.9891802520197894,
+          "s32_means": 0.9903737023007856
+        },
+        "v061": {
+          "baseline": 0.9877543134572853,
+          "s32_means": 0.9879433938032284
+        },
+        "v073": {
+          "baseline": 0.9221011759238629,
+          "s32_means": 0.9571601369082987
+        },
+        "v085": {
+          "baseline": 0.9873400281408861,
+          "s32_means": 0.9898085968446723
+        },
+        "v097": {
+          "baseline": 0.9670109579764145,
+          "s32_means": 0.9624494740604576
+        },
+        "v010": {
+          "baseline": 0.9875135611115237,
+          "s32_means": 0.991641212729831
+        },
+        "v023": {
+          "baseline": 0.9951098386850531,
+          "s32_means": 0.9852980259601736
+        },
+        "v036": {
+          "baseline": 0.9962219130128904,
+          "s32_means": 0.9968168784454017
+        },
+        "v049": {
+          "baseline": 0.9832749051482967,
+          "s32_means": 0.9889579844090414
+        },
+        "v062": {
+          "baseline": 0.9853461875701459,
+          "s32_means": 0.9843979152740642
+        },
+        "v074": {
+          "baseline": 0.9802575742102396,
+          "s32_means": 0.9881777437879613
+        },
+        "v086": {
+          "baseline": 0.9828146523445237,
+          "s32_means": 0.9806247844045026
+        },
+        "v098": {
+          "baseline": 0.9802823932234931,
+          "s32_means": 0.9778527928900937
+        },
+        "v011": {
+          "baseline": 0.9809883359225424,
+          "s32_means": 0.9852208185304846
+        },
+        "v024": {
+          "baseline": 0.9962420286401598,
+          "s32_means": 0.995503555778372
+        },
+        "v037": {
+          "baseline": 0.9738908831472404,
+          "s32_means": 0.9751075754481086
+        },
+        "v050": {
+          "baseline": 0.9785969168812306,
+          "s32_means": 0.988150876617482
+        },
+        "v063": {
+          "baseline": 0.9892893995613818,
+          "s32_means": 0.9900371541188023
+        },
+        "v075": {
+          "baseline": 0.9965912574994223,
+          "s32_means": 0.9912094832619496
+        },
+        "v087": {
+          "baseline": 0.997875384255133,
+          "s32_means": 0.997534752911055
+        },
+        "v099": {
+          "baseline": 0.9949297228308411,
+          "s32_means": 0.9942053670900178
+        },
+        "v012": {
+          "baseline": 0.9952155426301413,
+          "s32_means": 0.9948758456191821
+        },
+        "v025": {
+          "baseline": 0.995231731634152,
+          "s32_means": 0.9950087277493068
+        },
+        "v038": {
+          "baseline": 0.9849037562099756,
+          "s32_means": 0.9912071978465208
+        },
+        "v051": {
+          "baseline": 0.989032119087113,
+          "s32_means": 0.9874410622256057
+        }
+      }
+    },
+    "dynamic_degree": {
+      "means": {
+        "baseline": 0.33,
+        "s32_means": 0.21
+      },
+      "paired": {
+        "s32_means_minus_baseline": {
+          "mean": -0.12,
+          "ci95": [
+            -0.2,
+            -0.04
+          ],
+          "lower_prompts": 15,
+          "equal_prompts": 82,
+          "higher_prompts": 3
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.5384615384615384,
+            "s32_means": 0.07692307692307693
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.0,
+            "s32_means": 0.0
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.46153846153846156,
+            "s32_means": 0.38461538461538464
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.6153846153846154,
+            "s32_means": 0.46153846153846156
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.08333333333333333,
+            "s32_means": 0.25
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.08333333333333333,
+            "s32_means": 0.08333333333333333
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.25,
+            "s32_means": 0.16666666666666666
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.5833333333333334,
+            "s32_means": 0.25
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v013": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v026": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v039": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v052": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v064": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v076": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v088": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v001": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v014": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v027": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v040": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v053": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v065": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v077": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v089": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v002": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v015": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v028": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v041": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v054": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v066": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v078": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v090": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v003": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v016": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v029": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v042": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v055": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v067": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v079": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v091": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v004": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v017": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v030": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v043": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v056": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v068": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v080": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v092": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v005": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v018": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v031": {
+          "baseline": 0.0,
+          "s32_means": 1.0
+        },
+        "v044": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v057": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v069": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v081": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v093": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v006": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v019": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v032": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v045": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v058": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v070": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v082": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v094": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v007": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v020": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v033": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v046": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v059": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v071": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v083": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v095": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v008": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v021": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v034": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v047": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v060": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v072": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v084": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v096": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v009": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v022": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v035": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v048": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v061": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v073": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v085": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v097": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v010": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v023": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v036": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v049": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v062": {
+          "baseline": 0.0,
+          "s32_means": 1.0
+        },
+        "v074": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v086": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v098": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v011": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v024": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v037": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v050": {
+          "baseline": 1.0,
+          "s32_means": 0.0
+        },
+        "v063": {
+          "baseline": 0.0,
+          "s32_means": 1.0
+        },
+        "v075": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v087": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v099": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v012": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v025": {
+          "baseline": 0.0,
+          "s32_means": 0.0
+        },
+        "v038": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        },
+        "v051": {
+          "baseline": 1.0,
+          "s32_means": 1.0
+        }
+      }
+    },
+    "aesthetic_quality": {
+      "means": {
+        "baseline": 0.5885946694016456,
+        "s32_means": 0.5692107892036438
+      },
+      "paired": {
+        "s32_means_minus_baseline": {
+          "mean": -0.01938388019800186,
+          "ci95": [
+            -0.033004614524543285,
+            -0.0058383389189839395
+          ],
+          "lower_prompts": 62,
+          "equal_prompts": 0,
+          "higher_prompts": 38
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.5641624216849987,
+            "s32_means": 0.5488740297464224
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.5962667625684005,
+            "s32_means": 0.582774091225404
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.6336672214361337,
+            "s32_means": 0.6198608966974112
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.5812504176910107,
+            "s32_means": 0.5585336662255801
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.5274742866555849,
+            "s32_means": 0.5025501971443495
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.5897460902730624,
+            "s32_means": 0.5754381914933523
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.592272162437439,
+            "s32_means": 0.5844567542274793
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.622170646985372,
+            "s32_means": 0.5784318596124649
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 0.6371126770973206,
+          "s32_means": 0.6547955274581909
+        },
+        "v013": {
+          "baseline": 0.7628036737442017,
+          "s32_means": 0.7154092788696289
+        },
+        "v026": {
+          "baseline": 0.6459634900093079,
+          "s32_means": 0.5150328278541565
+        },
+        "v039": {
+          "baseline": 0.45896896719932556,
+          "s32_means": 0.5017942190170288
+        },
+        "v052": {
+          "baseline": 0.5400715470314026,
+          "s32_means": 0.5597312450408936
+        },
+        "v064": {
+          "baseline": 0.7560353875160217,
+          "s32_means": 0.615004301071167
+        },
+        "v076": {
+          "baseline": 0.6442850232124329,
+          "s32_means": 0.5599843263626099
+        },
+        "v088": {
+          "baseline": 0.5568904876708984,
+          "s32_means": 0.4609319865703583
+        },
+        "v001": {
+          "baseline": 0.4724799394607544,
+          "s32_means": 0.48588359355926514
+        },
+        "v014": {
+          "baseline": 0.5748320817947388,
+          "s32_means": 0.5748547315597534
+        },
+        "v027": {
+          "baseline": 0.6889857053756714,
+          "s32_means": 0.7689461708068848
+        },
+        "v040": {
+          "baseline": 0.5570640563964844,
+          "s32_means": 0.6360659599304199
+        },
+        "v053": {
+          "baseline": 0.5050181150436401,
+          "s32_means": 0.43331122398376465
+        },
+        "v065": {
+          "baseline": 0.5300874710083008,
+          "s32_means": 0.6022311449050903
+        },
+        "v077": {
+          "baseline": 0.5898115038871765,
+          "s32_means": 0.5866888165473938
+        },
+        "v089": {
+          "baseline": 0.5958626866340637,
+          "s32_means": 0.45669063925743103
+        },
+        "v002": {
+          "baseline": 0.5827969908714294,
+          "s32_means": 0.47242140769958496
+        },
+        "v015": {
+          "baseline": 0.6643186807632446,
+          "s32_means": 0.6172519326210022
+        },
+        "v028": {
+          "baseline": 0.5806871056556702,
+          "s32_means": 0.6094275712966919
+        },
+        "v041": {
+          "baseline": 0.6074191927909851,
+          "s32_means": 0.4915061295032501
+        },
+        "v054": {
+          "baseline": 0.4998842477798462,
+          "s32_means": 0.5501658916473389
+        },
+        "v066": {
+          "baseline": 0.5018438100814819,
+          "s32_means": 0.5297521352767944
+        },
+        "v078": {
+          "baseline": 0.5516812205314636,
+          "s32_means": 0.6851689219474792
+        },
+        "v090": {
+          "baseline": 0.4652537703514099,
+          "s32_means": 0.3873055875301361
+        },
+        "v003": {
+          "baseline": 0.6248767375946045,
+          "s32_means": 0.5843431353569031
+        },
+        "v016": {
+          "baseline": 0.4981733560562134,
+          "s32_means": 0.5434959530830383
+        },
+        "v029": {
+          "baseline": 0.6596693396568298,
+          "s32_means": 0.5969928503036499
+        },
+        "v042": {
+          "baseline": 0.6533819437026978,
+          "s32_means": 0.6658672094345093
+        },
+        "v055": {
+          "baseline": 0.354018896818161,
+          "s32_means": 0.3259807527065277
+        },
+        "v067": {
+          "baseline": 0.6550835371017456,
+          "s32_means": 0.6313753128051758
+        },
+        "v079": {
+          "baseline": 0.4967958331108093,
+          "s32_means": 0.5387159585952759
+        },
+        "v091": {
+          "baseline": 0.6041749715805054,
+          "s32_means": 0.5688874125480652
+        },
+        "v004": {
+          "baseline": 0.356575608253479,
+          "s32_means": 0.3696008622646332
+        },
+        "v017": {
+          "baseline": 0.5946122407913208,
+          "s32_means": 0.5804579854011536
+        },
+        "v030": {
+          "baseline": 0.5791673064231873,
+          "s32_means": 0.5529361963272095
+        },
+        "v043": {
+          "baseline": 0.4078477621078491,
+          "s32_means": 0.4894897937774658
+        },
+        "v056": {
+          "baseline": 0.5608006119728088,
+          "s32_means": 0.5372812151908875
+        },
+        "v068": {
+          "baseline": 0.6422516703605652,
+          "s32_means": 0.6285468339920044
+        },
+        "v080": {
+          "baseline": 0.6126900911331177,
+          "s32_means": 0.5964232683181763
+        },
+        "v092": {
+          "baseline": 0.6000769734382629,
+          "s32_means": 0.6589170694351196
+        },
+        "v005": {
+          "baseline": 0.6396582722663879,
+          "s32_means": 0.5629184246063232
+        },
+        "v018": {
+          "baseline": 0.46977129578590393,
+          "s32_means": 0.5310345888137817
+        },
+        "v031": {
+          "baseline": 0.6115474700927734,
+          "s32_means": 0.6060822606086731
+        },
+        "v044": {
+          "baseline": 0.628703773021698,
+          "s32_means": 0.5577054619789124
+        },
+        "v057": {
+          "baseline": 0.5521854758262634,
+          "s32_means": 0.5536627769470215
+        },
+        "v069": {
+          "baseline": 0.7438088655471802,
+          "s32_means": 0.6449387669563293
+        },
+        "v081": {
+          "baseline": 0.5221045613288879,
+          "s32_means": 0.38569319248199463
+        },
+        "v093": {
+          "baseline": 0.809937059879303,
+          "s32_means": 0.6537528038024902
+        },
+        "v006": {
+          "baseline": 0.6232585906982422,
+          "s32_means": 0.5765056610107422
+        },
+        "v019": {
+          "baseline": 0.5393818020820618,
+          "s32_means": 0.5365602970123291
+        },
+        "v032": {
+          "baseline": 0.6036489605903625,
+          "s32_means": 0.5608723163604736
+        },
+        "v045": {
+          "baseline": 0.6189478039741516,
+          "s32_means": 0.516122043132782
+        },
+        "v058": {
+          "baseline": 0.44282597303390503,
+          "s32_means": 0.4307977557182312
+        },
+        "v070": {
+          "baseline": 0.42877858877182007,
+          "s32_means": 0.5224437713623047
+        },
+        "v082": {
+          "baseline": 0.7076741456985474,
+          "s32_means": 0.5205586552619934
+        },
+        "v094": {
+          "baseline": 0.6996760964393616,
+          "s32_means": 0.5287202596664429
+        },
+        "v007": {
+          "baseline": 0.5568212270736694,
+          "s32_means": 0.5395013689994812
+        },
+        "v020": {
+          "baseline": 0.564893364906311,
+          "s32_means": 0.5707413554191589
+        },
+        "v033": {
+          "baseline": 0.6716820597648621,
+          "s32_means": 0.7019486427307129
+        },
+        "v046": {
+          "baseline": 0.41188013553619385,
+          "s32_means": 0.4897633194923401
+        },
+        "v059": {
+          "baseline": 0.7021077871322632,
+          "s32_means": 0.6279805302619934
+        },
+        "v071": {
+          "baseline": 0.555308997631073,
+          "s32_means": 0.4718034267425537
+        },
+        "v083": {
+          "baseline": 0.5149402022361755,
+          "s32_means": 0.6356453895568848
+        },
+        "v095": {
+          "baseline": 0.6137436032295227,
+          "s32_means": 0.7223471999168396
+        },
+        "v008": {
+          "baseline": 0.47123387455940247,
+          "s32_means": 0.4435144364833832
+        },
+        "v021": {
+          "baseline": 0.6079943776130676,
+          "s32_means": 0.4572049081325531
+        },
+        "v034": {
+          "baseline": 0.5391157269477844,
+          "s32_means": 0.5285177826881409
+        },
+        "v047": {
+          "baseline": 0.6100488305091858,
+          "s32_means": 0.5330348610877991
+        },
+        "v060": {
+          "baseline": 0.5136011242866516,
+          "s32_means": 0.44409167766571045
+        },
+        "v072": {
+          "baseline": 0.5790629982948303,
+          "s32_means": 0.6181173920631409
+        },
+        "v084": {
+          "baseline": 0.7150465250015259,
+          "s32_means": 0.7348127961158752
+        },
+        "v096": {
+          "baseline": 0.6174183487892151,
+          "s32_means": 0.7321023344993591
+        },
+        "v009": {
+          "baseline": 0.5920804738998413,
+          "s32_means": 0.6414065361022949
+        },
+        "v022": {
+          "baseline": 0.6364582180976868,
+          "s32_means": 0.5383978486061096
+        },
+        "v035": {
+          "baseline": 0.6944965124130249,
+          "s32_means": 0.6454384922981262
+        },
+        "v048": {
+          "baseline": 0.6765823364257812,
+          "s32_means": 0.6239755749702454
+        },
+        "v061": {
+          "baseline": 0.5448629260063171,
+          "s32_means": 0.526371955871582
+        },
+        "v073": {
+          "baseline": 0.5301937460899353,
+          "s32_means": 0.5334745049476624
+        },
+        "v085": {
+          "baseline": 0.6489537954330444,
+          "s32_means": 0.7052667737007141
+        },
+        "v097": {
+          "baseline": 0.5515071749687195,
+          "s32_means": 0.47942206263542175
+        },
+        "v010": {
+          "baseline": 0.47026824951171875,
+          "s32_means": 0.5131720900535583
+        },
+        "v023": {
+          "baseline": 0.6368270516395569,
+          "s32_means": 0.621878981590271
+        },
+        "v036": {
+          "baseline": 0.6871734857559204,
+          "s32_means": 0.7299725413322449
+        },
+        "v049": {
+          "baseline": 0.6209969520568848,
+          "s32_means": 0.5692781805992126
+        },
+        "v062": {
+          "baseline": 0.5494968891143799,
+          "s32_means": 0.523344874382019
+        },
+        "v074": {
+          "baseline": 0.4892748296260834,
+          "s32_means": 0.5077901482582092
+        },
+        "v086": {
+          "baseline": 0.6157825589179993,
+          "s32_means": 0.4940824806690216
+        },
+        "v098": {
+          "baseline": 0.7100255489349365,
+          "s32_means": 0.6576302647590637
+        },
+        "v011": {
+          "baseline": 0.5970279574394226,
+          "s32_means": 0.6189215183258057
+        },
+        "v024": {
+          "baseline": 0.6305080056190491,
+          "s32_means": 0.7438939809799194
+        },
+        "v037": {
+          "baseline": 0.5657323598861694,
+          "s32_means": 0.5417264699935913
+        },
+        "v050": {
+          "baseline": 0.5621428489685059,
+          "s32_means": 0.4770534634590149
+        },
+        "v063": {
+          "baseline": 0.5648178458213806,
+          "s32_means": 0.5178824663162231
+        },
+        "v075": {
+          "baseline": 0.6652231812477112,
+          "s32_means": 0.5997805595397949
+        },
+        "v087": {
+          "baseline": 0.48750048875808716,
+          "s32_means": 0.5704404711723328
+        },
+        "v099": {
+          "baseline": 0.6414810419082642,
+          "s32_means": 0.6344746947288513
+        },
+        "v012": {
+          "baseline": 0.7099208831787109,
+          "s32_means": 0.6723778247833252
+        },
+        "v025": {
+          "baseline": 0.5708937644958496,
+          "s32_means": 0.5448813438415527
+        },
+        "v038": {
+          "baseline": 0.709804356098175,
+          "s32_means": 0.7002975344657898
+        },
+        "v051": {
+          "baseline": 0.742270827293396,
+          "s32_means": 0.7092814445495605
+        }
+      }
+    },
+    "imaging_quality": {
+      "means": {
+        "baseline": 0.6606793984879387,
+        "s32_means": 0.6768818051889207
+      },
+      "paired": {
+        "s32_means_minus_baseline": {
+          "mean": 0.016202406700981983,
+          "ci95": [
+            -0.002057376702573578,
+            0.03374532965638902
+          ],
+          "lower_prompts": 40,
+          "equal_prompts": 0,
+          "higher_prompts": 60
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.6503054897275745,
+            "s32_means": 0.7057279305743356
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.7346590393588074,
+            "s32_means": 0.7385877870739015
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.6334409821013101,
+            "s32_means": 0.6546934740767519
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.6550936237237391,
+            "s32_means": 0.6817704374851326
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.6943677913524486,
+            "s32_means": 0.6988173150663024
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.6980890550966615,
+            "s32_means": 0.6939168521033393
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.569153754569866,
+            "s32_means": 0.606170258892907
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.6477603235597963,
+            "s32_means": 0.6292660188674927
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 0.5740763151380751,
+          "s32_means": 0.7084947594536675
+        },
+        "v013": {
+          "baseline": 0.7887455291748047,
+          "s32_means": 0.7053224809434678
+        },
+        "v026": {
+          "baseline": 0.7521011047363281,
+          "s32_means": 0.7521615024142796
+        },
+        "v039": {
+          "baseline": 0.6979554977416993,
+          "s32_means": 0.6873505138821072
+        },
+        "v052": {
+          "baseline": 0.7611365085177951,
+          "s32_means": 0.7581521928575304
+        },
+        "v064": {
+          "baseline": 0.7782627919514974,
+          "s32_means": 0.7422125820583767
+        },
+        "v076": {
+          "baseline": 0.5805375077989366,
+          "s32_means": 0.5190472793579102
+        },
+        "v088": {
+          "baseline": 0.3554325273301866,
+          "s32_means": 0.3626909205118815
+        },
+        "v001": {
+          "baseline": 0.6582105026245116,
+          "s32_means": 0.6416018176608616
+        },
+        "v014": {
+          "baseline": 0.7929888305664062,
+          "s32_means": 0.7879051700168186
+        },
+        "v027": {
+          "baseline": 0.7394124688042535,
+          "s32_means": 0.7577206336127387
+        },
+        "v040": {
+          "baseline": 0.7264369167751736,
+          "s32_means": 0.7604422912597656
+        },
+        "v053": {
+          "baseline": 0.6846372290717231,
+          "s32_means": 0.6401012861463758
+        },
+        "v065": {
+          "baseline": 0.7312756890190972,
+          "s32_means": 0.6847882910834419
+        },
+        "v077": {
+          "baseline": 0.42099322297838,
+          "s32_means": 0.5167802386813694
+        },
+        "v089": {
+          "baseline": 0.7747663048638238,
+          "s32_means": 0.4768117039998372
+        },
+        "v002": {
+          "baseline": 0.7179565751817492,
+          "s32_means": 0.7395511949327258
+        },
+        "v015": {
+          "baseline": 0.7731099294026693,
+          "s32_means": 0.7833351559109158
+        },
+        "v028": {
+          "baseline": 0.5277773903740777,
+          "s32_means": 0.6535403442382812
+        },
+        "v041": {
+          "baseline": 0.5832235421074761,
+          "s32_means": 0.692044069925944
+        },
+        "v054": {
+          "baseline": 0.745178227742513,
+          "s32_means": 0.7878756883409288
+        },
+        "v066": {
+          "baseline": 0.4126113967895508,
+          "s32_means": 0.47997749074300133
+        },
+        "v078": {
+          "baseline": 0.3776018591986762,
+          "s32_means": 0.6165864902072482
+        },
+        "v090": {
+          "baseline": 0.3866995951334636,
+          "s32_means": 0.4231620530022515
+        },
+        "v003": {
+          "baseline": 0.7406550632052951,
+          "s32_means": 0.7615219540066189
+        },
+        "v016": {
+          "baseline": 0.7334254082573785,
+          "s32_means": 0.7611519775390625
+        },
+        "v029": {
+          "baseline": 0.7436474083794488,
+          "s32_means": 0.7475452202690973
+        },
+        "v042": {
+          "baseline": 0.7662393934461805,
+          "s32_means": 0.7662527770996094
+        },
+        "v055": {
+          "baseline": 0.7915167592366537,
+          "s32_means": 0.7843931596544054
+        },
+        "v067": {
+          "baseline": 0.7606223008897569,
+          "s32_means": 0.7269823794894748
+        },
+        "v079": {
+          "baseline": 0.6818338470458984,
+          "s32_means": 0.6892053697374132
+        },
+        "v091": {
+          "baseline": 0.7754687288072374,
+          "s32_means": 0.7227671788533528
+        },
+        "v004": {
+          "baseline": 0.50243904071384,
+          "s32_means": 0.5503518227471246
+        },
+        "v017": {
+          "baseline": 0.641399424235026,
+          "s32_means": 0.6184243291219075
+        },
+        "v030": {
+          "baseline": 0.5902336629231771,
+          "s32_means": 0.4975224414401584
+        },
+        "v043": {
+          "baseline": 0.6994133309258355,
+          "s32_means": 0.6510243394639756
+        },
+        "v056": {
+          "baseline": 0.6797167036268447,
+          "s32_means": 0.7023224114312066
+        },
+        "v068": {
+          "baseline": 0.5471831919352214,
+          "s32_means": 0.5902153099907769
+        },
+        "v080": {
+          "baseline": 0.7980595855712891,
+          "s32_means": 0.7261236267089843
+        },
+        "v092": {
+          "baseline": 0.6481218711005318,
+          "s32_means": 0.6144300011528863
+        },
+        "v005": {
+          "baseline": 0.5736042675442166,
+          "s32_means": 0.6148141860961914
+        },
+        "v018": {
+          "baseline": 0.7936734941270616,
+          "s32_means": 0.7911378343370226
+        },
+        "v031": {
+          "baseline": 0.352327936384413,
+          "s32_means": 0.5817267032199436
+        },
+        "v044": {
+          "baseline": 0.7159212358262803,
+          "s32_means": 0.6802398071289062
+        },
+        "v057": {
+          "baseline": 0.6484340710110135,
+          "s32_means": 0.5798165181477865
+        },
+        "v069": {
+          "baseline": 0.7519124145507813,
+          "s32_means": 0.7717669050428603
+        },
+        "v081": {
+          "baseline": 0.3097325880262587,
+          "s32_means": 0.27448172526889375
+        },
+        "v093": {
+          "baseline": 0.7045109134250217,
+          "s32_means": 0.6862997351752387
+        },
+        "v006": {
+          "baseline": 0.7955142652723524,
+          "s32_means": 0.7697816229926215
+        },
+        "v019": {
+          "baseline": 0.7087499643961589,
+          "s32_means": 0.780954345703125
+        },
+        "v032": {
+          "baseline": 0.5931729999118381,
+          "s32_means": 0.714647452460395
+        },
+        "v045": {
+          "baseline": 0.7312695465087891,
+          "s32_means": 0.7075974655151367
+        },
+        "v058": {
+          "baseline": 0.7683529018825955,
+          "s32_means": 0.8006238505045573
+        },
+        "v070": {
+          "baseline": 0.7802575225830078,
+          "s32_means": 0.7553856353759766
+        },
+        "v082": {
+          "baseline": 0.7918490075005425,
+          "s32_means": 0.7839991573757595
+        },
+        "v094": {
+          "baseline": 0.7266385430230035,
+          "s32_means": 0.7676494801839193
+        },
+        "v007": {
+          "baseline": 0.6871867930094401,
+          "s32_means": 0.754192174275716
+        },
+        "v020": {
+          "baseline": 0.7885770704481336,
+          "s32_means": 0.7971668395996093
+        },
+        "v033": {
+          "baseline": 0.6702717556423612,
+          "s32_means": 0.7270024804009332
+        },
+        "v046": {
+          "baseline": 0.16238699128892686,
+          "s32_means": 0.3702169363233778
+        },
+        "v059": {
+          "baseline": 0.5136554429796008,
+          "s32_means": 0.6382308451334635
+        },
+        "v071": {
+          "baseline": 0.7256013988918728,
+          "s32_means": 0.525833233303494
+        },
+        "v083": {
+          "baseline": 0.7972912462022569,
+          "s32_means": 0.8087200893825955
+        },
+        "v095": {
+          "baseline": 0.7520803561740452,
+          "s32_means": 0.7942602657741971
+        },
+        "v008": {
+          "baseline": 0.4363354602389865,
+          "s32_means": 0.66039488474528
+        },
+        "v021": {
+          "baseline": 0.6489987386067709,
+          "s32_means": 0.6443437110053167
+        },
+        "v034": {
+          "baseline": 0.5849600118001301,
+          "s32_means": 0.6031204503377279
+        },
+        "v047": {
+          "baseline": 0.7067260403103299,
+          "s32_means": 0.6744184332953559
+        },
+        "v060": {
+          "baseline": 0.46205947197808156,
+          "s32_means": 0.5430894724527995
+        },
+        "v072": {
+          "baseline": 0.7850077718098959,
+          "s32_means": 0.7792627868652343
+        },
+        "v084": {
+          "baseline": 0.7667277560763889,
+          "s32_means": 0.7888448350694445
+        },
+        "v096": {
+          "baseline": 0.6307474958631727,
+          "s32_means": 0.6946927235921224
+        },
+        "v009": {
+          "baseline": 0.7474829728868272,
+          "s32_means": 0.7883520982530382
+        },
+        "v022": {
+          "baseline": 0.6225560217963324,
+          "s32_means": 0.5919562301635742
+        },
+        "v035": {
+          "baseline": 0.6594159673055013,
+          "s32_means": 0.7413309241400825
+        },
+        "v048": {
+          "baseline": 0.7479263186984592,
+          "s32_means": 0.7585491078694662
+        },
+        "v061": {
+          "baseline": 0.7567646441989474,
+          "s32_means": 0.7268234676784939
+        },
+        "v073": {
+          "baseline": 0.6621628061930339,
+          "s32_means": 0.745332995944553
+        },
+        "v085": {
+          "baseline": 0.6676017727322049,
+          "s32_means": 0.7803696390787761
+        },
+        "v097": {
+          "baseline": 0.5655064358181423,
+          "s32_means": 0.6809307428995769
+        },
+        "v010": {
+          "baseline": 0.6497989145914714,
+          "s32_means": 0.7299383375379774
+        },
+        "v023": {
+          "baseline": 0.7971883884006077,
+          "s32_means": 0.8064816623263888
+        },
+        "v036": {
+          "baseline": 0.7515271538628473,
+          "s32_means": 0.6893790571424696
+        },
+        "v049": {
+          "baseline": 0.6879905819363065,
+          "s32_means": 0.7634201236300998
+        },
+        "v062": {
+          "baseline": 0.7690946875678167,
+          "s32_means": 0.7777725338406033
+        },
+        "v074": {
+          "baseline": 0.7549989725748698,
+          "s32_means": 0.7430151502821181
+        },
+        "v086": {
+          "baseline": 0.3268958729637994,
+          "s32_means": 0.2641852963765462
+        },
+        "v098": {
+          "baseline": 0.7226651848687067,
+          "s32_means": 0.5834729461669922
+        },
+        "v011": {
+          "baseline": 0.6250935168796116,
+          "s32_means": 0.7096329345703125
+        },
+        "v024": {
+          "baseline": 0.6848009389241537,
+          "s32_means": 0.7561064792209201
+        },
+        "v037": {
+          "baseline": 0.566914687262641,
+          "s32_means": 0.7101329532199436
+        },
+        "v050": {
+          "baseline": 0.5064730826483832,
+          "s32_means": 0.5936295895046658
+        },
+        "v063": {
+          "baseline": 0.7518668484157986,
+          "s32_means": 0.6466063546074762
+        },
+        "v075": {
+          "baseline": 0.6871724039713542,
+          "s32_means": 0.7822294650607639
+        },
+        "v087": {
+          "baseline": 0.31072078874376086,
+          "s32_means": 0.5056993594699436
+        },
+        "v099": {
+          "baseline": 0.7304859263102214,
+          "s32_means": 0.7440244750976562
+        },
+        "v012": {
+          "baseline": 0.745617679172092,
+          "s32_means": 0.7458353101942273
+        },
+        "v025": {
+          "baseline": 0.7763537733289931,
+          "s32_means": 0.777355016072591
+        },
+        "v038": {
+          "baseline": 0.7029702199300131,
+          "s32_means": 0.33518500010172525
+        },
+        "v051": {
+          "baseline": 0.7842546301947699,
+          "s32_means": 0.7578302324083117
+        }
+      }
+    },
+    "overall_consistency": {
+      "means": {
+        "baseline": 0.2325550375878811,
+        "s32_means": 0.23137595240026712
+      },
+      "paired": {
+        "s32_means_minus_baseline": {
+          "mean": -0.0011790851876139642,
+          "ci95": [
+            -0.007737906420603394,
+            0.005387782556936143
+          ],
+          "lower_prompts": 53,
+          "equal_prompts": 0,
+          "higher_prompts": 47
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.2495161249087407,
+            "s32_means": 0.23213861424189347
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.24347367882728577,
+            "s32_means": 0.2313825786113739
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.25485359590787154,
+            "s32_means": 0.25123075109261733
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.2185436601822193,
+            "s32_means": 0.2303075618468798
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.22364975636204085,
+            "s32_means": 0.22154475996891657
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.2373678870499134,
+            "s32_means": 0.23941690474748611
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.20737879474957785,
+            "s32_means": 0.2191277633731564
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.22264289359251657,
+            "s32_means": 0.2242290439705054
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 0.25151512026786804,
+          "s32_means": 0.2827065885066986
+        },
+        "v013": {
+          "baseline": 0.2637780010700226,
+          "s32_means": 0.25828754901885986
+        },
+        "v026": {
+          "baseline": 0.31376197934150696,
+          "s32_means": 0.28370383381843567
+        },
+        "v039": {
+          "baseline": 0.20642198622226715,
+          "s32_means": 0.2432652711868286
+        },
+        "v052": {
+          "baseline": 0.2417811006307602,
+          "s32_means": 0.22995257377624512
+        },
+        "v064": {
+          "baseline": 0.2822622060775757,
+          "s32_means": 0.26545262336730957
+        },
+        "v076": {
+          "baseline": 0.2516976594924927,
+          "s32_means": 0.23300212621688843
+        },
+        "v088": {
+          "baseline": 0.15850497782230377,
+          "s32_means": 0.18437716364860535
+        },
+        "v001": {
+          "baseline": 0.22008483111858368,
+          "s32_means": 0.20564641058444977
+        },
+        "v014": {
+          "baseline": 0.29863792657852173,
+          "s32_means": 0.22001515328884125
+        },
+        "v027": {
+          "baseline": 0.2437276393175125,
+          "s32_means": 0.2466229796409607
+        },
+        "v040": {
+          "baseline": 0.12685124576091766,
+          "s32_means": 0.1913551241159439
+        },
+        "v053": {
+          "baseline": 0.23221704363822937,
+          "s32_means": 0.2693847119808197
+        },
+        "v065": {
+          "baseline": 0.27913975715637207,
+          "s32_means": 0.2773311138153076
+        },
+        "v077": {
+          "baseline": 0.17525362968444824,
+          "s32_means": 0.20058338344097137
+        },
+        "v089": {
+          "baseline": 0.20762014389038086,
+          "s32_means": 0.19389747083187103
+        },
+        "v002": {
+          "baseline": 0.27822253108024597,
+          "s32_means": 0.2266802191734314
+        },
+        "v015": {
+          "baseline": 0.22230882942676544,
+          "s32_means": 0.22173577547073364
+        },
+        "v028": {
+          "baseline": 0.20357972383499146,
+          "s32_means": 0.22115209698677063
+        },
+        "v041": {
+          "baseline": 0.19779904186725616,
+          "s32_means": 0.1988842934370041
+        },
+        "v054": {
+          "baseline": 0.15616658329963684,
+          "s32_means": 0.24898342788219452
+        },
+        "v066": {
+          "baseline": 0.21716350317001343,
+          "s32_means": 0.2186662256717682
+        },
+        "v078": {
+          "baseline": 0.20432329177856445,
+          "s32_means": 0.20901529490947723
+        },
+        "v090": {
+          "baseline": 0.1831740289926529,
+          "s32_means": 0.16794706881046295
+        },
+        "v003": {
+          "baseline": 0.2962462902069092,
+          "s32_means": 0.27224427461624146
+        },
+        "v016": {
+          "baseline": 0.18180079758167267,
+          "s32_means": 0.16333314776420593
+        },
+        "v029": {
+          "baseline": 0.2827381491661072,
+          "s32_means": 0.2594957649707794
+        },
+        "v042": {
+          "baseline": 0.19975945353507996,
+          "s32_means": 0.19260215759277344
+        },
+        "v055": {
+          "baseline": 0.18391361832618713,
+          "s32_means": 0.1474837064743042
+        },
+        "v067": {
+          "baseline": 0.28178671002388,
+          "s32_means": 0.23098622262477875
+        },
+        "v079": {
+          "baseline": 0.19607411324977875,
+          "s32_means": 0.22832289338111877
+        },
+        "v091": {
+          "baseline": 0.2390613555908203,
+          "s32_means": 0.19445489346981049
+        },
+        "v004": {
+          "baseline": 0.24002103507518768,
+          "s32_means": 0.16424864530563354
+        },
+        "v017": {
+          "baseline": 0.29980266094207764,
+          "s32_means": 0.32537582516670227
+        },
+        "v030": {
+          "baseline": 0.28786033391952515,
+          "s32_means": 0.23041033744812012
+        },
+        "v043": {
+          "baseline": 0.2367517054080963,
+          "s32_means": 0.1972969025373459
+        },
+        "v056": {
+          "baseline": 0.19240722060203552,
+          "s32_means": 0.1962350606918335
+        },
+        "v068": {
+          "baseline": 0.322221577167511,
+          "s32_means": 0.2948707342147827
+        },
+        "v080": {
+          "baseline": 0.17442922294139862,
+          "s32_means": 0.18013490736484528
+        },
+        "v092": {
+          "baseline": 0.24953821301460266,
+          "s32_means": 0.2308119833469391
+        },
+        "v005": {
+          "baseline": 0.23899249732494354,
+          "s32_means": 0.22666671872138977
+        },
+        "v018": {
+          "baseline": 0.1972922384738922,
+          "s32_means": 0.16223233938217163
+        },
+        "v031": {
+          "baseline": 0.22320084273815155,
+          "s32_means": 0.2208663821220398
+        },
+        "v044": {
+          "baseline": 0.2143974006175995,
+          "s32_means": 0.15803708136081696
+        },
+        "v057": {
+          "baseline": 0.17637130618095398,
+          "s32_means": 0.16050240397453308
+        },
+        "v069": {
+          "baseline": 0.25395703315734863,
+          "s32_means": 0.2673565745353699
+        },
+        "v081": {
+          "baseline": 0.25924748182296753,
+          "s32_means": 0.24831846356391907
+        },
+        "v093": {
+          "baseline": 0.26914310455322266,
+          "s32_means": 0.2618860900402069
+        },
+        "v006": {
+          "baseline": 0.2861051857471466,
+          "s32_means": 0.28001174330711365
+        },
+        "v019": {
+          "baseline": 0.26679959893226624,
+          "s32_means": 0.20349881052970886
+        },
+        "v032": {
+          "baseline": 0.2322273850440979,
+          "s32_means": 0.2241528034210205
+        },
+        "v045": {
+          "baseline": 0.1805301159620285,
+          "s32_means": 0.19543638825416565
+        },
+        "v058": {
+          "baseline": 0.16074901819229126,
+          "s32_means": 0.11152602732181549
+        },
+        "v070": {
+          "baseline": 0.18510934710502625,
+          "s32_means": 0.21205274760723114
+        },
+        "v082": {
+          "baseline": 0.10478179156780243,
+          "s32_means": 0.060764212161302567
+        },
+        "v094": {
+          "baseline": 0.2536064088344574,
+          "s32_means": 0.2678840160369873
+        },
+        "v007": {
+          "baseline": 0.24521423876285553,
+          "s32_means": 0.20458924770355225
+        },
+        "v020": {
+          "baseline": 0.22756844758987427,
+          "s32_means": 0.19491350650787354
+        },
+        "v033": {
+          "baseline": 0.2394760698080063,
+          "s32_means": 0.23861244320869446
+        },
+        "v046": {
+          "baseline": 0.16390712559223175,
+          "s32_means": 0.21748721599578857
+        },
+        "v059": {
+          "baseline": 0.2630675137042999,
+          "s32_means": 0.26299744844436646
+        },
+        "v071": {
+          "baseline": 0.20272201299667358,
+          "s32_means": 0.22016620635986328
+        },
+        "v083": {
+          "baseline": 0.2450205385684967,
+          "s32_means": 0.24565216898918152
+        },
+        "v095": {
+          "baseline": 0.2132813185453415,
+          "s32_means": 0.23008869588375092
+        },
+        "v008": {
+          "baseline": 0.20978784561157227,
+          "s32_means": 0.1836911141872406
+        },
+        "v021": {
+          "baseline": 0.2368088811635971,
+          "s32_means": 0.2383614033460617
+        },
+        "v034": {
+          "baseline": 0.2641092836856842,
+          "s32_means": 0.25544166564941406
+        },
+        "v047": {
+          "baseline": 0.27381449937820435,
+          "s32_means": 0.2963416874408722
+        },
+        "v060": {
+          "baseline": 0.34780213236808777,
+          "s32_means": 0.26705116033554077
+        },
+        "v072": {
+          "baseline": 0.23708544671535492,
+          "s32_means": 0.23879045248031616
+        },
+        "v084": {
+          "baseline": 0.2530161440372467,
+          "s32_means": 0.267785906791687
+        },
+        "v096": {
+          "baseline": 0.22245806455612183,
+          "s32_means": 0.21949107944965363
+        },
+        "v009": {
+          "baseline": 0.2635954022407532,
+          "s32_means": 0.249274343252182
+        },
+        "v022": {
+          "baseline": 0.26977774500846863,
+          "s32_means": 0.2944832444190979
+        },
+        "v035": {
+          "baseline": 0.2355143129825592,
+          "s32_means": 0.20936673879623413
+        },
+        "v048": {
+          "baseline": 0.3175961971282959,
+          "s32_means": 0.2876206636428833
+        },
+        "v061": {
+          "baseline": 0.27023568749427795,
+          "s32_means": 0.2375468611717224
+        },
+        "v073": {
+          "baseline": 0.19550591707229614,
+          "s32_means": 0.21522828936576843
+        },
+        "v085": {
+          "baseline": 0.21684470772743225,
+          "s32_means": 0.23082277178764343
+        },
+        "v097": {
+          "baseline": 0.15277786552906036,
+          "s32_means": 0.21103689074516296
+        },
+        "v010": {
+          "baseline": 0.18132272362709045,
+          "s32_means": 0.1998273730278015
+        },
+        "v023": {
+          "baseline": 0.28057730197906494,
+          "s32_means": 0.3266281485557556
+        },
+        "v036": {
+          "baseline": 0.2428356111049652,
+          "s32_means": 0.317268431186676
+        },
+        "v049": {
+          "baseline": 0.2508707642555237,
+          "s32_means": 0.2946048974990845
+        },
+        "v062": {
+          "baseline": 0.23977771401405334,
+          "s32_means": 0.27231064438819885
+        },
+        "v074": {
+          "baseline": 0.2439182996749878,
+          "s32_means": 0.23029780387878418
+        },
+        "v086": {
+          "baseline": 0.2114335149526596,
+          "s32_means": 0.27722495794296265
+        },
+        "v098": {
+          "baseline": 0.20893558859825134,
+          "s32_means": 0.22326090931892395
+        },
+        "v011": {
+          "baseline": 0.20945176482200623,
+          "s32_means": 0.2146850824356079
+        },
+        "v024": {
+          "baseline": 0.18424805998802185,
+          "s32_means": 0.20033565163612366
+        },
+        "v037": {
+          "baseline": 0.2817472517490387,
+          "s32_means": 0.2815452218055725
+        },
+        "v050": {
+          "baseline": 0.21955104172229767,
+          "s32_means": 0.23438049852848053
+        },
+        "v063": {
+          "baseline": 0.21930813789367676,
+          "s32_means": 0.2545630931854248
+        },
+        "v075": {
+          "baseline": 0.1475428342819214,
+          "s32_means": 0.20180386304855347
+        },
+        "v087": {
+          "baseline": 0.19642344117164612,
+          "s32_means": 0.24790607392787933
+        },
+        "v099": {
+          "baseline": 0.3136136531829834,
+          "s32_means": 0.3056122660636902
+        },
+        "v012": {
+          "baseline": 0.3231501579284668,
+          "s32_means": 0.3075302243232727
+        },
+        "v025": {
+          "baseline": 0.23575733602046967,
+          "s32_means": 0.19877296686172485
+        },
+        "v038": {
+          "baseline": 0.2623181641101837,
+          "s32_means": 0.27736106514930725
+        },
+        "v051": {
+          "baseline": 0.2528170049190521,
+          "s32_means": 0.28668612241744995
+        }
+      }
+    }
+  },
+  "videos": [
+    {
+      "path": "videos/baseline/v000.mp4",
+      "sha256": "fe6424c4a9b90f86b4137aa24f40094bc078b0480ef77086321a88c1e036f1e7",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v000.mp4",
+      "sha256": "362882acff908af05e45918b1167bf1bfa2c9eaf42c0d6e2840b477d9bc952ff",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v013.mp4",
+      "sha256": "4e01d99696984e9eaaffadba52778cd6848f01eb3b4d545ce8bd8ad61f8378c6",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v013.mp4",
+      "sha256": "7091278c81cb39279a2b170f65ed56d1eb8324560445d3bbee54e73c9e1aaa68",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v026.mp4",
+      "sha256": "7f37568f1b2f6f648e06e4ed506cf983d1531f42b1af24f16862ed310be4beb1",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v026.mp4",
+      "sha256": "90871055b511ab788a36b51efb16024d8bfdf669105d0a593ff45d6bf3dd5e8d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v039.mp4",
+      "sha256": "9d1397a95e98f7cfbe6bdaa5256165900ff4917a8cd9b3a7ac8f603192c6ee0f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v039.mp4",
+      "sha256": "22f61898152f8254ce2d91342e4a43015e996df2250cc093e37a308fe7130b04",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v052.mp4",
+      "sha256": "4735812070f912d793a7eaa60c5b1066584c9f899c94674e57ca2e39e59ff983",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v052.mp4",
+      "sha256": "6ff918744530d41635b1df3eda6fdad168d67f1dd46bf03489e0a16a28a30039",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v064.mp4",
+      "sha256": "87f4a278d11878b73f435076af5bc439b40fc1ee90c84798d4f73aa33af32586",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v064.mp4",
+      "sha256": "5a116ed04a7ee1ac503a4a6c86778a7d556b41b64efb61b2344fbccd135fd5a9",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v076.mp4",
+      "sha256": "365832733a78552cd582c0508cb5eb0d8a83629e21e588b6433fa70f1cf296a6",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v076.mp4",
+      "sha256": "306a05d131ce23a1b5221d108bf14d73e92ebf68fe369f18b018966f4be43498",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v088.mp4",
+      "sha256": "5c2e057a607b30d2317d8cc52803541aa698ef172eedab0c91cbc3bab3ec4fea",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v088.mp4",
+      "sha256": "c7d758f7e5233cf5ddff788dd598bbfe02a14eee553f473cfd8738b1a13f6e8b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v001.mp4",
+      "sha256": "b2e55812acee11ab4a0f73cc9d8361fd2252c46a5db102aa5dbce13f06dccf29",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v001.mp4",
+      "sha256": "450b72020c8d6acb20f14b3538f8d935c6e348e241fb5bd7fbd3a1df17b6cb28",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v014.mp4",
+      "sha256": "c92c36a3668d8c4bf15ed676d5fa533f2b557f3e58758d1f31c2cd162937f44e",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v014.mp4",
+      "sha256": "916ef75b14986cd500eb9ed0777ea427e0f2d16ac8263231247f4a76caf98a8c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v027.mp4",
+      "sha256": "bbf3bcade21dd491e428ae50cfc3bd9460e399fd746969d0a4acf972bf80e8c8",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v027.mp4",
+      "sha256": "7807b694ded63e903c2d3222026cd85962150c001737eedd809fdd25429418c0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v040.mp4",
+      "sha256": "1a632e3ddc226a70651b90d5b9a39a1e85ae757c9206f3c909f4c188aecd5554",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v040.mp4",
+      "sha256": "0e23f8b427832366a7d29eb9a2a195be339dc86a7132469963804750bf8be0f6",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v053.mp4",
+      "sha256": "bd312b92da7b3a1d040ff93c695a986e5656d03fb755a770084fda6dee24ab73",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v053.mp4",
+      "sha256": "45b11bf43a435bcb833278b5588fe51569f1af19ef483951724f70e8ad616e06",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v065.mp4",
+      "sha256": "70d19419540ced04a1c4af7b5ae79b40123a795ad4b13af0f5f5855d79fcd4ad",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v065.mp4",
+      "sha256": "82cc43ffb64be23aaeebbc2f7ef0b5d6a7e69f590bda6045500731022bde7bd5",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v077.mp4",
+      "sha256": "ad6a5648b5712a10568003f263869905e3a42d21caa8691b087ac2feb870cbb8",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v077.mp4",
+      "sha256": "b0ad887c05086bf0463aaaac736f27c0ca2f2473a15c0d62d7f090767cec787d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v089.mp4",
+      "sha256": "9c95d2c7c65c09e9120ecc2cd5c76b4b7e26b6f6cd5123e76d4edcae50871f6b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v089.mp4",
+      "sha256": "6311a53ef814d84bb5f683496f0265dce0632f5bf0b6cdf73e7423401a253343",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v002.mp4",
+      "sha256": "6ffc34624ff1f2fc1624652c663019ca85863576276cebb3051a7f1461442e46",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v002.mp4",
+      "sha256": "4f650dde89898a71c4b24a62a017d1f8c291a0518bd93eeca9630f4299237acf",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v015.mp4",
+      "sha256": "4a0ba8e73eac284381245fb18c2495e2b0f4b2b71c919767684ec26d46fd275d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v015.mp4",
+      "sha256": "4ac2a43e1270b69f8af6e2084071493d43126cc9c9324cc982279e859f42a14e",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v028.mp4",
+      "sha256": "ff9202c5011fbd87003c5043f27262c28354a1603946dfb66437c2c2423dd4fd",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v028.mp4",
+      "sha256": "c0559acfe1a118d6db25bf1e66f8d97db6668beefe5404cabfbf17545a09b947",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v041.mp4",
+      "sha256": "1bf3c727e50f52f3586aeed1aeb2921c94b2701ee8ac06c06fe89bb4d56ae65c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v041.mp4",
+      "sha256": "1543020454663c4bd65f96236d05c02f3916add4a2a458857fe3f348fbd18f4b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v054.mp4",
+      "sha256": "3f3af64640831b147062d25daf26152910619ff48ab13a35d699fc8f3707d973",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v054.mp4",
+      "sha256": "27fb7d4d6190ce504d2156f8aa6f76ea2108a607f93fd72b7999d9eca4d00e3e",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v066.mp4",
+      "sha256": "e47cbc03afded5cdf82aee9658e3b4dfc326ecc579110e8a35c4242023b06c9c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v066.mp4",
+      "sha256": "8cd7145064afda03d7802f3e98ebd4571ecd26c5196123d20a5cabb4fbd19015",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v078.mp4",
+      "sha256": "5b649f495df56a793b7a15fa984a9171e20ec9d6b4e063876550c4869e6dce70",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v078.mp4",
+      "sha256": "e7ed1b49b921af1e749f2fb30e61d4fb8bec44742d18341a238590335f0eb34a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v090.mp4",
+      "sha256": "ce10724d44f536c360277f7fe75ae591424d33feb7b99d6be1f2fb50f71a2152",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v090.mp4",
+      "sha256": "2b5111a62db297f799ba14c9fbcba500917fef80c0b7f15933fdc4e549a05091",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v003.mp4",
+      "sha256": "667578fe17db82e82207817903ecca8ed7330c7ea0d93fe177f2062c5128fbab",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v003.mp4",
+      "sha256": "92ce7b4d626860ab32a0125886ad2235f13180dc6abd8297c9715fa398d65fec",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v016.mp4",
+      "sha256": "94052eb3e1fd354d82fb4fa503ebad2c1854284e9fd1bf1a3eb6103d37144bd7",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v016.mp4",
+      "sha256": "2231aa043512016304d15e62502e9f456ebd74bed215348f74471a65993ea2c4",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v029.mp4",
+      "sha256": "eae612d15a1d628a3c32d155db9750cdbfef8efed4704363f6bbf9a0c6f82c7a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v029.mp4",
+      "sha256": "d434e20cfe5d755ce00184a1b02a02c0ea72a5b8c2026f1a91ab345a0e8c456f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v042.mp4",
+      "sha256": "daab9c402419673c8e336b814aa5fcd2ca9f89ae3750b7872f26de359c1a791f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v042.mp4",
+      "sha256": "3dc2ffb356533837aab922257d0c38da7ddb4303f413b030a31bca3a50618be5",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v055.mp4",
+      "sha256": "9c1d66f9f8cfe5c736ee31d69cb3100666791617983bbb0fa1d85a4943c407a9",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v055.mp4",
+      "sha256": "35beb09fc3c0bc12a40e63a9fb914f3818063022754b3a87aed910d208e1701b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v067.mp4",
+      "sha256": "1a2c989367c37dbd7ff92b7617abadcef731ecf4571deff29ed893f250356db5",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v067.mp4",
+      "sha256": "87bd19c84df8357ec2e8a822afe414394704e894eb416703f6d6212bf971d46d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v079.mp4",
+      "sha256": "6795e69e593dbaad65150a83b8c7e3e9e4c652e4a23063681552e788ba6c3124",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v079.mp4",
+      "sha256": "b04b3d466062f09b743d42479d607d986177ee72639c94b44db6d9dbad312a4b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v091.mp4",
+      "sha256": "a5de0b1bb8615f6439b27756fb91c70af2164535a1a70e2fe0dedb6817972edb",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v091.mp4",
+      "sha256": "b5de64f54bcfd14497730f471046ea820d7fc2e697275f642c4b670664a22bca",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v004.mp4",
+      "sha256": "899ddb25e9a32089f1c8a5dfe1d7031e440bba43e40375dfc7828141f734b8d7",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v004.mp4",
+      "sha256": "bf79d005dc3d6974056684d5d921e5ae7ecbb844441d3197680ce2b8cdd5c561",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v017.mp4",
+      "sha256": "fe6ca79701c8d3e8634f420d585a57b6949e6ad4d28fe3aceae58919e067a5dd",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v017.mp4",
+      "sha256": "b12d69baae98fe7ad40b8b0e773add6304ff8b2ce7eddc5f8e4373c63273148b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v030.mp4",
+      "sha256": "5a4b4173b1ee138e3d3cc9e64c1df3fa0b988092d24e093d0f7d0c69782062bd",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v030.mp4",
+      "sha256": "4410819d41b85dd2c139ed2ed0fb55bb8e265ec84fae2f2f50044df00184c72b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v043.mp4",
+      "sha256": "4b6c0efa68c24d9450b0346139ba3bc69561f94f9802f90355deb20b04a99766",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v043.mp4",
+      "sha256": "8a8008a7267c43c7c959e1188e8f4e741b7051821d4371ec9b6ac1793814b11f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v056.mp4",
+      "sha256": "225c78a6eabd41681c441923f3295ebe3aa24e93f43cf206be209575476e4c0b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v056.mp4",
+      "sha256": "ca95166966112ad2a18af51cd9fa5fa961c79cc97dd6251c2f70cbcc09a079dc",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v068.mp4",
+      "sha256": "968209e21d25afb6e6c7602716fb81e693f2c59cc23abc5c2eef15cedee7423d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v068.mp4",
+      "sha256": "d5ed31b72aa368ff65b30b0e8206b3756718b34b69cfda546a0974848fd6544b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v080.mp4",
+      "sha256": "a86eae5137c6f54701aa18961526af7048f1bab07891e4a3b16894184e6b3eff",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v080.mp4",
+      "sha256": "d50bb4585ee8d3e6fa196ba4d30e2967f264b76dd820543b6977572f95ed5a83",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v092.mp4",
+      "sha256": "e6be3fca0fe01eab726275fbc20dbd2f6a938d10f9e9d2c631e949b8d2b3c925",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v092.mp4",
+      "sha256": "e82fa264efa49558e6fc3b509aae248e585c1dc59c98f87598253525592fc8e8",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v005.mp4",
+      "sha256": "538d18041b13fc7e73405bb34d1ae59fb966a8c462b40517f82046e9b835baa7",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v005.mp4",
+      "sha256": "128450173f5c9ab495868a181c80f04e26b565d4649448f8b5ad03739aa8185d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v018.mp4",
+      "sha256": "dc757a877a24ada7a8f753fd04c820da52f67beda1af1b841cde332f072c384a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v018.mp4",
+      "sha256": "e5c2377cd30625a3420c4ea8f5c7ae045318c1211eb2f116038d22fb7fe03d6d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v031.mp4",
+      "sha256": "8617578623d2fc0a08cdff61474273ed99a9efcf726d0ead50b8fafdaac053e0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v031.mp4",
+      "sha256": "51bc0713b9925c5173793620cd11c099571421eaa980c631914f6154ea64ef3c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v044.mp4",
+      "sha256": "a7419631a5f473abacb3e7d1550b0faafbfecc37b2a32d931f814b165eac3daf",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v044.mp4",
+      "sha256": "1b85e632c2937cf625f1bb19d5f5c4579b2eca70cf11dbd3f6e33ef8d56a6778",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v057.mp4",
+      "sha256": "647429228118ecf09dc83bf7460d2f6a162dc4f84a8d307403a93f3153c9ef96",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v057.mp4",
+      "sha256": "5214e363aa1c44b64cc4cdff8e130bb539137fe58e49647b9f1d4b1e4aed58ee",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v069.mp4",
+      "sha256": "3dfa918a3dda4ad6e0aed95beebff6fc2468029f4e444f7263d84380178adcbf",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v069.mp4",
+      "sha256": "f10352909ae56eda67d4adc4f512571edf44bd27b5eed0795b48ca97c162e933",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v081.mp4",
+      "sha256": "2702f8fde3496dcd7bc3c6eaafb26429f706344b49a97480080729fd4b91826a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v081.mp4",
+      "sha256": "5e1ef55c07f764a031c4cdc781224716e6210d88f1e81f036ca9ea4500015eb0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v093.mp4",
+      "sha256": "012b7dda16a13830582973a77961d5bbbf02884a2fd9742b14adb760f3f3abf1",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v093.mp4",
+      "sha256": "56061a280404e9bc574248dc42a1803e18932db4876336e05268ea6252a60f7c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v006.mp4",
+      "sha256": "93c3db076d30cb21c4609e7651bf28f7514750fa1bed82c8dcdf401236a8dcb5",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v006.mp4",
+      "sha256": "a94fe817ccecff1473cb2cf7873056e58df803aeaef4c8f3211dfe599af5c4dc",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v019.mp4",
+      "sha256": "9741cb345b8576302398d7b237ea391dac7f0a46624ef41dab788c33b258593f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v019.mp4",
+      "sha256": "6cd2d6974d345bf1352ea0cb94a6b6af29cca63ab7af9c534e463addb84a604a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v032.mp4",
+      "sha256": "7b6fcc7b6d63c68f17206fed342e734b53bce7813672ff93ef01b1e02734e74c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v032.mp4",
+      "sha256": "5f963fb16b0e43cd63755da2e3ae18f5cca3705eaa8d7692b8cac38a3f6a2240",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v045.mp4",
+      "sha256": "6af71008497c71c108aa6eeb31e1268419f734828fa326cfa1e848f4ff8d1a8d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v045.mp4",
+      "sha256": "44b9dde1380a4644db7ac63c150f9784949bcd633f7b14c34aaeed59ff359cd2",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v058.mp4",
+      "sha256": "106abd06d595630f53265d751ee99f4d3f68c7ecadac1445e72c0cdc10b5d04d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v058.mp4",
+      "sha256": "64feb1827c28870cced3063b705bca977f885c3fa621da1c676086dae7baa853",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v070.mp4",
+      "sha256": "ce751aa55b6350d6b6b3537796e1e3664039ce00aaabdc98839aa05ce99748c0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v070.mp4",
+      "sha256": "c888e8c9cee0396bcb7e722b13ea0649bc1e3a139c24b078455967a35ca7925f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v082.mp4",
+      "sha256": "912a628b29b52e21d5faf115fafcf9866b9f91877056d1b91b858bf11dd40c6e",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v082.mp4",
+      "sha256": "120f8c01fc03f6ea58103d5bcb0dcd42fb55f886121ff00962fee3f96b25eb91",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v094.mp4",
+      "sha256": "6414b0a033a09e341fabef39e51e06fd41906891ca7b768b2b57eb3a204227ff",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v094.mp4",
+      "sha256": "2ec4fd4a301dbbafa667c4624bc17c0ebe6dcce26c0d6684ad3a74781e524514",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v007.mp4",
+      "sha256": "ee30de848323113e2a7598cec96ed82c4bced79022a6482d540b40b2f2bf6b7f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v007.mp4",
+      "sha256": "3bac87dfef2a35b651593b0d4dbd39852c08aec0e0e530f98b23ccd8f6e17b8b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v020.mp4",
+      "sha256": "c019ce676b455769b205b3e921a66ae190143d2de87379e4dc7830eb7fa44c6d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v020.mp4",
+      "sha256": "220011ec1fddb6fc785e65e1e02acde9a268438c438a74f2f08d9bff2bd4af57",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v033.mp4",
+      "sha256": "0acc3de2fa9848f41d24c2f147f8355b1d8f9481b2b968d4036f66936a7d6d0c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v033.mp4",
+      "sha256": "126b5a3072d1b962d106e626e8e18e41386070c8122d9661ba44524c5af7aa46",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v046.mp4",
+      "sha256": "8cc4be50f1edb0e2f0737e0a2a638dcc0457a7271ebfb12c9ee18d9159e11b96",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v046.mp4",
+      "sha256": "0866848839fcb9958e66f245c31e31f48e7a860fb64f91a7e275ecf3f8c281d5",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v059.mp4",
+      "sha256": "9b5e03c51fe012143b9d2875b5771d5343290f3f5ad4e6fc06dc7e819c1fb6a8",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v059.mp4",
+      "sha256": "bb9a783a5c63977097c71347d27584b0dbfe2ccacdb9ff2467458a9e9b3fd3ab",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v071.mp4",
+      "sha256": "51c2dea9cbdf8626109ff34afe161f1f6a1841a16e788c76e54d4812d3a1cee0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v071.mp4",
+      "sha256": "719e7a687a1027296923e91dbd5c0e045893a52fa313794f17544c789e29ab3a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v083.mp4",
+      "sha256": "47e8b0993a7d7eb3b6e9377fab744df4a6a4be37d58d62ca5ca4bc63741d5091",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v083.mp4",
+      "sha256": "fb239af4168ae139eaae7147e77df094f5f931f65cd11530157f9bc13d3e8112",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v095.mp4",
+      "sha256": "d6db59a0e2564b4a694910a19d6493c9d655cd069853b69bac83696aa206eea9",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v095.mp4",
+      "sha256": "0b5290646de38022bbac42ceed12dd0bacf3c7c58c27d449da567d34e781d172",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v008.mp4",
+      "sha256": "45490a6b261fe14202268496730b98fe6117a6811505336cc17ffa4db52d47cb",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v008.mp4",
+      "sha256": "d4ad18771bc1619d834f4b5282bec34949b65cb90be747d9086c8f69dd80c429",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v021.mp4",
+      "sha256": "d2842c9c4864f0351a6243296e646b8a7cfa91175f15c124171b02130727cbfa",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v021.mp4",
+      "sha256": "e2897207ffa969b8456b31071903331a4b8b4eafffd20485cd69c20927c2965c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v034.mp4",
+      "sha256": "6dbdd5be31953e201ac664312c38e3cf048a4e755da6346900f8c8c26fedd141",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v034.mp4",
+      "sha256": "8eb5a8aadf0f6d1a572080eee204ff6a99aa865925e2e8bb4819f9c9ec7a64c4",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v047.mp4",
+      "sha256": "472bb81f6a57ff439ed74f3e2dcedaf0fba5da79a4bda142e5e39c0b5214c500",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v047.mp4",
+      "sha256": "0a5061ae7ebc69588b112ed1e5bc6d4be1260fe5fe9816ad65f83138270797e5",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v060.mp4",
+      "sha256": "4b9a1779f0bda39ffceedbc9f5668ecc17f2940ba77d844398a45119b8658066",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v060.mp4",
+      "sha256": "25496b3e2cd328a092a5e38e4e8882a8522892e0814ce6a13f0388a58c2b4810",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v072.mp4",
+      "sha256": "3322e934fc7594ab780d40bc5e2605876947acee1ccb814932b290f73fb8165c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v072.mp4",
+      "sha256": "f52a3c4fd1100ef34f50b28e3748d96e328b154717f25693a338d025ea721fe0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v084.mp4",
+      "sha256": "294fe7a74b7de11c86f38a9ac232425b38e6551d62fde5263df2d2044b24ae8c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v084.mp4",
+      "sha256": "1acb611ef50f88aefd01e6905ca9806f217fcf7a4c613dbf2a60a433d2b11411",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v096.mp4",
+      "sha256": "5d4d7bb71e7fa901c673c02538b995ee1fd513261090d6f4f4a1c637ef41e3a3",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v096.mp4",
+      "sha256": "9f5621733fef18ad0873024f01aa3ca2de50d1bb230ec87947f1b43ee6fa6ed9",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v009.mp4",
+      "sha256": "4c4c0309934160eb5213849d843a1b31d44b734a6c0e0d41cbdbbd006f4709bd",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v009.mp4",
+      "sha256": "d6c97e2b00900d77f689793705bd7305fdc7777da633b1d3d872b7d5a2c196e7",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v022.mp4",
+      "sha256": "1c3643799ebde8b13037855e5d6761138643f052897c282bccd1c119d89a1a84",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v022.mp4",
+      "sha256": "377a02ac61348538acd83500edc23af032197fe95a8661f335391c957a31608f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v035.mp4",
+      "sha256": "8e78f86bcdb73a2e89be0d3910dce94abfad58d804437a5a6c853fd6e9f0f880",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v035.mp4",
+      "sha256": "c2a487a90a24152249206328439973d3dac065825bbc2a265c8e8b9343fcdeeb",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v048.mp4",
+      "sha256": "564cd7ef3ffd6a195d4b919cc88e8bc7cf3f8b65122794242f51dfd7f723a60b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v048.mp4",
+      "sha256": "5f71215b1f9a092e8a7363ea327c0e820819dd0dd4f006be0c0320980e6d1e0f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v061.mp4",
+      "sha256": "d3f191f02e715da6320654ad605437073ae7858e0ed08405757e192f48d1f879",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v061.mp4",
+      "sha256": "493b310cd88e2e936497f54bc92cf8c2e2588201f0bdfc8556501eb32d28a13f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v073.mp4",
+      "sha256": "79b60b5830d77989ff36484037ea1d195ed1911d85eda9c88709f2e723f28bef",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v073.mp4",
+      "sha256": "825aa3429ff1f26641a7350f0360917b53ac967217a17032933367f8902e0dfb",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v085.mp4",
+      "sha256": "de5e5aeadddd26099f2950a921e7e2aed6f1e84a7d0ad2131e9bcd52519d8488",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v085.mp4",
+      "sha256": "ba13b9ce9c28515debd28cfb15c2ede97bff59e7d8df9d19f854dfa143e79882",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v097.mp4",
+      "sha256": "832cf5ea5fe1ad423b34fd240d4d3fda06cdbc53ed438ee781ce668de9344cb0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v097.mp4",
+      "sha256": "81e81b924cc0cda7d4928480d6345746a52bacafe440c1c6fae5340416a3875a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v010.mp4",
+      "sha256": "0c6c03ce9d125f2dd2213ebf304fa31798429a28a690462b8fb91752415fd527",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v010.mp4",
+      "sha256": "1f071bf590526aab17bed2684665eda64969236876e744800113787e211335bd",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v023.mp4",
+      "sha256": "de5555f8114c84b8a7c883063999258131312f9a04888bead1419253118016f9",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v023.mp4",
+      "sha256": "e3c613d542b953ffe29ea7e6968532aafc89ebd8f54cb9ccf3389316a74b0e9f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v036.mp4",
+      "sha256": "f4a6f6bd380ebea4583ffbc703b31c6f81296554ed79864ddc0da38d21a2e9b3",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v036.mp4",
+      "sha256": "532d9f5c9911adc2d8fd73a4eab3cfabe9fab625dca5d10ba2a79c1ec6e778a3",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v049.mp4",
+      "sha256": "21d9fcf6ca6f9ff2cb08a34ac62e320bfb768ab0d6f06769f6acc880592d8fee",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v049.mp4",
+      "sha256": "3ce5ea2f734f3f7344ae090f3a12f2a84f0f69c2d81882ecafb0fc262b70789d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v062.mp4",
+      "sha256": "75db7598dd317f3cfcd2c39c7627ee1aff6de5a1095a4975b4214cfbb2c0ad69",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v062.mp4",
+      "sha256": "022ddd253b09073b91fc9fa21aaf7686ba8a352c3291d69442558cde00af740f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v074.mp4",
+      "sha256": "5c4562f5a0431ea5407190f8de69903cbcce8abe8f2b3ee07cbfbce1e735f201",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v074.mp4",
+      "sha256": "3cf4268395b9f07abc9c602bb5a025f40e5383ffba4aa30028d469cb59189c54",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v086.mp4",
+      "sha256": "0612c30414b978eb99767cf22aeb207bfa0b7f37ee6192136ec6a726885aa6ee",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v086.mp4",
+      "sha256": "31b0e7db31762bb717a9b129af5169e477db06712cb24feb24d5007ba386ac36",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v098.mp4",
+      "sha256": "b34de8c7a8eb09d68ee3be064012f9f4b3ee200292edf2b85e560db853df04b3",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v098.mp4",
+      "sha256": "7251818cf4392c3f9c1dd98d2ea32031261818f6973cdeab6d81934415102676",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v011.mp4",
+      "sha256": "4ea143bf7c9aded49313522bfc20b0f4c07e6594cf033977f636aefe40a78ea1",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v011.mp4",
+      "sha256": "eb5615072e9e46fed60c997cba8717460732b99b1d877059910b893c32057c96",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v024.mp4",
+      "sha256": "8824b0096bcc97aa1914ad7c39fe52250411824b651932cff0e41ee3b5886f42",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v024.mp4",
+      "sha256": "c8069207618225e200fcec733760f3fcda3d95cb8b706fc34befd330288380d6",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v037.mp4",
+      "sha256": "20464f20030bcfcd4a0f5dd439cfc320f5c1233ae664e99edff157a398046a80",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v037.mp4",
+      "sha256": "e5d5c2d28967685168812939c020fd6ac539f0a1fa2ce5dd8c710b3a47b0b6ba",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v050.mp4",
+      "sha256": "34eb71bbeefe720ff77e76941ac2b5666f958584607be79e370dd60b6718c52f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v050.mp4",
+      "sha256": "18dfbec90f031a8f56a5fe59d02574dd3895aec78c78c93eddba73474027b386",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v063.mp4",
+      "sha256": "5cc21db7e3b699f815cd00ad5c88663a68cb5de37ee2bae1cdd693c476af870a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v063.mp4",
+      "sha256": "9910c1eec4191f6672cdaa6841c1eb1000cdb8d04938ae61e163f1cc3852a81f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v075.mp4",
+      "sha256": "c0adbbf6dee8f0d0eb8e14887d7c3b81f60c7c9db088a1adef0287467d65bb4f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v075.mp4",
+      "sha256": "c8257471bcd495fda7d7cf0c264599887b4bf2a4f8b14bc08e36ec1f6d0c88e0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v087.mp4",
+      "sha256": "91a54b35a40d23c53c00360d2f8d66578beb05e8df0fac9578118302a3220a52",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v087.mp4",
+      "sha256": "c36b3e7cffe189fb0bad74ee2c1e09f1369feb99774319b45fd91aa12c7eaac2",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v099.mp4",
+      "sha256": "c5e2cfc1514fb39519522708a0c893969680fa7068bee9e54d1db57fd077f510",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v099.mp4",
+      "sha256": "ec0f64a1244129713273dbd903e350c4d7c9a34e842164c6d0177ee608baca9e",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v012.mp4",
+      "sha256": "49aa0962baa92c08f0adc4a733bbe6f16b06a4a1ad135bafd90de24ed9476e27",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v012.mp4",
+      "sha256": "133c331b53e6ffcbb2f56fc5399564d08e2c37a4c7d637a50dc46c6d0cf08bc4",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v025.mp4",
+      "sha256": "96c9446284d0fbf655f04134832831940943c23bd86ee59dbea4a62129b68394",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v025.mp4",
+      "sha256": "a6655c682ca5531af2d3a47ae801bd92c51356b8f99e9977e2267101947db3f9",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v038.mp4",
+      "sha256": "45801a2e10bf38758b80252fea1d6d2ae357704cc79476a0964dba7e491af444",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v038.mp4",
+      "sha256": "324e8e1e3a46428af544ef4a7829e05606b3398124d139e55b7d82eb92861e7c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v051.mp4",
+      "sha256": "5a9d5d9432cb08645afae717d2d1f6c5d8256cec5afe6842ebd0808f15b1c83a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_means/v051.mp4",
+      "sha256": "0681b0bbfaeed3023c88e955a17be89c389f4c3ee259d2b467518ffa951b0726",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    }
+  ],
+  "coverage": {
+    "prompts": 100,
+    "videos": 200,
+    "qk_hook_calls": 480000,
+    "frames_per_video": 45,
+    "tokens_per_forward": 10800,
+    "denoising_steps": 20,
+    "layers": 30,
+    "heads": 12
+  },
+  "generation_code_sha256": {
+    "baseline": {
+      "center_replacement.py": "e2316b2314e1ad6230111c811fbf8db919b888a55bfbef56c25fca95c782b57a",
+      "run_center_benchmark.py": "a34e9de8c540c08d25901f78de9c4e212972aad22f2c5c5ff8d0499412d5c570"
+    },
+    "s32_means": {
+      "generate_learned_center.py": "2161b4fdd730445b04e10b8517dc2724687fd2056afe04fd012e98db01a84a89",
+      "learned_center.py": "3a19455aac2b63e01b3e8c46719ceb299914f1ecde8e253e48d29a5a2a43540a"
+    }
+  },
+  "bootstrap": {
+    "replicates": 10000,
+    "seed": 20261109,
+    "unit": "paired prompt with its one fixed seed; retain all arms together",
+    "interval": "2.5th and 97.5th percentiles of resampled mean paired difference"
+  },
+  "timing": {
+    "baseline": {
+      "mean_seconds": 15.352797548770905,
+      "median_seconds": 15.272468328475952,
+      "min_seconds": 15.139758586883545,
+      "max_seconds": 16.159030437469482
+    },
+    "s32_means": {
+      "mean_seconds": 15.916904447078705,
+      "median_seconds": 15.900593876838684,
+      "min_seconds": 15.548746824264526,
+      "max_seconds": 16.35139012336731
+    }
+  },
+  "audit": {},
+  "source_copy": {
+    "raw_sha256": "88fc8619c92e95e38bff052327c28e61cc269bbe159dd549b99544bbe2c8d847",
+    "omitted_fields": [
+      "config.model"
+    ]
+  }
+}

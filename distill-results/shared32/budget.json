@@ -1,0 +1,5 @@
+{
+  "approved_gpu_hours": 18.0,
+  "gpu_hours_used": 12.798253055555556,
+  "accounting": "Allocated wall seconds x GPUs of every GPU job (ledger.tsv), including loading, validation, saves, failed attempts and scorers; CPU work excluded."
+}

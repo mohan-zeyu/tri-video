@@ -1,0 +1,7 @@
+2026-11-22T14:02:35Z	claude	-	Brief: attention-score share of the replaced pairs inside the trained students
+2026-11-23T06:35:49Z	claude	-	Brief: pair scores of one cell (d0000, layer 0, step 1, head 1)
+2026-11-23T08:19:42Z	claude	-	Brief: the same cell for prompt d0006, with one-query maps of all pairs
+2026-11-23T10:22:34Z	claude	-	Brief: single-cell pair scores at a middle step and a middle layer, both prompts
+2026-11-23T10:41:24Z	claude	-	Brief: single-cell pair scores at the last layer and the last step, both prompts
+2026-11-25T09:23:40Z	claude	-	Plan and brief: separate the text from the noise seed (2 x 2, lab writes the code)
+2026-11-25T09:31:19Z	claude	-	Brief narrowed: text versus noise seed at layer 15, step 1 only (replaces 3cd891d)

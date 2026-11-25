@@ -1,0 +1,7 @@
+{
+  "approved_gpu_hours_total": 13,
+  "source": "User-assigned brief 6f273d8, explicitly instructed to carry out by user in lab chat; return after verifying the run works to conserve credits.",
+  "recipe_changes_approved": false,
+  "max_training_gpus": 2,
+  "max_total_gpus": 4
+}

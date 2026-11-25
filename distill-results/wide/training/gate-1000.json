@@ -1,0 +1,14 @@
+{
+  "step": 1000,
+  "guided_validation_error": 0.04485590904077981,
+  "threshold": 0.1,
+  "passed": true,
+  "scope": "Live student weights at update 1000; whole-latent relative squared velocity error vs the bf16 teacher, equal mean over the first 8 held-out prompts x 20 teacher entering states; conditional and unconditional combined at CFG 5; nothing exempt.",
+  "c1_allocated_wall_seconds": 8974.402567863464,
+  "projected_remaining_gpu_seconds": 71795.22054290771,
+  "projection_basis": "C1 allocated wall seconds per update (including model load, 5 validations and saves) x 4000 remaining updates x 2 GPUs",
+  "gpu_seconds_used": 20149.70276427269,
+  "reserve_DE_gpu_seconds": 10800.0,
+  "budget_gpu_seconds": 100800,
+  "fits_budget": false
+}

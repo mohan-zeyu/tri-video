@@ -1,0 +1,263 @@
+{
+  "record": "/mnt/data/liuzeyu/tri-score-attribution-e8657af/out/distill-score-attribution/d0000.pt",
+  "reference": "/mnt/data/liuzeyu/tri-video-selection-67c101b/out/distill-pair-stats/d0000.pt",
+  "record_bytes": 211116959,
+  "seconds": 138.93142652511597,
+  "worker_wall_seconds": 150.16,
+  "peak_device_memory_mib_sampled_at_500ms": 7571,
+  "filled_layer_step_branch_groups": 1200,
+  "shapes": {
+    "var_cov": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "var_own": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "row_var": [
+      30,
+      20,
+      2,
+      12
+    ],
+    "var_share_quantiles": [
+      30,
+      20,
+      2,
+      12,
+      64,
+      5
+    ],
+    "row_var_quantiles": [
+      30,
+      20,
+      2,
+      12,
+      5
+    ],
+    "adv": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "adv_total": [
+      30,
+      20,
+      2,
+      12
+    ],
+    "adv_share_quantiles": [
+      30,
+      20,
+      2,
+      12,
+      64,
+      5
+    ],
+    "adv_total_quantiles": [
+      30,
+      20,
+      2,
+      12,
+      5
+    ],
+    "mean_contribution": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "center_var_cov": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "center_var_own": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "center_cross_own": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "center_cross_cov": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "energy_q": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "energy_k": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "norm_q": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "norm_k": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "center_norm_q": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "center_norm_k": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "top1": [
+      30,
+      20,
+      2,
+      12,
+      64
+    ],
+    "entropy": [
+      30,
+      20,
+      2,
+      12
+    ],
+    "effective_keys": [
+      30,
+      20,
+      2,
+      12
+    ],
+    "pmax": [
+      30,
+      20,
+      2,
+      12
+    ],
+    "top1_self": [
+      30,
+      20,
+      2,
+      12
+    ],
+    "top1_total": [
+      30,
+      20,
+      2,
+      12
+    ],
+    "pair_cov": [
+      30,
+      20,
+      2,
+      12,
+      64,
+      64
+    ],
+    "filled": [
+      30,
+      20,
+      2
+    ]
+  },
+  "attention_output_validation": {
+    "step0-layer0-conditional": {
+      "max_abs_err": 0.0,
+      "output_scale": 15.5,
+      "relative_max_err": 0.0
+    },
+    "step0-layer0-unconditional": {
+      "max_abs_err": 0.0,
+      "output_scale": 15.5,
+      "relative_max_err": 0.0
+    },
+    "step0-layer15-conditional": {
+      "max_abs_err": 0.0,
+      "output_scale": 11.25,
+      "relative_max_err": 0.0
+    },
+    "step0-layer15-unconditional": {
+      "max_abs_err": 0.0,
+      "output_scale": 11.4375,
+      "relative_max_err": 0.0
+    },
+    "step0-layer29-conditional": {
+      "max_abs_err": 0.0,
+      "output_scale": 19.375,
+      "relative_max_err": 0.0
+    },
+    "step0-layer29-unconditional": {
+      "max_abs_err": 0.0,
+      "output_scale": 18.5,
+      "relative_max_err": 0.0
+    }
+  },
+  "pre_rope_pair_energy": {
+    "energy_q": {
+      "elements": 921600,
+      "n_exact": 921600,
+      "max_absolute_error": 0.0,
+      "max_relative_error": 0.0,
+      "bf16_epsilon": 0.0078125
+    },
+    "energy_k": {
+      "elements": 921600,
+      "n_exact": 921600,
+      "max_absolute_error": 0.0,
+      "max_relative_error": 0.0,
+      "bf16_epsilon": 0.0078125
+    }
+  },
+  "checks": {
+    "shapes_match": true,
+    "pair_cov_float16": true,
+    "all_groups_filled": true,
+    "prompt_and_steps_match": true,
+    "branch_order_matches": true,
+    "every_query": true,
+    "attention_matches": true,
+    "energy_q_within_bf16_precision": true,
+    "energy_k_within_bf16_precision": true
+  },
+  "calibration_64_projected_gpu_hours": 2.469892027113173,
+  "all_96_projected_gpu_hours": 3.704838040669759,
+  "all_96_projected_record_bytes": 20267228064
+}

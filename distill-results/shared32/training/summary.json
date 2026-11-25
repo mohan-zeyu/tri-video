@@ -1,0 +1,30 @@
+{
+  "updates": 2500,
+  "median_seconds_per_update": 6.946635512402281,
+  "time_scope": "Median of logged rank-mean optimizer-update wall time, excluding validation and checkpoint I/O.",
+  "peaks": [
+    {
+      "log": "train-a01.log",
+      "rank": 1,
+      "peak_cuda_allocated_bytes": 23124272128,
+      "wall_seconds": 19026.38642369001
+    },
+    {
+      "log": "train-a01.log",
+      "rank": 0,
+      "peak_cuda_allocated_bytes": 23127626752,
+      "wall_seconds": 19026.554132612888
+    }
+  ],
+  "mu_norm": {
+    "q": [
+      12.271143913269043,
+      12.27098560333252
+    ],
+    "k": [
+      12.71428394317627,
+      12.714110374450684
+    ]
+  },
+  "mu_scope": "Live per-cell Euclidean norm over all 128 mean coordinates, equal average over all cells; first and last logged update."
+}

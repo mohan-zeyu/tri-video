@@ -1,0 +1,20 @@
+2026-11-19T06:47:53Z	claude	dry-run	Dry run 2: hand-off through the log trigger
+2026-11-19T07:01:47Z	codex	done	Dry run: Codex to Claude hand-off
+2026-11-19T13:51:34Z	codex-cloud	dry-run	Dry run: Codex cloud to Claude hand-off
+2026-11-19T14:06:51Z	codex	question	NoPE paused at update 3000: budget approval needed
+2026-11-19T15:05:28Z	codex-cloud	dry-run	Dry run: Codex cloud to Claude hand-off
+2026-11-20T03:34:07Z	codex	question	NoPE C SIGKILL after 4590: audited recovery and budget ASK
+2026-11-20T07:26:15Z	codex	done	Complete NoPE A-E: split42 fails video quality; zeroing has mixed effects
+2026-11-20T16:50:25Z	codex	interrupted	No-exemption study stopped: Command '['python3', '/mnt/data/liuzeyu/tri-video-noexempt-6f273d8/out/distill-noexempt-run/gpu-work
+2026-11-21T04:21:01Z	claude-lab	done	Widened head A-E complete: wide32 below shared22 on video; zeroing its position channel is catastrophic
+2026-11-21T07:49:56Z	claude-lab	done	Complete no-exemption shared22 A-C and paired inference-only zero swap
+2026-11-21T18:04:52Z	claude-lab	done	shared32 complete: means and zeros benchmarks
+2026-11-22T10:14:23Z	claude-lab	done	Hand-off: shared32 written up in DISTILL_REPORT.md and handoff.md
+2026-11-22T11:34:11Z	codex	done	Score shares across denoising steps: step-trajectory pages and step similarity (CPU only)
+2026-11-22T12:21:51Z	codex	done	Score share of the shared32 pairs in the teacher (CPU only)
+2026-11-22T15:16:07Z	claude-lab	done	Score share of the replaced pairs inside the trained students
+2026-11-23T06:42:27Z	claude-lab	done	Pair scores of one cell (d0000, layer 0, step 1, conditional, head 1)
+2026-11-23T08:25:14Z	claude-lab	done	Pair scores of the same cell for prompt d0006, with one-query maps of all pairs
+2026-11-23T10:29:05Z	claude-lab	done	Pair scores of four more single cells: layer 0 step 10 and layer 15 step 1, prompts d0000 and d0006
+2026-11-23T10:49:30Z	claude-lab	done	Pair scores of six single cells at the last layer and the last step, prompts d0000 and d0006
+2026-11-25T09:55:19Z	claude-lab	done	Text or noise seed at layer 15, step 1: two crossed cells, six comparisons, summary
