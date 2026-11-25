@@ -17,3 +17,4 @@
 2026-11-23T08:25:14Z	claude-lab	done	Pair scores of the same cell for prompt d0006, with one-query maps of all pairs
 2026-11-23T10:29:05Z	claude-lab	done	Pair scores of four more single cells: layer 0 step 10 and layer 15 step 1, prompts d0000 and d0006
 2026-11-23T10:49:30Z	claude-lab	done	Pair scores of six single cells at the last layer and the last step, prompts d0000 and d0006
+2026-11-25T09:55:19Z	claude-lab	done	Text or noise seed at layer 15, step 1: two crossed cells, six comparisons, summary
