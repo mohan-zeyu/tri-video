@@ -438,3 +438,8 @@ two noise seeds (two control trajectories that must reproduce the stored ones, t
 (layers 0, 15, 29 × steps 1, 10, 20; conditional branch, head 1), and the six pairwise comparisons per setting
 grouped as same noise / different text, same text / different noise, and both differ. The owner asked that the
 lab agent write the code for this task and run it; the research session reviews code and results.
+
+Narrowed the same day at the owner's request ("Just do it on the layer 15 step 1. Don't run too many"): one
+setting only, layer 15 at step 1. At step 1 the entering state is the initial noise, so the two crossed cells
+need no sampling run: the stored step-1 state of one prompt with the stored text embeddings of the other. The
+two uncrossed cells already exist. The revised `DISTILL_SCORE_SEED_PROMPT.md` replaces the brief of `3cd891d`.

@@ -4,3 +4,4 @@
 2026-11-23T10:22:34Z	claude	-	Brief: single-cell pair scores at a middle step and a middle layer, both prompts
 2026-11-23T10:41:24Z	claude	-	Brief: single-cell pair scores at the last layer and the last step, both prompts
 2026-11-25T09:23:40Z	claude	-	Plan and brief: separate the text from the noise seed (2 x 2, lab writes the code)
+2026-11-25T09:31:19Z	claude	-	Brief narrowed: text versus noise seed at layer 15, step 1 only (replaces 3cd891d)
