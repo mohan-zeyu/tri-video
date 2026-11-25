@@ -379,3 +379,12 @@ highest-damage pairs taken from the real projection without RoPE (a pure content
 appended rows are gathered from the projection output, which equals copying those rows of to_q/to_k); the `wide`
 selection variant picks the content pairs. Mode `delete` zeroes the position channel. Nothing exempt. The procedure
 is in `DISTILL_WIDE_PROMPT.md`.
+
+### Update-time profile (25 November)
+
+The fine-tunes cost 10 GPU-hours per 2,500 updates. The study and run levels are measured (training is 68% of the
+first study's 71.5 GPU-hours; optimizer updates are about 97% of the no-exemption run's 10.06 GPU-hours), but the
+split inside one training sample (3.46 GPU-seconds, median update time divided by the 2 samples per rank) is only
+an estimate. `DISTILL_PROFILE_PROMPT.md` measures it: phase timers on the real two-rank recipe, FSDP communication,
+a single-card compute floor, four toggles and the anatomy of one forward. No recipe change and no kept training; it
+runs on branch `claude/profile-distill-update` and decides which speed-up, if any, is worth building.
