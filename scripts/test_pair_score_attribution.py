@@ -523,6 +523,16 @@ def test_cell_pair_scores():
         same = list(csv.DictReader(open(tmp / "compare" / f"{folder.name}--vs--{folder.name}.csv")))
         assert len(same) == 64 and all(abs(float(r["map_correlation_min_27_queries"]) - 1) < 1e-9 and r["centred_share_a"] == r["centred_share_b"] for r in same)
         assert abs(float(same[7]["centred_share_a"]) - pairs[7]["ctr_att_abs_share"]) < 1e-7 and (tmp / "compare" / f"{folder.name}--vs--{folder.name}.png").exists()
+        # one query, every key: absolute raw scores of each pair, their share, and a cell compared with itself
+        run("one_query_pair_scores.py", ["--out", tmp / "one", "--cell", "A", folder, "--cell", "B", folder, "--compare", "A", "B", "same", "--grid", 2, 2, 2])
+        one = [r for r in csv.DictReader(open(tmp / "one" / "one-query-pairs.csv")) if r["cell"] == "A"]
+        raw = contrib[7].abs().sum(0)                                                                                   # centre query (1, 1, 1) = token 7: [pair]
+        assert len(one) == 64 and all(abs(float(r["sum_abs_raw_score"]) - float(raw[f])) < 1e-6 * max(1, float(raw[f])) for f, r in enumerate(one))
+        assert all(abs(float(r["share_of_abs_raw_score"]) - float(raw[f] / raw.sum())) < 1e-7 and abs(float(r["sum_raw_score"]) - float(contrib[7, :, f].sum())) < 1e-6
+                   for f, r in enumerate(one))
+        both = list(csv.DictReader(open(tmp / "one" / "one-query-correlations.csv")))
+        assert len(both) == 64 and all(abs(float(r["correlation_absolute_maps"]) - 1) < 1e-9 and abs(float(r["correlation_signed_maps"]) - 1) < 1e-9 for r in both)
+        assert (tmp / "one" / "one-query.png").exists() and len(list((tmp / "one").glob("abs-maps-*.png"))) == 6
     print("test_cell_pair_scores OK")
 
 
