@@ -1,0 +1,25 @@
+{
+  "files": [
+    {
+      "file": "student/learned_center.pt",
+      "audited_sha256": "a2e2060833d8a624fbacccb81064bd880f5e26884fdaaaf1bbc318efcb352cf3",
+      "sha256": "a2e2060833d8a624fbacccb81064bd880f5e26884fdaaaf1bbc318efcb352cf3",
+      "match": true
+    },
+    {
+      "file": "student/transformer/config.json",
+      "audited_sha256": "52669ea7e3f7954e403c37d6fe2c853728821b8feae11a582b40f9541b86a402",
+      "sha256": "52669ea7e3f7954e403c37d6fe2c853728821b8feae11a582b40f9541b86a402",
+      "match": true
+    },
+    {
+      "file": "student/transformer/diffusion_pytorch_model.safetensors",
+      "audited_sha256": "be743d0c16541e1dbea385047e36670f496db5a24a94a4d0e8765e9fe8daeccc",
+      "sha256": "be743d0c16541e1dbea385047e36670f496db5a24a94a4d0e8765e9fe8daeccc",
+      "match": true
+    }
+  ],
+  "center_audit_match": true,
+  "ok": true,
+  "scope": "SHA-256 of the shared32 final EMA (learned_center.pt and bf16 transformer) on the lab host against distill-results/shared32/training/final-ema.sha256 and center-audit.json"
+}

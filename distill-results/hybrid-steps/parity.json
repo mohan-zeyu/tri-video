@@ -1,0 +1,101 @@
+{
+  "prompts": [
+    "v000",
+    "v013"
+  ],
+  "tolerance": "torch.equal on the final latent (all coordinates of the step-20 state), as the encoder-parity probes; MP4 SHA-256 reported",
+  "checks": {
+    "parity_teacher20": {
+      "teacher_steps": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "reference": "frozen teacher baseline (out/center-benchmark-wan-20261109)",
+      "prompts": [
+        {
+          "prompt_id": "v000",
+          "seed": 2026110900,
+          "identical_final_latents": true,
+          "relative_l2": 0.0,
+          "dtype": [
+            "torch.float32",
+            "torch.float32"
+          ],
+          "identical_mp4_sha256": true,
+          "record_audit_problems": [],
+          "teacher_forwards": 40,
+          "intervention_calls": 0
+        },
+        {
+          "prompt_id": "v013",
+          "seed": 2026110913,
+          "identical_final_latents": true,
+          "relative_l2": 0.0,
+          "dtype": [
+            "torch.float32",
+            "torch.float32"
+          ],
+          "identical_mp4_sha256": true,
+          "record_audit_problems": [],
+          "teacher_forwards": 40,
+          "intervention_calls": 0
+        }
+      ],
+      "passed": true
+    },
+    "parity_teacher0": {
+      "teacher_steps": [],
+      "reference": "s32_means benchmark (shared32 bench-mean)",
+      "prompts": [
+        {
+          "prompt_id": "v000",
+          "seed": 2026110900,
+          "identical_final_latents": true,
+          "relative_l2": 0.0,
+          "dtype": [
+            "torch.float32",
+            "torch.float32"
+          ],
+          "identical_mp4_sha256": true,
+          "record_audit_problems": [],
+          "teacher_forwards": 0,
+          "intervention_calls": 2400
+        },
+        {
+          "prompt_id": "v013",
+          "seed": 2026110913,
+          "identical_final_latents": true,
+          "relative_l2": 0.0,
+          "dtype": [
+            "torch.float32",
+            "torch.float32"
+          ],
+          "identical_mp4_sha256": true,
+          "record_audit_problems": [],
+          "teacher_forwards": 0,
+          "intervention_calls": 2400
+        }
+      ],
+      "passed": true
+    }
+  },
+  "passed": true
+}
