@@ -101,9 +101,21 @@ class Profile(Hybrid):
             self.state('waiting-for-idle-gpus', gpus=n)
             time.sleep(30)
 
+    @staticmethod
+    def descends(pid, root):
+        """True if `pid` is `root` or a descendant of it (parent chain from /proc). torch.distributed.run starts its
+        workers in sessions of their own, so the session id does not identify our ranks; the parent chain does."""
+        while pid > 1:
+            if pid == root:
+                return True
+            stat = Path('/proc/%d/stat' % pid).read_text()
+            pid = int(stat[stat.rindex(')') + 2:].split()[1])
+        return False
+
     def foreign(self, lease, session=None):
-        """Compute processes on the leased cards that are not in our job's session (start() uses start_new_session,
-        so every rank and worker of the job has session id == the job's pid). Before a job, every process is foreign."""
+        """Compute processes on the leased cards that are not the job (`session` = the job's pid) or its descendants.
+        A process that exited before its parent chain could be read counts as ours only if it ran the lab python.
+        Before a job, every process is foreign."""
         uuids = {g[1] for g in lease}
         out = []
         try:
@@ -116,9 +128,9 @@ class Profile(Hybrid):
                 continue
             pid = int(parts[2])
             try:
-                ours = session is not None and os.getsid(pid) == session
-            except (ProcessLookupError, PermissionError):
-                ours = False
+                ours = session is not None and self.descends(pid, session)
+            except (FileNotFoundError, ProcessLookupError, PermissionError, ValueError, IndexError):
+                ours = session is not None and parts[3] in (self.lab['python'], '[No data]')
             if not ours:
                 out.append({'timestamp': parts[0], 'gpu_uuid': parts[1], 'pid': pid, 'process_name': parts[3], 'used_memory': parts[4]})
         return out
