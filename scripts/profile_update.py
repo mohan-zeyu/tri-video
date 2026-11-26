@@ -50,8 +50,14 @@ PAIR_ARMS = [  # (arm, recipe, profile flags)
     ('P4c', with_flag(RECIPE, '--accum', '1'), ['--profile-timers', 'blocks']),
     ('P4d', RECIPE + ['--no-checkpointing'], ['--profile-timers', 'blocks']),
 ]
+APPS = 'timestamp,gpu_uuid,pid,process_name,used_memory'
 TELEMETRY = 'timestamp,index,utilization.gpu,memory.used,power.draw,power.limit,temperature.gpu,clocks.sm,clocks.max.sm,clocks_event_reasons.active'
 ARM_WALL_LIMIT = 1500
+ATTEMPTS = 3          # per arm; an attempt during which another user's process sat on a leased card is set aside
+
+
+class Contended(Exception):
+    """A compute process we did not start was on a leased card before or during an arm."""
 
 
 class Profile(Hybrid):
@@ -95,6 +101,43 @@ class Profile(Hybrid):
             self.state('waiting-for-idle-gpus', gpus=n)
             time.sleep(30)
 
+    def foreign(self, lease, session=None):
+        """Compute processes on the leased cards that are not in our job's session (start() uses start_new_session,
+        so every rank and worker of the job has session id == the job's pid). Before a job, every process is foreign."""
+        uuids = {g[1] for g in lease}
+        out = []
+        try:
+            rows = self.smi('--query-compute-apps=' + APPS, '--format=csv,noheader').splitlines()
+        except Exception as error:
+            return [{'error': repr(error)}]
+        for row in rows:
+            parts = [x.strip() for x in row.split(',')]
+            if len(parts) < 5 or parts[1] not in uuids:
+                continue
+            pid = int(parts[2])
+            try:
+                ours = session is not None and os.getsid(pid) == session
+            except (ProcessLookupError, PermissionError):
+                ours = False
+            if not ours:
+                out.append({'timestamp': parts[0], 'gpu_uuid': parts[1], 'pid': pid, 'process_name': parts[3], 'used_memory': parts[4]})
+        return out
+
+    def set_aside(self, arm, reason, stage=None):
+        """Move an attempt (our own output) to <arm>-contended-<k>/ and say why; nothing is deleted."""
+        k = 1
+        while (WORK / ('%s-contended-%d' % (arm, k))).exists():
+            k += 1
+        target = WORK / ('%s-contended-%d' % (arm, k))
+        target.mkdir(parents=True)
+        for src in (stage, WORK / arm):
+            if src is not None and src.exists():
+                for f in src.iterdir():
+                    shutil.move(str(f), target / f.name)
+                src.rmdir()
+        self.write(target / 'set-aside.json', reason)
+        print('SET ASIDE', arm, '->', target.name, json.dumps(reason)[:300], flush=True)
+
     def run_arm(self, arm, argv, lease, ok_codes=(0,)):
         dest = WORK / arm
         if (dest / 'done.json').exists():
@@ -104,6 +147,9 @@ class Profile(Hybrid):
             raise RuntimeError('ASK: %s exists without done.json (an earlier attempt); not overwriting it' % dest)
         if self.used() + 2 * 600 > self.budget:
             raise RuntimeError('ASK: Part 1 guard of %.2f GPU-hours would be exceeded before %s' % (self.budget / 3600, arm))
+        before = self.foreign(lease)
+        if before:
+            raise Contended({'when': 'before start', 'processes': before})
         stage = self.p.run / arm
         stage.mkdir(parents=True, exist_ok=True)
         (stage / 'smi-before.txt').write_text(self.sh('nvidia-smi'))
@@ -111,12 +157,18 @@ class Profile(Hybrid):
                                 stdout=(stage / 'gpu-telemetry.csv').open('w'), stderr=subprocess.DEVNULL)
         job = self.start(arm, argv, lease)
         rc = None
+        seen = []
         try:
-            while rc is None:
-                rc = job['proc'].poll()
-                if rc is None and time.time() - job['started'] > ARM_WALL_LIMIT:
-                    rc = self.stop(job) or 124
-                time.sleep(2)
+            with (stage / 'foreign-processes.jsonl').open('w') as log:
+                while rc is None:
+                    rc = job['proc'].poll()
+                    if rc is None and time.time() - job['started'] > ARM_WALL_LIMIT:
+                        rc = self.stop(job) or 124
+                    for entry in self.foreign(lease, session=job['proc'].pid):
+                        log.write(json.dumps(entry) + '\n')
+                        log.flush()
+                        seen.append(entry)
+                    time.sleep(1)
         finally:
             seconds = time.time() - job['started']
             with self.p.ledger.open('a') as f:
@@ -126,6 +178,12 @@ class Profile(Hybrid):
             tele.terminate()
             tele.wait(timeout=30)
         (stage / 'smi-after.txt').write_text(self.sh('nvidia-smi'))
+        if seen:
+            pids = sorted({(e.get('pid'), e.get('process_name'), e.get('gpu_uuid')) for e in seen}, key=str)
+            self.set_aside(arm, {'when': 'during the arm', 'exit_code': rc, 'allocated_seconds': seconds,
+                                 'foreign_processes': [{'pid': p, 'process_name': n, 'gpu_uuid': u} for p, n, u in pids],
+                                 'first_seen': seen[0].get('timestamp'), 'last_seen': seen[-1].get('timestamp')}, stage)
+            raise Contended({'when': 'during the arm'})
         oom = list(dest.glob('oom-rank*.json')) if dest.exists() else []
         if rc not in ok_codes and not oom:
             raise RuntimeError('%s exited %s, see %s' % (arm, rc, self.p.run / (arm + '.log')))
@@ -139,36 +197,51 @@ class Profile(Hybrid):
                                         'argv': argv})
         print('ARM', arm, 'rc', rc, 'seconds %.1f' % seconds, 'oom' if oom else '', flush=True)
 
+    def leased_run(self, n, arms):
+        """Run [(arm, argv)] in order on one lease of n idle cards. If another user's process is on a leased card
+        before an arm, or appears during it (that attempt is set aside), release the lease, lease idle cards again
+        and continue with that arm; at most ATTEMPTS attempts per arm. Lease time outside arms goes to the ledger."""
+        attempts = {}
+        pending = list(arms)
+        while pending:
+            lease = self.lease(n)
+            started, ran = time.time(), 0.0
+            try:
+                while pending:
+                    arm, argv = pending[0]
+                    attempts[arm] = attempts.get(arm, 0) + 1
+                    if attempts[arm] > ATTEMPTS:
+                        raise RuntimeError('ASK: %s was crowded by other users on %d attempts' % (arm, ATTEMPTS))
+                    t0 = time.time()
+                    try:
+                        self.run_arm(arm, argv, lease)
+                    except Contended as error:
+                        print('CONTENDED', arm, 'GPUs', [g[0] for g in lease], json.dumps(error.args[0])[:300], flush=True)
+                        if error.args[0].get('when') == 'before start':
+                            attempts[arm] -= 1      # nothing ran; not an attempt
+                        else:
+                            ran += time.time() - t0
+                        break
+                    ran += time.time() - t0
+                    pending.pop(0)
+            finally:
+                with self.p.ledger.open('a') as f:
+                    f.write('%s-lease-gaps\t%s\t%.3f\t0\n' % ('pair' if n == 2 else 'single', ','.join(str(g[0]) for g in lease),
+                                                            max(0.0, time.time() - started - ran)))
+                for g in lease:
+                    g[2].close()
+
     def pair(self):
-        lease = self.lease(2)
-        started = time.time()
-        try:
-            for arm, recipe, flags in PAIR_ARMS:
-                argv = [self.lab['python'], '-m', 'torch.distributed.run', '--standalone', '--nproc_per_node', '2',
-                        'scripts/train_learned_center.py', *recipe, '--out', str(WORK / arm), '--profile', arm, *PROFILE, *flags]
-                self.run_arm(arm, argv, lease, ok_codes=(0,))
-        finally:
-            arms = sum(float(l.split('\t')[2]) for l in self.p.ledger.read_text().splitlines()
-                       if l.split('\t')[0] in {a for a, _, _ in PAIR_ARMS}) if self.p.ledger.exists() else 0.0
-            gap = max(0.0, time.time() - started - arms)
-            with self.p.ledger.open('a') as f:
-                f.write('pair-lease-gaps\t%s\t%.3f\t0\n' % (','.join(str(g[0]) for g in lease), gap))
-            for g in lease:
-                g[2].close()
+        self.leased_run(2, [(arm, [self.lab['python'], '-m', 'torch.distributed.run', '--standalone', '--nproc_per_node', '2',
+                                   'scripts/train_learned_center.py', *recipe, '--out', str(WORK / arm), '--profile', arm, *PROFILE, *flags])
+                            for arm, recipe, flags in PAIR_ARMS])
 
     def single(self):
-        lease = self.lease(1)
-        started = time.time()
-        try:
-            self.run_arm('P5', [self.lab['python'], '-u', 'scripts/profile_forward_anatomy.py', '--traj', '/tmp/tri-distill-pilot.EG6asH/traj',
-                                '--snapshot', '/dev/shm/tri-wan-snapshot', '--out', str(WORK / 'P5')], lease)
-            self.run_arm('P3', [self.lab['python'], '-u', 'scripts/train_learned_center.py', *RECIPE, '--no-fsdp', '--out', str(WORK / 'P3'),
-                                '--profile', 'P3', '--profile-floor', *PROFILE, '--profile-timers', 'blocks'], lease)
-        finally:
-            arms = sum(float(l.split('\t')[2]) for l in self.p.ledger.read_text().splitlines() if l.split('\t')[0] in ('P5', 'P3'))
-            with self.p.ledger.open('a') as f:
-                f.write('single-lease-gaps\t%s\t%.3f\t0\n' % (lease[0][0], max(0.0, time.time() - started - arms)))
-            lease[0][2].close()
+        self.leased_run(1, [
+            ('P5', [self.lab['python'], '-u', 'scripts/profile_forward_anatomy.py', '--traj', '/tmp/tri-distill-pilot.EG6asH/traj',
+                    '--snapshot', '/dev/shm/tri-wan-snapshot', '--out', str(WORK / 'P5')]),
+            ('P3', [self.lab['python'], '-u', 'scripts/train_learned_center.py', *RECIPE, '--no-fsdp', '--out', str(WORK / 'P3'),
+                    '--profile', 'P3', '--profile-floor', *PROFILE, '--profile-timers', 'blocks'])])
 
 
 def main():

@@ -152,6 +152,17 @@ def main(work, results):
         s["out_of_memory"] = [json.loads(f.read_text()) for f in sorted(d.glob("oom-rank*.json"))]
         (dest / "summary.json").write_text(json.dumps(s, indent=1) + "\n")
         summary[arm] = s
+    aside = {}
+    for d in sorted(work.glob("*-contended-*")):
+        if (d / "set-aside.json").exists():
+            dest = results / "set-aside" / d.name
+            dest.mkdir(parents=True, exist_ok=True)
+            for f in ("set-aside.json", "done.json", "foreign-processes.jsonl", "gpu-telemetry.csv", "smi-before.txt", "smi-after.txt"):
+                if (d / f).exists():
+                    shutil.copyfile(d / f, dest / f)
+            aside[d.name] = json.loads((d / "set-aside.json").read_text())
+    if aside:
+        (results / "set-aside" / "index.json").write_text(json.dumps(aside, indent=1) + "\n")
     for f in ("host.json",):
         if (work / f).exists():
             shutil.copyfile(work / f, results / f)
@@ -178,6 +189,9 @@ def med(summary, arm, phase=None, key="median"):
 
 def compute_checks(summary):
     c = {}
+    full = summary
+    # timing checks use only arms with measured updates (an arm that ran out of memory has none)
+    summary = {a: v for a, v in full.items() if a == "P5" or (v.get("update_wall") or {}).get("n")}
     if "P0" in summary:
         p0 = med(summary, "P0")
         c["1_p0_vs_reference"] = {"p0_median_update_s": p0, "reference_s": REFERENCE_UPDATE, "relative_difference": p0 / REFERENCE_UPDATE - 1,
@@ -202,8 +216,8 @@ def compute_checks(summary):
                                 "per_phase_change_s": {p: med(summary, "P1", p) - med(summary, "P4a", p) for p in summary["P1"]["phases_per_update"]}}
     if "P1" in summary and "P4b" in summary:
         c["5b_ema"] = {"total_change_s": med(summary, "P1") - med(summary, "P4b"), "p1_ema_phase_s": med(summary, "P1", "ema")}
-    if "P4d" in summary:
-        s = summary["P4d"]
+    if "P4d" in full:
+        s = full["P4d"]
         c["p4d_no_checkpointing"] = {"out_of_memory": bool(s["out_of_memory"]), "median_update_s": s["update_wall"]["median"] if s.get("update_wall", {}).get("n") else None,
                                      "peak": s["out_of_memory"] or s["peak_memory"]}
     if "P1" in summary:
