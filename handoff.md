@@ -779,3 +779,28 @@ This is complete. The report section is "Teacher on the early steps" in `DISTILL
 **GPU time.** 1.3042 GPU-hours.
 
 **Open, needs approval.** A student trained only on steps 4-20, other step splits, and the same test on other students.
+
+### Where one optimizer update goes, 26 November 2026
+
+This is complete. The report section is "Where one optimizer update goes" in `DISTILL_REPORT.md`; evidence, README and figure are in `distill-results/profile/`.
+
+**Code**
+- `scripts/train_learned_center.py --profile <arm>` with `--profile-timers none|phases|blocks`, `--profile-torch-updates N` and `--profile-floor` (P3 only). With the flags absent, the trainer behaves as before.
+- `scripts/update_profile.py`, `scripts/profile_forward_anatomy.py`, `scripts/profile_update.py` (stages host / pair / single / summary) and `scripts/summarize_update_profile.py`.
+- CPU test: `scripts/test_update_profile.py`.
+- Lab outputs are in `/mnt/data/liuzeyu/tri-video-profile-8b2502c/out/distill-profile/`.
+
+**Headline.** P1 per-update medians over 30 updates, rank mean, 6.938 s:
+- teacher forward 18.4%, student first pass 19.6%, recomputation 19.1%, rest of backward 39.9%;
+- fixed per-update cost 2.7%; data and loss 0.3%;
+- NCCL kernel time 14.8% of the update, but only 3.8% exposed (P1 − P3);
+- the self-attention kernel is 34% of a forward;
+- the cards run power capped (SW power cap in 86–91% of samples).
+
+All five checks pass. Without checkpointing the recipe runs out of memory.
+
+**GPU time.** 2.290 GPU-hours, including 1.333 for attempts set aside because another user's service occupied the leased GPUs 3 and 4, and three false alarms from the first version of the new foreign-process monitor.
+
+**Open**
+- The P5 forward is slower in absolute time than P1's teacher forward, unexplained.
+- Reduce-scattering gradients only on the last micro-batch was not tested.

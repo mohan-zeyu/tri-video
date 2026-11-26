@@ -1481,3 +1481,95 @@ Special-casing steps 1-3 at inference would therefore not close this student's a
 | Parity | 155.656 |
 | s32_teacher3 (render and scoring) | 2,294.158 |
 | s32_student3 (render and scoring) | 2,245.448 |
+
+## Where one optimizer update goes
+
+The user assigned this on 25 November 2026, as Part 1 of `DISTILL_PROFILE_PROMPT.md`. It ran on 26 November 2026 by `scripts/profile_update.py`, with timers inside the real training loop (`scripts/train_learned_center.py --profile`). Full tables, scopes and raw rows are in `distill-results/profile/README.md`.
+
+**Recipe and how it was timed.**
+- The recipe is the no-exemption shared22 Stage 2 recipe from teacher weights: `--steps 2500` (the real schedule), two ranks, accumulation 2.
+- Each arm ran 5 warm-up updates, which were discarded, then 30 measured updates.
+- One sample is one prompt at one denoising step, with both CFG branches as a batch of 2 and 10,800 tokens.
+- Phase boundaries synchronize, so the phases partition each update. The recomputation time comes from per-block CUDA events during `.backward()`.
+- Unless stated otherwise, every number is a P1 per-update median over the 30 measured updates, averaged over the 2 ranks. P0, P1 and P4a–d ran on GPUs 5 and 6, which sit on different NUMA nodes, as in the 6.911 s reference run.
+
+**Measured per-sample split next to the estimate.** P1 per-update medians are divided by the 2 samples per rank, giving 3.469 s per sample. The estimate is bar 3 of `estimate-before-profiling.png`.
+
+| Part | Estimate | Measured |
+|---|---:|---:|
+| Teacher forward | ≤ 0.62 s (18%) | 0.637 s (18.4%) |
+| Student forward, first pass | ~0.62 s (18%) | 0.679 s (19.6%) |
+| Recomputation for checkpointing | ~0.62 s (18%) | 0.662 s (19.1%) |
+| Rest of backward | | 1.385 s (39.9%) |
+| Per-update fixed cost (centre sync, clip, optimizer, EMA, bookkeeping), spread over 2 samples | | 0.094 s (2.7%) |
+| Backward + optimizer + EMA + FSDP traffic, together | ~1.58 s (46%) | 1.479 s (42.6%) |
+| Loss terms and trajectory loading | | 0.011 s (0.3%) |
+
+![Measured update breakdown](distill-results/profile/measured-update-breakdown.png)
+
+**Per-update fixed cost.** 0.189 s per update: optimizer 0.147 s, EMA 0.021 s, clip 0.018 s, centre sync and bookkeeping 0.002 s. The intercept of accumulation 1 (P4c, 3.571 s) against accumulation 2 gives 0.204 s, which agrees.
+
+**FSDP communication.**
+- **Bytes per update** (P1, rank mean): 11.25 GB of bf16 all-gathers (122 calls; half in the student forward, half re-gathered inside `.backward()`) and 11.35 GB of fp32 reduce-scatters (62 calls). The gradients are reduce-scattered after each micro-batch, not once per update.
+- **NCCL kernel time** (P2, rank 0, 3 profiled updates): 1.024 s per update (14.8%). All-gather is 0.237 s in the student forward and 0.234 s in backward; reduce-scatter is 0.550 s in backward.
+- **Exposed cost:** most of this overlaps compute. The cost sharding adds to the sample phases is the P1 − P3 gap of 0.264 s (3.8%): student forward +0.081 s, recompute +0.091 s, backward_rest +0.094 s.
+
+**Compute floor (P3).** P3 ran on one GPU with no FSDP. The student was cast to bf16, so its gradients are bf16; it ran no optimizer and no EMA. Its numerics therefore differ from training, and the arm measures time only. Sample phases total 6.483 s per update, against 6.746 s in P1.
+
+**Forward anatomy (P5).** Teacher only, one GPU, 20 forwards on stored training states, summed over the 30 blocks. Instrumented outputs equal uninstrumented ones (`torch.equal`).
+
+| Category | Share of forward |
+|---|---:|
+| Self-attention kernel (FLASH_ATTENTION) | 34.2% |
+| Q/K/V projections and norms | 7.9% |
+| RoPE application and reshapes | 6.7% |
+| `to_out` | 2.6% |
+| Cross-attention | 6.8% |
+| FFN | 27.8% |
+| Block norms, modulation and residuals | 13.9% |
+| Everything outside the blocks | 0.4% |
+
+P5's absolute forward time, 0.884 s, is above P1's teacher forward of 0.637 s, and an uninstrumented forward was slower still. P5 is used for shares only; the difference is unexplained.
+
+**Telemetry.** In every training arm, both cards sat at the 575 W power limit (the driver's SW power cap flag) in 86–91% of the 0.5 s samples, loading included. The median SM clock was 2,750–2,780 MHz against a 3,090 MHz maximum. Peak temperature was 83 °C, with no thermal flag. The cards are power capped, not thermally throttled.
+
+**Checks.**
+
+| Check | Result |
+|---|---|
+| 1. P0 against the 6.911 s reference | 6.931 s, +0.29% |
+| 2. Timer overhead | +0.10% |
+| 3. Phases sum to the update wall time | 4.5e-6 relative error at worst |
+| 4. P4c intercept against P1's fixed phases | 0.204 against 0.189 s |
+| 5a. No feature loss (P4a) | total −0.011 s, as predicted by the 0.010 s loss-phase change |
+| 5b. No EMA (P4b) | total −0.011 s, against a 0.021 s EMA phase; the shortfall is within the 0.011 s IQR of the update time |
+
+P4d (no checkpointing) ran out of memory in the first student forward, at 29.65 GiB allocated by PyTorch per rank, with no other process on the card. The recipe does not fit two 32 GB cards without checkpointing.
+
+**What the result decides.** Each bound is the share of one P1 update (6.938 s) the change could remove at most. None of these changes was implemented or timed.
+
+| Candidate change | Upper bound |
+|---|---:|
+| Store teacher velocities, skip the teacher forward (needs the feature loss dropped) | 18.4% |
+| Avoid checkpoint recomputation (does not fit as is, P4d) | 19.1% |
+| Avoid sharding | 18.6% as the brief defines it (NCCL 14.8% + gap 3.8%); 3.8% measured as exposed |
+| Cheaper per-update work (clip + optimizer + EMA) | 2.7% |
+| Faster data path | 0.16% |
+| Less quadratic attention work (P5 kernel share × the student phases' 78.6%) | 26.9% |
+
+The time is in GPU compute: the three forward-sized passes and their backward. The cheap per-update items and the data path together bound less than 3%. All timings are descriptive measurements on this host on 26 November 2026.
+
+**GPU time.** Part 1 used 2.290 GPU-hours, allocated wall time × GPUs including loading:
+
+| | GPU-hours |
+|---|---:|
+| Arms kept | 0.948 |
+| Attempts set aside | 1.333 |
+| Lease gaps | 0.008 |
+
+**Why attempts were set aside.**
+- **Another user's service on GPUs 3 and 4.** It started on the leased cards between and during arms: it slowed P4b, and its 9.7 GiB per card left P4c and P4d out of memory. Those six attempts were set aside.
+- **Driver monitor.** The driver now checks the leased cards for compute processes outside the job before each arm and once per second during it, and retries on newly leased idle cards.
+- **False alarms.** The first version of that check flagged our own ranks. That set aside three clean P0 attempts (0.442 GPU-hours) before it was fixed.
+
+Together with Part 2 (1.304), the task used 3.594 of the 6 GPU-hour cap.

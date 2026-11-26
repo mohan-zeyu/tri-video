@@ -2,16 +2,16 @@
  "done": {
   "arm": "P0",
   "gpus": [
-   3,
-   4
+   5,
+   6
   ],
   "gpu_uuids": [
-   "GPU-37b043fc-e2c1-7a4c-2e56-d90d9aea39e4",
-   "GPU-721b39e7-aa5e-e60d-ac55-3c16d203eb43"
+   "GPU-198cec66-4c42-218b-05f6-5c7b9946992d",
+   "GPU-0249a4e6-0715-37a5-b8f9-6cf8cfc674d1"
   ],
   "exit_code": 0,
-  "allocated_seconds": 268.01885962486267,
-  "gpu_seconds": 536.0377192497253,
+  "allocated_seconds": 265.91258573532104,
+  "gpu_seconds": 531.8251714706421,
   "out_of_memory": false,
   "argv": [
    "/dev/shm/tri-center-runtime/bin/python",
@@ -74,110 +74,112 @@
  "telemetry": {
   "0": {
    "leased": false,
-   "samples": 475,
+   "samples": 490,
    "util_mean": 0.0,
-   "power_w_mean": 23.124947368421054,
-   "power_w_max": 24.53,
-   "power_limit_w": 575.0,
-   "temperature_c_max": 32.0,
-   "sm_clock_mhz_median": 180.0,
-   "sm_clock_mhz_min": 172.0,
-   "sm_clock_max_mhz": 3090.0,
-   "event_reasons_counts": {
-    "0x0000000000000000": 475
-   }
-  },
-  "1": {
-   "leased": false,
-   "samples": 475,
-   "util_mean": 0.18736842105263157,
-   "power_w_mean": 12.235473684210525,
-   "power_w_max": 55.61,
-   "power_limit_w": 575.0,
-   "temperature_c_max": 37.0,
-   "sm_clock_mhz_median": 180.0,
-   "sm_clock_mhz_min": 172.0,
-   "sm_clock_max_mhz": 3090.0,
-   "event_reasons_counts": {
-    "0x0000000000000000": 475
-   }
-  },
-  "2": {
-   "leased": false,
-   "samples": 475,
-   "util_mean": 0.0,
-   "power_w_mean": 33.38305263157895,
-   "power_w_max": 35.16,
-   "power_limit_w": 575.0,
-   "temperature_c_max": 36.0,
-   "sm_clock_mhz_median": 180.0,
-   "sm_clock_mhz_min": 172.0,
-   "sm_clock_max_mhz": 3090.0,
-   "event_reasons_counts": {
-    "0x0000000000000000": 475
-   }
-  },
-  "3": {
-   "leased": true,
-   "samples": 475,
-   "util_mean": 89.6378947368421,
-   "power_w_mean": 518.3130105263158,
-   "power_w_max": 583.0,
-   "power_limit_w": 575.0,
-   "temperature_c_max": 72.0,
-   "sm_clock_mhz_median": 2797.0,
-   "sm_clock_mhz_min": 180.0,
-   "sm_clock_max_mhz": 3090.0,
-   "event_reasons_counts": {
-    "0x0000000000000000": 60,
-    "0x0000000000000004": 415
-   }
-  },
-  "4": {
-   "leased": true,
-   "samples": 475,
-   "util_mean": 87.42736842105263,
-   "power_w_mean": 517.4049684210527,
-   "power_w_max": 581.43,
-   "power_limit_w": 575.0,
-   "temperature_c_max": 79.0,
-   "sm_clock_mhz_median": 2797.0,
-   "sm_clock_mhz_min": 180.0,
-   "sm_clock_max_mhz": 3090.0,
-   "event_reasons_counts": {
-    "0x0000000000000000": 64,
-    "0x0000000000000004": 411
-   }
-  },
-  "5": {
-   "leased": false,
-   "samples": 475,
-   "util_mean": 0.0,
-   "power_w_mean": 22.80997894736842,
-   "power_w_max": 24.87,
+   "power_w_mean": 23.424755102040816,
+   "power_w_max": 24.81,
    "power_limit_w": 575.0,
    "temperature_c_max": 34.0,
    "sm_clock_mhz_median": 180.0,
    "sm_clock_mhz_min": 172.0,
    "sm_clock_max_mhz": 3090.0,
    "event_reasons_counts": {
-    "0x0000000000000000": 475
+    "0x0000000000000000": 490
    }
   },
-  "6": {
+  "1": {
    "leased": false,
-   "samples": 475,
-   "util_mean": 2.5326315789473686,
-   "power_w_mean": 38.896652631578945,
-   "power_w_max": 462.52,
+   "samples": 490,
+   "util_mean": 70.7,
+   "power_w_mean": 372.6844693877551,
+   "power_w_max": 568.68,
    "power_limit_w": 575.0,
-   "temperature_c_max": 53.0,
+   "temperature_c_max": 79.0,
+   "sm_clock_mhz_median": 2827.0,
+   "sm_clock_mhz_min": 2400.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000004": 239,
+    "0x0000000000000000": 251
+   }
+  },
+  "2": {
+   "leased": false,
+   "samples": 490,
+   "util_mean": 0.0,
+   "power_w_mean": 33.80504081632653,
+   "power_w_max": 36.06,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 34.0,
    "sm_clock_mhz_median": 180.0,
    "sm_clock_mhz_min": 172.0,
    "sm_clock_max_mhz": 3090.0,
    "event_reasons_counts": {
-    "0x0000000000000000": 473,
-    "0x0000000000000004": 2
+    "0x0000000000000000": 490
+   }
+  },
+  "3": {
+   "leased": false,
+   "samples": 490,
+   "util_mean": 86.73469387755102,
+   "power_w_mean": 509.58822448979595,
+   "power_w_max": 580.46,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 71.0,
+   "sm_clock_mhz_median": 2752.0,
+   "sm_clock_mhz_min": 2400.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 64,
+    "0x0000000000000004": 426
+   }
+  },
+  "4": {
+   "leased": false,
+   "samples": 490,
+   "util_mean": 87.0530612244898,
+   "power_w_mean": 508.5970408163265,
+   "power_w_max": 578.29,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 78.0,
+   "sm_clock_mhz_median": 2752.0,
+   "sm_clock_mhz_min": 2400.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 64,
+    "0x0000000000000004": 426
+   }
+  },
+  "5": {
+   "leased": true,
+   "samples": 490,
+   "util_mean": 87.96122448979592,
+   "power_w_mean": 514.5374489795919,
+   "power_w_max": 581.94,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 82.0,
+   "sm_clock_mhz_median": 2767.0,
+   "sm_clock_mhz_min": 180.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 69,
+    "0x0000000000000004": 421
+   }
+  },
+  "6": {
+   "leased": true,
+   "samples": 490,
+   "util_mean": 89.64489795918368,
+   "power_w_mean": 520.7948775510204,
+   "power_w_max": 584.79,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 75.0,
+   "sm_clock_mhz_median": 2775.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 60,
+    "0x0000000000000004": 430
    }
   }
  },
@@ -185,10 +187,10 @@
  "updates_measured": 30,
  "samples_per_rank_per_update": 2,
  "update_wall": {
-  "median": 6.9740303691942245,
-  "q25": 6.9445874656084925,
-  "q75": 7.007606924249558,
-  "mean": 6.993775797755613,
+  "median": 6.930787164310459,
+  "q25": 6.915796491899528,
+  "q75": 6.954807311616605,
+  "mean": 6.95350100309588,
   "n": 30
  },
  "comm_per_update": {
@@ -210,7 +212,7 @@
    "updates_run": 35,
    "peak_cuda_allocated_bytes": 23125667840,
    "peak_cuda_reserved_bytes": 24725422080,
-   "wall_seconds": 247.0996852950193
+   "wall_seconds": 245.2060257771518
   },
   {
    "rank": 1,
@@ -218,7 +220,7 @@
    "updates_run": 35,
    "peak_cuda_allocated_bytes": 23122313216,
    "peak_cuda_reserved_bytes": 24721227776,
-   "wall_seconds": 246.9756717418786
+   "wall_seconds": 245.43814074993134
   }
  ],
  "out_of_memory": []

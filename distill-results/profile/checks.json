@@ -1,25 +1,77 @@
 {
  "1_p0_vs_reference": {
-  "p0_median_update_s": 6.9740303691942245,
+  "p0_median_update_s": 6.930787164310459,
   "reference_s": 6.911,
-  "relative_difference": 0.009120296511970105,
+  "relative_difference": 0.0028631405455736836,
   "within_10_percent": true
  },
  "2_timer_overhead": {
-  "p1_median_update_s": 6.971530051261652,
-  "p0_median_update_s": 6.9740303691942245,
-  "overhead": -0.0003585183602894393,
+  "p1_median_update_s": 6.9379594182246365,
+  "p0_median_update_s": 6.930787164310459,
+  "overhead": 0.001034839729477044,
   "under_3_percent": true
  },
  "3_phases_sum_to_wall": {
-  "max_relative_error_any_update_rank": 9.187786714732408e-06,
+  "max_relative_error_any_update_rank": 4.518860932603917e-06,
   "within_1_percent": true
  },
- "fixed_cost_p1_s": 0.20300043845782056,
+ "fixed_cost_p1_s": 0.18859559268457815,
+ "4_fixed_cost_intercept": {
+  "accum2_median_s": 6.9379594182246365,
+  "accum1_median_s": 3.571106250223238,
+  "intercept_s": 0.20425308222183958,
+  "p1_fixed_phases_s": 0.18859559268457815,
+  "difference_s": 0.015657489537261426,
+  "within_0_2_s": true,
+  "model": "update(accum) = fixed + accum x per-sample; intercept = 2 x update(1) - update(2); P1 timers on both"
+ },
+ "5a_feature_loss": {
+  "total_change_s": 0.011484823480714113,
+  "p1_loss_phase_s": 0.010756607982330024,
+  "p4a_loss_phase_s": 0.0009385195444338024,
+  "per_phase_change_s": {
+   "data": 0.00016438763123005629,
+   "teacher_forward": 0.0014307466335594654,
+   "student_forward": 0.00019862374756485224,
+   "loss": 0.009818088437896222,
+   "recompute": -0.0015477952957154706,
+   "backward_rest": 0.004880679659080123,
+   "center_sync": 6.867339834570885e-07,
+   "clip": 6.30557187832892e-05,
+   "optimizer": -0.0024724320392124355,
+   "ema": -5.1592651288956404e-05,
+   "bookkeeping": 1.528079155832529e-05
+  }
+ },
+ "5b_ema": {
+  "total_change_s": 0.011181186244357377,
+  "p1_ema_phase_s": 0.021115211595315486
+ },
+ "p4d_no_checkpointing": {
+  "out_of_memory": true,
+  "median_update_s": null,
+  "peak": [
+   {
+    "rank": 0,
+    "error": "CUDA out of memory. Tried to allocate 128.00 MiB. GPU 0 has a total capacity of 31.36 GiB of which 112.75 MiB is free. Including non-PyTorch memory, this process has 31.24 GiB memory in use. Of the allocated memory 29.65 GiB is allocated by PyTorch, and 814.45 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)",
+    "peak_cuda_allocated_bytes": 31838491648,
+    "peak_cuda_reserved_bytes": 32780582912
+   },
+   {
+    "rank": 1,
+    "error": "CUDA out of memory. Tried to allocate 128.00 MiB. GPU 1 has a total capacity of 31.36 GiB of which 112.75 MiB is free. Including non-PyTorch memory, this process has 31.24 GiB memory in use. Of the allocated memory 29.65 GiB is allocated by PyTorch, and 815.51 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)",
+    "peak_cuda_allocated_bytes": 31837373440,
+    "peak_cuda_reserved_bytes": 32780582912
+   }
+  ]
+ },
  "decision_bounds_share_of_p1_update": {
-  "teacher_forward": 0.18159526584511562,
-  "recompute": 0.18903115464560316,
-  "clip_optimizer_ema": 0.028718462012736937,
-  "data": 0.004654228343042899
+  "teacher_forward": 0.1835776546515603,
+  "recompute": 0.1909547963055659,
+  "clip_optimizer_ema": 0.026873206120997556,
+  "data": 0.001563653253250459,
+  "sharding_sample_phase_gap_p1_minus_p3": 0.03804900675559113,
+  "attention_kernel_share_of_forward_p5": 0.3421180997268728,
+  "attention_kernel_applied_to_student_phases": 0.2688039440963075
  }
 }
