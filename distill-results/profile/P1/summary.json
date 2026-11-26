@@ -1,0 +1,419 @@
+{
+ "done": {
+  "arm": "P1",
+  "gpus": [
+   3,
+   4
+  ],
+  "gpu_uuids": [
+   "GPU-37b043fc-e2c1-7a4c-2e56-d90d9aea39e4",
+   "GPU-721b39e7-aa5e-e60d-ac55-3c16d203eb43"
+  ],
+  "exit_code": 0,
+  "allocated_seconds": 268.0388162136078,
+  "gpu_seconds": 536.0776324272156,
+  "out_of_memory": false,
+  "argv": [
+   "/dev/shm/tri-center-runtime/bin/python",
+   "-m",
+   "torch.distributed.run",
+   "--standalone",
+   "--nproc_per_node",
+   "2",
+   "scripts/train_learned_center.py",
+   "--stage",
+   "2",
+   "--steps",
+   "2500",
+   "--accum",
+   "2",
+   "--lr",
+   "1e-5",
+   "--lr-center",
+   "2e-4",
+   "--warmup",
+   "250",
+   "--lambda-cfg",
+   "1.0",
+   "--lambda-feat",
+   "0.1",
+   "--ema",
+   "0.999",
+   "--clip",
+   "1.0",
+   "--seed",
+   "20261114",
+   "--selection",
+   "/mnt/data/liuzeyu/tri-video-selection-67c101b/out/distill-selection/selection.pt",
+   "--variant",
+   "shared",
+   "--calibration",
+   "/mnt/data/liuzeyu/tri-video-selection-67c101b/out/distill-selection/pair-statistics.pt",
+   "--center-mode",
+   "mean",
+   "--include-layer0",
+   "--include-step1",
+   "--traj",
+   "/tmp/tri-distill-pilot.EG6asH/traj",
+   "--prompts",
+   "configs/distill_prompts.json",
+   "--snapshot",
+   "/dev/shm/tri-wan-snapshot",
+   "--out",
+   "/mnt/data/liuzeyu/tri-video-profile-8b2502c/out/distill-profile/P1",
+   "--profile",
+   "P1",
+   "--profile-warmup",
+   "5",
+   "--profile-updates",
+   "30",
+   "--profile-timers",
+   "blocks"
+  ]
+ },
+ "telemetry": {
+  "0": {
+   "leased": false,
+   "samples": 468,
+   "util_mean": 0.0,
+   "power_w_mean": 23.209529914529913,
+   "power_w_max": 24.67,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 33.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 468
+   }
+  },
+  "1": {
+   "leased": false,
+   "samples": 468,
+   "util_mean": 0.0,
+   "power_w_mean": 5.898760683760684,
+   "power_w_max": 55.58,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 37.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 468
+   }
+  },
+  "2": {
+   "leased": false,
+   "samples": 468,
+   "util_mean": 0.0,
+   "power_w_mean": 33.83893162393162,
+   "power_w_max": 35.94,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 37.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 468
+   }
+  },
+  "3": {
+   "leased": true,
+   "samples": 468,
+   "util_mean": 89.45299145299145,
+   "power_w_mean": 522.2155341880342,
+   "power_w_max": 584.02,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 72.0,
+   "sm_clock_mhz_median": 2793.5,
+   "sm_clock_mhz_min": 180.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000004": 412,
+    "0x0000000000000000": 56
+   }
+  },
+  "4": {
+   "leased": true,
+   "samples": 468,
+   "util_mean": 85.76709401709402,
+   "power_w_mean": 522.7341025641026,
+   "power_w_max": 582.11,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 80.0,
+   "sm_clock_mhz_median": 2790.0,
+   "sm_clock_mhz_min": 180.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 57,
+    "0x0000000000000004": 411
+   }
+  },
+  "5": {
+   "leased": false,
+   "samples": 468,
+   "util_mean": 0.0,
+   "power_w_mean": 22.86929487179487,
+   "power_w_max": 24.91,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 34.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 468
+   }
+  },
+  "6": {
+   "leased": false,
+   "samples": 468,
+   "util_mean": 0.3888888888888889,
+   "power_w_mean": 36.25773504273504,
+   "power_w_max": 186.96,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 43.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 468
+   }
+  }
+ },
+ "ranks": 2,
+ "updates_measured": 30,
+ "samples_per_rank_per_update": 2,
+ "update_wall": {
+  "median": 6.971530051261652,
+  "q25": 6.952769411058398,
+  "q75": 7.015228912146995,
+  "mean": 7.038061242705832,
+  "n": 30
+ },
+ "phases_per_update": {
+  "data": {
+   "median": 0.0324470927589573,
+   "q25": 0.022615572408540174,
+   "q75": 0.03726657899096608,
+   "mean": 0.031233595280597607,
+   "n": 30,
+   "share_median": 0.004663639941167746,
+   "share_mean": 0.004437825517972152
+  },
+  "teacher_forward": {
+   "median": 1.2659968530060723,
+   "q25": 1.2651975056214724,
+   "q75": 1.267912334180437,
+   "mean": 1.2686043150063293,
+   "n": 30,
+   "share_median": 0.18196248067377002,
+   "share_mean": 0.18024964948053693
+  },
+  "student_forward": {
+   "median": 1.3621582127525471,
+   "q25": 1.3576869575772434,
+   "q75": 1.3785512904578354,
+   "mean": 1.4058756083909734,
+   "n": 30,
+   "share_median": 0.19578381010510584,
+   "share_mean": 0.19975384178355507
+  },
+  "loss": {
+   "median": 0.010838289395906031,
+   "q25": 0.010781510936794803,
+   "q75": 0.010883813811233267,
+   "mean": 0.010893915108560274,
+   "n": 30,
+   "share_median": 0.00155779378128503,
+   "share_mean": 0.001547861974424167
+  },
+  "recompute": {
+   "median": 1.3178363752365112,
+   "q25": 1.3152307131290435,
+   "q75": 1.3224957094192507,
+   "mean": 1.3242766090710958,
+   "n": 30,
+   "share_median": 0.1894134060371275,
+   "share_mean": 0.18815984761895446
+  },
+  "backward_rest": {
+   "median": 2.7651836848375386,
+   "q25": 2.762569996001897,
+   "q75": 2.767142814771505,
+   "mean": 2.7793243029190227,
+   "n": 30,
+   "share_median": 0.39744149570114407,
+   "share_mean": 0.39490030537330467
+  },
+  "center_sync": {
+   "median": 0.001276365073863417,
+   "q25": 0.001245185179868713,
+   "q75": 0.0012968842638656497,
+   "mean": 0.0012921290860200922,
+   "n": 30,
+   "share_median": 0.00018345271122441965,
+   "share_mean": 0.00018359216666984627
+  },
+  "clip": {
+   "median": 0.019490056962240487,
+   "q25": 0.018771679926430807,
+   "q75": 0.020121148350881413,
+   "mean": 0.01995354873749117,
+   "n": 30,
+   "share_median": 0.002801317479503522,
+   "share_mean": 0.0028351000570320853
+  },
+  "optimizer": {
+   "median": 0.15867330896435305,
+   "q25": 0.15702766241156496,
+   "q75": 0.17792332445969805,
+   "mean": 0.17204166392718132,
+   "n": 30,
+   "share_median": 0.02280620907335758,
+   "share_mean": 0.024444540549090003
+  },
+  "ema": {
+   "median": 0.02204825502121821,
+   "q25": 0.021837469743331894,
+   "q75": 0.024451333418255672,
+   "mean": 0.02298610471189022,
+   "n": 30,
+   "share_median": 0.003169008808088663,
+   "share_mean": 0.0032659807855221264
+  },
+  "bookkeeping": {
+   "median": 0.001512452436145395,
+   "q25": 0.0014311919221654534,
+   "q75": 0.0016245951119344682,
+   "mean": 0.001558607075518618,
+   "n": 30,
+   "share_median": 0.0002173856882255479,
+   "share_mean": 0.0002214546929384471
+  }
+ },
+ "sum_of_phase_medians": 6.957460946445353,
+ "per_sample": {
+  "data": {
+   "median": 0.01622354637947865,
+   "mean": 0.015616797640298804
+  },
+  "teacher_forward": {
+   "median": 0.6329984265030362,
+   "mean": 0.6343021575031647
+  },
+  "student_forward": {
+   "median": 0.6810791063762736,
+   "mean": 0.7029378041954867
+  },
+  "loss": {
+   "median": 0.0054191446979530156,
+   "mean": 0.005446957554280137
+  },
+  "recompute": {
+   "median": 0.6589181876182556,
+   "mean": 0.6621383045355479
+  },
+  "backward_rest": {
+   "median": 1.3825918424187693,
+   "mean": 1.3896621514595113
+  }
+ },
+ "phase_sum_vs_wall_max_relative_error": 9.187786714732408e-06,
+ "comm_per_update": {
+  "all_gather_bytes": 11251095808.0,
+  "all_gather_calls": 122.0,
+  "backward_rest:all_gather_bytes": 5573990400.0,
+  "backward_rest:all_gather_calls": 60.0,
+  "backward_rest:reduce_scatter_bytes": 11354210816.0,
+  "backward_rest:reduce_scatter_calls": 62.0,
+  "reduce_scatter_bytes": 11354210816.0,
+  "reduce_scatter_calls": 62.0,
+  "student_forward:all_gather_bytes": 5677105408.0,
+  "student_forward:all_gather_calls": 62.0
+ },
+ "blocks_per_sample_median": {
+  "first": [
+   0.02526985549926758,
+   0.02211702346801758,
+   0.022076064109802247,
+   0.02206223964691162,
+   0.02208784008026123,
+   0.022156959533691407,
+   0.022176416397094726,
+   0.022189711570739748,
+   0.022236319541931154,
+   0.022192272186279297,
+   0.022209168434143067,
+   0.02225065517425537,
+   0.022197407722473146,
+   0.022212751388549806,
+   0.022205583572387694,
+   0.022211727142333985,
+   0.022214816093444823,
+   0.022200480461120605,
+   0.02227113628387451,
+   0.022215840339660644,
+   0.022203551292419434,
+   0.022264992713928223,
+   0.022198431968688963,
+   0.022214303970336913,
+   0.022213279724121092,
+   0.02221889591217041,
+   0.02221840000152588,
+   0.022191264152526854,
+   0.022257311820983887,
+   0.021617823600769043
+  ],
+  "recompute": [
+   0.021932064056396486,
+   0.021995727539062503,
+   0.022009103775024415,
+   0.02201625537872314,
+   0.021999551773071287,
+   0.022022480010986327,
+   0.022024432182312013,
+   0.022019584655761718,
+   0.022008912086486816,
+   0.022032591819763185,
+   0.02202784061431885,
+   0.0220272159576416,
+   0.022019055366516112,
+   0.022028719902038574,
+   0.022029024124145508,
+   0.02202065563201904,
+   0.02202451229095459,
+   0.022034832000732422,
+   0.022027071952819825,
+   0.022014784812927245,
+   0.02200590419769287,
+   0.022016607284545898,
+   0.022021471977233885,
+   0.022012080192565918,
+   0.021992112159729002,
+   0.02195806407928467,
+   0.021942815780639648,
+   0.02193388748168945,
+   0.021811039924621585,
+   0.02113100814819336
+  ]
+ },
+ "peak_memory": [
+  {
+   "rank": 0,
+   "world": 2,
+   "updates_run": 35,
+   "peak_cuda_allocated_bytes": 23125667840,
+   "peak_cuda_reserved_bytes": 24725422080,
+   "wall_seconds": 248.62956541590393
+  },
+  {
+   "rank": 1,
+   "world": 2,
+   "updates_run": 35,
+   "peak_cuda_allocated_bytes": 23122313216,
+   "peak_cuda_reserved_bytes": 24721227776,
+   "wall_seconds": 248.51837310311384
+  }
+ ],
+ "out_of_memory": []
+}

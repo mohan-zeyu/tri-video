@@ -1,0 +1,346 @@
+{
+ "scope": "rank 0, 3 measured updates after warm-up under torch.profiler; times summed over those updates",
+ "profiled_updates": 3,
+ "top_cuda_ops_by_self_time": [
+  {
+   "name": "aten::addmm",
+   "self_device_seconds": 4.337688977000056,
+   "calls": 5472,
+   "share_of_profiled_self_device_time": 0.08494911429516537
+  },
+  {
+   "name": "aten::_flash_attention_forward",
+   "self_device_seconds": 3.9731569179999697,
+   "calls": 1080,
+   "share_of_profiled_self_device_time": 0.07781013413581175
+  },
+  {
+   "name": "void pytorch_flash::flash_fwd_kernel<Flash_fwd_kernel_traits<128, 128, 64, 4, false, false, cutlass::bfloat16_t, Flash_kernel_traits<128, 128, 64, 4, cutlass::bfloat16_t> >, false, false, false, false, false, true, false, false>(pytorch_flash::Flash_fwd_params)",
+   "self_device_seconds": 3.9731569179999697,
+   "calls": 1080,
+   "share_of_profiled_self_device_time": 0.07781013413581175
+  },
+  {
+   "name": "aten::_flash_attention_backward",
+   "self_device_seconds": 3.295576672000013,
+   "calls": 360,
+   "share_of_profiled_self_device_time": 0.0645404317512473
+  },
+  {
+   "name": "void pytorch_flash::flash_bwd_dq_dk_dv_loop_seqk_parallel_kernel<Flash_bwd_kernel_traits<128, 64, 64, 8, 4, 2, 2, true, false, cutlass::bfloat16_t, Flash_kernel_traits<128, 64, 64, 8, cutlass::bfloat16_t> >, false, false, false, false, false, true, false>(pytorch_flash::Flash_bwd_params)",
+   "self_device_seconds": 3.2015729610000143,
+   "calls": 360,
+   "share_of_profiled_self_device_time": 0.06269946711956192
+  },
+  {
+   "name": "record_param_comms",
+   "self_device_seconds": 3.0679411130000176,
+   "calls": 564,
+   "share_of_profiled_self_device_time": 0.0600824267578814
+  },
+  {
+   "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_256x128_32x3_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_256x128_32x3_tn_align8::Params)",
+   "self_device_seconds": 2.9346007480000647,
+   "calls": 3780,
+   "share_of_profiled_self_device_time": 0.057471094786732575
+  },
+  {
+   "name": "aten::mm",
+   "self_device_seconds": 2.905997233999903,
+   "calls": 3660,
+   "share_of_profiled_self_device_time": 0.056910924799228414
+  },
+  {
+   "name": "ncclDevKernel_ReduceScatter_Sum_f32_RING_LL(ncclDevKernelArgsStorage<4096ul>)",
+   "self_device_seconds": 1.6510555340000166,
+   "calls": 186,
+   "share_of_profiled_self_device_time": 0.032334200540683644
+  },
+  {
+   "name": "nccl:_reduce_scatter_base",
+   "self_device_seconds": 1.6510555340000166,
+   "calls": 186,
+   "share_of_profiled_self_device_time": 0.032334200540683644
+  },
+  {
+   "name": "aten::copy_",
+   "self_device_seconds": 1.5073822699998831,
+   "calls": 22242,
+   "share_of_profiled_self_device_time": 0.02952050952009145
+  },
+  {
+   "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_128x128_32x4_nt_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_128x128_32x4_nt_align8::Params)",
+   "self_device_seconds": 1.4594373439999582,
+   "calls": 1440,
+   "share_of_profiled_self_device_time": 0.028581558152154123
+  },
+  {
+   "name": "ncclDevKernel_AllGather_RING_LL(ncclDevKernelArgsStorage<4096ul>)",
+   "self_device_seconds": 1.413249245000003,
+   "calls": 366,
+   "share_of_profiled_self_device_time": 0.02767701240859618
+  },
+  {
+   "name": "nccl:_all_gather_base",
+   "self_device_seconds": 1.413249245000003,
+   "calls": 366,
+   "share_of_profiled_self_device_time": 0.02767701240859618
+  },
+  {
+   "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_128x256_32x3_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_128x256_32x3_tn_align8::Params)",
+   "self_device_seconds": 1.3646930389999983,
+   "calls": 540,
+   "share_of_profiled_self_device_time": 0.0267260897594378
+  },
+  {
+   "name": "Command Buffer Full",
+   "self_device_seconds": 1.3160846510000697,
+   "calls": 3699,
+   "share_of_profiled_self_device_time": 0.02577414518023806
+  },
+  {
+   "name": "aten::mul",
+   "self_device_seconds": 1.1109565980000067,
+   "calls": 10275,
+   "share_of_profiled_self_device_time": 0.02175692621598246
+  },
+  {
+   "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_256x128_32x3_nn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_256x128_32x3_nn_align8::Params)",
+   "self_device_seconds": 0.953756471999966,
+   "calls": 1260,
+   "share_of_profiled_self_device_time": 0.018678325711981483
+  },
+  {
+   "name": "Optimizer.step#AdamW.step",
+   "self_device_seconds": 0.6475167010000004,
+   "calls": 3,
+   "share_of_profiled_self_device_time": 0.012680939212778589
+  },
+  {
+   "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1> >(int, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1>)",
+   "self_device_seconds": 0.5941417490000266,
+   "calls": 6570,
+   "share_of_profiled_self_device_time": 0.011635646449284845
+  }
+ ],
+ "fsdp_ranges_cpu": [
+  {
+   "name": "FSDP::post_backward_reduce (blocks.29)",
+   "cpu_seconds": 0.011723637999997009,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.10)",
+   "cpu_seconds": 0.011075924000001978,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::pre_forward (blocks.1)",
+   "cpu_seconds": 0.010209856999999028,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::pre_forward",
+   "cpu_seconds": 0.010180883999997982,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.21)",
+   "cpu_seconds": 0.010019330999996048,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.5)",
+   "cpu_seconds": 0.009255847999995574,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::all_gather (blocks.1)",
+   "cpu_seconds": 0.009221372999996645,
+   "calls": 12
+  },
+  {
+   "name": "FSDP::pre_forward (blocks.9)",
+   "cpu_seconds": 0.009130847000000067,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::all_gather (blocks.29)",
+   "cpu_seconds": 0.00905405000000191,
+   "calls": 12
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.2)",
+   "cpu_seconds": 0.009008329999998212,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::pre_forward (blocks.27)",
+   "cpu_seconds": 0.009007548000001349,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::root_post_backward_callback",
+   "cpu_seconds": 0.008959911999996751,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.13)",
+   "cpu_seconds": 0.008933048000000884,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::pre_forward (blocks.12)",
+   "cpu_seconds": 0.008865998999998556,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.28)",
+   "cpu_seconds": 0.008740576000000583,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.26)",
+   "cpu_seconds": 0.008522448999997694,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::pre_forward (blocks.21)",
+   "cpu_seconds": 0.008317273999998114,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.1)",
+   "cpu_seconds": 0.008310127999999094,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.18)",
+   "cpu_seconds": 0.00827724100000132,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.27)",
+   "cpu_seconds": 0.008184136000001105,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::all_gather (blocks.27)",
+   "cpu_seconds": 0.008175485999995376,
+   "calls": 12
+  },
+  {
+   "name": "FSDP::pre_backward (blocks.9)",
+   "cpu_seconds": 0.00813782499999972,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.17)",
+   "cpu_seconds": 0.008133147000002209,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.24)",
+   "cpu_seconds": 0.008029191999997479,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.7)",
+   "cpu_seconds": 0.008014789000004064,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::pre_backward (blocks.1)",
+   "cpu_seconds": 0.008006538999996614,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.20)",
+   "cpu_seconds": 0.008003832999998238,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.25)",
+   "cpu_seconds": 0.00798288599999831,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::pre_forward (blocks.17)",
+   "cpu_seconds": 0.007969637999995146,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::pre_forward (blocks.14)",
+   "cpu_seconds": 0.007901583000000333,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.4)",
+   "cpu_seconds": 0.00788652800000226,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::pre_forward (blocks.0)",
+   "cpu_seconds": 0.0078578470000003,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.22)",
+   "cpu_seconds": 0.007848450999999652,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.15)",
+   "cpu_seconds": 0.007832424999999813,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.3)",
+   "cpu_seconds": 0.007810046000003349,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.11)",
+   "cpu_seconds": 0.007796047000001184,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::pre_forward (blocks.4)",
+   "cpu_seconds": 0.007779158000000403,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.16)",
+   "cpu_seconds": 0.007765114000000991,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::pre_forward (blocks.7)",
+   "cpu_seconds": 0.007765003000001423,
+   "calls": 6
+  },
+  {
+   "name": "FSDP::post_backward_reduce (blocks.6)",
+   "cpu_seconds": 0.007764460999997332,
+   "calls": 6
+  }
+ ],
+ "nccl_kernel_seconds_by_phase": {
+  "student_forward": {
+   "all_gather_seconds": 0.710533976,
+   "other_seconds": 0.710533976
+  },
+  "backward": {
+   "all_gather_seconds": 0.7027152690000001,
+   "other_seconds": 2.3537708030000024,
+   "reduce_scatter_seconds": 1.651055534
+  },
+  "center_sync": {
+   "other_seconds": 0.006649888000000001
+  },
+  "clip": {
+   "other_seconds": 0.0006227800000000001
+  }
+ },
+ "note": "'backward' collects NCCL kernels inside .backward() (recompute and backward_rest together)"
+}

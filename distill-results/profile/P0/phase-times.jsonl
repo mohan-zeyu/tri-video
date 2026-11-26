@@ -1,0 +1,280 @@
+{"arm": "P0", "rank": 0, "update": 0, "optimizer_step": 1, "measured": false, "kind": "update_wall", "seconds": 9.210722882999107}
+{"arm": "P0", "rank": 0, "update": 0, "optimizer_step": 1, "measured": false, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 0, "optimizer_step": 1, "measured": false, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 0, "optimizer_step": 1, "measured": false, "kind": "losses", "vel_cond": 0.00514558725990355, "vel_uncond": 0.0053690007189288735, "cfg": 0.01896977098658681, "feat": 0.05989800579845905}
+{"arm": "P0", "rank": 0, "update": 1, "optimizer_step": 2, "measured": false, "kind": "update_wall", "seconds": 6.844595117960125}
+{"arm": "P0", "rank": 0, "update": 1, "optimizer_step": 2, "measured": false, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 1, "optimizer_step": 2, "measured": false, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 1, "optimizer_step": 2, "measured": false, "kind": "losses", "vel_cond": 0.0067017399705946445, "vel_uncond": 0.006616449449211359, "cfg": 0.03332774806767702, "feat": 0.060573192313313484}
+{"arm": "P0", "rank": 0, "update": 2, "optimizer_step": 3, "measured": false, "kind": "update_wall", "seconds": 6.8179646651260555}
+{"arm": "P0", "rank": 0, "update": 2, "optimizer_step": 3, "measured": false, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 2, "optimizer_step": 3, "measured": false, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 2, "optimizer_step": 3, "measured": false, "kind": "losses", "vel_cond": 0.003998111933469772, "vel_uncond": 0.004084414103999734, "cfg": 0.013130827341228724, "feat": 0.04698318615555763}
+{"arm": "P0", "rank": 0, "update": 3, "optimizer_step": 4, "measured": false, "kind": "update_wall", "seconds": 6.862562978873029}
+{"arm": "P0", "rank": 0, "update": 3, "optimizer_step": 4, "measured": false, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 3, "optimizer_step": 4, "measured": false, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 3, "optimizer_step": 4, "measured": false, "kind": "losses", "vel_cond": 0.012282400857657194, "vel_uncond": 0.012797177769243717, "cfg": 0.03477958403527737, "feat": 0.05469751916825771}
+{"arm": "P0", "rank": 0, "update": 4, "optimizer_step": 5, "measured": false, "kind": "update_wall", "seconds": 7.17842013691552}
+{"arm": "P0", "rank": 0, "update": 4, "optimizer_step": 5, "measured": false, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 4, "optimizer_step": 5, "measured": false, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 4, "optimizer_step": 5, "measured": false, "kind": "losses", "vel_cond": 0.008027717703953385, "vel_uncond": 0.008026659255847335, "cfg": 0.027040671557188034, "feat": 0.049677894450724125}
+{"arm": "P0", "rank": 0, "update": 5, "optimizer_step": 6, "measured": true, "kind": "update_wall", "seconds": 6.946450920077041}
+{"arm": "P0", "rank": 0, "update": 5, "optimizer_step": 6, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 5, "optimizer_step": 6, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 5, "optimizer_step": 6, "measured": true, "kind": "losses", "vel_cond": 0.009134246502071619, "vel_uncond": 0.00899148709140718, "cfg": 0.027612539939582348, "feat": 0.04242714587599039}
+{"arm": "P0", "rank": 0, "update": 6, "optimizer_step": 7, "measured": true, "kind": "update_wall", "seconds": 7.005858293035999}
+{"arm": "P0", "rank": 0, "update": 6, "optimizer_step": 7, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 6, "optimizer_step": 7, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 6, "optimizer_step": 7, "measured": true, "kind": "losses", "vel_cond": 0.002868961892090738, "vel_uncond": 0.0027016405947506428, "cfg": 0.04656533943489194, "feat": 0.03997434675693512}
+{"arm": "P0", "rank": 0, "update": 7, "optimizer_step": 8, "measured": true, "kind": "update_wall", "seconds": 6.96145268692635}
+{"arm": "P0", "rank": 0, "update": 7, "optimizer_step": 8, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 7, "optimizer_step": 8, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 7, "optimizer_step": 8, "measured": true, "kind": "losses", "vel_cond": 0.00399492506403476, "vel_uncond": 0.003983207745477557, "cfg": 0.015180773567408323, "feat": 0.0508749894797802}
+{"arm": "P0", "rank": 0, "update": 8, "optimizer_step": 9, "measured": true, "kind": "update_wall", "seconds": 6.954415165819228}
+{"arm": "P0", "rank": 0, "update": 8, "optimizer_step": 9, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 8, "optimizer_step": 9, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 8, "optimizer_step": 9, "measured": true, "kind": "losses", "vel_cond": 0.004392464645206928, "vel_uncond": 0.0028907765517942607, "cfg": 0.03043552953749895, "feat": 0.04115266166627407}
+{"arm": "P0", "rank": 0, "update": 9, "optimizer_step": 10, "measured": true, "kind": "update_wall", "seconds": 6.960393727058545}
+{"arm": "P0", "rank": 0, "update": 9, "optimizer_step": 10, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 9, "optimizer_step": 10, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 9, "optimizer_step": 10, "measured": true, "kind": "losses", "vel_cond": 0.011849279515445232, "vel_uncond": 0.011763740330934525, "cfg": 0.030366191640496254, "feat": 0.04716692306101322}
+{"arm": "P0", "rank": 0, "update": 10, "optimizer_step": 11, "measured": true, "kind": "update_wall", "seconds": 6.994935950962827}
+{"arm": "P0", "rank": 0, "update": 10, "optimizer_step": 11, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 10, "optimizer_step": 11, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 10, "optimizer_step": 11, "measured": true, "kind": "losses", "vel_cond": 0.007376540568657219, "vel_uncond": 0.0073661693604663014, "cfg": 0.025023274356499314, "feat": 0.04117789678275585}
+{"arm": "P0", "rank": 0, "update": 11, "optimizer_step": 12, "measured": true, "kind": "update_wall", "seconds": 6.966921005165204}
+{"arm": "P0", "rank": 0, "update": 11, "optimizer_step": 12, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 11, "optimizer_step": 12, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 11, "optimizer_step": 12, "measured": true, "kind": "losses", "vel_cond": 0.006025898735970259, "vel_uncond": 0.007173454388976097, "cfg": 0.03671394195407629, "feat": 0.06380571611225605}
+{"arm": "P0", "rank": 0, "update": 12, "optimizer_step": 13, "measured": true, "kind": "update_wall", "seconds": 7.174807259114459}
+{"arm": "P0", "rank": 0, "update": 12, "optimizer_step": 13, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 12, "optimizer_step": 13, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 12, "optimizer_step": 13, "measured": true, "kind": "losses", "vel_cond": 0.0027978031430393457, "vel_uncond": 0.002782025490887463, "cfg": 0.013067024759948254, "feat": 0.0397522896528244}
+{"arm": "P0", "rank": 0, "update": 13, "optimizer_step": 14, "measured": true, "kind": "update_wall", "seconds": 6.908490449888632}
+{"arm": "P0", "rank": 0, "update": 13, "optimizer_step": 14, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 13, "optimizer_step": 14, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 13, "optimizer_step": 14, "measured": true, "kind": "losses", "vel_cond": 0.010778604075312614, "vel_uncond": 0.010592475067824125, "cfg": 0.028966699726879597, "feat": 0.04408141132444143}
+{"arm": "P0", "rank": 0, "update": 14, "optimizer_step": 15, "measured": true, "kind": "update_wall", "seconds": 6.905806225026026}
+{"arm": "P0", "rank": 0, "update": 14, "optimizer_step": 15, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 14, "optimizer_step": 15, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 14, "optimizer_step": 15, "measured": true, "kind": "losses", "vel_cond": 0.006050099502317607, "vel_uncond": 0.0029337614541873336, "cfg": 0.07389228045940399, "feat": 0.05006992258131504}
+{"arm": "P0", "rank": 0, "update": 15, "optimizer_step": 16, "measured": true, "kind": "update_wall", "seconds": 7.04199439403601}
+{"arm": "P0", "rank": 0, "update": 15, "optimizer_step": 16, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 15, "optimizer_step": 16, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 15, "optimizer_step": 16, "measured": true, "kind": "losses", "vel_cond": 0.003414988750591874, "vel_uncond": 0.003434336744248867, "cfg": 0.014051073230803013, "feat": 0.04224073328077793}
+{"arm": "P0", "rank": 0, "update": 16, "optimizer_step": 17, "measured": true, "kind": "update_wall", "seconds": 6.961661593988538}
+{"arm": "P0", "rank": 0, "update": 16, "optimizer_step": 17, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 16, "optimizer_step": 17, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 16, "optimizer_step": 17, "measured": true, "kind": "losses", "vel_cond": 0.004774187691509724, "vel_uncond": 0.0048160862643271685, "cfg": 0.020436571910977364, "feat": 0.05052676610648632}
+{"arm": "P0", "rank": 0, "update": 17, "optimizer_step": 18, "measured": true, "kind": "update_wall", "seconds": 6.970554099185392}
+{"arm": "P0", "rank": 0, "update": 17, "optimizer_step": 18, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 17, "optimizer_step": 18, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 17, "optimizer_step": 18, "measured": true, "kind": "losses", "vel_cond": 0.005517130251973867, "vel_uncond": 0.005443926434963942, "cfg": 0.02213151566684246, "feat": 0.053904591128230095}
+{"arm": "P0", "rank": 0, "update": 18, "optimizer_step": 19, "measured": true, "kind": "update_wall", "seconds": 6.921025395859033}
+{"arm": "P0", "rank": 0, "update": 18, "optimizer_step": 19, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 18, "optimizer_step": 19, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 18, "optimizer_step": 19, "measured": true, "kind": "losses", "vel_cond": 0.00488277361728251, "vel_uncond": 0.004169869993347675, "cfg": 0.021108984015882015, "feat": 0.03554070275276899}
+{"arm": "P0", "rank": 0, "update": 19, "optimizer_step": 20, "measured": true, "kind": "update_wall", "seconds": 7.155466115102172}
+{"arm": "P0", "rank": 0, "update": 19, "optimizer_step": 20, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 19, "optimizer_step": 20, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 19, "optimizer_step": 20, "measured": true, "kind": "losses", "vel_cond": 0.006619301624596119, "vel_uncond": 0.006782923825085163, "cfg": 0.030376261100172997, "feat": 0.05501050874590874}
+{"arm": "P0", "rank": 0, "update": 20, "optimizer_step": 21, "measured": true, "kind": "update_wall", "seconds": 6.923353930935264}
+{"arm": "P0", "rank": 0, "update": 20, "optimizer_step": 21, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 20, "optimizer_step": 21, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 20, "optimizer_step": 21, "measured": true, "kind": "losses", "vel_cond": 0.005151892313733697, "vel_uncond": 0.005516787758097053, "cfg": 0.019959917291998863, "feat": 0.05445637181401253}
+{"arm": "P0", "rank": 0, "update": 21, "optimizer_step": 22, "measured": true, "kind": "update_wall", "seconds": 6.95259295986034}
+{"arm": "P0", "rank": 0, "update": 21, "optimizer_step": 22, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 21, "optimizer_step": 22, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 21, "optimizer_step": 22, "measured": true, "kind": "losses", "vel_cond": 0.0038108198205009103, "vel_uncond": 0.003864794154651463, "cfg": 0.014134174212813377, "feat": 0.039643531665205956}
+{"arm": "P0", "rank": 0, "update": 22, "optimizer_step": 23, "measured": true, "kind": "update_wall", "seconds": 6.922534339129925}
+{"arm": "P0", "rank": 0, "update": 22, "optimizer_step": 23, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 22, "optimizer_step": 23, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 22, "optimizer_step": 23, "measured": true, "kind": "losses", "vel_cond": 0.0021667928085662425, "vel_uncond": 0.002299662388395518, "cfg": 0.01155870477668941, "feat": 0.03808334469795227}
+{"arm": "P0", "rank": 0, "update": 23, "optimizer_step": 24, "measured": true, "kind": "update_wall", "seconds": 6.918038845062256}
+{"arm": "P0", "rank": 0, "update": 23, "optimizer_step": 24, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 23, "optimizer_step": 24, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 23, "optimizer_step": 24, "measured": true, "kind": "losses", "vel_cond": 0.008027103496715426, "vel_uncond": 0.008857541717588902, "cfg": 0.05849738884717226, "feat": 0.05673187039792538}
+{"arm": "P0", "rank": 0, "update": 24, "optimizer_step": 25, "measured": true, "kind": "update_wall", "seconds": 6.994366317987442}
+{"arm": "P0", "rank": 0, "update": 24, "optimizer_step": 25, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 24, "optimizer_step": 25, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 24, "optimizer_step": 25, "measured": true, "kind": "losses", "vel_cond": 0.007832225412130356, "vel_uncond": 0.006657381192781031, "cfg": 0.03277344536036253, "feat": 0.06165200658142567}
+{"arm": "P0", "rank": 0, "update": 25, "optimizer_step": 26, "measured": true, "kind": "update_wall", "seconds": 6.983164352830499}
+{"arm": "P0", "rank": 0, "update": 25, "optimizer_step": 26, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 25, "optimizer_step": 26, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 25, "optimizer_step": 26, "measured": true, "kind": "losses", "vel_cond": 0.002528201788663864, "vel_uncond": 0.0022002258338034153, "cfg": 0.02821942698210478, "feat": 0.041385043412446976}
+{"arm": "P0", "rank": 0, "update": 26, "optimizer_step": 27, "measured": true, "kind": "update_wall", "seconds": 7.290626586880535}
+{"arm": "P0", "rank": 0, "update": 26, "optimizer_step": 27, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 26, "optimizer_step": 27, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 26, "optimizer_step": 27, "measured": true, "kind": "losses", "vel_cond": 0.006844412884674966, "vel_uncond": 0.006912688608281314, "cfg": 0.02286240877583623, "feat": 0.05030495207756758}
+{"arm": "P0", "rank": 0, "update": 27, "optimizer_step": 28, "measured": true, "kind": "update_wall", "seconds": 6.993028323864564}
+{"arm": "P0", "rank": 0, "update": 27, "optimizer_step": 28, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 27, "optimizer_step": 28, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 27, "optimizer_step": 28, "measured": true, "kind": "losses", "vel_cond": 0.004999216878786683, "vel_uncond": 0.005028404528275132, "cfg": 0.016181800980120897, "feat": 0.030279695987701416}
+{"arm": "P0", "rank": 0, "update": 28, "optimizer_step": 29, "measured": true, "kind": "update_wall", "seconds": 7.095019116066396}
+{"arm": "P0", "rank": 0, "update": 28, "optimizer_step": 29, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 28, "optimizer_step": 29, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 28, "optimizer_step": 29, "measured": true, "kind": "losses", "vel_cond": 0.005409839213825762, "vel_uncond": 0.005400381167419255, "cfg": 0.022312757559120655, "feat": 0.0522763654589653}
+{"arm": "P0", "rank": 0, "update": 29, "optimizer_step": 30, "measured": true, "kind": "update_wall", "seconds": 6.999624359887093}
+{"arm": "P0", "rank": 0, "update": 29, "optimizer_step": 30, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 29, "optimizer_step": 30, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 29, "optimizer_step": 30, "measured": true, "kind": "losses", "vel_cond": 0.006007244577631354, "vel_uncond": 0.00667604454793036, "cfg": 0.030524766072630882, "feat": 0.05604450777173042}
+{"arm": "P0", "rank": 0, "update": 30, "optimizer_step": 31, "measured": true, "kind": "update_wall", "seconds": 6.995113200973719}
+{"arm": "P0", "rank": 0, "update": 30, "optimizer_step": 31, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 30, "optimizer_step": 31, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 30, "optimizer_step": 31, "measured": true, "kind": "losses", "vel_cond": 0.005750942276790738, "vel_uncond": 0.00610430259257555, "cfg": 0.022076832130551338, "feat": 0.038687966763973236}
+{"arm": "P0", "rank": 0, "update": 31, "optimizer_step": 32, "measured": true, "kind": "update_wall", "seconds": 6.988237424055114}
+{"arm": "P0", "rank": 0, "update": 31, "optimizer_step": 32, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 31, "optimizer_step": 32, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 31, "optimizer_step": 32, "measured": true, "kind": "losses", "vel_cond": 0.002755108173005283, "vel_uncond": 0.0028329389169812202, "cfg": 0.012641377281397581, "feat": 0.03719788044691086}
+{"arm": "P0", "rank": 0, "update": 32, "optimizer_step": 33, "measured": true, "kind": "update_wall", "seconds": 6.9902239420916885}
+{"arm": "P0", "rank": 0, "update": 32, "optimizer_step": 33, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 32, "optimizer_step": 33, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 32, "optimizer_step": 33, "measured": true, "kind": "losses", "vel_cond": 0.004942847532220185, "vel_uncond": 0.00437264796346426, "cfg": 0.030276653822511435, "feat": 0.04020670801401138}
+{"arm": "P0", "rank": 0, "update": 33, "optimizer_step": 34, "measured": true, "kind": "update_wall", "seconds": 7.010923695052043}
+{"arm": "P0", "rank": 0, "update": 33, "optimizer_step": 34, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 33, "optimizer_step": 34, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 33, "optimizer_step": 34, "measured": true, "kind": "losses", "vel_cond": 0.005639133451040834, "vel_uncond": 0.0032371417619287968, "cfg": 0.07615144713781774, "feat": 0.041133240796625614}
+{"arm": "P0", "rank": 0, "update": 34, "optimizer_step": 35, "measured": true, "kind": "update_wall", "seconds": 6.995839819079265}
+{"arm": "P0", "rank": 0, "update": 34, "optimizer_step": 35, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 34, "optimizer_step": 35, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 0, "update": 34, "optimizer_step": 35, "measured": true, "kind": "losses", "vel_cond": 0.0025295265950262547, "vel_uncond": 0.0030275401659309864, "cfg": 0.011406832607463002, "feat": 0.034355309791862965}
+{"arm": "P0", "rank": 1, "update": 0, "optimizer_step": 1, "measured": false, "kind": "update_wall", "seconds": 8.901581713929772}
+{"arm": "P0", "rank": 1, "update": 0, "optimizer_step": 1, "measured": false, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 0, "optimizer_step": 1, "measured": false, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 0, "optimizer_step": 1, "measured": false, "kind": "losses", "vel_cond": 0.013275052886456251, "vel_uncond": 0.012397211976349354, "cfg": 0.03604395315051079, "feat": 0.058939265087246895}
+{"arm": "P0", "rank": 1, "update": 1, "optimizer_step": 2, "measured": false, "kind": "update_wall", "seconds": 6.830982488114387}
+{"arm": "P0", "rank": 1, "update": 1, "optimizer_step": 2, "measured": false, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 1, "optimizer_step": 2, "measured": false, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 1, "optimizer_step": 2, "measured": false, "kind": "losses", "vel_cond": 0.007047419901937246, "vel_uncond": 0.00712999003008008, "cfg": 0.034915510565042496, "feat": 0.05820070393383503}
+{"arm": "P0", "rank": 1, "update": 2, "optimizer_step": 3, "measured": false, "kind": "update_wall", "seconds": 6.8616878730244935}
+{"arm": "P0", "rank": 1, "update": 2, "optimizer_step": 3, "measured": false, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 2, "optimizer_step": 3, "measured": false, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 2, "optimizer_step": 3, "measured": false, "kind": "losses", "vel_cond": 0.0076978481374681, "vel_uncond": 0.007892347173765302, "cfg": 0.045597516000270844, "feat": 0.06304690428078175}
+{"arm": "P0", "rank": 1, "update": 3, "optimizer_step": 4, "measured": false, "kind": "update_wall", "seconds": 6.820379381999373}
+{"arm": "P0", "rank": 1, "update": 3, "optimizer_step": 4, "measured": false, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 3, "optimizer_step": 4, "measured": false, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 3, "optimizer_step": 4, "measured": false, "kind": "losses", "vel_cond": 0.004963955609127879, "vel_uncond": 0.004684346029534936, "cfg": 0.02786428853869438, "feat": 0.060214223340153694}
+{"arm": "P0", "rank": 1, "update": 4, "optimizer_step": 5, "measured": false, "kind": "update_wall", "seconds": 7.2124104159884155}
+{"arm": "P0", "rank": 1, "update": 4, "optimizer_step": 5, "measured": false, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 4, "optimizer_step": 5, "measured": false, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 4, "optimizer_step": 5, "measured": false, "kind": "losses", "vel_cond": 0.006144515238702297, "vel_uncond": 0.006190889165736735, "cfg": 0.02228132262825966, "feat": 0.04532209224998951}
+{"arm": "P0", "rank": 1, "update": 5, "optimizer_step": 6, "measured": true, "kind": "update_wall", "seconds": 6.904011283069849}
+{"arm": "P0", "rank": 1, "update": 5, "optimizer_step": 6, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 5, "optimizer_step": 6, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 5, "optimizer_step": 6, "measured": true, "kind": "losses", "vel_cond": 0.015897787641733885, "vel_uncond": 0.015619439771398902, "cfg": 0.037791148759424686, "feat": 0.046904293820261955}
+{"arm": "P0", "rank": 1, "update": 6, "optimizer_step": 7, "measured": true, "kind": "update_wall", "seconds": 7.00667145405896}
+{"arm": "P0", "rank": 1, "update": 6, "optimizer_step": 7, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 6, "optimizer_step": 7, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 6, "optimizer_step": 7, "measured": true, "kind": "losses", "vel_cond": 0.00524689257144928, "vel_uncond": 0.004942529951222241, "cfg": 0.025150470435619354, "feat": 0.06428800337016582}
+{"arm": "P0", "rank": 1, "update": 7, "optimizer_step": 8, "measured": true, "kind": "update_wall", "seconds": 6.92265883507207}
+{"arm": "P0", "rank": 1, "update": 7, "optimizer_step": 8, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 7, "optimizer_step": 8, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 7, "optimizer_step": 8, "measured": true, "kind": "losses", "vel_cond": 0.00477675860747695, "vel_uncond": 0.006224997108802199, "cfg": 0.03643767535686493, "feat": 0.04857894033193588}
+{"arm": "P0", "rank": 1, "update": 8, "optimizer_step": 9, "measured": true, "kind": "update_wall", "seconds": 6.949949993053451}
+{"arm": "P0", "rank": 1, "update": 8, "optimizer_step": 9, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 8, "optimizer_step": 9, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 8, "optimizer_step": 9, "measured": true, "kind": "losses", "vel_cond": 0.005806936300359666, "vel_uncond": 0.005796014331281185, "cfg": 0.020545850042253733, "feat": 0.06043274328112602}
+{"arm": "P0", "rank": 1, "update": 9, "optimizer_step": 10, "measured": true, "kind": "update_wall", "seconds": 6.964331527007744}
+{"arm": "P0", "rank": 1, "update": 9, "optimizer_step": 10, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 9, "optimizer_step": 10, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 9, "optimizer_step": 10, "measured": true, "kind": "losses", "vel_cond": 0.007584536913782358, "vel_uncond": 0.005942739313468337, "cfg": 0.057325705885887146, "feat": 0.07000790722668171}
+{"arm": "P0", "rank": 1, "update": 10, "optimizer_step": 11, "measured": true, "kind": "update_wall", "seconds": 6.951908533927053}
+{"arm": "P0", "rank": 1, "update": 10, "optimizer_step": 11, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 10, "optimizer_step": 11, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 10, "optimizer_step": 11, "measured": true, "kind": "losses", "vel_cond": 0.0018133611301891506, "vel_uncond": 0.0018046736950054765, "cfg": 0.007520968792960048, "feat": 0.03822169825434685}
+{"arm": "P0", "rank": 1, "update": 11, "optimizer_step": 12, "measured": true, "kind": "update_wall", "seconds": 6.993307789089158}
+{"arm": "P0", "rank": 1, "update": 11, "optimizer_step": 12, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 11, "optimizer_step": 12, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 11, "optimizer_step": 12, "measured": true, "kind": "losses", "vel_cond": 0.006978272693231702, "vel_uncond": 0.006746851373463869, "cfg": 0.033671412616968155, "feat": 0.05838940106332302}
+{"arm": "P0", "rank": 1, "update": 12, "optimizer_step": 13, "measured": true, "kind": "update_wall", "seconds": 7.185557220131159}
+{"arm": "P0", "rank": 1, "update": 12, "optimizer_step": 13, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 12, "optimizer_step": 13, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 12, "optimizer_step": 13, "measured": true, "kind": "losses", "vel_cond": 0.02231387561187148, "vel_uncond": 0.022906494792550802, "cfg": 0.0588305089622736, "feat": 0.04877926968038082}
+{"arm": "P0", "rank": 1, "update": 13, "optimizer_step": 14, "measured": true, "kind": "update_wall", "seconds": 6.906610977137461}
+{"arm": "P0", "rank": 1, "update": 13, "optimizer_step": 14, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 13, "optimizer_step": 14, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 13, "optimizer_step": 14, "measured": true, "kind": "losses", "vel_cond": 0.004294981597922742, "vel_uncond": 0.004303187015466392, "cfg": 0.017360352911055088, "feat": 0.0549779012799263}
+{"arm": "P0", "rank": 1, "update": 14, "optimizer_step": 15, "measured": true, "kind": "update_wall", "seconds": 6.908957637147978}
+{"arm": "P0", "rank": 1, "update": 14, "optimizer_step": 15, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 14, "optimizer_step": 15, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 14, "optimizer_step": 15, "measured": true, "kind": "losses", "vel_cond": 0.004400119301863015, "vel_uncond": 0.004251323523931205, "cfg": 0.03387445816770196, "feat": 0.05075046792626381}
+{"arm": "P0", "rank": 1, "update": 15, "optimizer_step": 16, "measured": true, "kind": "update_wall", "seconds": 6.981940646190196}
+{"arm": "P0", "rank": 1, "update": 15, "optimizer_step": 16, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 15, "optimizer_step": 16, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 15, "optimizer_step": 16, "measured": true, "kind": "losses", "vel_cond": 0.006155229639261961, "vel_uncond": 0.006468176143243909, "cfg": 0.0361503716558218, "feat": 0.0536083672195673}
+{"arm": "P0", "rank": 1, "update": 16, "optimizer_step": 17, "measured": true, "kind": "update_wall", "seconds": 6.9643170109484345}
+{"arm": "P0", "rank": 1, "update": 16, "optimizer_step": 17, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 16, "optimizer_step": 17, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 16, "optimizer_step": 17, "measured": true, "kind": "losses", "vel_cond": 0.0024091372033581138, "vel_uncond": 0.0024252746952697635, "cfg": 0.009295673575252295, "feat": 0.038823291659355164}
+{"arm": "P0", "rank": 1, "update": 17, "optimizer_step": 18, "measured": true, "kind": "update_wall", "seconds": 6.966861086897552}
+{"arm": "P0", "rank": 1, "update": 17, "optimizer_step": 18, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 17, "optimizer_step": 18, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 17, "optimizer_step": 18, "measured": true, "kind": "losses", "vel_cond": 0.00463705719448626, "vel_uncond": 0.0044298560824245214, "cfg": 0.03344736434519291, "feat": 0.05647394619882107}
+{"arm": "P0", "rank": 1, "update": 18, "optimizer_step": 19, "measured": true, "kind": "update_wall", "seconds": 7.018345054006204}
+{"arm": "P0", "rank": 1, "update": 18, "optimizer_step": 19, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 18, "optimizer_step": 19, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 18, "optimizer_step": 19, "measured": true, "kind": "losses", "vel_cond": 0.006768573075532913, "vel_uncond": 0.006902570137754083, "cfg": 0.0260297991335392, "feat": 0.05921645835042}
+{"arm": "P0", "rank": 1, "update": 19, "optimizer_step": 20, "measured": true, "kind": "update_wall", "seconds": 7.148011428071186}
+{"arm": "P0", "rank": 1, "update": 19, "optimizer_step": 20, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 19, "optimizer_step": 20, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 19, "optimizer_step": 20, "measured": true, "kind": "losses", "vel_cond": 0.0033877050736919045, "vel_uncond": 0.0035025005927309394, "cfg": 0.022276205010712147, "feat": 0.048036374151706696}
+{"arm": "P0", "rank": 1, "update": 20, "optimizer_step": 21, "measured": true, "kind": "update_wall", "seconds": 6.955257609020919}
+{"arm": "P0", "rank": 1, "update": 20, "optimizer_step": 21, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 20, "optimizer_step": 21, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 20, "optimizer_step": 21, "measured": true, "kind": "losses", "vel_cond": 0.008101415354758501, "vel_uncond": 0.008619847940281034, "cfg": 0.03872816450893879, "feat": 0.054113078862428665}
+{"arm": "P0", "rank": 1, "update": 21, "optimizer_step": 22, "measured": true, "kind": "update_wall", "seconds": 6.906416586134583}
+{"arm": "P0", "rank": 1, "update": 21, "optimizer_step": 22, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 21, "optimizer_step": 22, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 21, "optimizer_step": 22, "measured": true, "kind": "losses", "vel_cond": 0.003939910791814327, "vel_uncond": 0.004005418042652309, "cfg": 0.019255185034126043, "feat": 0.027161050587892532}
+{"arm": "P0", "rank": 1, "update": 22, "optimizer_step": 23, "measured": true, "kind": "update_wall", "seconds": 6.926219808869064}
+{"arm": "P0", "rank": 1, "update": 22, "optimizer_step": 23, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 22, "optimizer_step": 23, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 22, "optimizer_step": 23, "measured": true, "kind": "losses", "vel_cond": 0.005002584075555205, "vel_uncond": 0.004570968740154058, "cfg": 0.022318143397569656, "feat": 0.0354749821126461}
+{"arm": "P0", "rank": 1, "update": 23, "optimizer_step": 24, "measured": true, "kind": "update_wall", "seconds": 6.919397250050679}
+{"arm": "P0", "rank": 1, "update": 23, "optimizer_step": 24, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 23, "optimizer_step": 24, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 23, "optimizer_step": 24, "measured": true, "kind": "losses", "vel_cond": 0.008832375751808286, "vel_uncond": 0.008832249324768782, "cfg": 0.027454308234155178, "feat": 0.03963240422308445}
+{"arm": "P0", "rank": 1, "update": 24, "optimizer_step": 25, "measured": true, "kind": "update_wall", "seconds": 6.987186979036778}
+{"arm": "P0", "rank": 1, "update": 24, "optimizer_step": 25, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 24, "optimizer_step": 25, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 24, "optimizer_step": 25, "measured": true, "kind": "losses", "vel_cond": 0.007477449253201485, "vel_uncond": 0.007699970272369683, "cfg": 0.02808924438431859, "feat": 0.047825807705521584}
+{"arm": "P0", "rank": 1, "update": 25, "optimizer_step": 26, "measured": true, "kind": "update_wall", "seconds": 6.986536648124456}
+{"arm": "P0", "rank": 1, "update": 25, "optimizer_step": 26, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 25, "optimizer_step": 26, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 25, "optimizer_step": 26, "measured": true, "kind": "losses", "vel_cond": 0.004387524910271168, "vel_uncond": 0.0045268082758411765, "cfg": 0.01742801768705249, "feat": 0.04544762521982193}
+{"arm": "P0", "rank": 1, "update": 26, "optimizer_step": 27, "measured": true, "kind": "update_wall", "seconds": 7.284883359214291}
+{"arm": "P0", "rank": 1, "update": 26, "optimizer_step": 27, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 26, "optimizer_step": 27, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 26, "optimizer_step": 27, "measured": true, "kind": "losses", "vel_cond": 0.004824955714866519, "vel_uncond": 0.005315565620549023, "cfg": 0.01668435474857688, "feat": 0.04541759006679058}
+{"arm": "P0", "rank": 1, "update": 27, "optimizer_step": 28, "measured": true, "kind": "update_wall", "seconds": 7.023080225102603}
+{"arm": "P0", "rank": 1, "update": 27, "optimizer_step": 28, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 27, "optimizer_step": 28, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 27, "optimizer_step": 28, "measured": true, "kind": "losses", "vel_cond": 0.006269077304750681, "vel_uncond": 0.007091841660439968, "cfg": 0.023186602164059877, "feat": 0.06007849797606468}
+{"arm": "P0", "rank": 1, "update": 28, "optimizer_step": 29, "measured": true, "kind": "update_wall", "seconds": 7.057604001136497}
+{"arm": "P0", "rank": 1, "update": 28, "optimizer_step": 29, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 28, "optimizer_step": 29, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 28, "optimizer_step": 29, "measured": true, "kind": "losses", "vel_cond": 0.0029374227160587907, "vel_uncond": 0.0030483148293569684, "cfg": 0.01379142701625824, "feat": 0.044870397076010704}
+{"arm": "P0", "rank": 1, "update": 29, "optimizer_step": 30, "measured": true, "kind": "update_wall", "seconds": 6.949652631999925}
+{"arm": "P0", "rank": 1, "update": 29, "optimizer_step": 30, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 29, "optimizer_step": 30, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 29, "optimizer_step": 30, "measured": true, "kind": "losses", "vel_cond": 0.003407709824386984, "vel_uncond": 0.0039375912747345865, "cfg": 0.03329699672758579, "feat": 0.04046075604856014}
+{"arm": "P0", "rank": 1, "update": 30, "optimizer_step": 31, "measured": true, "kind": "update_wall", "seconds": 6.927064894931391}
+{"arm": "P0", "rank": 1, "update": 30, "optimizer_step": 31, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 30, "optimizer_step": 31, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 30, "optimizer_step": 31, "measured": true, "kind": "losses", "vel_cond": 0.0046022412134334445, "vel_uncond": 0.00474728608969599, "cfg": 0.01909016678109765, "feat": 0.03674851916730404}
+{"arm": "P0", "rank": 1, "update": 31, "optimizer_step": 32, "measured": true, "kind": "update_wall", "seconds": 7.050214115064591}
+{"arm": "P0", "rank": 1, "update": 31, "optimizer_step": 32, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 31, "optimizer_step": 32, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 31, "optimizer_step": 32, "measured": true, "kind": "losses", "vel_cond": 0.005058784619905055, "vel_uncond": 0.004962469101883471, "cfg": 0.012617337517440319, "feat": 0.038524490781128407}
+{"arm": "P0", "rank": 1, "update": 32, "optimizer_step": 33, "measured": true, "kind": "update_wall", "seconds": 6.984217836987227}
+{"arm": "P0", "rank": 1, "update": 32, "optimizer_step": 33, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 32, "optimizer_step": 33, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 32, "optimizer_step": 33, "measured": true, "kind": "losses", "vel_cond": 0.004307442111894488, "vel_uncond": 0.004664454609155655, "cfg": 0.03588469559326768, "feat": 0.044236429035663605}
+{"arm": "P0", "rank": 1, "update": 33, "optimizer_step": 34, "measured": true, "kind": "update_wall", "seconds": 7.027781389886513}
+{"arm": "P0", "rank": 1, "update": 33, "optimizer_step": 34, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 33, "optimizer_step": 34, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 33, "optimizer_step": 34, "measured": true, "kind": "losses", "vel_cond": 0.006667632609605789, "vel_uncond": 0.0019464641227386892, "cfg": 0.06566458893939853, "feat": 0.03579932823777199}
+{"arm": "P0", "rank": 1, "update": 34, "optimizer_step": 35, "measured": true, "kind": "update_wall", "seconds": 6.984673558967188}
+{"arm": "P0", "rank": 1, "update": 34, "optimizer_step": 35, "measured": true, "kind": "comm", "phase": "student_forward", "all_gather_bytes": 5677105408.0, "all_gather_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 34, "optimizer_step": 35, "measured": true, "kind": "comm", "phase": "backward_rest", "all_gather_bytes": 5573990400.0, "all_gather_calls": 60.0, "reduce_scatter_bytes": 11354210816.0, "reduce_scatter_calls": 62.0}
+{"arm": "P0", "rank": 1, "update": 34, "optimizer_step": 35, "measured": true, "kind": "losses", "vel_cond": 0.0034270499600097537, "vel_uncond": 0.0029713226831518114, "cfg": 0.03999487217515707, "feat": 0.0365195544436574}

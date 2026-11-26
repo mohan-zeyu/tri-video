@@ -1,0 +1,25 @@
+{
+ "1_p0_vs_reference": {
+  "p0_median_update_s": 6.9740303691942245,
+  "reference_s": 6.911,
+  "relative_difference": 0.009120296511970105,
+  "within_10_percent": true
+ },
+ "2_timer_overhead": {
+  "p1_median_update_s": 6.971530051261652,
+  "p0_median_update_s": 6.9740303691942245,
+  "overhead": -0.0003585183602894393,
+  "under_3_percent": true
+ },
+ "3_phases_sum_to_wall": {
+  "max_relative_error_any_update_rank": 9.187786714732408e-06,
+  "within_1_percent": true
+ },
+ "fixed_cost_p1_s": 0.20300043845782056,
+ "decision_bounds_share_of_p1_update": {
+  "teacher_forward": 0.18159526584511562,
+  "recompute": 0.18903115464560316,
+  "clip_optimizer_ema": 0.028718462012736937,
+  "data": 0.004654228343042899
+ }
+}
