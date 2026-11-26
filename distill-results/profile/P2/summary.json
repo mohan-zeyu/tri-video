@@ -1,0 +1,341 @@
+{
+ "done": {
+  "arm": "P2",
+  "gpus": [
+   3,
+   4
+  ],
+  "gpu_uuids": [
+   "GPU-37b043fc-e2c1-7a4c-2e56-d90d9aea39e4",
+   "GPU-721b39e7-aa5e-e60d-ac55-3c16d203eb43"
+  ],
+  "exit_code": 0,
+  "allocated_seconds": 332.02901220321655,
+  "gpu_seconds": 664.0580244064331,
+  "out_of_memory": false,
+  "argv": [
+   "/dev/shm/tri-center-runtime/bin/python",
+   "-m",
+   "torch.distributed.run",
+   "--standalone",
+   "--nproc_per_node",
+   "2",
+   "scripts/train_learned_center.py",
+   "--stage",
+   "2",
+   "--steps",
+   "2500",
+   "--accum",
+   "2",
+   "--lr",
+   "1e-5",
+   "--lr-center",
+   "2e-4",
+   "--warmup",
+   "250",
+   "--lambda-cfg",
+   "1.0",
+   "--lambda-feat",
+   "0.1",
+   "--ema",
+   "0.999",
+   "--clip",
+   "1.0",
+   "--seed",
+   "20261114",
+   "--selection",
+   "/mnt/data/liuzeyu/tri-video-selection-67c101b/out/distill-selection/selection.pt",
+   "--variant",
+   "shared",
+   "--calibration",
+   "/mnt/data/liuzeyu/tri-video-selection-67c101b/out/distill-selection/pair-statistics.pt",
+   "--center-mode",
+   "mean",
+   "--include-layer0",
+   "--include-step1",
+   "--traj",
+   "/tmp/tri-distill-pilot.EG6asH/traj",
+   "--prompts",
+   "configs/distill_prompts.json",
+   "--snapshot",
+   "/dev/shm/tri-wan-snapshot",
+   "--out",
+   "/mnt/data/liuzeyu/tri-video-profile-8b2502c/out/distill-profile/P2",
+   "--profile",
+   "P2",
+   "--profile-warmup",
+   "5",
+   "--profile-updates",
+   "30",
+   "--profile-timers",
+   "phases",
+   "--profile-torch-updates",
+   "3"
+  ]
+ },
+ "telemetry": {
+  "0": {
+   "leased": false,
+   "samples": 615,
+   "util_mean": 6.863414634146341,
+   "power_w_mean": 83.41639024390244,
+   "power_w_max": 406.57,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 62.0,
+   "sm_clock_mhz_median": 2400.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 609,
+    "0x0000000000000004": 6
+   }
+  },
+  "1": {
+   "leased": false,
+   "samples": 615,
+   "util_mean": 1.0439024390243903,
+   "power_w_mean": 18.372780487804878,
+   "power_w_max": 406.36,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 52.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 615
+   }
+  },
+  "2": {
+   "leased": false,
+   "samples": 615,
+   "util_mean": 0.0,
+   "power_w_mean": 33.339642276422765,
+   "power_w_max": 35.59,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 36.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 615
+   }
+  },
+  "3": {
+   "leased": true,
+   "samples": 615,
+   "util_mean": 70.87642276422764,
+   "power_w_mean": 426.8444715447154,
+   "power_w_max": 582.81,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 71.0,
+   "sm_clock_mhz_median": 2797.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 185,
+    "0x0000000000000004": 430
+   }
+  },
+  "4": {
+   "leased": true,
+   "samples": 615,
+   "util_mean": 90.99674796747968,
+   "power_w_mean": 446.48746341463414,
+   "power_w_max": 581.92,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 77.0,
+   "sm_clock_mhz_median": 2820.0,
+   "sm_clock_mhz_min": 180.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 176,
+    "0x0000000000000004": 439
+   }
+  },
+  "5": {
+   "leased": false,
+   "samples": 615,
+   "util_mean": 0.47479674796747967,
+   "power_w_mean": 25.55951219512195,
+   "power_w_max": 306.36,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 51.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 614,
+    "0x0000000000000004": 1
+   }
+  },
+  "6": {
+   "leased": false,
+   "samples": 615,
+   "util_mean": 3.710569105691057,
+   "power_w_mean": 44.33676422764228,
+   "power_w_max": 452.66,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 53.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 610,
+    "0x0000000000000004": 5
+   }
+  }
+ },
+ "ranks": 2,
+ "updates_measured": 30,
+ "samples_per_rank_per_update": 2,
+ "update_wall": {
+  "median": 6.938613713835366,
+  "q25": 6.924837489670608,
+  "q75": 7.002127229614416,
+  "mean": 8.151237146758165,
+  "n": 30
+ },
+ "phases_per_update": {
+  "data": {
+   "median": 0.0113845159066841,
+   "q25": 0.009634178772103041,
+   "q75": 0.019241887173848227,
+   "mean": 0.016089012186663847,
+   "n": 30,
+   "share_median": 0.0016424132025867858,
+   "share_mean": 0.001974007042366695
+  },
+  "teacher_forward": {
+   "median": 1.2626886219368316,
+   "q25": 1.2594153126410674,
+   "q75": 1.2642261387372855,
+   "mean": 1.260940889075088,
+   "n": 30,
+   "share_median": 0.18216465947467822,
+   "share_mean": 0.15470845358085816
+  },
+  "student_forward": {
+   "median": 1.3643577796174213,
+   "q25": 1.361719205393456,
+   "q75": 1.3938345505448524,
+   "mean": 2.57598951580779,
+   "n": 30,
+   "share_median": 0.1968321928365877,
+   "share_mean": 0.3160555406553993
+  },
+  "loss": {
+   "median": 0.010853518499061465,
+   "q25": 0.010829044767888263,
+   "q75": 0.010922492772806436,
+   "mean": 0.010885434853844345,
+   "n": 30,
+   "share_median": 0.0015658076481681973,
+   "share_mean": 0.001335565217516829
+  },
+  "center_sync": {
+   "median": 0.0013365072081796825,
+   "q25": 0.0013045819359831512,
+   "q75": 0.0013839102757629007,
+   "mean": 0.0013452481323232254,
+   "n": 30,
+   "share_median": 0.00019281426650543185,
+   "share_mean": 0.00016505235101617075
+  },
+  "clip": {
+   "median": 0.019231059588491917,
+   "q25": 0.018753304990241304,
+   "q75": 0.020280700031435117,
+   "mean": 0.01957734228344634,
+   "n": 30,
+   "share_median": 0.0027744127573600093,
+   "share_mean": 0.0024020002651486453
+  },
+  "optimizer": {
+   "median": 0.16554308868944645,
+   "q25": 0.16401845891959965,
+   "q75": 0.18479470507008955,
+   "mean": 0.17543655099580063,
+   "n": 30,
+   "share_median": 0.023882451980317347,
+   "share_mean": 0.021524813527165607
+  },
+  "ema": {
+   "median": 0.02225742128212005,
+   "q25": 0.022136590851005167,
+   "q75": 0.025025337818078697,
+   "mean": 0.023453154123853893,
+   "n": 30,
+   "share_median": 0.0032110177427770387,
+   "share_mean": 0.0028775347342066358
+  },
+  "bookkeeping": {
+   "median": 0.0014918151427991688,
+   "q25": 0.0014025030541233718,
+   "q75": 0.0015828814648557454,
+   "mean": 0.001535641592151175,
+   "n": 30,
+   "share_median": 0.00021522012059499982,
+   "share_mean": 0.0001884122705786946
+  },
+  "backward_total": {
+   "median": 4.072434089030139,
+   "q25": 4.063415542419534,
+   "q75": 4.075356962479418,
+   "mean": 4.065180234417009,
+   "n": 30,
+   "share_median": 0.5875190099704243,
+   "share_mean": 0.4987686203557433
+  }
+ },
+ "sum_of_phase_medians": 6.931578416901175,
+ "per_sample": {
+  "data": {
+   "median": 0.00569225795334205,
+   "mean": 0.008044506093331924
+  },
+  "teacher_forward": {
+   "median": 0.6313443109684158,
+   "mean": 0.630470444537544
+  },
+  "student_forward": {
+   "median": 0.6821788898087107,
+   "mean": 1.287994757903895
+  },
+  "loss": {
+   "median": 0.005426759249530733,
+   "mean": 0.005442717426922173
+  }
+ },
+ "phase_sum_vs_wall_max_relative_error": 0.006655848260473229,
+ "comm_per_update": {
+  "all_gather_bytes": 11251095808.0,
+  "all_gather_calls": 122.0,
+  "backward_rest:all_gather_bytes": 5573990400.0,
+  "backward_rest:all_gather_calls": 60.0,
+  "backward_rest:reduce_scatter_bytes": 11354210816.0,
+  "backward_rest:reduce_scatter_calls": 62.0,
+  "reduce_scatter_bytes": 11354210816.0,
+  "reduce_scatter_calls": 62.0,
+  "student_forward:all_gather_bytes": 5677105408.0,
+  "student_forward:all_gather_calls": 62.0
+ },
+ "peak_memory": [
+  {
+   "rank": 0,
+   "world": 2,
+   "updates_run": 35,
+   "peak_cuda_allocated_bytes": 23125667840,
+   "peak_cuda_reserved_bytes": 24725422080,
+   "wall_seconds": 312.67638666392304
+  },
+  {
+   "rank": 1,
+   "world": 2,
+   "updates_run": 35,
+   "peak_cuda_allocated_bytes": 23122313216,
+   "peak_cuda_reserved_bytes": 24721227776,
+   "wall_seconds": 312.5036155190319
+  }
+ ],
+ "out_of_memory": []
+}

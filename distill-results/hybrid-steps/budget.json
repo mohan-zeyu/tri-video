@@ -1,0 +1,5 @@
+{
+  "gpu_hours_used": 1.3042394444444443,
+  "guard_gpu_hours": 3.0,
+  "accounting": "Allocated wall seconds x GPUs of every GPU job (ledger.tsv), including loading, parity, rendering and scorers; CPU work excluded."
+}

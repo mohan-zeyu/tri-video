@@ -16,6 +16,12 @@ Arms (--arm NAME, with --student DIR and --center-mode):
 The arm name is free; the weights/means/mode come from the arguments. Every record stores the
 LearnedCenter state hash, the mode, exempt layers/steps and the number of replacement hook calls.
 
+Hybrid sampling (--teacher-steps S1 S2 ..., 1-based denoising steps): on the named steps the denoiser is the frozen
+teacher transformer from the snapshot with LearnedCenter off; on every other step it is the --student transformer
+with its center. Both transformers stay on the GPU and one sampler runs all steps, so the scheduler keeps its
+multistep history across the hand-over. `--teacher-steps` with no values hands the teacher no step (the student
+path through the hybrid code). Without the flag nothing changes.
+
 Same protocol as the benchmark: 45 frames 480x480, 20 UniPC steps, CFG 5, empty negative prompt, bf16
 transformer, fp32 tiled VAE, CUDA generator seeded per prompt, same prompt seeds as center_benchmark_wan.json.
 """
@@ -42,6 +48,69 @@ def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+class StepHandover:
+    """Run the teacher transformer on the named 1-based denoising steps and the student on the others, in one
+    pipeline call. The pipeline reads `pipe.transformer` at every step, so the denoiser for step i+1 is set from
+    the end-of-step callback of step i. The LearnedCenter step counter also runs on teacher forwards (its
+    transformer pre-hook is registered on the teacher, which carries no replacement hooks), so the student sees its
+    true step index after the hand-over. Every forward is logged as (step index, branch, denoiser) and checked."""
+
+    def __init__(self, pipe, student, teacher, center, teacher_steps, steps):
+        if student is teacher:
+            raise ValueError("student and teacher must be different modules")
+        bad = [s for s in teacher_steps if not 1 <= int(s) <= steps]
+        if bad or len(set(teacher_steps)) != len(teacher_steps):
+            raise ValueError(f"teacher steps must be distinct 1-based steps in 1..{steps}: {teacher_steps}")
+        self.pipe, self.student, self.teacher, self.center = pipe, student, teacher, center
+        self.teacher_steps = sorted(int(s) for s in teacher_steps)
+        self.steps = steps
+        self.forwards = []
+        # order matters: the center's step counter runs before the log hook on both modules
+        self.handles = [teacher.register_forward_pre_hook(center._transformer_pre_hook, with_kwargs=True),
+                        student.register_forward_pre_hook(self._log("student"), with_kwargs=True),
+                        teacher.register_forward_pre_hook(self._log("teacher"), with_kwargs=True)]
+
+    def _log(self, name):
+        def hook(module, args, kwargs):
+            if self.center.rollout is not None:
+                self.forwards.append((int(self.center.rollout["step"]), int(self.center.branch[0]), name))
+        return hook
+
+    def denoiser_for(self, index):
+        """Denoiser for zero-based scheduler index `index`."""
+        return self.teacher if index + 1 in self.teacher_steps else self.student
+
+    def begin(self):
+        self.forwards = []
+        self.pipe.transformer = self.denoiser_for(0)
+
+    def after_step(self, index):
+        if index + 1 < self.steps:
+            self.pipe.transformer = self.denoiser_for(index + 1)
+
+    def end(self):
+        self.pipe.transformer = self.student
+
+    def student_steps(self):
+        """Zero-based indices of the steps the student runs."""
+        return [i for i in range(self.steps) if i + 1 not in self.teacher_steps]
+
+    def check(self):
+        """Verify one completed rollout: two forwards (conditional, unconditional) per step, by the planned denoiser."""
+        expected = [(i, b, "teacher" if i + 1 in self.teacher_steps else "student") for i in range(self.steps) for b in (0, 1)]
+        if self.forwards != expected:
+            raise RuntimeError(f"denoiser schedule {self.forwards} != planned {expected}")
+        teacher = sum(1 for f in self.forwards if f[2] == "teacher")
+        return {"teacher_steps": self.teacher_steps, "teacher_forwards": teacher, "expected_teacher_forwards": 2 * len(self.teacher_steps),
+                "student_forwards": len(self.forwards) - teacher, "denoiser_by_step": [expected[2 * i][2] for i in range(self.steps)]}
+
+    def remove(self):
+        for h in self.handles:
+            h.remove()
+        self.handles = []
+        self.end()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--config", default="configs/center_benchmark_wan.json")
@@ -54,6 +123,9 @@ def main():
     parser.add_argument("--max-prompts", type=int)
     parser.add_argument("--resident-text-encoder", action="store_true",
                         help="keep the text encoder on CUDA between prompts when device memory permits")
+    parser.add_argument("--teacher-steps", type=int, nargs="*",
+                        help="1-based denoising steps run by the frozen teacher from the snapshot with LearnedCenter off; "
+                             "the --student transformer with its center runs the others (no values: teacher on no step)")
     args = parser.parse_args()
     config_path = ROOT / args.config
     config = json.loads(config_path.read_text())
@@ -124,6 +196,11 @@ def main():
         center = LearnedCenter(layers=len(transformer.blocks), steps=config["steps"], heads=transformer.config.num_attention_heads,
                                head_dim=transformer.config.attention_head_dim, mode=args.center_mode).to("cuda")
     center.attach(pipe.transformer)
+    handover = None
+    if args.teacher_steps is not None:
+        teacher = WanTransformer3DModel.from_pretrained(snapshot, subfolder="transformer", torch_dtype=torch.bfloat16,
+                                                        local_files_only=True).to("cuda").eval()
+        handover = StepHandover(pipe, pipe.transformer, teacher, center, args.teacher_steps, config["steps"])
     exempt = {"layers": [int(i) for i in torch.nonzero(~center.layer_active).flatten()], "steps": [int(i) for i in torch.nonzero(~center.step_active).flatten()]}
     selection_info = {"default_high_masks": center.uses_default_masks, "cell_invariant_masks": center.cell_invariant(),
                       "pairs_per_cell_q": float(center.selected_pairs("q").sum(-1).float().mean()),
@@ -138,6 +215,11 @@ def main():
                    "config_sha256": digest(config_path), "code_sha256": {n: digest(ROOT / "scripts" / n) for n in ("generate_learned_center.py", "learned_center.py")}}
     active_layers = int(center.layer_active.sum()) if args.center_mode != "off" else 0
     active_steps = int(center.step_active.sum()) if args.center_mode != "off" else 0
+    if handover is not None:
+        environment["teacher_steps"] = handover.teacher_steps
+        environment["teacher_weights"] = "teacher snapshot transformer, LearnedCenter off"
+        # replacement and NoPE calls happen only on the steps the student runs
+        active_steps = int(center.step_active[handover.student_steps()].sum()) if args.center_mode != "off" else 0
     expected_calls = active_layers * 2 * 2 * active_steps if args.center_mode != "off" else 0   # layers x (q,k) x branches x steps
     expected_nope_calls = active_layers * 2 * active_steps if (center.uses_nope and args.center_mode != "off") else 0   # one processor call per layer, branch, step
     scope = {
@@ -152,6 +234,9 @@ def main():
                      if center.cell_invariant() and bool(center.step_active.all()) else ""),
         "off": "full Q/K with no replacements",
     }[args.center_mode]
+    if handover is not None:
+        scope += ("; denoising steps %s (1-based) run by the frozen teacher with no replacement, the others by the student"
+                  % (handover.teacher_steps or "none"))
 
     completed = 0
     for prompt in config["prompts"]:
@@ -187,7 +272,11 @@ def main():
                     raise RuntimeError("nonfinite latents")
                 latents_holder["final"] = lat.detach()
                 checked_steps.append(i)
+                if handover is not None:
+                    handover.after_step(i)
                 return kw
+            if handover is not None:
+                handover.begin()
             frames = pipe(prompt_embeds=positive, negative_prompt_embeds=negative, height=config["height"], width=config["width"],
                           num_frames=config["frames"], num_inference_steps=config["steps"], guidance_scale=config["guidance_scale"],
                           generator=torch.Generator(device="cuda").manual_seed(prompt["seed"]), output_type="np",
@@ -196,6 +285,10 @@ def main():
             seconds = time.time() - started
             if checked_steps != list(range(config["steps"])) or center.rollout["step"] != config["steps"] - 1:
                 raise RuntimeError("incomplete denoising trajectory")
+            hybrid = {}
+            if handover is not None:
+                hybrid = handover.check()
+                handover.end()
             center.clear_rollout()
             if center.calls != expected_calls:
                 raise RuntimeError(f"replacement calls {center.calls} != expected {expected_calls}")
@@ -215,13 +308,15 @@ def main():
                 "nope_calls": center.nope_calls, "expected_nope_calls": expected_nope_calls,
                 "video_sha256": digest(video), "video_bytes": video.stat().st_size, "frames": list(frames.shape),
                 "center_scope": scope,
-                "peak_gpu_memory_bytes": torch.cuda.max_memory_allocated()})
+                "peak_gpu_memory_bytes": torch.cuda.max_memory_allocated(), **hybrid})
             completed += 1
             print("COMPLETE", prompt["id"], args.arm, round(seconds, 1), flush=True)
         except BaseException as error:
             write_json(arm / "failed.json", {"error": repr(error), "traceback": traceback.format_exc()})
             raise
         finally:
+            if handover is not None:
+                handover.end()
             claim.rmdir()
         if args.max_prompts and completed >= args.max_prompts:
             break

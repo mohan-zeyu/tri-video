@@ -759,3 +759,48 @@ it is 0.018 below s22_all_means in aesthetics. The inference-only zeros swap cos
 text-video -0.015 vs s32_means (s22_all's swap was within noise on those three). Trained-student guided velocity error
 0.0240 means / 0.0279 zeros (32 held-out prompts x 20 states, whole latent, CFG 5). 12.798 of 18 approved GPU-hours.
 Open: zeros-trained arm, other pair counts (need approval).
+
+### Teacher on the early steps, 25-26 November 2026
+
+This is complete. The report section is "Teacher on the early steps" in `DISTILL_REPORT.md`, with evidence and the README in `distill-results/hybrid-steps/`.
+
+**Code**
+- `scripts/generate_learned_center.py --teacher-steps <1-based steps>` swaps the denoiser between steps inside one sampler; teacher steps run with `LearnedCenter` off. With the flag absent, the script behaves exactly as before.
+- CPU test: `scripts/test_hybrid_steps.py`. Driver: `scripts/hybrid_steps.py`, stages verify / parity / arm / collect.
+- Lab root: `/mnt/data/liuzeyu/tri-video-profile-8b2502c/out/study-hybrid-steps/` (videos `bench-s32_teacher3/` and `bench-s32_student3/`; `run/ledger.tsv`).
+
+**Parity.** On v000 and v013, teacher on all steps reproduces the frozen baseline, and teacher on no step reproduces `s32_means`. Both hold bit for bit.
+
+**Headline.** 100 prompts, one seed each, paired 95% intervals.
+- s32_teacher3 (teacher on steps 1-3): dynamic degree is back to 30 of 100 (teacher 33) and same-seed final-latent relative L2 is halved, 0.5818 → 0.2923. Aesthetics stays at -0.0135 [-0.0227, -0.0042] against the teacher.
+- s32_student3 (student on steps 1-3 only): aesthetics is at teacher level, +0.0044 [-0.0086, +0.0171], but agreement is unchanged at 0.5895.
+- Reading: the early steps decide the trajectory and part of the motion, while the aesthetics deficit sits in steps 4-20. This is the "In between" outcome row.
+
+**GPU time.** 1.3042 GPU-hours.
+
+**Open, needs approval.** A student trained only on steps 4-20, other step splits, and the same test on other students.
+
+### Where one optimizer update goes, 26 November 2026
+
+This is complete. The report section is "Where one optimizer update goes" in `DISTILL_REPORT.md`; evidence, README and figure are in `distill-results/profile/`.
+
+**Code**
+- `scripts/train_learned_center.py --profile <arm>` with `--profile-timers none|phases|blocks`, `--profile-torch-updates N` and `--profile-floor` (P3 only). With the flags absent, the trainer behaves as before.
+- `scripts/update_profile.py`, `scripts/profile_forward_anatomy.py`, `scripts/profile_update.py` (stages host / pair / single / summary) and `scripts/summarize_update_profile.py`.
+- CPU test: `scripts/test_update_profile.py`.
+- Lab outputs are in `/mnt/data/liuzeyu/tri-video-profile-8b2502c/out/distill-profile/`.
+
+**Headline.** P1 per-update medians over 30 updates, rank mean, 6.938 s:
+- teacher forward 18.4%, student first pass 19.6%, recomputation 19.1%, rest of backward 39.9%;
+- fixed per-update cost 2.7%; data and loss 0.3%;
+- NCCL kernel time 14.8% of the update, but only 3.8% exposed (P1 − P3);
+- the self-attention kernel is 34% of a forward;
+- the cards run power capped (SW power cap in 86–91% of samples).
+
+All five checks pass. Without checkpointing the recipe runs out of memory.
+
+**GPU time.** 2.290 GPU-hours, including 1.333 for attempts set aside because another user's service occupied the leased GPUs 3 and 4, and three false alarms from the first version of the new foreign-process monitor.
+
+**Open**
+- The P5 forward is slower in absolute time than P1's teacher forward, unexplained.
+- Reduce-scattering gradients only on the last micro-batch was not tested.

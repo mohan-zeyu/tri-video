@@ -1,0 +1,29 @@
+{
+  "when": "during the arm",
+  "exit_code": 0,
+  "allocated_seconds": 270.33207273483276,
+  "foreign_processes": [
+    {
+      "pid": 3277664,
+      "process_name": "/mnt/data/v-lijuyang/inferix-atas-validation/native-wan-20261024-v1/venv-v2/bin/python",
+      "gpu_uuid": "GPU-721b39e7-aa5e-e60d-ac55-3c16d203eb43"
+    },
+    {
+      "pid": 3277664,
+      "process_name": "sgl_diffusion::scheduler",
+      "gpu_uuid": "GPU-721b39e7-aa5e-e60d-ac55-3c16d203eb43"
+    },
+    {
+      "pid": 3277665,
+      "process_name": "/mnt/data/v-lijuyang/inferix-atas-validation/native-wan-20261024-v1/venv-v2/bin/python",
+      "gpu_uuid": "GPU-37b043fc-e2c1-7a4c-2e56-d90d9aea39e4"
+    },
+    {
+      "pid": 3277665,
+      "process_name": "sgl_diffusion::scheduler",
+      "gpu_uuid": "GPU-37b043fc-e2c1-7a4c-2e56-d90d9aea39e4"
+    }
+  ],
+  "first_seen": "2026/11/26 14:34:16.398",
+  "last_seen": "2026/11/26 14:36:23.540"
+}

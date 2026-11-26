@@ -1,0 +1,20 @@
+{
+ "when": "during the arm",
+ "exit_code": 0,
+ "allocated_seconds": 266.1932702064514,
+ "foreign_processes": [
+  {
+   "pid": 3124293,
+   "process_name": "/dev/shm/tri-center-runtime/bin/python",
+   "gpu_uuid": "GPU-37b043fc-e2c1-7a4c-2e56-d90d9aea39e4"
+  },
+  {
+   "pid": 3124294,
+   "process_name": "/dev/shm/tri-center-runtime/bin/python",
+   "gpu_uuid": "GPU-721b39e7-aa5e-e60d-ac55-3c16d203eb43"
+  }
+ ],
+ "first_seen": "2026/11/26 14:16:24.114",
+ "last_seen": "2026/11/26 14:20:39.572",
+ "correction": "false alarm: every flagged process was one of this job's own two ranks (lab python, pids just above the job pid). torch.distributed.run starts workers in their own sessions, so the session-id test of the first monitor version misclassified them; fixed by a parent-chain test. The attempt is kept set aside and P0 is rerun."
+}

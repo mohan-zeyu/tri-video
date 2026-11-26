@@ -1,0 +1,209 @@
+{
+ "done": {
+  "arm": "P4d",
+  "gpus": [
+   5,
+   6
+  ],
+  "gpu_uuids": [
+   "GPU-198cec66-4c42-218b-05f6-5c7b9946992d",
+   "GPU-0249a4e6-0715-37a5-b8f9-6cf8cfc674d1"
+  ],
+  "exit_code": 1,
+  "allocated_seconds": 17.379085779190063,
+  "gpu_seconds": 34.75817155838013,
+  "out_of_memory": true,
+  "argv": [
+   "/dev/shm/tri-center-runtime/bin/python",
+   "-m",
+   "torch.distributed.run",
+   "--standalone",
+   "--nproc_per_node",
+   "2",
+   "scripts/train_learned_center.py",
+   "--stage",
+   "2",
+   "--steps",
+   "2500",
+   "--accum",
+   "2",
+   "--lr",
+   "1e-5",
+   "--lr-center",
+   "2e-4",
+   "--warmup",
+   "250",
+   "--lambda-cfg",
+   "1.0",
+   "--lambda-feat",
+   "0.1",
+   "--ema",
+   "0.999",
+   "--clip",
+   "1.0",
+   "--seed",
+   "20261114",
+   "--selection",
+   "/mnt/data/liuzeyu/tri-video-selection-67c101b/out/distill-selection/selection.pt",
+   "--variant",
+   "shared",
+   "--calibration",
+   "/mnt/data/liuzeyu/tri-video-selection-67c101b/out/distill-selection/pair-statistics.pt",
+   "--center-mode",
+   "mean",
+   "--include-layer0",
+   "--include-step1",
+   "--traj",
+   "/tmp/tri-distill-pilot.EG6asH/traj",
+   "--prompts",
+   "configs/distill_prompts.json",
+   "--snapshot",
+   "/dev/shm/tri-wan-snapshot",
+   "--no-checkpointing",
+   "--out",
+   "/mnt/data/liuzeyu/tri-video-profile-8b2502c/out/distill-profile/P4d",
+   "--profile",
+   "P4d",
+   "--profile-warmup",
+   "5",
+   "--profile-updates",
+   "30",
+   "--profile-timers",
+   "blocks"
+  ]
+ },
+ "telemetry": {
+  "0": {
+   "leased": false,
+   "samples": 33,
+   "util_mean": 0.0,
+   "power_w_mean": 24.35121212121212,
+   "power_w_max": 24.86,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 34.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 180.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 33
+   }
+  },
+  "1": {
+   "leased": false,
+   "samples": 33,
+   "util_mean": 19.636363636363637,
+   "power_w_mean": 84.8830303030303,
+   "power_w_max": 147.67,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 59.0,
+   "sm_clock_mhz_median": 2400.0,
+   "sm_clock_mhz_min": 2400.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 33
+   }
+  },
+  "2": {
+   "leased": false,
+   "samples": 33,
+   "util_mean": 0.0,
+   "power_w_mean": 34.63151515151515,
+   "power_w_max": 35.13,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 35.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 33
+   }
+  },
+  "3": {
+   "leased": false,
+   "samples": 33,
+   "util_mean": 100.0,
+   "power_w_mean": 574.9824242424243,
+   "power_w_max": 575.44,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 71.0,
+   "sm_clock_mhz_median": 2760.0,
+   "sm_clock_mhz_min": 2752.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000004": 33
+   }
+  },
+  "4": {
+   "leased": false,
+   "samples": 33,
+   "util_mean": 100.0,
+   "power_w_mean": 574.9518181818182,
+   "power_w_max": 575.41,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 79.0,
+   "sm_clock_mhz_median": 2752.0,
+   "sm_clock_mhz_min": 2707.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000004": 33
+   }
+  },
+  "5": {
+   "leased": true,
+   "samples": 33,
+   "util_mean": 11.818181818181818,
+   "power_w_mean": 108.2230303030303,
+   "power_w_max": 405.08,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 69.0,
+   "sm_clock_mhz_median": 2400.0,
+   "sm_clock_mhz_min": 180.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 29,
+    "0x0000000000000004": 4
+   }
+  },
+  "6": {
+   "leased": true,
+   "samples": 33,
+   "util_mean": 7.424242424242424,
+   "power_w_mean": 107.3630303030303,
+   "power_w_max": 377.03,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 66.0,
+   "sm_clock_mhz_median": 2400.0,
+   "sm_clock_mhz_min": 180.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 31,
+    "0x0000000000000004": 2
+   }
+  }
+ },
+ "ranks": 0,
+ "updates_measured": 0,
+ "samples_per_rank_per_update": 2,
+ "update_wall": {
+  "median": null,
+  "q25": null,
+  "q75": null,
+  "mean": null,
+  "n": 0
+ },
+ "peak_memory": [],
+ "out_of_memory": [
+  {
+   "rank": 0,
+   "error": "CUDA out of memory. Tried to allocate 128.00 MiB. GPU 0 has a total capacity of 31.36 GiB of which 112.75 MiB is free. Including non-PyTorch memory, this process has 31.24 GiB memory in use. Of the allocated memory 29.65 GiB is allocated by PyTorch, and 814.45 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)",
+   "peak_cuda_allocated_bytes": 31838491648,
+   "peak_cuda_reserved_bytes": 32780582912
+  },
+  {
+   "rank": 1,
+   "error": "CUDA out of memory. Tried to allocate 128.00 MiB. GPU 1 has a total capacity of 31.36 GiB of which 112.75 MiB is free. Including non-PyTorch memory, this process has 31.24 GiB memory in use. Of the allocated memory 29.65 GiB is allocated by PyTorch, and 815.51 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)",
+   "peak_cuda_allocated_bytes": 31837373440,
+   "peak_cuda_reserved_bytes": 32780582912
+  }
+ ]
+}

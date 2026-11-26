@@ -1,0 +1,6160 @@
+{
+  "config": {
+    "experiment": "wan-learned-center-20261114",
+    "frames": 45,
+    "height": 480,
+    "width": 480,
+    "steps": 20,
+    "guidance_scale": 5.0,
+    "negative_prompt": "",
+    "fps": 16,
+    "center_policy": "shared32 EMA (shared, 32 means pairs per head, nothing exempt), trained means; inference-only hybrid: denoising steps [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] (1-based) run by the frozen teacher with no replacement, the other steps by the student, one sampler over all 20 steps",
+    "high_pairs": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49
+    ],
+    "modes": [
+      "baseline",
+      "s32_student3"
+    ],
+    "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+    "sampling_seed": 20261109,
+    "prompt_scope": "100 prompts sampled without replacement within eight official VBench content-category lists, 13 each animal/architecture/food/human and 12 each lifestyle/plant/scenery/vehicles. One independent deterministic seed per prompt, shared across six arms.",
+    "dimensions": [
+      "subject_consistency",
+      "background_consistency",
+      "motion_smoothness",
+      "dynamic_degree",
+      "aesthetic_quality",
+      "imaging_quality"
+    ],
+    "prompts": [
+      {
+        "id": "v000",
+        "text": "lemur eating grass leaves",
+        "category": "animal",
+        "seed": 2026110900,
+        "audit": true
+      },
+      {
+        "id": "v013",
+        "text": "a miniature house",
+        "category": "architecture",
+        "seed": 2026110913,
+        "audit": true
+      },
+      {
+        "id": "v026",
+        "text": "a broccoli soup on wooden table",
+        "category": "food",
+        "seed": 2026110926,
+        "audit": true
+      },
+      {
+        "id": "v039",
+        "text": "a girl pushing the chair while her sister is on the chair",
+        "category": "human",
+        "seed": 2026110939,
+        "audit": true
+      },
+      {
+        "id": "v052",
+        "text": "modern office waiting room",
+        "category": "lifestyle",
+        "seed": 2026110952,
+        "audit": true
+      },
+      {
+        "id": "v064",
+        "text": "a man holding leaves looking at the camera",
+        "category": "plant",
+        "seed": 2026110964,
+        "audit": true
+      },
+      {
+        "id": "v076",
+        "text": "fireworks display in the sky at night",
+        "category": "scenery",
+        "seed": 2026110976,
+        "audit": true
+      },
+      {
+        "id": "v088",
+        "text": "video of passengers riding a double decker bus during night",
+        "category": "vehicles",
+        "seed": 2026110988,
+        "audit": true
+      },
+      {
+        "id": "v001",
+        "text": "chameleon eating ant",
+        "category": "animal",
+        "seed": 2026110901,
+        "audit": false
+      },
+      {
+        "id": "v014",
+        "text": "red paper lantern decorations hanging outside a building",
+        "category": "architecture",
+        "seed": 2026110914,
+        "audit": false
+      },
+      {
+        "id": "v027",
+        "text": "a mother preparing food with her kids",
+        "category": "food",
+        "seed": 2026110927,
+        "audit": false
+      },
+      {
+        "id": "v040",
+        "text": "cab driver talking to passenger",
+        "category": "human",
+        "seed": 2026110940,
+        "audit": false
+      },
+      {
+        "id": "v053",
+        "text": "woman painting at home",
+        "category": "lifestyle",
+        "seed": 2026110953,
+        "audit": false
+      },
+      {
+        "id": "v065",
+        "text": "green moss in forest nature",
+        "category": "plant",
+        "seed": 2026110965,
+        "audit": false
+      },
+      {
+        "id": "v077",
+        "text": "video of ocean during daytime",
+        "category": "scenery",
+        "seed": 2026110977,
+        "audit": false
+      },
+      {
+        "id": "v089",
+        "text": "cargo train traveling on the mountainside",
+        "category": "vehicles",
+        "seed": 2026110989,
+        "audit": false
+      },
+      {
+        "id": "v002",
+        "text": "a raccoon climbing a tree",
+        "category": "animal",
+        "seed": 2026110902,
+        "audit": false
+      },
+      {
+        "id": "v015",
+        "text": "modern wooden house interior",
+        "category": "architecture",
+        "seed": 2026110915,
+        "audit": false
+      },
+      {
+        "id": "v028",
+        "text": "boy getting a dumpling using chopsticks",
+        "category": "food",
+        "seed": 2026110928,
+        "audit": false
+      },
+      {
+        "id": "v041",
+        "text": "friends talking while on the basketball court",
+        "category": "human",
+        "seed": 2026110941,
+        "audit": false
+      },
+      {
+        "id": "v054",
+        "text": "woman and man in pajamas working from home",
+        "category": "lifestyle",
+        "seed": 2026110954,
+        "audit": false
+      },
+      {
+        "id": "v066",
+        "text": "a shadow of a swaying plant",
+        "category": "plant",
+        "seed": 2026110966,
+        "audit": false
+      },
+      {
+        "id": "v078",
+        "text": "scenery of desert landscape",
+        "category": "scenery",
+        "seed": 2026110978,
+        "audit": false
+      },
+      {
+        "id": "v090",
+        "text": "video of blinking traffic lights",
+        "category": "vehicles",
+        "seed": 2026110990,
+        "audit": false
+      },
+      {
+        "id": "v003",
+        "text": "koala eating leaves from a branch",
+        "category": "animal",
+        "seed": 2026110903,
+        "audit": false
+      },
+      {
+        "id": "v016",
+        "text": "silhouette of a building",
+        "category": "architecture",
+        "seed": 2026110916,
+        "audit": false
+      },
+      {
+        "id": "v029",
+        "text": "fresh dim sum set up on a bamboo steam tray for cooking",
+        "category": "food",
+        "seed": 2026110929,
+        "audit": false
+      },
+      {
+        "id": "v042",
+        "text": "brother and sister using hammock",
+        "category": "human",
+        "seed": 2026110942,
+        "audit": false
+      },
+      {
+        "id": "v055",
+        "text": "a toolbox and a paint roller beside a huge package in a room",
+        "category": "lifestyle",
+        "seed": 2026110955,
+        "audit": false
+      },
+      {
+        "id": "v067",
+        "text": "tree with golden leaves",
+        "category": "plant",
+        "seed": 2026110967,
+        "audit": false
+      },
+      {
+        "id": "v079",
+        "text": "sun view through a spider web",
+        "category": "scenery",
+        "seed": 2026110979,
+        "audit": false
+      },
+      {
+        "id": "v091",
+        "text": "a modern railway station in malaysia use for public transportation",
+        "category": "vehicles",
+        "seed": 2026110991,
+        "audit": false
+      },
+      {
+        "id": "v004",
+        "text": "paper cut out of a pair of hands a whale and a heart",
+        "category": "animal",
+        "seed": 2026110904,
+        "audit": false
+      },
+      {
+        "id": "v017",
+        "text": "candle on a jar and a house figurine on a surface",
+        "category": "architecture",
+        "seed": 2026110917,
+        "audit": false
+      },
+      {
+        "id": "v030",
+        "text": "a man eating a donut",
+        "category": "food",
+        "seed": 2026110930,
+        "audit": false
+      },
+      {
+        "id": "v043",
+        "text": "couple dancing with body paint",
+        "category": "human",
+        "seed": 2026110943,
+        "audit": false
+      },
+      {
+        "id": "v056",
+        "text": "video of a bathroom interior",
+        "category": "lifestyle",
+        "seed": 2026110956,
+        "audit": false
+      },
+      {
+        "id": "v068",
+        "text": "forest trees and a medieval castle at sunset",
+        "category": "plant",
+        "seed": 2026110968,
+        "audit": false
+      },
+      {
+        "id": "v080",
+        "text": "scenic view from wooden pathway",
+        "category": "scenery",
+        "seed": 2026110980,
+        "audit": false
+      },
+      {
+        "id": "v092",
+        "text": "drone view of an illuminated bridge across a river",
+        "category": "vehicles",
+        "seed": 2026110992,
+        "audit": false
+      },
+      {
+        "id": "v005",
+        "text": "a frog eating an ant",
+        "category": "animal",
+        "seed": 2026110905,
+        "audit": false
+      },
+      {
+        "id": "v018",
+        "text": "house in village",
+        "category": "architecture",
+        "seed": 2026110918,
+        "audit": false
+      },
+      {
+        "id": "v031",
+        "text": "preparing a cocktail drink",
+        "category": "food",
+        "seed": 2026110931,
+        "audit": false
+      },
+      {
+        "id": "v044",
+        "text": "teacher writing on her notebook",
+        "category": "human",
+        "seed": 2026110944,
+        "audit": false
+      },
+      {
+        "id": "v057",
+        "text": "a woman in a locker room",
+        "category": "lifestyle",
+        "seed": 2026110957,
+        "audit": false
+      },
+      {
+        "id": "v069",
+        "text": "flower field near the waterfall",
+        "category": "plant",
+        "seed": 2026110969,
+        "audit": false
+      },
+      {
+        "id": "v081",
+        "text": "close up view of swaying white flowers and leaves",
+        "category": "scenery",
+        "seed": 2026110981,
+        "audit": false
+      },
+      {
+        "id": "v093",
+        "text": "man wearing motorcycle helmet looking at the camera",
+        "category": "vehicles",
+        "seed": 2026110993,
+        "audit": false
+      },
+      {
+        "id": "v006",
+        "text": "a tortoise covered with algae",
+        "category": "animal",
+        "seed": 2026110906,
+        "audit": false
+      },
+      {
+        "id": "v019",
+        "text": "view of the sky through a building",
+        "category": "architecture",
+        "seed": 2026110919,
+        "audit": false
+      },
+      {
+        "id": "v032",
+        "text": "grilling a meat on a charcoal grill",
+        "category": "food",
+        "seed": 2026110932,
+        "audit": false
+      },
+      {
+        "id": "v045",
+        "text": "a group of campers with a cute dog",
+        "category": "human",
+        "seed": 2026110945,
+        "audit": false
+      },
+      {
+        "id": "v058",
+        "text": "aerial shot of interior of the warehouse",
+        "category": "lifestyle",
+        "seed": 2026110958,
+        "audit": false
+      },
+      {
+        "id": "v070",
+        "text": "a mossy fountain and green plants in a botanical garden",
+        "category": "plant",
+        "seed": 2026110970,
+        "audit": false
+      },
+      {
+        "id": "v082",
+        "text": "a bonfire near river",
+        "category": "scenery",
+        "seed": 2026110982,
+        "audit": false
+      },
+      {
+        "id": "v094",
+        "text": "a woman in a halloween costume posing on a motorcycle",
+        "category": "vehicles",
+        "seed": 2026110994,
+        "audit": false
+      },
+      {
+        "id": "v007",
+        "text": "a pig wallowing in mud",
+        "category": "animal",
+        "seed": 2026110907,
+        "audit": false
+      },
+      {
+        "id": "v020",
+        "text": "aerial view of the highway and building in a city",
+        "category": "architecture",
+        "seed": 2026110920,
+        "audit": false
+      },
+      {
+        "id": "v033",
+        "text": "an orange fruit cut in half",
+        "category": "food",
+        "seed": 2026110933,
+        "audit": false
+      },
+      {
+        "id": "v046",
+        "text": "a man video recording the movie in theater",
+        "category": "human",
+        "seed": 2026110946,
+        "audit": false
+      },
+      {
+        "id": "v059",
+        "text": "sunlight inside a room",
+        "category": "lifestyle",
+        "seed": 2026110959,
+        "audit": false
+      },
+      {
+        "id": "v071",
+        "text": "a woman opening a book with a flower inside",
+        "category": "plant",
+        "seed": 2026110971,
+        "audit": false
+      },
+      {
+        "id": "v083",
+        "text": "view of the sea from an abandoned building",
+        "category": "scenery",
+        "seed": 2026110983,
+        "audit": false
+      },
+      {
+        "id": "v095",
+        "text": "drone footage of a wreck ship on shore",
+        "category": "vehicles",
+        "seed": 2026110995,
+        "audit": false
+      },
+      {
+        "id": "v008",
+        "text": "spider making a web",
+        "category": "animal",
+        "seed": 2026110908,
+        "audit": false
+      },
+      {
+        "id": "v021",
+        "text": "city view reflected on a glass building",
+        "category": "architecture",
+        "seed": 2026110921,
+        "audit": false
+      },
+      {
+        "id": "v034",
+        "text": "grilling a steak on a pan grill",
+        "category": "food",
+        "seed": 2026110934,
+        "audit": false
+      },
+      {
+        "id": "v047",
+        "text": "pregnant woman exercising with trainer",
+        "category": "human",
+        "seed": 2026110947,
+        "audit": false
+      },
+      {
+        "id": "v060",
+        "text": "a person sanitizing an office space using smoke machine",
+        "category": "lifestyle",
+        "seed": 2026110960,
+        "audit": false
+      },
+      {
+        "id": "v072",
+        "text": "trees in the forest during sunny day",
+        "category": "plant",
+        "seed": 2026110972,
+        "audit": false
+      },
+      {
+        "id": "v084",
+        "text": "view of golden domed church",
+        "category": "scenery",
+        "seed": 2026110984,
+        "audit": false
+      },
+      {
+        "id": "v096",
+        "text": "boat sailing in the middle of the ocean",
+        "category": "vehicles",
+        "seed": 2026110996,
+        "audit": false
+      },
+      {
+        "id": "v009",
+        "text": "an american crocodile",
+        "category": "animal",
+        "seed": 2026110909,
+        "audit": false
+      },
+      {
+        "id": "v022",
+        "text": "time lapse footage of the sun light in front of a small house porch",
+        "category": "architecture",
+        "seed": 2026110922,
+        "audit": false
+      },
+      {
+        "id": "v035",
+        "text": "girl peeling a banana",
+        "category": "food",
+        "seed": 2026110935,
+        "audit": false
+      },
+      {
+        "id": "v048",
+        "text": "a family wearing paper bag masks",
+        "category": "human",
+        "seed": 2026110948,
+        "audit": false
+      },
+      {
+        "id": "v061",
+        "text": "a woman recording herself while exercising at home",
+        "category": "lifestyle",
+        "seed": 2026110961,
+        "audit": false
+      },
+      {
+        "id": "v073",
+        "text": "plucking leaves from plant",
+        "category": "plant",
+        "seed": 2026110973,
+        "audit": false
+      },
+      {
+        "id": "v085",
+        "text": "waterfalls in between mountain",
+        "category": "scenery",
+        "seed": 2026110985,
+        "audit": false
+      },
+      {
+        "id": "v097",
+        "text": "people in queue to military ship",
+        "category": "vehicles",
+        "seed": 2026110997,
+        "audit": false
+      },
+      {
+        "id": "v010",
+        "text": "cat licking another cat",
+        "category": "animal",
+        "seed": 2026110910,
+        "audit": false
+      },
+      {
+        "id": "v023",
+        "text": "waterfall and house",
+        "category": "architecture",
+        "seed": 2026110923,
+        "audit": false
+      },
+      {
+        "id": "v036",
+        "text": "pancake with blueberry on the top",
+        "category": "food",
+        "seed": 2026110936,
+        "audit": false
+      },
+      {
+        "id": "v049",
+        "text": "woman adding honey to the cinnamon rolls",
+        "category": "human",
+        "seed": 2026110949,
+        "audit": false
+      },
+      {
+        "id": "v062",
+        "text": "a family stacking cardboard boxes in a room",
+        "category": "lifestyle",
+        "seed": 2026110962,
+        "audit": false
+      },
+      {
+        "id": "v074",
+        "text": "reflection of tree branches",
+        "category": "plant",
+        "seed": 2026110974,
+        "audit": false
+      },
+      {
+        "id": "v086",
+        "text": "close up view of lighted candles",
+        "category": "scenery",
+        "seed": 2026110986,
+        "audit": false
+      },
+      {
+        "id": "v098",
+        "text": "video of a kayak boat in a river",
+        "category": "vehicles",
+        "seed": 2026110998,
+        "audit": false
+      },
+      {
+        "id": "v011",
+        "text": "brown chicken hunting for its food",
+        "category": "animal",
+        "seed": 2026110911,
+        "audit": false
+      },
+      {
+        "id": "v024",
+        "text": "a beach house built over a seawall protected from the sea waves",
+        "category": "architecture",
+        "seed": 2026110924,
+        "audit": false
+      },
+      {
+        "id": "v037",
+        "text": "a chef cutting sushi rolls",
+        "category": "food",
+        "seed": 2026110937,
+        "audit": false
+      },
+      {
+        "id": "v050",
+        "text": "a child playing with water",
+        "category": "human",
+        "seed": 2026110950,
+        "audit": false
+      },
+      {
+        "id": "v063",
+        "text": "man doing handstand in indoor garden",
+        "category": "lifestyle",
+        "seed": 2026110963,
+        "audit": false
+      },
+      {
+        "id": "v075",
+        "text": "a coconut tree by the house",
+        "category": "plant",
+        "seed": 2026110975,
+        "audit": false
+      },
+      {
+        "id": "v087",
+        "text": "a dark clouds over shadowing the full moon",
+        "category": "scenery",
+        "seed": 2026110987,
+        "audit": false
+      },
+      {
+        "id": "v099",
+        "text": "a white yacht traveling on a river and passing under the bridge",
+        "category": "vehicles",
+        "seed": 2026110999,
+        "audit": false
+      },
+      {
+        "id": "v012",
+        "text": "wild rabbit in a green meadow",
+        "category": "animal",
+        "seed": 2026110912,
+        "audit": false
+      },
+      {
+        "id": "v025",
+        "text": "water tower on the desert",
+        "category": "architecture",
+        "seed": 2026110925,
+        "audit": false
+      },
+      {
+        "id": "v038",
+        "text": "little boy pretending to eat the watermelon",
+        "category": "food",
+        "seed": 2026110938,
+        "audit": false
+      },
+      {
+        "id": "v051",
+        "text": "a man in a hoodie and woman with a red bandana talking to each other and smiling",
+        "category": "human",
+        "seed": 2026110951,
+        "audit": false
+      }
+    ],
+    "arms": {
+      "baseline": "teacher, replacement off (reused from the completed benchmark)",
+      "static": "teacher weights + calibrated per-step means, no training (stage 0)",
+      "student_s1": "teacher weights + stage-1 trained means",
+      "student": "stage-3 distilled weights + trained means",
+      "dense_control": "stage-2/3 recipe without replacement (center mode off)",
+      "deletion": "stage-2/3 recipe with HIGH coordinates zeroed (center mode delete)"
+    },
+    "note": "Same 100 prompts and seeds as center_benchmark_wan.json so every arm pairs with the existing baseline/all/high videos."
+  },
+  "dimensions": {
+    "subject_consistency": {
+      "means": {
+        "baseline": 0.9639986982128836,
+        "s32_student3": 0.9688067212633112
+      },
+      "paired": {
+        "s32_student3_minus_baseline": {
+          "mean": 0.004808023050427435,
+          "ci95": [
+            -0.002203509117561311,
+            0.011678899513980878
+          ],
+          "lower_prompts": 46,
+          "equal_prompts": 0,
+          "higher_prompts": 54
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9453127001236368,
+            "s32_student3": 0.9693928266634473
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9946848500025022,
+            "s32_student3": 0.9932048441646816
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9444492474406748,
+            "s32_student3": 0.9723927482337386
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9522222223190161,
+            "s32_student3": 0.9535481956872073
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9764614763923665,
+            "s32_student3": 0.9713857535724387
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9769564009074009,
+            "s32_student3": 0.9866906654541241
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9766586950105247,
+            "s32_student3": 0.9605207855276988
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9468544745874224,
+            "s32_student3": 0.9422086399951669
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 0.9205445444042032,
+          "s32_student3": 0.9716095931150697
+        },
+        "v013": {
+          "baseline": 0.9977922825650736,
+          "s32_student3": 0.9925546815449541
+        },
+        "v026": {
+          "baseline": 0.9990251761945811,
+          "s32_student3": 0.9995413083921779
+        },
+        "v039": {
+          "baseline": 0.9245662519877608,
+          "s32_student3": 0.9470867338505659
+        },
+        "v052": {
+          "baseline": 0.9991650114005263,
+          "s32_student3": 0.9993599192662672
+        },
+        "v064": {
+          "baseline": 0.9901054189963774,
+          "s32_student3": 0.9764018221334978
+        },
+        "v076": {
+          "baseline": 0.9564466720277612,
+          "s32_student3": 0.9219489984891631
+        },
+        "v088": {
+          "baseline": 0.8550103543834253,
+          "s32_student3": 0.875581488690593
+        },
+        "v001": {
+          "baseline": 0.772319669411941,
+          "s32_student3": 0.9170897765593096
+        },
+        "v014": {
+          "baseline": 0.9983377795327794,
+          "s32_student3": 0.9980576160279188
+        },
+        "v027": {
+          "baseline": 0.9859603988853368,
+          "s32_student3": 0.9766310920769518
+        },
+        "v040": {
+          "baseline": 0.9711371524767443,
+          "s32_student3": 0.9794562655416402
+        },
+        "v053": {
+          "baseline": 0.986072613434358,
+          "s32_student3": 0.9765481467951428
+        },
+        "v065": {
+          "baseline": 0.9968196864832531,
+          "s32_student3": 0.9983352226289836
+        },
+        "v077": {
+          "baseline": 0.9780217619104818,
+          "s32_student3": 0.969686819748445
+        },
+        "v089": {
+          "baseline": 0.9085831818255511,
+          "s32_student3": 0.8226974552327936
+        },
+        "v002": {
+          "baseline": 0.9554466544227167,
+          "s32_student3": 0.9086192406036637
+        },
+        "v015": {
+          "baseline": 0.9988845403898846,
+          "s32_student3": 0.9989070946520026
+        },
+        "v028": {
+          "baseline": 0.9194851456718012,
+          "s32_student3": 0.9516656547784805
+        },
+        "v041": {
+          "baseline": 0.9088831706480547,
+          "s32_student3": 0.8833222578872334
+        },
+        "v054": {
+          "baseline": 0.9933164302598346,
+          "s32_student3": 0.9877906123345549
+        },
+        "v066": {
+          "baseline": 0.9686770811676979,
+          "s32_student3": 0.984788490967317
+        },
+        "v078": {
+          "baseline": 0.9959501637653871,
+          "s32_student3": 0.9946836625987833
+        },
+        "v090": {
+          "baseline": 0.9147767709060148,
+          "s32_student3": 0.8656422563574531
+        },
+        "v003": {
+          "baseline": 0.9918735352429476,
+          "s32_student3": 0.9954337504777041
+        },
+        "v016": {
+          "baseline": 0.999467593702403,
+          "s32_student3": 0.9985828704454682
+        },
+        "v029": {
+          "baseline": 0.9976279972629114,
+          "s32_student3": 0.9981515576893633
+        },
+        "v042": {
+          "baseline": 0.978300119665536,
+          "s32_student3": 0.9731657633727248
+        },
+        "v055": {
+          "baseline": 0.9950024248524145,
+          "s32_student3": 0.9982063926079057
+        },
+        "v067": {
+          "baseline": 0.9983419938520952,
+          "s32_student3": 0.9918889782645486
+        },
+        "v079": {
+          "baseline": 0.995569228448651,
+          "s32_student3": 0.9980862018736926
+        },
+        "v091": {
+          "baseline": 0.9180228744040836,
+          "s32_student3": 0.9551747678355738
+        },
+        "v004": {
+          "baseline": 0.8612034290351651,
+          "s32_student3": 0.9541800116950815
+        },
+        "v017": {
+          "baseline": 0.9991021955555136,
+          "s32_student3": 0.9992433149706234
+        },
+        "v030": {
+          "baseline": 0.978061399676583,
+          "s32_student3": 0.9675361324440349
+        },
+        "v043": {
+          "baseline": 0.9179961864243854,
+          "s32_student3": 0.8910845951600508
+        },
+        "v056": {
+          "baseline": 0.9995285028761084,
+          "s32_student3": 0.9990424534136598
+        },
+        "v068": {
+          "baseline": 0.9977522824298252,
+          "s32_student3": 0.9973643977533687
+        },
+        "v080": {
+          "baseline": 0.9965131689201702,
+          "s32_student3": 0.9964409680529074
+        },
+        "v092": {
+          "baseline": 0.9979882470586083,
+          "s32_student3": 0.9898005622354421
+        },
+        "v005": {
+          "baseline": 0.9758762148293582,
+          "s32_student3": 0.9694010371511633
+        },
+        "v018": {
+          "baseline": 0.9918885969302871,
+          "s32_student3": 0.9928964478048411
+        },
+        "v031": {
+          "baseline": 0.9818633225831118,
+          "s32_student3": 0.9753544154492292
+        },
+        "v044": {
+          "baseline": 0.9930453456260941,
+          "s32_student3": 0.9944063966924493
+        },
+        "v057": {
+          "baseline": 0.9553299898451025,
+          "s32_student3": 0.967653214931488
+        },
+        "v069": {
+          "baseline": 0.9872179356488314,
+          "s32_student3": 0.9927052130753343
+        },
+        "v081": {
+          "baseline": 0.9106283689087088,
+          "s32_student3": 0.7566788216883485
+        },
+        "v093": {
+          "baseline": 0.993137692863291,
+          "s32_student3": 0.9953612637790766
+        },
+        "v006": {
+          "baseline": 0.9488552239808169,
+          "s32_student3": 0.9793099110776727
+        },
+        "v019": {
+          "baseline": 0.998791057955135,
+          "s32_student3": 0.9924219772219658
+        },
+        "v032": {
+          "baseline": 0.9661113213409077,
+          "s32_student3": 0.9853074631907723
+        },
+        "v045": {
+          "baseline": 0.9944954792206938,
+          "s32_student3": 0.9601000974124129
+        },
+        "v058": {
+          "baseline": 0.996098046953028,
+          "s32_student3": 0.9964193999767303
+        },
+        "v070": {
+          "baseline": 0.9815783053636551,
+          "s32_student3": 0.9937176027081229
+        },
+        "v082": {
+          "baseline": 0.9956784932450815,
+          "s32_student3": 0.9891784678805958
+        },
+        "v094": {
+          "baseline": 0.9705411331220106,
+          "s32_student3": 0.9690646481784907
+        },
+        "v007": {
+          "baseline": 0.9679593267765912,
+          "s32_student3": 0.9729292291131887
+        },
+        "v020": {
+          "baseline": 0.9792253950780089,
+          "s32_student3": 0.9847085936502977
+        },
+        "v033": {
+          "baseline": 0.8839823820374229,
+          "s32_student3": 0.9816614253954454
+        },
+        "v046": {
+          "baseline": 0.9226382720199499,
+          "s32_student3": 0.9592205841432918
+        },
+        "v059": {
+          "baseline": 0.9969803697683595,
+          "s32_student3": 0.9859049489552324
+        },
+        "v071": {
+          "baseline": 0.8994228033856912,
+          "s32_student3": 0.9769777587868951
+        },
+        "v083": {
+          "baseline": 0.9976794970306483,
+          "s32_student3": 0.997503059154207
+        },
+        "v095": {
+          "baseline": 0.9908044954592531,
+          "s32_student3": 0.9888415268876336
+        },
+        "v008": {
+          "baseline": 0.9611883319237016,
+          "s32_student3": 0.9863228405063803
+        },
+        "v021": {
+          "baseline": 0.9991688484495337,
+          "s32_student3": 0.9846092117103663
+        },
+        "v034": {
+          "baseline": 0.8840329078110781,
+          "s32_student3": 0.9329592511057854
+        },
+        "v047": {
+          "baseline": 0.9743043434890833,
+          "s32_student3": 0.940864122049375
+        },
+        "v060": {
+          "baseline": 0.9077465459704399,
+          "s32_student3": 0.8975995819677006
+        },
+        "v072": {
+          "baseline": 0.9963159852407195,
+          "s32_student3": 0.9956390031359412
+        },
+        "v084": {
+          "baseline": 0.9972662471912124,
+          "s32_student3": 0.9973056892102415
+        },
+        "v096": {
+          "baseline": 0.9834139069372957,
+          "s32_student3": 0.9848269014195963
+        },
+        "v009": {
+          "baseline": 0.9887213916941122,
+          "s32_student3": 0.9915920556946234
+        },
+        "v022": {
+          "baseline": 0.9783290489153429,
+          "s32_student3": 0.9864902293140237
+        },
+        "v035": {
+          "baseline": 0.9464158327742056,
+          "s32_student3": 0.9851801889863882
+        },
+        "v048": {
+          "baseline": 0.9564749510450796,
+          "s32_student3": 0.9763116233728149
+        },
+        "v061": {
+          "baseline": 0.9486254589124159,
+          "s32_student3": 0.9572464180263606
+        },
+        "v073": {
+          "baseline": 0.922276878898794,
+          "s32_student3": 0.9443852542476221
+        },
+        "v085": {
+          "baseline": 0.987431642006744,
+          "s32_student3": 0.995718626813455
+        },
+        "v097": {
+          "baseline": 0.9123170687393709,
+          "s32_student3": 0.9009337987412106
+        },
+        "v010": {
+          "baseline": 0.981641409072009,
+          "s32_student3": 0.9816332662647421
+        },
+        "v023": {
+          "baseline": 0.9979118074883114,
+          "s32_student3": 0.9916927780617367
+        },
+        "v036": {
+          "baseline": 0.9990050311792981,
+          "s32_student3": 0.999043960462917
+        },
+        "v049": {
+          "baseline": 0.9632346901026639,
+          "s32_student3": 0.967152130197395
+        },
+        "v062": {
+          "baseline": 0.9613118720325556,
+          "s32_student3": 0.9488302929834886
+        },
+        "v074": {
+          "baseline": 0.9859071922573176,
+          "s32_student3": 0.9916344562714751
+        },
+        "v086": {
+          "baseline": 0.9117915494875475,
+          "s32_student3": 0.9304355809634383
+        },
+        "v098": {
+          "baseline": 0.9264345473863862,
+          "s32_student3": 0.961597932333296
+        },
+        "v011": {
+          "baseline": 0.9686078815297647,
+          "s32_student3": 0.9769018705595623
+        },
+        "v024": {
+          "baseline": 0.995287612080574,
+          "s32_student3": 0.9949964020739902
+        },
+        "v037": {
+          "baseline": 0.906266107477925,
+          "s32_student3": 0.9304686371575702
+        },
+        "v050": {
+          "baseline": 0.9059419110417366,
+          "s32_student3": 0.9628507379781116
+        },
+        "v063": {
+          "baseline": 0.9783604504032568,
+          "s32_student3": 0.9420276616107334
+        },
+        "v075": {
+          "baseline": 0.9990612471645529,
+          "s32_student3": 0.9964497854763811
+        },
+        "v087": {
+          "baseline": 0.9969275471839038,
+          "s32_student3": 0.9785825298591093
+        },
+        "v099": {
+          "baseline": 0.9912234219637784,
+          "s32_student3": 0.9969810782508417
+        },
+        "v012": {
+          "baseline": 0.9948274892839518,
+          "s32_student3": 0.9970841638066552
+        },
+        "v025": {
+          "baseline": 0.9967162913896821,
+          "s32_student3": 0.9965017566626723
+        },
+        "v038": {
+          "baseline": 0.8300031938336112,
+          "s32_student3": 0.9576046399094842
+        },
+        "v051": {
+          "baseline": 0.9678710163994269,
+          "s32_student3": 0.9611052362756296
+        }
+      }
+    },
+    "background_consistency": {
+      "means": {
+        "baseline": 0.9764660089666193,
+        "s32_student3": 0.978507412997159
+      },
+      "paired": {
+        "s32_student3_minus_baseline": {
+          "mean": 0.002041404030539773,
+          "ci95": [
+            -0.0016817280162464499,
+            0.005724055897105824
+          ],
+          "lower_prompts": 46,
+          "equal_prompts": 0,
+          "higher_prompts": 54
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9722554667012674,
+            "s32_student3": 0.9840015331348339
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9921418303376309,
+            "s32_student3": 0.9922468278791519
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9740954845935315,
+            "s32_student3": 0.9842234791575611
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9596544812609266,
+            "s32_student3": 0.9645005873033217
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9839486786813447,
+            "s32_student3": 0.9791625051787406
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9786057905717329,
+            "s32_student3": 0.9851365522904829
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.986944025213068,
+            "s32_student3": 0.976852879379735
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9647253787878788,
+            "s32_student3": 0.9610230416962594
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 0.95306396484375,
+          "s32_student3": 0.9826882102272727
+        },
+        "v013": {
+          "baseline": 0.9913163618607954,
+          "s32_student3": 0.9949729225852273
+        },
+        "v026": {
+          "baseline": 0.998046875,
+          "s32_student3": 0.9969315962357954
+        },
+        "v039": {
+          "baseline": 0.9590176669034091,
+          "s32_student3": 0.9674072265625
+        },
+        "v052": {
+          "baseline": 0.9988847212357954,
+          "s32_student3": 0.9983686967329546
+        },
+        "v064": {
+          "baseline": 0.9803355823863636,
+          "s32_student3": 0.9622469815340909
+        },
+        "v076": {
+          "baseline": 0.9802079634232954,
+          "s32_student3": 0.9515269886363636
+        },
+        "v088": {
+          "baseline": 0.9162930575284091,
+          "s32_student3": 0.9233786843039773
+        },
+        "v001": {
+          "baseline": 0.9321677468039773,
+          "s32_student3": 0.9676680131392046
+        },
+        "v014": {
+          "baseline": 0.9942127574573864,
+          "s32_student3": 0.9959827769886364
+        },
+        "v027": {
+          "baseline": 0.9930142489346591,
+          "s32_student3": 0.9886863014914773
+        },
+        "v040": {
+          "baseline": 0.9652266068892046,
+          "s32_student3": 0.9766734730113636
+        },
+        "v053": {
+          "baseline": 0.9877485795454546,
+          "s32_student3": 0.9934803355823864
+        },
+        "v065": {
+          "baseline": 0.9983354048295454,
+          "s32_student3": 0.9993397105823864
+        },
+        "v077": {
+          "baseline": 0.9830044833096591,
+          "s32_student3": 0.9875876686789773
+        },
+        "v089": {
+          "baseline": 0.9463112571022727,
+          "s32_student3": 0.9227017489346591
+        },
+        "v002": {
+          "baseline": 0.9756580699573864,
+          "s32_student3": 0.9722012606534091
+        },
+        "v015": {
+          "baseline": 0.9975086558948864,
+          "s32_student3": 0.9952559037642046
+        },
+        "v028": {
+          "baseline": 0.9713190252130682,
+          "s32_student3": 0.9746537642045454
+        },
+        "v041": {
+          "baseline": 0.9263194691051136,
+          "s32_student3": 0.9197720614346591
+        },
+        "v054": {
+          "baseline": 0.9965265447443182,
+          "s32_student3": 0.9868275035511364
+        },
+        "v066": {
+          "baseline": 0.9841586026278409,
+          "s32_student3": 0.9871548739346591
+        },
+        "v078": {
+          "baseline": 0.9837812943892046,
+          "s32_student3": 0.9957330877130682
+        },
+        "v090": {
+          "baseline": 0.94140625,
+          "s32_student3": 0.9327891956676136
+        },
+        "v003": {
+          "baseline": 0.98736572265625,
+          "s32_student3": 0.9952947443181818
+        },
+        "v016": {
+          "baseline": 0.9946122602982954,
+          "s32_student3": 0.9916492808948864
+        },
+        "v029": {
+          "baseline": 0.9964544122869318,
+          "s32_student3": 0.9964100230823864
+        },
+        "v042": {
+          "baseline": 0.9651933149857954,
+          "s32_student3": 0.9683948863636364
+        },
+        "v055": {
+          "baseline": 0.9961492365056818,
+          "s32_student3": 0.9976973100142046
+        },
+        "v067": {
+          "baseline": 0.99871826171875,
+          "s32_student3": 0.9978193803267046
+        },
+        "v079": {
+          "baseline": 0.9901511452414773,
+          "s32_student3": 0.9948231090198864
+        },
+        "v091": {
+          "baseline": 0.9732998934659091,
+          "s32_student3": 0.9628628817471591
+        },
+        "v004": {
+          "baseline": 0.9446300159801136,
+          "s32_student3": 0.9765680486505682
+        },
+        "v017": {
+          "baseline": 0.9973921342329546,
+          "s32_student3": 0.9979469992897727
+        },
+        "v030": {
+          "baseline": 0.9814009232954546,
+          "s32_student3": 0.9736605557528409
+        },
+        "v043": {
+          "baseline": 0.9462058327414773,
+          "s32_student3": 0.9511441317471591
+        },
+        "v056": {
+          "baseline": 0.9992731267755682,
+          "s32_student3": 0.9987238103693182
+        },
+        "v068": {
+          "baseline": 0.9677013050426136,
+          "s32_student3": 0.9863003817471591
+        },
+        "v080": {
+          "baseline": 0.9926813299005682,
+          "s32_student3": 0.9823441938920454
+        },
+        "v092": {
+          "baseline": 0.9946400035511364,
+          "s32_student3": 0.9768454811789773
+        },
+        "v005": {
+          "baseline": 0.9882035688920454,
+          "s32_student3": 0.9892522638494318
+        },
+        "v018": {
+          "baseline": 0.98907470703125,
+          "s32_student3": 0.9906671697443182
+        },
+        "v031": {
+          "baseline": 0.9915272105823864,
+          "s32_student3": 0.9768343838778409
+        },
+        "v044": {
+          "baseline": 0.9946677468039773,
+          "s32_student3": 0.9966763583096591
+        },
+        "v057": {
+          "baseline": 0.9570201526988636,
+          "s32_student3": 0.9763294566761364
+        },
+        "v069": {
+          "baseline": 0.9892689098011364,
+          "s32_student3": 0.9948064630681818
+        },
+        "v081": {
+          "baseline": 0.9759632457386364,
+          "s32_student3": 0.8789728338068182
+        },
+        "v093": {
+          "baseline": 0.9897128018465909,
+          "s32_student3": 0.9914162375710227
+        },
+        "v006": {
+          "baseline": 0.9699485085227273,
+          "s32_student3": 0.9858065518465909
+        },
+        "v019": {
+          "baseline": 0.9954057173295454,
+          "s32_student3": 0.9920265891335227
+        },
+        "v032": {
+          "baseline": 0.9854625355113636,
+          "s32_student3": 0.9907725941051136
+        },
+        "v045": {
+          "baseline": 0.9946011629971591,
+          "s32_student3": 0.9802967418323864
+        },
+        "v058": {
+          "baseline": 0.9880260120738636,
+          "s32_student3": 0.9916714754971591
+        },
+        "v070": {
+          "baseline": 0.9843084161931818,
+          "s32_student3": 0.9904119318181818
+        },
+        "v082": {
+          "baseline": 0.99200439453125,
+          "s32_student3": 0.9878096147017046
+        },
+        "v094": {
+          "baseline": 0.9635453657670454,
+          "s32_student3": 0.9680897105823864
+        },
+        "v007": {
+          "baseline": 0.9768454811789773,
+          "s32_student3": 0.9820112748579546
+        },
+        "v020": {
+          "baseline": 0.9810014204545454,
+          "s32_student3": 0.9890580610795454
+        },
+        "v033": {
+          "baseline": 0.9639448686079546,
+          "s32_student3": 0.9816395152698864
+        },
+        "v046": {
+          "baseline": 0.9606378728693182,
+          "s32_student3": 0.9542458274147727
+        },
+        "v059": {
+          "baseline": 0.9951671253551136,
+          "s32_student3": 0.9888805042613636
+        },
+        "v071": {
+          "baseline": 0.9083973277698864,
+          "s32_student3": 0.9803855202414773
+        },
+        "v083": {
+          "baseline": 0.9968650124289773,
+          "s32_student3": 0.9920210404829546
+        },
+        "v095": {
+          "baseline": 0.9945956143465909,
+          "s32_student3": 0.9941461736505682
+        },
+        "v008": {
+          "baseline": 0.9638283469460227,
+          "s32_student3": 0.9786931818181818
+        },
+        "v021": {
+          "baseline": 0.9974143288352273,
+          "s32_student3": 0.9921653053977273
+        },
+        "v034": {
+          "baseline": 0.9608487215909091,
+          "s32_student3": 0.9789539683948864
+        },
+        "v047": {
+          "baseline": 0.9718405983664773,
+          "s32_student3": 0.9548783735795454
+        },
+        "v060": {
+          "baseline": 0.9572088068181818,
+          "s32_student3": 0.9332164417613636
+        },
+        "v072": {
+          "baseline": 0.9930142489346591,
+          "s32_student3": 0.9840420809659091
+        },
+        "v084": {
+          "baseline": 0.9965376420454546,
+          "s32_student3": 0.9930697354403409
+        },
+        "v096": {
+          "baseline": 0.9865778142755682,
+          "s32_student3": 0.9937189275568182
+        },
+        "v009": {
+          "baseline": 0.9785822088068182,
+          "s32_student3": 0.99188232421875
+        },
+        "v022": {
+          "baseline": 0.9784934303977273,
+          "s32_student3": 0.98797607421875
+        },
+        "v035": {
+          "baseline": 0.9223854758522727,
+          "s32_student3": 0.9931807084517046
+        },
+        "v048": {
+          "baseline": 0.9609707919034091,
+          "s32_student3": 0.9784046519886364
+        },
+        "v061": {
+          "baseline": 0.9788152521306818,
+          "s32_student3": 0.9687333540482954
+        },
+        "v073": {
+          "baseline": 0.9705255681818182,
+          "s32_student3": 0.9671797318892046
+        },
+        "v085": {
+          "baseline": 0.9897238991477273,
+          "s32_student3": 0.9947176846590909
+        },
+        "v097": {
+          "baseline": 0.9075594815340909,
+          "s32_student3": 0.9151333895596591
+        },
+        "v010": {
+          "baseline": 0.9820501154119318,
+          "s32_student3": 0.9817837801846591
+        },
+        "v023": {
+          "baseline": 0.9925648082386364,
+          "s32_student3": 0.9895463423295454
+        },
+        "v036": {
+          "baseline": 0.9985573508522727,
+          "s32_student3": 0.9987071644176136
+        },
+        "v049": {
+          "baseline": 0.95928955078125,
+          "s32_student3": 0.9738270152698864
+        },
+        "v062": {
+          "baseline": 0.9809292879971591,
+          "s32_student3": 0.9781716086647727
+        },
+        "v074": {
+          "baseline": 0.9857066761363636,
+          "s32_student3": 0.9781938032670454
+        },
+        "v086": {
+          "baseline": 0.9662808504971591,
+          "s32_student3": 0.9697543057528409
+        },
+        "v098": {
+          "baseline": 0.9712746360085227,
+          "s32_student3": 0.9681507457386364
+        },
+        "v011": {
+          "baseline": 0.9901566938920454,
+          "s32_student3": 0.9900068803267046
+        },
+        "v024": {
+          "baseline": 0.9920376864346591,
+          "s32_student3": 0.9917436079545454
+        },
+        "v037": {
+          "baseline": 0.9647549715909091,
+          "s32_student3": 0.9725896661931818
+        },
+        "v050": {
+          "baseline": 0.9309026544744318,
+          "s32_student3": 0.9758245294744318
+        },
+        "v063": {
+          "baseline": 0.9716352982954546,
+          "s32_student3": 0.9378495649857954
+        },
+        "v075": {
+          "baseline": 0.9827991832386364,
+          "s32_student3": 0.9937577681107954
+        },
+        "v087": {
+          "baseline": 0.9961270419034091,
+          "s32_student3": 0.9938742897727273
+        },
+        "v099": {
+          "baseline": 0.9914883700284091,
+          "s32_student3": 0.9830433238636364
+        },
+        "v012": {
+          "baseline": 0.9968206232244318,
+          "s32_student3": 0.9981633966619318
+        },
+        "v025": {
+          "baseline": 0.9968095259232954,
+          "s32_student3": 0.9902177290482954
+        },
+        "v038": {
+          "baseline": 0.9355246803977273,
+          "s32_student3": 0.9718849875710227
+        },
+        "v051": {
+          "baseline": 0.9406349875710227,
+          "s32_student3": 0.9409623579545454
+        }
+      }
+    },
+    "motion_smoothness": {
+      "means": {
+        "baseline": 0.9844626893681503,
+        "s32_student3": 0.9861117847103593
+      },
+      "paired": {
+        "s32_student3_minus_baseline": {
+          "mean": 0.0016490953422088506,
+          "ci95": [
+            0.0002971278256291424,
+            0.0031187881204302065
+          ],
+          "lower_prompts": 34,
+          "equal_prompts": 0,
+          "higher_prompts": 66
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9802667871486039,
+            "s32_student3": 0.9866606860737529
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.992835623251907,
+            "s32_student3": 0.9935670200861684
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9861062995306255,
+            "s32_student3": 0.9890476824317205
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.9850464548585719,
+            "s32_student3": 0.9848541067569866
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9913657451678414,
+            "s32_student3": 0.991832344241709
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9835274719424985,
+            "s32_student3": 0.9876031329386938
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9840880893717266,
+            "s32_student3": 0.9823132810608811
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.9719313430636705,
+            "s32_student3": 0.9722091610506963
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 0.9810146022108338,
+          "s32_student3": 0.9841113065912392
+        },
+        "v013": {
+          "baseline": 0.9924647096475375,
+          "s32_student3": 0.99448929062892
+        },
+        "v026": {
+          "baseline": 0.9964502477285107,
+          "s32_student3": 0.9969775780682643
+        },
+        "v039": {
+          "baseline": 0.9862373224173929,
+          "s32_student3": 0.980155885602347
+        },
+        "v052": {
+          "baseline": 0.9971341947869216,
+          "s32_student3": 0.9973079358742655
+        },
+        "v064": {
+          "baseline": 0.9935903688127188,
+          "s32_student3": 0.9938534247190037
+        },
+        "v076": {
+          "baseline": 0.9658262514338648,
+          "s32_student3": 0.9460624940685449
+        },
+        "v088": {
+          "baseline": 0.9630592536888493,
+          "s32_student3": 0.9729517342027298
+        },
+        "v001": {
+          "baseline": 0.9811320063378888,
+          "s32_student3": 0.9845486430893906
+        },
+        "v014": {
+          "baseline": 0.9954624688469664,
+          "s32_student3": 0.9960736196730375
+        },
+        "v027": {
+          "baseline": 0.9918461321239354,
+          "s32_student3": 0.9917579963751072
+        },
+        "v040": {
+          "baseline": 0.9890078101789959,
+          "s32_student3": 0.9908707507571631
+        },
+        "v053": {
+          "baseline": 0.986470830651284,
+          "s32_student3": 0.9889177771382122
+        },
+        "v065": {
+          "baseline": 0.995413324162788,
+          "s32_student3": 0.996787555652522
+        },
+        "v077": {
+          "baseline": 0.9592888156998911,
+          "s32_student3": 0.9656464043003564
+        },
+        "v089": {
+          "baseline": 0.9242595676949231,
+          "s32_student3": 0.9150310529725357
+        },
+        "v002": {
+          "baseline": 0.9852661284000132,
+          "s32_student3": 0.9857027350713012
+        },
+        "v015": {
+          "baseline": 0.9965703467992837,
+          "s32_student3": 0.9970783068119925
+        },
+        "v028": {
+          "baseline": 0.9901742282403282,
+          "s32_student3": 0.9839767345121971
+        },
+        "v041": {
+          "baseline": 0.9500224389524328,
+          "s32_student3": 0.9509636223860336
+        },
+        "v054": {
+          "baseline": 0.9957919542132931,
+          "s32_student3": 0.9952010203650064
+        },
+        "v066": {
+          "baseline": 0.9865650035898198,
+          "s32_student3": 0.9897637571074305
+        },
+        "v078": {
+          "baseline": 0.9961999988652869,
+          "s32_student3": 0.9963092023688684
+        },
+        "v090": {
+          "baseline": 0.9014715919406483,
+          "s32_student3": 0.9163799192393709
+        },
+        "v003": {
+          "baseline": 0.9892340057024493,
+          "s32_student3": 0.9895386016517297
+        },
+        "v016": {
+          "baseline": 0.997206036570773,
+          "s32_student3": 0.9964217313556315
+        },
+        "v029": {
+          "baseline": 0.9938255922686835,
+          "s32_student3": 0.9962999590987489
+        },
+        "v042": {
+          "baseline": 0.9892556513872384,
+          "s32_student3": 0.9907369814876708
+        },
+        "v055": {
+          "baseline": 0.9961212551887337,
+          "s32_student3": 0.9969855700592527
+        },
+        "v067": {
+          "baseline": 0.9954177242708953,
+          "s32_student3": 0.9929668227928797
+        },
+        "v079": {
+          "baseline": 0.9936124152575593,
+          "s32_student3": 0.9925423302159668
+        },
+        "v091": {
+          "baseline": 0.9711957911426355,
+          "s32_student3": 0.9678184420285371
+        },
+        "v004": {
+          "baseline": 0.9849243556376676,
+          "s32_student3": 0.9891981325200534
+        },
+        "v017": {
+          "baseline": 0.9970965963247673,
+          "s32_student3": 0.9973226363409421
+        },
+        "v030": {
+          "baseline": 0.9936272704578464,
+          "s32_student3": 0.9945368436200237
+        },
+        "v043": {
+          "baseline": 0.980858729245065,
+          "s32_student3": 0.9783363003503169
+        },
+        "v056": {
+          "baseline": 0.9975488491429821,
+          "s32_student3": 0.9975606769801776
+        },
+        "v068": {
+          "baseline": 0.9911313095208621,
+          "s32_student3": 0.9928945939171122
+        },
+        "v080": {
+          "baseline": 0.9826530702243018,
+          "s32_student3": 0.9855410933786393
+        },
+        "v092": {
+          "baseline": 0.9969096876650492,
+          "s32_student3": 0.9957654357092164
+        },
+        "v005": {
+          "baseline": 0.983362383537169,
+          "s32_student3": 0.9868357087521457
+        },
+        "v018": {
+          "baseline": 0.9753164183707995,
+          "s32_student3": 0.9844657649307619
+        },
+        "v031": {
+          "baseline": 0.9923765419204298,
+          "s32_student3": 0.9921041333989404
+        },
+        "v044": {
+          "baseline": 0.9944585793597742,
+          "s32_student3": 0.9953021864890738
+        },
+        "v057": {
+          "baseline": 0.9860577623147323,
+          "s32_student3": 0.9869181683563577
+        },
+        "v069": {
+          "baseline": 0.9852027876807288,
+          "s32_student3": 0.9833937075514129
+        },
+        "v081": {
+          "baseline": 0.9715263083242557,
+          "s32_student3": 0.9570607326842775
+        },
+        "v093": {
+          "baseline": 0.9944368864812339,
+          "s32_student3": 0.990641732892652
+        },
+        "v006": {
+          "baseline": 0.9661162758611441,
+          "s32_student3": 0.9867952634494455
+        },
+        "v019": {
+          "baseline": 0.9970541588268305,
+          "s32_student3": 0.9961539553005545
+        },
+        "v032": {
+          "baseline": 0.9809588999162375,
+          "s32_student3": 0.9862409694885951
+        },
+        "v045": {
+          "baseline": 0.9938600145655906,
+          "s32_student3": 0.9834320879340794
+        },
+        "v058": {
+          "baseline": 0.985994700115947,
+          "s32_student3": 0.9878662712191358
+        },
+        "v070": {
+          "baseline": 0.9762971282473427,
+          "s32_student3": 0.9917343713895491
+        },
+        "v082": {
+          "baseline": 0.9868501472032415,
+          "s32_student3": 0.9889245508599063
+        },
+        "v094": {
+          "baseline": 0.9857764942624777,
+          "s32_student3": 0.984983212692695
+        },
+        "v007": {
+          "baseline": 0.9757904919806727,
+          "s32_student3": 0.9821570226364957
+        },
+        "v020": {
+          "baseline": 0.9838908571004159,
+          "s32_student3": 0.9908179987167426
+        },
+        "v033": {
+          "baseline": 0.994174926088912,
+          "s32_student3": 0.995712100580973
+        },
+        "v046": {
+          "baseline": 0.9897563585198389,
+          "s32_student3": 0.9919072694366047
+        },
+        "v059": {
+          "baseline": 0.9971388215797683,
+          "s32_student3": 0.99660409781021
+        },
+        "v071": {
+          "baseline": 0.9887228496670132,
+          "s32_student3": 0.992990040829042
+        },
+        "v083": {
+          "baseline": 0.9935399883227701,
+          "s32_student3": 0.9931427159668581
+        },
+        "v095": {
+          "baseline": 0.9963073819279396,
+          "s32_student3": 0.9936231003870403
+        },
+        "v008": {
+          "baseline": 0.9532482976723938,
+          "s32_student3": 0.9872765035464943
+        },
+        "v021": {
+          "baseline": 0.9973360744392453,
+          "s32_student3": 0.9955438007010464
+        },
+        "v034": {
+          "baseline": 0.9386881560705089,
+          "s32_student3": 0.9640878541336568
+        },
+        "v047": {
+          "baseline": 0.9920628153986762,
+          "s32_student3": 0.986578878036905
+        },
+        "v060": {
+          "baseline": 0.9917406734316201,
+          "s32_student3": 0.989067845530468
+        },
+        "v072": {
+          "baseline": 0.9910391597242854,
+          "s32_student3": 0.9896555632406582
+        },
+        "v084": {
+          "baseline": 0.9915300123890044,
+          "s32_student3": 0.9920602349578299
+        },
+        "v096": {
+          "baseline": 0.9875363879295405,
+          "s32_student3": 0.9875722180444148
+        },
+        "v009": {
+          "baseline": 0.9796622459274114,
+          "s32_student3": 0.9806729483354789
+        },
+        "v022": {
+          "baseline": 0.9878818363888063,
+          "s32_student3": 0.9878998143712452
+        },
+        "v035": {
+          "baseline": 0.9922433467126328,
+          "s32_student3": 0.993541895414521
+        },
+        "v048": {
+          "baseline": 0.9891802520197894,
+          "s32_student3": 0.9902562352487291
+        },
+        "v061": {
+          "baseline": 0.9877543134572853,
+          "s32_student3": 0.9900150081286723
+        },
+        "v073": {
+          "baseline": 0.9221011759238629,
+          "s32_student3": 0.95072016864932
+        },
+        "v085": {
+          "baseline": 0.9873400281408861,
+          "s32_student3": 0.9917767562780584
+        },
+        "v097": {
+          "baseline": 0.9670109579764145,
+          "s32_student3": 0.9655217901028257
+        },
+        "v010": {
+          "baseline": 0.9875135611115237,
+          "s32_student3": 0.9902725320504885
+        },
+        "v023": {
+          "baseline": 0.9951098386850531,
+          "s32_student3": 0.9893518809933486
+        },
+        "v036": {
+          "baseline": 0.9962219130128904,
+          "s32_student3": 0.9968118761656598
+        },
+        "v049": {
+          "baseline": 0.9832749051482967,
+          "s32_student3": 0.9905332068643956
+        },
+        "v062": {
+          "baseline": 0.9853461875701459,
+          "s32_student3": 0.9846385624009705
+        },
+        "v074": {
+          "baseline": 0.9802575742102396,
+          "s32_student3": 0.9849724218285799
+        },
+        "v086": {
+          "baseline": 0.9828146523445237,
+          "s32_student3": 0.981042725560342
+        },
+        "v098": {
+          "baseline": 0.9802823932234931,
+          "s32_student3": 0.9808377223521985
+        },
+        "v011": {
+          "baseline": 0.9809883359225424,
+          "s32_student3": 0.9841419691192975
+        },
+        "v024": {
+          "baseline": 0.9962420286401598,
+          "s32_student3": 0.9954752359171783
+        },
+        "v037": {
+          "baseline": 0.9738908831472404,
+          "s32_student3": 0.9756749578093021
+        },
+        "v050": {
+          "baseline": 0.9785969168812306,
+          "s32_student3": 0.9870807446400277
+        },
+        "v063": {
+          "baseline": 0.9892893995613818,
+          "s32_student3": 0.9909051970377798
+        },
+        "v075": {
+          "baseline": 0.9965912574994223,
+          "s32_student3": 0.9915051675868158
+        },
+        "v087": {
+          "baseline": 0.997875384255133,
+          "s32_student3": 0.9976501320909257
+        },
+        "v099": {
+          "baseline": 0.9949297228308411,
+          "s32_student3": 0.9953835719841388
+        },
+        "v012": {
+          "baseline": 0.9952155426301413,
+          "s32_student3": 0.9953375521452268
+        },
+        "v025": {
+          "baseline": 0.995231731634152,
+          "s32_student3": 0.9952772253787879
+        },
+        "v038": {
+          "baseline": 0.9849037562099756,
+          "s32_student3": 0.9898969729463756
+        },
+        "v051": {
+          "baseline": 0.989032119087113,
+          "s32_student3": 0.9869492386074801
+        }
+      }
+    },
+    "dynamic_degree": {
+      "means": {
+        "baseline": 0.33,
+        "s32_student3": 0.26
+      },
+      "paired": {
+        "s32_student3_minus_baseline": {
+          "mean": -0.07,
+          "ci95": [
+            -0.15,
+            0.01
+          ],
+          "lower_prompts": 12,
+          "equal_prompts": 83,
+          "higher_prompts": 5
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.5384615384615384,
+            "s32_student3": 0.3076923076923077
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.0,
+            "s32_student3": 0.0
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.46153846153846156,
+            "s32_student3": 0.46153846153846156
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.6153846153846154,
+            "s32_student3": 0.46153846153846156
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.08333333333333333,
+            "s32_student3": 0.25
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.08333333333333333,
+            "s32_student3": 0.08333333333333333
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.25,
+            "s32_student3": 0.16666666666666666
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.5833333333333334,
+            "s32_student3": 0.3333333333333333
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 1.0,
+          "s32_student3": 0.0
+        },
+        "v013": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v026": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v039": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v052": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v064": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v076": {
+          "baseline": 0.0,
+          "s32_student3": 1.0
+        },
+        "v088": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v001": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v014": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v027": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v040": {
+          "baseline": 1.0,
+          "s32_student3": 0.0
+        },
+        "v053": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v065": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v077": {
+          "baseline": 1.0,
+          "s32_student3": 0.0
+        },
+        "v089": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v002": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v015": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v028": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v041": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v054": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v066": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v078": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v090": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v003": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v016": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v029": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v042": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v055": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v067": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v079": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v091": {
+          "baseline": 1.0,
+          "s32_student3": 0.0
+        },
+        "v004": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v017": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v030": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v043": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v056": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v068": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v080": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v092": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v005": {
+          "baseline": 1.0,
+          "s32_student3": 0.0
+        },
+        "v018": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v031": {
+          "baseline": 0.0,
+          "s32_student3": 1.0
+        },
+        "v044": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v057": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v069": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v081": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v093": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v006": {
+          "baseline": 1.0,
+          "s32_student3": 0.0
+        },
+        "v019": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v032": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v045": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v058": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v070": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v082": {
+          "baseline": 1.0,
+          "s32_student3": 0.0
+        },
+        "v094": {
+          "baseline": 1.0,
+          "s32_student3": 0.0
+        },
+        "v007": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v020": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v033": {
+          "baseline": 1.0,
+          "s32_student3": 0.0
+        },
+        "v046": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v059": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v071": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v083": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v095": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v008": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v021": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v034": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v047": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v060": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v072": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v084": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v096": {
+          "baseline": 1.0,
+          "s32_student3": 0.0
+        },
+        "v009": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v022": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v035": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v048": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v061": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v073": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v085": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v097": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v010": {
+          "baseline": 0.0,
+          "s32_student3": 1.0
+        },
+        "v023": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v036": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v049": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v062": {
+          "baseline": 0.0,
+          "s32_student3": 1.0
+        },
+        "v074": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v086": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v098": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v011": {
+          "baseline": 1.0,
+          "s32_student3": 0.0
+        },
+        "v024": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v037": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v050": {
+          "baseline": 1.0,
+          "s32_student3": 0.0
+        },
+        "v063": {
+          "baseline": 0.0,
+          "s32_student3": 1.0
+        },
+        "v075": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v087": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v099": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v012": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v025": {
+          "baseline": 0.0,
+          "s32_student3": 0.0
+        },
+        "v038": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        },
+        "v051": {
+          "baseline": 1.0,
+          "s32_student3": 1.0
+        }
+      }
+    },
+    "aesthetic_quality": {
+      "means": {
+        "baseline": 0.5885946694016456,
+        "s32_student3": 0.5929447361826896
+      },
+      "paired": {
+        "s32_student3_minus_baseline": {
+          "mean": 0.004350066781044006,
+          "ci95": [
+            -0.008607266716659068,
+            0.0171372801437974
+          ],
+          "lower_prompts": 47,
+          "equal_prompts": 0,
+          "higher_prompts": 53
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.5641624216849987,
+            "s32_student3": 0.5834545011703784
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.5962667625684005,
+            "s32_student3": 0.5989298774645879
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.6336672214361337,
+            "s32_student3": 0.6317398960773761
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.5812504176910107,
+            "s32_student3": 0.5850166357480563
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.5274742866555849,
+            "s32_student3": 0.5172239417831103
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.5897460902730624,
+            "s32_student3": 0.6260697295268377
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.592272162437439,
+            "s32_student3": 0.6158907761176428
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.622170646985372,
+            "s32_student3": 0.5829523677627245
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 0.6371126770973206,
+          "s32_student3": 0.6379406452178955
+        },
+        "v013": {
+          "baseline": 0.7628036737442017,
+          "s32_student3": 0.717507004737854
+        },
+        "v026": {
+          "baseline": 0.6459634900093079,
+          "s32_student3": 0.644818127155304
+        },
+        "v039": {
+          "baseline": 0.45896896719932556,
+          "s32_student3": 0.5589621663093567
+        },
+        "v052": {
+          "baseline": 0.5400715470314026,
+          "s32_student3": 0.558097779750824
+        },
+        "v064": {
+          "baseline": 0.7560353875160217,
+          "s32_student3": 0.6908294558525085
+        },
+        "v076": {
+          "baseline": 0.6442850232124329,
+          "s32_student3": 0.5985241532325745
+        },
+        "v088": {
+          "baseline": 0.5568904876708984,
+          "s32_student3": 0.5460478067398071
+        },
+        "v001": {
+          "baseline": 0.4724799394607544,
+          "s32_student3": 0.5944596529006958
+        },
+        "v014": {
+          "baseline": 0.5748320817947388,
+          "s32_student3": 0.6318283081054688
+        },
+        "v027": {
+          "baseline": 0.6889857053756714,
+          "s32_student3": 0.6902447938919067
+        },
+        "v040": {
+          "baseline": 0.5570640563964844,
+          "s32_student3": 0.6157928705215454
+        },
+        "v053": {
+          "baseline": 0.5050181150436401,
+          "s32_student3": 0.4716929793357849
+        },
+        "v065": {
+          "baseline": 0.5300874710083008,
+          "s32_student3": 0.5786221623420715
+        },
+        "v077": {
+          "baseline": 0.5898115038871765,
+          "s32_student3": 0.5795947909355164
+        },
+        "v089": {
+          "baseline": 0.5958626866340637,
+          "s32_student3": 0.5423158407211304
+        },
+        "v002": {
+          "baseline": 0.5827969908714294,
+          "s32_student3": 0.5717525482177734
+        },
+        "v015": {
+          "baseline": 0.6643186807632446,
+          "s32_student3": 0.5771148800849915
+        },
+        "v028": {
+          "baseline": 0.5806871056556702,
+          "s32_student3": 0.5901368260383606
+        },
+        "v041": {
+          "baseline": 0.6074191927909851,
+          "s32_student3": 0.5337011218070984
+        },
+        "v054": {
+          "baseline": 0.4998842477798462,
+          "s32_student3": 0.5759935975074768
+        },
+        "v066": {
+          "baseline": 0.5018438100814819,
+          "s32_student3": 0.5936402082443237
+        },
+        "v078": {
+          "baseline": 0.5516812205314636,
+          "s32_student3": 0.6749195456504822
+        },
+        "v090": {
+          "baseline": 0.4652537703514099,
+          "s32_student3": 0.4443338215351105
+        },
+        "v003": {
+          "baseline": 0.6248767375946045,
+          "s32_student3": 0.674541175365448
+        },
+        "v016": {
+          "baseline": 0.4981733560562134,
+          "s32_student3": 0.508675754070282
+        },
+        "v029": {
+          "baseline": 0.6596693396568298,
+          "s32_student3": 0.5810049176216125
+        },
+        "v042": {
+          "baseline": 0.6533819437026978,
+          "s32_student3": 0.6431958675384521
+        },
+        "v055": {
+          "baseline": 0.354018896818161,
+          "s32_student3": 0.4188554286956787
+        },
+        "v067": {
+          "baseline": 0.6550835371017456,
+          "s32_student3": 0.6671140193939209
+        },
+        "v079": {
+          "baseline": 0.4967958331108093,
+          "s32_student3": 0.5396289825439453
+        },
+        "v091": {
+          "baseline": 0.6041749715805054,
+          "s32_student3": 0.5698084831237793
+        },
+        "v004": {
+          "baseline": 0.356575608253479,
+          "s32_student3": 0.3644576966762543
+        },
+        "v017": {
+          "baseline": 0.5946122407913208,
+          "s32_student3": 0.5528734922409058
+        },
+        "v030": {
+          "baseline": 0.5791673064231873,
+          "s32_student3": 0.46395230293273926
+        },
+        "v043": {
+          "baseline": 0.4078477621078491,
+          "s32_student3": 0.42808252573013306
+        },
+        "v056": {
+          "baseline": 0.5608006119728088,
+          "s32_student3": 0.5352035164833069
+        },
+        "v068": {
+          "baseline": 0.6422516703605652,
+          "s32_student3": 0.6616629362106323
+        },
+        "v080": {
+          "baseline": 0.6126900911331177,
+          "s32_student3": 0.7016009092330933
+        },
+        "v092": {
+          "baseline": 0.6000769734382629,
+          "s32_student3": 0.5819181203842163
+        },
+        "v005": {
+          "baseline": 0.6396582722663879,
+          "s32_student3": 0.6506304740905762
+        },
+        "v018": {
+          "baseline": 0.46977129578590393,
+          "s32_student3": 0.5812761187553406
+        },
+        "v031": {
+          "baseline": 0.6115474700927734,
+          "s32_student3": 0.6142305135726929
+        },
+        "v044": {
+          "baseline": 0.628703773021698,
+          "s32_student3": 0.5983995795249939
+        },
+        "v057": {
+          "baseline": 0.5521854758262634,
+          "s32_student3": 0.5124640464782715
+        },
+        "v069": {
+          "baseline": 0.7438088655471802,
+          "s32_student3": 0.6943114399909973
+        },
+        "v081": {
+          "baseline": 0.5221045613288879,
+          "s32_student3": 0.5067983269691467
+        },
+        "v093": {
+          "baseline": 0.809937059879303,
+          "s32_student3": 0.6648913025856018
+        },
+        "v006": {
+          "baseline": 0.6232585906982422,
+          "s32_student3": 0.6619784832000732
+        },
+        "v019": {
+          "baseline": 0.5393818020820618,
+          "s32_student3": 0.5179358124732971
+        },
+        "v032": {
+          "baseline": 0.6036489605903625,
+          "s32_student3": 0.6032308340072632
+        },
+        "v045": {
+          "baseline": 0.6189478039741516,
+          "s32_student3": 0.5874583721160889
+        },
+        "v058": {
+          "baseline": 0.44282597303390503,
+          "s32_student3": 0.45049768686294556
+        },
+        "v070": {
+          "baseline": 0.42877858877182007,
+          "s32_student3": 0.5150347352027893
+        },
+        "v082": {
+          "baseline": 0.7076741456985474,
+          "s32_student3": 0.5348835587501526
+        },
+        "v094": {
+          "baseline": 0.6996760964393616,
+          "s32_student3": 0.556501567363739
+        },
+        "v007": {
+          "baseline": 0.5568212270736694,
+          "s32_student3": 0.5752259492874146
+        },
+        "v020": {
+          "baseline": 0.564893364906311,
+          "s32_student3": 0.5279030203819275
+        },
+        "v033": {
+          "baseline": 0.6716820597648621,
+          "s32_student3": 0.6859019994735718
+        },
+        "v046": {
+          "baseline": 0.41188013553619385,
+          "s32_student3": 0.6048832535743713
+        },
+        "v059": {
+          "baseline": 0.7021077871322632,
+          "s32_student3": 0.6723806262016296
+        },
+        "v071": {
+          "baseline": 0.555308997631073,
+          "s32_student3": 0.6400431990623474
+        },
+        "v083": {
+          "baseline": 0.5149402022361755,
+          "s32_student3": 0.5950914621353149
+        },
+        "v095": {
+          "baseline": 0.6137436032295227,
+          "s32_student3": 0.6409843564033508
+        },
+        "v008": {
+          "baseline": 0.47123387455940247,
+          "s32_student3": 0.4707948565483093
+        },
+        "v021": {
+          "baseline": 0.6079943776130676,
+          "s32_student3": 0.5242125988006592
+        },
+        "v034": {
+          "baseline": 0.5391157269477844,
+          "s32_student3": 0.6017609238624573
+        },
+        "v047": {
+          "baseline": 0.6100488305091858,
+          "s32_student3": 0.6059166193008423
+        },
+        "v060": {
+          "baseline": 0.5136011242866516,
+          "s32_student3": 0.49687281250953674
+        },
+        "v072": {
+          "baseline": 0.5790629982948303,
+          "s32_student3": 0.6938480734825134
+        },
+        "v084": {
+          "baseline": 0.7150465250015259,
+          "s32_student3": 0.7426656484603882
+        },
+        "v096": {
+          "baseline": 0.6174183487892151,
+          "s32_student3": 0.6695773601531982
+        },
+        "v009": {
+          "baseline": 0.5920804738998413,
+          "s32_student3": 0.6056875586509705
+        },
+        "v022": {
+          "baseline": 0.6364582180976868,
+          "s32_student3": 0.6655774116516113
+        },
+        "v035": {
+          "baseline": 0.6944965124130249,
+          "s32_student3": 0.7257294058799744
+        },
+        "v048": {
+          "baseline": 0.6765823364257812,
+          "s32_student3": 0.6295137405395508
+        },
+        "v061": {
+          "baseline": 0.5448629260063171,
+          "s32_student3": 0.3729413151741028
+        },
+        "v073": {
+          "baseline": 0.5301937460899353,
+          "s32_student3": 0.5546948909759521
+        },
+        "v085": {
+          "baseline": 0.6489537954330444,
+          "s32_student3": 0.7623383402824402
+        },
+        "v097": {
+          "baseline": 0.5515071749687195,
+          "s32_student3": 0.510025143623352
+        },
+        "v010": {
+          "baseline": 0.47026824951171875,
+          "s32_student3": 0.515635073184967
+        },
+        "v023": {
+          "baseline": 0.6368270516395569,
+          "s32_student3": 0.5516660809516907
+        },
+        "v036": {
+          "baseline": 0.6871734857559204,
+          "s32_student3": 0.7384932041168213
+        },
+        "v049": {
+          "baseline": 0.6209969520568848,
+          "s32_student3": 0.5957078337669373
+        },
+        "v062": {
+          "baseline": 0.5494968891143799,
+          "s32_student3": 0.5764319896697998
+        },
+        "v074": {
+          "baseline": 0.4892748296260834,
+          "s32_student3": 0.5106849074363708
+        },
+        "v086": {
+          "baseline": 0.6157825589179993,
+          "s32_student3": 0.6146987676620483
+        },
+        "v098": {
+          "baseline": 0.7100255489349365,
+          "s32_student3": 0.6841815114021301
+        },
+        "v011": {
+          "baseline": 0.5970279574394226,
+          "s32_student3": 0.6197521686553955
+        },
+        "v024": {
+          "baseline": 0.6305080056190491,
+          "s32_student3": 0.7902815937995911
+        },
+        "v037": {
+          "baseline": 0.5657323598861694,
+          "s32_student3": 0.527356743812561
+        },
+        "v050": {
+          "baseline": 0.5621428489685059,
+          "s32_student3": 0.4892176389694214
+        },
+        "v063": {
+          "baseline": 0.5648178458213806,
+          "s32_student3": 0.5652555227279663
+        },
+        "v075": {
+          "baseline": 0.6652231812477112,
+          "s32_student3": 0.7123507261276245
+        },
+        "v087": {
+          "baseline": 0.48750048875808716,
+          "s32_student3": 0.5399448275566101
+        },
+        "v099": {
+          "baseline": 0.6414810419082642,
+          "s32_student3": 0.584843099117279
+        },
+        "v012": {
+          "baseline": 0.7099208831787109,
+          "s32_student3": 0.6420522332191467
+        },
+        "v025": {
+          "baseline": 0.5708937644958496,
+          "s32_student3": 0.639236330986023
+        },
+        "v038": {
+          "baseline": 0.709804356098175,
+          "s32_student3": 0.745758056640625
+        },
+        "v051": {
+          "baseline": 0.742270827293396,
+          "s32_student3": 0.7143846750259399
+        }
+      }
+    },
+    "imaging_quality": {
+      "means": {
+        "baseline": 0.6606793984879387,
+        "s32_student3": 0.6808197554779053
+      },
+      "paired": {
+        "s32_student3_minus_baseline": {
+          "mean": 0.020140356989966503,
+          "ci95": [
+            0.0026663884074422965,
+            0.03685385740168889
+          ],
+          "lower_prompts": 43,
+          "equal_prompts": 0,
+          "higher_prompts": 57
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.6503054897275745,
+            "s32_student3": 0.712491579430735
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.7346590393588074,
+            "s32_student3": 0.7382882579575237
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.6334409821013101,
+            "s32_student3": 0.6622264086405435
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.6550936237237391,
+            "s32_student3": 0.6854228081988474
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.6943677913524486,
+            "s32_student3": 0.6980927870008681
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.6980890550966615,
+            "s32_student3": 0.7022572202329282
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.569153754569866,
+            "s32_student3": 0.6049575774934556
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.6477603235597963,
+            "s32_student3": 0.6365589021753383
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 0.5740763151380751,
+          "s32_student3": 0.690307140774197
+        },
+        "v013": {
+          "baseline": 0.7887455291748047,
+          "s32_student3": 0.6845928226047091
+        },
+        "v026": {
+          "baseline": 0.7521011047363281,
+          "s32_student3": 0.7392105000813802
+        },
+        "v039": {
+          "baseline": 0.6979554977416993,
+          "s32_student3": 0.6905756378173828
+        },
+        "v052": {
+          "baseline": 0.7611365085177951,
+          "s32_student3": 0.733071043226454
+        },
+        "v064": {
+          "baseline": 0.7782627919514974,
+          "s32_student3": 0.7224715474446615
+        },
+        "v076": {
+          "baseline": 0.5805375077989366,
+          "s32_student3": 0.5347822401258681
+        },
+        "v088": {
+          "baseline": 0.3554325273301866,
+          "s32_student3": 0.3153215620252821
+        },
+        "v001": {
+          "baseline": 0.6582105026245116,
+          "s32_student3": 0.6918448130289714
+        },
+        "v014": {
+          "baseline": 0.7929888305664062,
+          "s32_student3": 0.8019525705973307
+        },
+        "v027": {
+          "baseline": 0.7394124688042535,
+          "s32_student3": 0.7659070231119791
+        },
+        "v040": {
+          "baseline": 0.7264369167751736,
+          "s32_student3": 0.7318353254530164
+        },
+        "v053": {
+          "baseline": 0.6846372290717231,
+          "s32_student3": 0.6325492943657769
+        },
+        "v065": {
+          "baseline": 0.7312756890190972,
+          "s32_student3": 0.7028093126085069
+        },
+        "v077": {
+          "baseline": 0.42099322297838,
+          "s32_student3": 0.4892381261189779
+        },
+        "v089": {
+          "baseline": 0.7747663048638238,
+          "s32_student3": 0.5621681950887044
+        },
+        "v002": {
+          "baseline": 0.7179565751817492,
+          "s32_student3": 0.7394868587917752
+        },
+        "v015": {
+          "baseline": 0.7731099294026693,
+          "s32_student3": 0.77547361585829
+        },
+        "v028": {
+          "baseline": 0.5277773903740777,
+          "s32_student3": 0.6340055033365886
+        },
+        "v041": {
+          "baseline": 0.5832235421074761,
+          "s32_student3": 0.6811795086330839
+        },
+        "v054": {
+          "baseline": 0.745178227742513,
+          "s32_student3": 0.7495205569797092
+        },
+        "v066": {
+          "baseline": 0.4126113967895508,
+          "s32_student3": 0.5697975294325086
+        },
+        "v078": {
+          "baseline": 0.3776018591986762,
+          "s32_student3": 0.650783959282769
+        },
+        "v090": {
+          "baseline": 0.3866995951334636,
+          "s32_student3": 0.3387185389200847
+        },
+        "v003": {
+          "baseline": 0.7406550632052951,
+          "s32_student3": 0.7452554389105903
+        },
+        "v016": {
+          "baseline": 0.7334254082573785,
+          "s32_student3": 0.7026619686550565
+        },
+        "v029": {
+          "baseline": 0.7436474083794488,
+          "s32_student3": 0.7484133978949653
+        },
+        "v042": {
+          "baseline": 0.7662393934461805,
+          "s32_student3": 0.7811752098931207
+        },
+        "v055": {
+          "baseline": 0.7915167592366537,
+          "s32_student3": 0.7933810102674695
+        },
+        "v067": {
+          "baseline": 0.7606223008897569,
+          "s32_student3": 0.7574881167941624
+        },
+        "v079": {
+          "baseline": 0.6818338470458984,
+          "s32_student3": 0.7605441572401258
+        },
+        "v091": {
+          "baseline": 0.7754687288072374,
+          "s32_student3": 0.7610697462293836
+        },
+        "v004": {
+          "baseline": 0.50243904071384,
+          "s32_student3": 0.7280799289279514
+        },
+        "v017": {
+          "baseline": 0.641399424235026,
+          "s32_student3": 0.6874457550048828
+        },
+        "v030": {
+          "baseline": 0.5902336629231771,
+          "s32_student3": 0.6445244623819987
+        },
+        "v043": {
+          "baseline": 0.6994133309258355,
+          "s32_student3": 0.6931267734103733
+        },
+        "v056": {
+          "baseline": 0.6797167036268447,
+          "s32_student3": 0.709940651787652
+        },
+        "v068": {
+          "baseline": 0.5471831919352214,
+          "s32_student3": 0.5102975726657444
+        },
+        "v080": {
+          "baseline": 0.7980595855712891,
+          "s32_student3": 0.7767860734727648
+        },
+        "v092": {
+          "baseline": 0.6481218711005318,
+          "s32_student3": 0.5981613447401258
+        },
+        "v005": {
+          "baseline": 0.5736042675442166,
+          "s32_student3": 0.5569508353339301
+        },
+        "v018": {
+          "baseline": 0.7936734941270616,
+          "s32_student3": 0.791054436577691
+        },
+        "v031": {
+          "baseline": 0.352327936384413,
+          "s32_student3": 0.4726963916354709
+        },
+        "v044": {
+          "baseline": 0.7159212358262803,
+          "s32_student3": 0.6924901190863716
+        },
+        "v057": {
+          "baseline": 0.6484340710110135,
+          "s32_student3": 0.5314463772243924
+        },
+        "v069": {
+          "baseline": 0.7519124145507813,
+          "s32_student3": 0.7731116333007813
+        },
+        "v081": {
+          "baseline": 0.3097325880262587,
+          "s32_student3": 0.3084955253601074
+        },
+        "v093": {
+          "baseline": 0.7045109134250217,
+          "s32_student3": 0.6779734208848741
+        },
+        "v006": {
+          "baseline": 0.7955142652723524,
+          "s32_student3": 0.7870183003743491
+        },
+        "v019": {
+          "baseline": 0.7087499643961589,
+          "s32_student3": 0.7899264611138238
+        },
+        "v032": {
+          "baseline": 0.5931729999118381,
+          "s32_student3": 0.6756403062608507
+        },
+        "v045": {
+          "baseline": 0.7312695465087891,
+          "s32_student3": 0.7433429175482855
+        },
+        "v058": {
+          "baseline": 0.7683529018825955,
+          "s32_student3": 0.7942523735894098
+        },
+        "v070": {
+          "baseline": 0.7802575225830078,
+          "s32_student3": 0.7752542470296224
+        },
+        "v082": {
+          "baseline": 0.7918490075005425,
+          "s32_student3": 0.7463871036105685
+        },
+        "v094": {
+          "baseline": 0.7266385430230035,
+          "s32_student3": 0.7584358707004124
+        },
+        "v007": {
+          "baseline": 0.6871867930094401,
+          "s32_student3": 0.7406393330891927
+        },
+        "v020": {
+          "baseline": 0.7885770704481336,
+          "s32_student3": 0.761741200764974
+        },
+        "v033": {
+          "baseline": 0.6702717556423612,
+          "s32_student3": 0.7296154327392579
+        },
+        "v046": {
+          "baseline": 0.16238699128892686,
+          "s32_student3": 0.3415070275200738
+        },
+        "v059": {
+          "baseline": 0.5136554429796008,
+          "s32_student3": 0.6064308810763889
+        },
+        "v071": {
+          "baseline": 0.7256013988918728,
+          "s32_student3": 0.5386668387518988
+        },
+        "v083": {
+          "baseline": 0.7972912462022569,
+          "s32_student3": 0.7943990681966145
+        },
+        "v095": {
+          "baseline": 0.7520803561740452,
+          "s32_student3": 0.7946182115342881
+        },
+        "v008": {
+          "baseline": 0.4363354602389865,
+          "s32_student3": 0.70081103515625
+        },
+        "v021": {
+          "baseline": 0.6489987386067709,
+          "s32_student3": 0.6600437316894531
+        },
+        "v034": {
+          "baseline": 0.5849600118001301,
+          "s32_student3": 0.696319810655382
+        },
+        "v047": {
+          "baseline": 0.7067260403103299,
+          "s32_student3": 0.6305041478474935
+        },
+        "v060": {
+          "baseline": 0.46205947197808156,
+          "s32_student3": 0.5758130238850911
+        },
+        "v072": {
+          "baseline": 0.7850077718098959,
+          "s32_student3": 0.8073579084608289
+        },
+        "v084": {
+          "baseline": 0.7667277560763889,
+          "s32_student3": 0.7833753899468315
+        },
+        "v096": {
+          "baseline": 0.6307474958631727,
+          "s32_student3": 0.7208837144639757
+        },
+        "v009": {
+          "baseline": 0.7474829728868272,
+          "s32_student3": 0.7845056016710069
+        },
+        "v022": {
+          "baseline": 0.6225560217963324,
+          "s32_student3": 0.6079854888916016
+        },
+        "v035": {
+          "baseline": 0.6594159673055013,
+          "s32_student3": 0.7706176842583551
+        },
+        "v048": {
+          "baseline": 0.7479263186984592,
+          "s32_student3": 0.7767747073703342
+        },
+        "v061": {
+          "baseline": 0.7567646441989474,
+          "s32_student3": 0.7209046427408855
+        },
+        "v073": {
+          "baseline": 0.6621628061930339,
+          "s32_student3": 0.740693603515625
+        },
+        "v085": {
+          "baseline": 0.6676017727322049,
+          "s32_student3": 0.7746507127549913
+        },
+        "v097": {
+          "baseline": 0.5655064358181423,
+          "s32_student3": 0.6755142110188802
+        },
+        "v010": {
+          "baseline": 0.6497989145914714,
+          "s32_student3": 0.6877865447998047
+        },
+        "v023": {
+          "baseline": 0.7971883884006077,
+          "s32_student3": 0.8079524502224392
+        },
+        "v036": {
+          "baseline": 0.7515271538628473,
+          "s32_student3": 0.6469616207546658
+        },
+        "v049": {
+          "baseline": 0.6879905819363065,
+          "s32_student3": 0.7394010247124566
+        },
+        "v062": {
+          "baseline": 0.7690946875678167,
+          "s32_student3": 0.7824914822048611
+        },
+        "v074": {
+          "baseline": 0.7549989725748698,
+          "s32_student3": 0.7323669162326389
+        },
+        "v086": {
+          "baseline": 0.3268958729637994,
+          "s32_student3": 0.3576254713270399
+        },
+        "v098": {
+          "baseline": 0.7226651848687067,
+          "s32_student3": 0.7057652282714844
+        },
+        "v011": {
+          "baseline": 0.6250935168796116,
+          "s32_student3": 0.6767478705512153
+        },
+        "v024": {
+          "baseline": 0.6848009389241537,
+          "s32_student3": 0.7677299346923828
+        },
+        "v037": {
+          "baseline": 0.566914687262641,
+          "s32_student3": 0.7527169206407335
+        },
+        "v050": {
+          "baseline": 0.5064730826483832,
+          "s32_student3": 0.6357664006551107
+        },
+        "v063": {
+          "baseline": 0.7518668484157986,
+          "s32_student3": 0.7473121066623264
+        },
+        "v075": {
+          "baseline": 0.6871724039713542,
+          "s32_student3": 0.7967714165581598
+        },
+        "v087": {
+          "baseline": 0.31072078874376086,
+          "s32_student3": 0.282423102484809
+        },
+        "v099": {
+          "baseline": 0.7304859263102214,
+          "s32_student3": 0.7300767822265626
+        },
+        "v012": {
+          "baseline": 0.745617679172092,
+          "s32_student3": 0.7329568311903212
+        },
+        "v025": {
+          "baseline": 0.7763537733289931,
+          "s32_student3": 0.7591869167751736
+        },
+        "v038": {
+          "baseline": 0.7029702199300131,
+          "s32_student3": 0.33231425857543945
+        },
+        "v051": {
+          "baseline": 0.7842546301947699,
+          "s32_student3": 0.7728177066379124
+        }
+      }
+    },
+    "overall_consistency": {
+      "means": {
+        "baseline": 0.2325550375878811,
+        "s32_student3": 0.23550183601677419
+      },
+      "paired": {
+        "s32_student3_minus_baseline": {
+          "mean": 0.0029467984288930895,
+          "ci95": [
+            -0.003921657787635923,
+            0.009942559042945503
+          ],
+          "lower_prompts": 46,
+          "equal_prompts": 0,
+          "higher_prompts": 54
+        }
+      },
+      "categories": {
+        "animal": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.2495161249087407,
+            "s32_student3": 0.255129051896242
+          }
+        },
+        "architecture": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.24347367882728577,
+            "s32_student3": 0.2364521359021847
+          }
+        },
+        "food": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.25485359590787154,
+            "s32_student3": 0.257217689202382
+          }
+        },
+        "human": {
+          "prompts": 13,
+          "means": {
+            "baseline": 0.2185436601822193,
+            "s32_student3": 0.22997058011018312
+          }
+        },
+        "lifestyle": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.22364975636204085,
+            "s32_student3": 0.22372875859340033
+          }
+        },
+        "plant": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.2373678870499134,
+            "s32_student3": 0.22730053712924322
+          }
+        },
+        "scenery": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.20737879474957785,
+            "s32_student3": 0.2265133342395226
+          }
+        },
+        "vehicles": {
+          "prompts": 12,
+          "means": {
+            "baseline": 0.22264289359251657,
+            "s32_student3": 0.22463909164071083
+          }
+        }
+      },
+      "per_prompt": {
+        "v000": {
+          "baseline": 0.25151512026786804,
+          "s32_student3": 0.29669514298439026
+        },
+        "v013": {
+          "baseline": 0.2637780010700226,
+          "s32_student3": 0.2621280550956726
+        },
+        "v026": {
+          "baseline": 0.31376197934150696,
+          "s32_student3": 0.2829780578613281
+        },
+        "v039": {
+          "baseline": 0.20642198622226715,
+          "s32_student3": 0.20591838657855988
+        },
+        "v052": {
+          "baseline": 0.2417811006307602,
+          "s32_student3": 0.2175271213054657
+        },
+        "v064": {
+          "baseline": 0.2822622060775757,
+          "s32_student3": 0.17744089663028717
+        },
+        "v076": {
+          "baseline": 0.2516976594924927,
+          "s32_student3": 0.25428506731987
+        },
+        "v088": {
+          "baseline": 0.15850497782230377,
+          "s32_student3": 0.21237672865390778
+        },
+        "v001": {
+          "baseline": 0.22008483111858368,
+          "s32_student3": 0.21703174710273743
+        },
+        "v014": {
+          "baseline": 0.29863792657852173,
+          "s32_student3": 0.2521072328090668
+        },
+        "v027": {
+          "baseline": 0.2437276393175125,
+          "s32_student3": 0.22963009774684906
+        },
+        "v040": {
+          "baseline": 0.12685124576091766,
+          "s32_student3": 0.20799770951271057
+        },
+        "v053": {
+          "baseline": 0.23221704363822937,
+          "s32_student3": 0.2617575526237488
+        },
+        "v065": {
+          "baseline": 0.27913975715637207,
+          "s32_student3": 0.2977977693080902
+        },
+        "v077": {
+          "baseline": 0.17525362968444824,
+          "s32_student3": 0.1939190775156021
+        },
+        "v089": {
+          "baseline": 0.20762014389038086,
+          "s32_student3": 0.2085595428943634
+        },
+        "v002": {
+          "baseline": 0.27822253108024597,
+          "s32_student3": 0.28386080265045166
+        },
+        "v015": {
+          "baseline": 0.22230882942676544,
+          "s32_student3": 0.22474035620689392
+        },
+        "v028": {
+          "baseline": 0.20357972383499146,
+          "s32_student3": 0.24534820020198822
+        },
+        "v041": {
+          "baseline": 0.19779904186725616,
+          "s32_student3": 0.19255605340003967
+        },
+        "v054": {
+          "baseline": 0.15616658329963684,
+          "s32_student3": 0.2762129008769989
+        },
+        "v066": {
+          "baseline": 0.21716350317001343,
+          "s32_student3": 0.2492889165878296
+        },
+        "v078": {
+          "baseline": 0.20432329177856445,
+          "s32_student3": 0.21036124229431152
+        },
+        "v090": {
+          "baseline": 0.1831740289926529,
+          "s32_student3": 0.15178416669368744
+        },
+        "v003": {
+          "baseline": 0.2962462902069092,
+          "s32_student3": 0.2974054217338562
+        },
+        "v016": {
+          "baseline": 0.18180079758167267,
+          "s32_student3": 0.16945582628250122
+        },
+        "v029": {
+          "baseline": 0.2827381491661072,
+          "s32_student3": 0.30711936950683594
+        },
+        "v042": {
+          "baseline": 0.19975945353507996,
+          "s32_student3": 0.21109940111637115
+        },
+        "v055": {
+          "baseline": 0.18391361832618713,
+          "s32_student3": 0.20372581481933594
+        },
+        "v067": {
+          "baseline": 0.28178671002388,
+          "s32_student3": 0.2433883249759674
+        },
+        "v079": {
+          "baseline": 0.19607411324977875,
+          "s32_student3": 0.25658535957336426
+        },
+        "v091": {
+          "baseline": 0.2390613555908203,
+          "s32_student3": 0.22292128205299377
+        },
+        "v004": {
+          "baseline": 0.24002103507518768,
+          "s32_student3": 0.20322859287261963
+        },
+        "v017": {
+          "baseline": 0.29980266094207764,
+          "s32_student3": 0.3205101490020752
+        },
+        "v030": {
+          "baseline": 0.28786033391952515,
+          "s32_student3": 0.24710744619369507
+        },
+        "v043": {
+          "baseline": 0.2367517054080963,
+          "s32_student3": 0.23680083453655243
+        },
+        "v056": {
+          "baseline": 0.19240722060203552,
+          "s32_student3": 0.19020169973373413
+        },
+        "v068": {
+          "baseline": 0.322221577167511,
+          "s32_student3": 0.30788654088974
+        },
+        "v080": {
+          "baseline": 0.17442922294139862,
+          "s32_student3": 0.19661708176136017
+        },
+        "v092": {
+          "baseline": 0.24953821301460266,
+          "s32_student3": 0.21668954193592072
+        },
+        "v005": {
+          "baseline": 0.23899249732494354,
+          "s32_student3": 0.1925876885652542
+        },
+        "v018": {
+          "baseline": 0.1972922384738922,
+          "s32_student3": 0.16829712688922882
+        },
+        "v031": {
+          "baseline": 0.22320084273815155,
+          "s32_student3": 0.225961834192276
+        },
+        "v044": {
+          "baseline": 0.2143974006175995,
+          "s32_student3": 0.17193393409252167
+        },
+        "v057": {
+          "baseline": 0.17637130618095398,
+          "s32_student3": 0.1540479063987732
+        },
+        "v069": {
+          "baseline": 0.25395703315734863,
+          "s32_student3": 0.26641637086868286
+        },
+        "v081": {
+          "baseline": 0.25924748182296753,
+          "s32_student3": 0.23932939767837524
+        },
+        "v093": {
+          "baseline": 0.26914310455322266,
+          "s32_student3": 0.27408847212791443
+        },
+        "v006": {
+          "baseline": 0.2861051857471466,
+          "s32_student3": 0.2714974880218506
+        },
+        "v019": {
+          "baseline": 0.26679959893226624,
+          "s32_student3": 0.22020858526229858
+        },
+        "v032": {
+          "baseline": 0.2322273850440979,
+          "s32_student3": 0.22744062542915344
+        },
+        "v045": {
+          "baseline": 0.1805301159620285,
+          "s32_student3": 0.20647218823432922
+        },
+        "v058": {
+          "baseline": 0.16074901819229126,
+          "s32_student3": 0.11298049986362457
+        },
+        "v070": {
+          "baseline": 0.18510934710502625,
+          "s32_student3": 0.13110847771167755
+        },
+        "v082": {
+          "baseline": 0.10478179156780243,
+          "s32_student3": 0.07345803827047348
+        },
+        "v094": {
+          "baseline": 0.2536064088344574,
+          "s32_student3": 0.24704401195049286
+        },
+        "v007": {
+          "baseline": 0.24521423876285553,
+          "s32_student3": 0.27714937925338745
+        },
+        "v020": {
+          "baseline": 0.22756844758987427,
+          "s32_student3": 0.20864662528038025
+        },
+        "v033": {
+          "baseline": 0.2394760698080063,
+          "s32_student3": 0.2369731068611145
+        },
+        "v046": {
+          "baseline": 0.16390712559223175,
+          "s32_student3": 0.2172059416770935
+        },
+        "v059": {
+          "baseline": 0.2630675137042999,
+          "s32_student3": 0.2622077763080597
+        },
+        "v071": {
+          "baseline": 0.20272201299667358,
+          "s32_student3": 0.24499598145484924
+        },
+        "v083": {
+          "baseline": 0.2450205385684967,
+          "s32_student3": 0.26221004128456116
+        },
+        "v095": {
+          "baseline": 0.2132813185453415,
+          "s32_student3": 0.2112288475036621
+        },
+        "v008": {
+          "baseline": 0.20978784561157227,
+          "s32_student3": 0.22399494051933289
+        },
+        "v021": {
+          "baseline": 0.2368088811635971,
+          "s32_student3": 0.22658966481685638
+        },
+        "v034": {
+          "baseline": 0.2641092836856842,
+          "s32_student3": 0.27005887031555176
+        },
+        "v047": {
+          "baseline": 0.27381449937820435,
+          "s32_student3": 0.2739509344100952
+        },
+        "v060": {
+          "baseline": 0.34780213236808777,
+          "s32_student3": 0.2757681906223297
+        },
+        "v072": {
+          "baseline": 0.23708544671535492,
+          "s32_student3": 0.22932663559913635
+        },
+        "v084": {
+          "baseline": 0.2530161440372467,
+          "s32_student3": 0.27338913083076477
+        },
+        "v096": {
+          "baseline": 0.22245806455612183,
+          "s32_student3": 0.22747397422790527
+        },
+        "v009": {
+          "baseline": 0.2635954022407532,
+          "s32_student3": 0.2642159163951874
+        },
+        "v022": {
+          "baseline": 0.26977774500846863,
+          "s32_student3": 0.2887399196624756
+        },
+        "v035": {
+          "baseline": 0.2355143129825592,
+          "s32_student3": 0.21537840366363525
+        },
+        "v048": {
+          "baseline": 0.3175961971282959,
+          "s32_student3": 0.25109627842903137
+        },
+        "v061": {
+          "baseline": 0.27023568749427795,
+          "s32_student3": 0.2054949849843979
+        },
+        "v073": {
+          "baseline": 0.19550591707229614,
+          "s32_student3": 0.18836109340190887
+        },
+        "v085": {
+          "baseline": 0.21684470772743225,
+          "s32_student3": 0.24093899130821228
+        },
+        "v097": {
+          "baseline": 0.15277786552906036,
+          "s32_student3": 0.1873847246170044
+        },
+        "v010": {
+          "baseline": 0.18132272362709045,
+          "s32_student3": 0.24927493929862976
+        },
+        "v023": {
+          "baseline": 0.28057730197906494,
+          "s32_student3": 0.3218691051006317
+        },
+        "v036": {
+          "baseline": 0.2428356111049652,
+          "s32_student3": 0.3061279356479645
+        },
+        "v049": {
+          "baseline": 0.2508707642555237,
+          "s32_student3": 0.3010692894458771
+        },
+        "v062": {
+          "baseline": 0.23977771401405334,
+          "s32_student3": 0.27679410576820374
+        },
+        "v074": {
+          "baseline": 0.2439182996749878,
+          "s32_student3": 0.24409246444702148
+        },
+        "v086": {
+          "baseline": 0.2114335149526596,
+          "s32_student3": 0.26830387115478516
+        },
+        "v098": {
+          "baseline": 0.20893558859825134,
+          "s32_student3": 0.2251163274049759
+        },
+        "v011": {
+          "baseline": 0.20945176482200623,
+          "s32_student3": 0.22416538000106812
+        },
+        "v024": {
+          "baseline": 0.18424805998802185,
+          "s32_student3": 0.19921304285526276
+        },
+        "v037": {
+          "baseline": 0.2817472517490387,
+          "s32_student3": 0.28709977865219116
+        },
+        "v050": {
+          "baseline": 0.21955104172229767,
+          "s32_student3": 0.21245883405208588
+        },
+        "v063": {
+          "baseline": 0.21930813789367676,
+          "s32_student3": 0.2480265498161316
+        },
+        "v075": {
+          "baseline": 0.1475428342819214,
+          "s32_student3": 0.14750297367572784
+        },
+        "v087": {
+          "baseline": 0.19642344117164612,
+          "s32_student3": 0.24876271188259125
+        },
+        "v099": {
+          "baseline": 0.3136136531829834,
+          "s32_student3": 0.3110014796257019
+        },
+        "v012": {
+          "baseline": 0.3231501579284668,
+          "s32_student3": 0.31557023525238037
+        },
+        "v025": {
+          "baseline": 0.23575733602046967,
+          "s32_student3": 0.21137207746505737
+        },
+        "v038": {
+          "baseline": 0.2623181641101837,
+          "s32_student3": 0.2626062333583832
+        },
+        "v051": {
+          "baseline": 0.2528170049190521,
+          "s32_student3": 0.30105775594711304
+        }
+      }
+    }
+  },
+  "videos": [
+    {
+      "path": "videos/baseline/v000.mp4",
+      "sha256": "fe6424c4a9b90f86b4137aa24f40094bc078b0480ef77086321a88c1e036f1e7",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v000.mp4",
+      "sha256": "fb3ef042144ee3696505c327c3d814a91e47b6b1e4fb1bdb746dd58c23e09b23",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v013.mp4",
+      "sha256": "4e01d99696984e9eaaffadba52778cd6848f01eb3b4d545ce8bd8ad61f8378c6",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v013.mp4",
+      "sha256": "5fe3dbed82b562413cce6f2edf729338b0ed75725ac329e44bd277aff185dc99",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v026.mp4",
+      "sha256": "7f37568f1b2f6f648e06e4ed506cf983d1531f42b1af24f16862ed310be4beb1",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v026.mp4",
+      "sha256": "4e2d5620edeb6c244b002538575739d9896fb3dac5e8447e0c487dfded8ffdf8",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v039.mp4",
+      "sha256": "9d1397a95e98f7cfbe6bdaa5256165900ff4917a8cd9b3a7ac8f603192c6ee0f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v039.mp4",
+      "sha256": "4abcfde328e14cb413d350972b597f66d6cfd6c6140f29befde50d873402d967",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v052.mp4",
+      "sha256": "4735812070f912d793a7eaa60c5b1066584c9f899c94674e57ca2e39e59ff983",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v052.mp4",
+      "sha256": "43b4504e98eac9d20511deb597d632db846158dcfeb6c332046e790af88e7f85",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v064.mp4",
+      "sha256": "87f4a278d11878b73f435076af5bc439b40fc1ee90c84798d4f73aa33af32586",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v064.mp4",
+      "sha256": "085b05af3872f83be34fe2ce897ccbcc439ee08cfeb0c6718dc7b6143a1821c1",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v076.mp4",
+      "sha256": "365832733a78552cd582c0508cb5eb0d8a83629e21e588b6433fa70f1cf296a6",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v076.mp4",
+      "sha256": "cae00013c5ce02f67340766a2dfc8a7da470a209f825063754be3ad7a124ecc8",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v088.mp4",
+      "sha256": "5c2e057a607b30d2317d8cc52803541aa698ef172eedab0c91cbc3bab3ec4fea",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v088.mp4",
+      "sha256": "a5141df021f7b7841699ccc673df75d4d5d2c86278da88abbf2c51b71ce49b2c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v001.mp4",
+      "sha256": "b2e55812acee11ab4a0f73cc9d8361fd2252c46a5db102aa5dbce13f06dccf29",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v001.mp4",
+      "sha256": "9bceff9d721c135063e024ac9790862dc87aaa32e21f8e31f07f7eac60fe2426",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v014.mp4",
+      "sha256": "c92c36a3668d8c4bf15ed676d5fa533f2b557f3e58758d1f31c2cd162937f44e",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v014.mp4",
+      "sha256": "a492401cc09d9d667f80d31f7203ac68b946cf06b05c635170721cef3ae53947",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v027.mp4",
+      "sha256": "bbf3bcade21dd491e428ae50cfc3bd9460e399fd746969d0a4acf972bf80e8c8",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v027.mp4",
+      "sha256": "5a8b290c1600b01c3f3c155184a60d8bdf6a1935dcc3733647cee09f26ca3414",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v040.mp4",
+      "sha256": "1a632e3ddc226a70651b90d5b9a39a1e85ae757c9206f3c909f4c188aecd5554",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v040.mp4",
+      "sha256": "66e1cf1c1357d28f07bcd8172c5708ffc158d77718c9c06ed20932a4ff6eaa20",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v053.mp4",
+      "sha256": "bd312b92da7b3a1d040ff93c695a986e5656d03fb755a770084fda6dee24ab73",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v053.mp4",
+      "sha256": "682cc773d9f4de74403f8e71e401f94f93f1b42ee40d928a19dd451b4379ac71",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v065.mp4",
+      "sha256": "70d19419540ced04a1c4af7b5ae79b40123a795ad4b13af0f5f5855d79fcd4ad",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v065.mp4",
+      "sha256": "1419715a081ea70026e5a4abefc92cb7781c4a30157a8e407fa70060b6e6d5d5",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v077.mp4",
+      "sha256": "ad6a5648b5712a10568003f263869905e3a42d21caa8691b087ac2feb870cbb8",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v077.mp4",
+      "sha256": "c4a09aea27ade6d3d748104105969e0fc5b9fc2f740502cbc16841c758b6a962",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v089.mp4",
+      "sha256": "9c95d2c7c65c09e9120ecc2cd5c76b4b7e26b6f6cd5123e76d4edcae50871f6b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v089.mp4",
+      "sha256": "13b8865fbf07705009789d2535e8fc20aa88def828730cb09d365e7385bd4627",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v002.mp4",
+      "sha256": "6ffc34624ff1f2fc1624652c663019ca85863576276cebb3051a7f1461442e46",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v002.mp4",
+      "sha256": "5198412432d38b24c36c4414a5ccfda81a34f512a11427220be11a84b7cde1ba",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v015.mp4",
+      "sha256": "4a0ba8e73eac284381245fb18c2495e2b0f4b2b71c919767684ec26d46fd275d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v015.mp4",
+      "sha256": "3df92c60c470c2515558dc32d7809230001b28c592a385f04415b64c766910e7",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v028.mp4",
+      "sha256": "ff9202c5011fbd87003c5043f27262c28354a1603946dfb66437c2c2423dd4fd",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v028.mp4",
+      "sha256": "4845129f3b3f31d387fc3933ed6ed13dfba18c2527a824e830d9b2e573df4a0d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v041.mp4",
+      "sha256": "1bf3c727e50f52f3586aeed1aeb2921c94b2701ee8ac06c06fe89bb4d56ae65c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v041.mp4",
+      "sha256": "64a39d557397ef7f2ccefbcc1826e11ab2b4af9ce0d85622475b165ea9b3f3ca",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v054.mp4",
+      "sha256": "3f3af64640831b147062d25daf26152910619ff48ab13a35d699fc8f3707d973",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v054.mp4",
+      "sha256": "a4cdb3afd804c5f7340716edf7321e7191816aa07b92453b9d53c6144d93b2a1",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v066.mp4",
+      "sha256": "e47cbc03afded5cdf82aee9658e3b4dfc326ecc579110e8a35c4242023b06c9c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v066.mp4",
+      "sha256": "2ba040b3e7d270f36d3a9329d024a1845f50422db6a38d5070dd7b694ad3375e",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v078.mp4",
+      "sha256": "5b649f495df56a793b7a15fa984a9171e20ec9d6b4e063876550c4869e6dce70",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v078.mp4",
+      "sha256": "f58ed03359888d541e0a2a9bc084b627c7aff64beb3c31a140814c1bca37fb27",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v090.mp4",
+      "sha256": "ce10724d44f536c360277f7fe75ae591424d33feb7b99d6be1f2fb50f71a2152",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v090.mp4",
+      "sha256": "578b135266cb33ea3cb8c2b68b0d7c4894e319eb273b9a50f0c6e12f3b6f29ca",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v003.mp4",
+      "sha256": "667578fe17db82e82207817903ecca8ed7330c7ea0d93fe177f2062c5128fbab",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v003.mp4",
+      "sha256": "f7dbf25f133b900bf80dcb107ee415a83cb005640cf652b645e2307857cdb254",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v016.mp4",
+      "sha256": "94052eb3e1fd354d82fb4fa503ebad2c1854284e9fd1bf1a3eb6103d37144bd7",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v016.mp4",
+      "sha256": "3f9ae75d55a008944cd15ea8dfa436b07378d8c7bcbefb9f0f750a64f6f9d233",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v029.mp4",
+      "sha256": "eae612d15a1d628a3c32d155db9750cdbfef8efed4704363f6bbf9a0c6f82c7a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v029.mp4",
+      "sha256": "5393c088b8c15080e1d1e2bb9e4faf2d23fa574bd6a137312728dee0249ed11f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v042.mp4",
+      "sha256": "daab9c402419673c8e336b814aa5fcd2ca9f89ae3750b7872f26de359c1a791f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v042.mp4",
+      "sha256": "09cec8c97bc27345a7b234a09d1e956bddc20c133ed944c2754530bba53488c4",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v055.mp4",
+      "sha256": "9c1d66f9f8cfe5c736ee31d69cb3100666791617983bbb0fa1d85a4943c407a9",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v055.mp4",
+      "sha256": "0482087f30742b67dda0e0b570aebf342f6e4aa58a06b6ff946168d1ba31d2a5",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v067.mp4",
+      "sha256": "1a2c989367c37dbd7ff92b7617abadcef731ecf4571deff29ed893f250356db5",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v067.mp4",
+      "sha256": "f74d3aad0b5bba2beb51574eb17185e3758d0eb40fb99b2337e8edeb872fba4a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v079.mp4",
+      "sha256": "6795e69e593dbaad65150a83b8c7e3e9e4c652e4a23063681552e788ba6c3124",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v079.mp4",
+      "sha256": "cc46fc2d33af63b0876507e8774a7347ba8ef54fce9c623e958ddfe060053dea",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v091.mp4",
+      "sha256": "a5de0b1bb8615f6439b27756fb91c70af2164535a1a70e2fe0dedb6817972edb",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v091.mp4",
+      "sha256": "b20ce02b2f9426f41d717fd1739eb93b313d90c23abd1b73d42b677dad320028",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v004.mp4",
+      "sha256": "899ddb25e9a32089f1c8a5dfe1d7031e440bba43e40375dfc7828141f734b8d7",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v004.mp4",
+      "sha256": "8f838c64765bfc74e8251261ed435b440764a416a56dc4ea9aadb4bfb9d8f053",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v017.mp4",
+      "sha256": "fe6ca79701c8d3e8634f420d585a57b6949e6ad4d28fe3aceae58919e067a5dd",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v017.mp4",
+      "sha256": "766e0c5671bbbbd42a97f177f41fa892abb9f763cffa1d0029d2f74c6322ec46",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v030.mp4",
+      "sha256": "5a4b4173b1ee138e3d3cc9e64c1df3fa0b988092d24e093d0f7d0c69782062bd",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v030.mp4",
+      "sha256": "6a126baeb1170b418572afba4e349cc3e0e654a600cd98c8fb8f4e5783f2bb2e",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v043.mp4",
+      "sha256": "4b6c0efa68c24d9450b0346139ba3bc69561f94f9802f90355deb20b04a99766",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v043.mp4",
+      "sha256": "54f340a5bbaf3eccdfd745f64ae876f92dbbd9e8600e80dd8dc48297de210c58",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v056.mp4",
+      "sha256": "225c78a6eabd41681c441923f3295ebe3aa24e93f43cf206be209575476e4c0b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v056.mp4",
+      "sha256": "3df6d620c2416eeab2103da42c19c1a8fa0b9ecb3d3d12c435233d5e9cda6a8f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v068.mp4",
+      "sha256": "968209e21d25afb6e6c7602716fb81e693f2c59cc23abc5c2eef15cedee7423d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v068.mp4",
+      "sha256": "bc399a4c8320d3e48289522dee6c77f7ed09930688ff83d1f27d6a0d73622a77",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v080.mp4",
+      "sha256": "a86eae5137c6f54701aa18961526af7048f1bab07891e4a3b16894184e6b3eff",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v080.mp4",
+      "sha256": "b0bca355d23014955c1676db9f8bcda6a6629769096c075b3eec03f1bfba6b5c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v092.mp4",
+      "sha256": "e6be3fca0fe01eab726275fbc20dbd2f6a938d10f9e9d2c631e949b8d2b3c925",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v092.mp4",
+      "sha256": "66e2b58fd70edbb2af8dc00504712f903910e95616a16cf6c350dbe2161b10bc",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v005.mp4",
+      "sha256": "538d18041b13fc7e73405bb34d1ae59fb966a8c462b40517f82046e9b835baa7",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v005.mp4",
+      "sha256": "5863ef2c3977bbcd8bcc58d9267009acaf1febd687815c2dcf43a31aa500abbc",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v018.mp4",
+      "sha256": "dc757a877a24ada7a8f753fd04c820da52f67beda1af1b841cde332f072c384a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v018.mp4",
+      "sha256": "554d25364a771ed04ea4900e33ada81e0a5be060689528da8f41168065f3811c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v031.mp4",
+      "sha256": "8617578623d2fc0a08cdff61474273ed99a9efcf726d0ead50b8fafdaac053e0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v031.mp4",
+      "sha256": "6eab918c32d2c295a243574882f4bf35ba2c64b87c5d5dbded07d9c7c24a1ae5",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v044.mp4",
+      "sha256": "a7419631a5f473abacb3e7d1550b0faafbfecc37b2a32d931f814b165eac3daf",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v044.mp4",
+      "sha256": "55b2a5643966e66918dc2c4ec9aca1d54a6afe47a583d97da0f510574d9b9920",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v057.mp4",
+      "sha256": "647429228118ecf09dc83bf7460d2f6a162dc4f84a8d307403a93f3153c9ef96",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v057.mp4",
+      "sha256": "c37db276e1caa93a7eec210b31b5f66743e6cd7d3261b20e454b4f61880c1a9d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v069.mp4",
+      "sha256": "3dfa918a3dda4ad6e0aed95beebff6fc2468029f4e444f7263d84380178adcbf",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v069.mp4",
+      "sha256": "adcd68bb0ffe48c77dcfd44c039c0c88714696b5026aa60c957d9e63d2bffa33",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v081.mp4",
+      "sha256": "2702f8fde3496dcd7bc3c6eaafb26429f706344b49a97480080729fd4b91826a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v081.mp4",
+      "sha256": "5ca64f75b4a75d0b395c9b5d1d401f58955bdc1cc940c727678a2092654048e0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v093.mp4",
+      "sha256": "012b7dda16a13830582973a77961d5bbbf02884a2fd9742b14adb760f3f3abf1",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v093.mp4",
+      "sha256": "b908bd62e6cda7475a5671cd289950528e2974f96eed8803ba42dd8c10a08670",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v006.mp4",
+      "sha256": "93c3db076d30cb21c4609e7651bf28f7514750fa1bed82c8dcdf401236a8dcb5",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v006.mp4",
+      "sha256": "5a6805e77db74f8d3ca0caf2917100810ffc0d4c209f772ff366b7e3489146e1",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v019.mp4",
+      "sha256": "9741cb345b8576302398d7b237ea391dac7f0a46624ef41dab788c33b258593f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v019.mp4",
+      "sha256": "503b143aedbf789a213cf4cde91ff70a17a73d533dca4605ce4f2d81d436258d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v032.mp4",
+      "sha256": "7b6fcc7b6d63c68f17206fed342e734b53bce7813672ff93ef01b1e02734e74c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v032.mp4",
+      "sha256": "ded392e68c95649d8ac3718e95f92a4d384dc982668b6aa0f630bebbf1e284f9",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v045.mp4",
+      "sha256": "6af71008497c71c108aa6eeb31e1268419f734828fa326cfa1e848f4ff8d1a8d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v045.mp4",
+      "sha256": "e1fc85ff9ec8a164d8d42f845af5a90b94d944ba407ca1817fe64272231f8ff9",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v058.mp4",
+      "sha256": "106abd06d595630f53265d751ee99f4d3f68c7ecadac1445e72c0cdc10b5d04d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v058.mp4",
+      "sha256": "91618f84ed75adef785ad7941317a12b66b4e08dcd67baedf790744258a4f776",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v070.mp4",
+      "sha256": "ce751aa55b6350d6b6b3537796e1e3664039ce00aaabdc98839aa05ce99748c0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v070.mp4",
+      "sha256": "b90494baaf6515cd8a663c90a47b0fb9a8b725981517693d12ef9cd4c176c8a5",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v082.mp4",
+      "sha256": "912a628b29b52e21d5faf115fafcf9866b9f91877056d1b91b858bf11dd40c6e",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v082.mp4",
+      "sha256": "8cb71b4a2bd1e057c769d954656ea367d020ed27c2b1411d1d0a2fa443e38a64",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v094.mp4",
+      "sha256": "6414b0a033a09e341fabef39e51e06fd41906891ca7b768b2b57eb3a204227ff",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v094.mp4",
+      "sha256": "98ee7ab8de55866e5ceb097665f386baf1e48f91dccaa5a9685f8108ca4f0a0a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v007.mp4",
+      "sha256": "ee30de848323113e2a7598cec96ed82c4bced79022a6482d540b40b2f2bf6b7f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v007.mp4",
+      "sha256": "f96756f32efe498c12a6be45c0cb02b1ad1801126b129038289c751442ed6d0c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v020.mp4",
+      "sha256": "c019ce676b455769b205b3e921a66ae190143d2de87379e4dc7830eb7fa44c6d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v020.mp4",
+      "sha256": "bdcd737fb718d3fe86f66e4d82c308d9750c2d9b743645cc8c6da70610fe7c5c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v033.mp4",
+      "sha256": "0acc3de2fa9848f41d24c2f147f8355b1d8f9481b2b968d4036f66936a7d6d0c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v033.mp4",
+      "sha256": "7b8b4fa03c40e7d80c0e8f52dde268a222196552651f9652dccfe95e0cbacf1d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v046.mp4",
+      "sha256": "8cc4be50f1edb0e2f0737e0a2a638dcc0457a7271ebfb12c9ee18d9159e11b96",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v046.mp4",
+      "sha256": "61d89dc6789dd8c689d6398691359d8b816f2486e46f6d74879c97ff745db8ad",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v059.mp4",
+      "sha256": "9b5e03c51fe012143b9d2875b5771d5343290f3f5ad4e6fc06dc7e819c1fb6a8",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v059.mp4",
+      "sha256": "15880ffe1daa191aa0231e5d1fa053087a472fca7f04d9c2ddee9beff783c708",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v071.mp4",
+      "sha256": "51c2dea9cbdf8626109ff34afe161f1f6a1841a16e788c76e54d4812d3a1cee0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v071.mp4",
+      "sha256": "12c0dcae4f7df19d93d4fc355d95802923c41d650de875c787e4f23fedb1f864",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v083.mp4",
+      "sha256": "47e8b0993a7d7eb3b6e9377fab744df4a6a4be37d58d62ca5ca4bc63741d5091",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v083.mp4",
+      "sha256": "323083030b89610be08e813a9e79edb8300d1f46bde6f448bdf5ef8556982269",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v095.mp4",
+      "sha256": "d6db59a0e2564b4a694910a19d6493c9d655cd069853b69bac83696aa206eea9",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v095.mp4",
+      "sha256": "2c6e3d7c0a317c68834f0a7ee769e0ebfbb12144afa70288392e5895cd6fc9b4",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v008.mp4",
+      "sha256": "45490a6b261fe14202268496730b98fe6117a6811505336cc17ffa4db52d47cb",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v008.mp4",
+      "sha256": "86734d20c69d90b1dc239394998a3a861ba1e131c441066a41e9d201abef902a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v021.mp4",
+      "sha256": "d2842c9c4864f0351a6243296e646b8a7cfa91175f15c124171b02130727cbfa",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v021.mp4",
+      "sha256": "645d4d3ca5114c0e2150c36f3055c553d63291b62957ba3ba8a95a210692a7be",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v034.mp4",
+      "sha256": "6dbdd5be31953e201ac664312c38e3cf048a4e755da6346900f8c8c26fedd141",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v034.mp4",
+      "sha256": "0c00316607fe4769004a3f3f5d68f7183296b06f56a9c39b759211f90aed788b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v047.mp4",
+      "sha256": "472bb81f6a57ff439ed74f3e2dcedaf0fba5da79a4bda142e5e39c0b5214c500",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v047.mp4",
+      "sha256": "917b3491ddda1cd5b56b9f64c7964e5bb00a21f0a70008c1f5bbffab66bc26d8",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v060.mp4",
+      "sha256": "4b9a1779f0bda39ffceedbc9f5668ecc17f2940ba77d844398a45119b8658066",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v060.mp4",
+      "sha256": "ae7680c1c4b991b4ac4a63f68f157af74e6ec6bb18f0825d9458af09bf2f6531",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v072.mp4",
+      "sha256": "3322e934fc7594ab780d40bc5e2605876947acee1ccb814932b290f73fb8165c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v072.mp4",
+      "sha256": "8fa9f0e21cb63108ba8c2d069bdcea1cf7eb2044f2248e4455484c3a1ae1ed42",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v084.mp4",
+      "sha256": "294fe7a74b7de11c86f38a9ac232425b38e6551d62fde5263df2d2044b24ae8c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v084.mp4",
+      "sha256": "c21e3e1ce08b0fce8eee586c17a346f1661406129db379738b127a83d39fff41",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v096.mp4",
+      "sha256": "5d4d7bb71e7fa901c673c02538b995ee1fd513261090d6f4f4a1c637ef41e3a3",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v096.mp4",
+      "sha256": "e5b2d6ec10a5daefbe75e95ed55383c7db4dc1b29e530b91918fe0d0ad32f850",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v009.mp4",
+      "sha256": "4c4c0309934160eb5213849d843a1b31d44b734a6c0e0d41cbdbbd006f4709bd",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v009.mp4",
+      "sha256": "374297ba2623e38cd1b976896cda59747bda18840a3153c5e4011910f6c96682",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v022.mp4",
+      "sha256": "1c3643799ebde8b13037855e5d6761138643f052897c282bccd1c119d89a1a84",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v022.mp4",
+      "sha256": "1db0260b0dcbccae3b25b55d5b1915d87692961ca28333fba7c5435fbdbad9f8",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v035.mp4",
+      "sha256": "8e78f86bcdb73a2e89be0d3910dce94abfad58d804437a5a6c853fd6e9f0f880",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v035.mp4",
+      "sha256": "800eafc9a5667088b6a14d9d254b5199415e7e72febacb5af6c4ba53a97ffdd6",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v048.mp4",
+      "sha256": "564cd7ef3ffd6a195d4b919cc88e8bc7cf3f8b65122794242f51dfd7f723a60b",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v048.mp4",
+      "sha256": "274933e8a86d476d299f50d7c9c722439850c984c5c76b2b11c3b6a5363a3d35",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v061.mp4",
+      "sha256": "d3f191f02e715da6320654ad605437073ae7858e0ed08405757e192f48d1f879",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v061.mp4",
+      "sha256": "09e461580a9089d87d77b0f34a6b5cce7069bc28dc966972ed61710428dd3b65",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v073.mp4",
+      "sha256": "79b60b5830d77989ff36484037ea1d195ed1911d85eda9c88709f2e723f28bef",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v073.mp4",
+      "sha256": "24d68171519f13a3dfe7d0f74c9bd98a978106b14261200869b57a6288eb284a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v085.mp4",
+      "sha256": "de5e5aeadddd26099f2950a921e7e2aed6f1e84a7d0ad2131e9bcd52519d8488",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v085.mp4",
+      "sha256": "78b6f7748b96354e93920f84cf1ff394c138f33b7c22fc6f34ae651473b982ab",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v097.mp4",
+      "sha256": "832cf5ea5fe1ad423b34fd240d4d3fda06cdbc53ed438ee781ce668de9344cb0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v097.mp4",
+      "sha256": "ec63b248678e4356359461483e0a0cb6fd207e20f07b8affbb96e363c4a23a2d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v010.mp4",
+      "sha256": "0c6c03ce9d125f2dd2213ebf304fa31798429a28a690462b8fb91752415fd527",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v010.mp4",
+      "sha256": "21b95fc4ab9c347439169aab57a2d8eb09dd6991c189d0fb5e05e425ceafbeb1",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v023.mp4",
+      "sha256": "de5555f8114c84b8a7c883063999258131312f9a04888bead1419253118016f9",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v023.mp4",
+      "sha256": "a8fff81df155e0d12331503f12e987bd0e37710090421320c8a77b22914358da",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v036.mp4",
+      "sha256": "f4a6f6bd380ebea4583ffbc703b31c6f81296554ed79864ddc0da38d21a2e9b3",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v036.mp4",
+      "sha256": "333ac5d9e0989a10bf286d7438d6f8b1b2384a8ffc7394bd2a1a3dbc93a4c176",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v049.mp4",
+      "sha256": "21d9fcf6ca6f9ff2cb08a34ac62e320bfb768ab0d6f06769f6acc880592d8fee",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v049.mp4",
+      "sha256": "eff1d499d73e86ac4a98e920d914bb5fcf85f34b871b772e2283dd16c7dc894d",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v062.mp4",
+      "sha256": "75db7598dd317f3cfcd2c39c7627ee1aff6de5a1095a4975b4214cfbb2c0ad69",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v062.mp4",
+      "sha256": "496f5e0d98f5dbf50067ff52a0b37b0c00a0bc3c029d7c159972ffdcb51641e1",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v074.mp4",
+      "sha256": "5c4562f5a0431ea5407190f8de69903cbcce8abe8f2b3ee07cbfbce1e735f201",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v074.mp4",
+      "sha256": "094d8f9423502e023f6b154a654d8705b07be4933f623ebd2b437a32f3ed8d6e",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v086.mp4",
+      "sha256": "0612c30414b978eb99767cf22aeb207bfa0b7f37ee6192136ec6a726885aa6ee",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v086.mp4",
+      "sha256": "b87bb0012b4f0e2d2121ae1a5d728a885602c3df75f910c13034cf093003691a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v098.mp4",
+      "sha256": "b34de8c7a8eb09d68ee3be064012f9f4b3ee200292edf2b85e560db853df04b3",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v098.mp4",
+      "sha256": "90e858e2207d6725dac55bd40cf6d2be918d489c82434d162a0bfed6eb358616",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v011.mp4",
+      "sha256": "4ea143bf7c9aded49313522bfc20b0f4c07e6594cf033977f636aefe40a78ea1",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v011.mp4",
+      "sha256": "005c4b3f13a9ac5d29da59d64ff24ef09093b0cb442b7de01c087d6f6b483f76",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v024.mp4",
+      "sha256": "8824b0096bcc97aa1914ad7c39fe52250411824b651932cff0e41ee3b5886f42",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v024.mp4",
+      "sha256": "a8c7cb954c7ae0b2e3964afb62a0a281162f32b1771c82fdd46711bc49739cb9",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v037.mp4",
+      "sha256": "20464f20030bcfcd4a0f5dd439cfc320f5c1233ae664e99edff157a398046a80",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v037.mp4",
+      "sha256": "0c56df98e955fbd221d8c5999881a2d9270d147307e9c7af7cafc6972ceb195c",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v050.mp4",
+      "sha256": "34eb71bbeefe720ff77e76941ac2b5666f958584607be79e370dd60b6718c52f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v050.mp4",
+      "sha256": "b2e18b2ca1316746e17d65a5aa0e4fb63c03166de289a2941c0a69c60dfb6ce3",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v063.mp4",
+      "sha256": "5cc21db7e3b699f815cd00ad5c88663a68cb5de37ee2bae1cdd693c476af870a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v063.mp4",
+      "sha256": "a21ecaf1a2c07cae317a20e6f8c2ff1e28e2b2c0f9c8c238c59d736e5972c599",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v075.mp4",
+      "sha256": "c0adbbf6dee8f0d0eb8e14887d7c3b81f60c7c9db088a1adef0287467d65bb4f",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v075.mp4",
+      "sha256": "2d3e99d0ec272e7b31960c7f2fc6f30dcd1a1ac413487a1581928e1595c511ef",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v087.mp4",
+      "sha256": "91a54b35a40d23c53c00360d2f8d66578beb05e8df0fac9578118302a3220a52",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v087.mp4",
+      "sha256": "c540f1cc0f645e815a772df0063f53353776b9c10415171b292203559e7620d0",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v099.mp4",
+      "sha256": "c5e2cfc1514fb39519522708a0c893969680fa7068bee9e54d1db57fd077f510",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v099.mp4",
+      "sha256": "bcf4e5c7f3fc9955ac0368e3b3fc669c9054fed6cb7180a7ec074c62dbe0d3be",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v012.mp4",
+      "sha256": "49aa0962baa92c08f0adc4a733bbe6f16b06a4a1ad135bafd90de24ed9476e27",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v012.mp4",
+      "sha256": "a3b6b8d02949f807b751b7c8c70c44c637760f9b435ae8613389729e1e35c1d9",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v025.mp4",
+      "sha256": "96c9446284d0fbf655f04134832831940943c23bd86ee59dbea4a62129b68394",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v025.mp4",
+      "sha256": "d3dfa8b66f49a24e9b1f615a340208a11dc35c1a6e89acef3f602911572a4a78",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v038.mp4",
+      "sha256": "45801a2e10bf38758b80252fea1d6d2ae357704cc79476a0964dba7e491af444",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v038.mp4",
+      "sha256": "203d7607cabcec9a69952f8f682254d20117199032e1e3d41a7dbc5c2e8b766a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/baseline/v051.mp4",
+      "sha256": "5a9d5d9432cb08645afae717d2d1f6c5d8256cec5afe6842ebd0808f15b1c83a",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    },
+    {
+      "path": "videos/s32_student3/v051.mp4",
+      "sha256": "bac67ab73a579f4c39e1058b2e921362106aa10e3d8bf96221c26ec755ca5085",
+      "frames_width_height_fps": [
+        45,
+        480,
+        480,
+        16
+      ]
+    }
+  ],
+  "coverage": {
+    "prompts": 100,
+    "videos": 200,
+    "qk_hook_calls": 276000,
+    "frames_per_video": 45,
+    "tokens_per_forward": 10800,
+    "denoising_steps": 20,
+    "layers": 30,
+    "heads": 12
+  },
+  "generation_code_sha256": {
+    "baseline": {
+      "center_replacement.py": "e2316b2314e1ad6230111c811fbf8db919b888a55bfbef56c25fca95c782b57a",
+      "run_center_benchmark.py": "a34e9de8c540c08d25901f78de9c4e212972aad22f2c5c5ff8d0499412d5c570"
+    },
+    "s32_student3": {
+      "generate_learned_center.py": "c558b37d70a0079cfded1ddd32bf5fcbe9fbb812b61983d69e1540478af28378",
+      "learned_center.py": "3a19455aac2b63e01b3e8c46719ceb299914f1ecde8e253e48d29a5a2a43540a"
+    }
+  },
+  "bootstrap": {
+    "replicates": 10000,
+    "seed": 20261109,
+    "unit": "paired prompt with its one fixed seed; retain all arms together",
+    "interval": "2.5th and 97.5th percentiles of resampled mean paired difference"
+  },
+  "timing": {
+    "baseline": {
+      "mean_seconds": 15.352797548770905,
+      "median_seconds": 15.272468328475952,
+      "min_seconds": 15.139758586883545,
+      "max_seconds": 16.159030437469482
+    },
+    "s32_student3": {
+      "mean_seconds": 15.455354452133179,
+      "median_seconds": 15.439641952514648,
+      "min_seconds": 15.227232694625854,
+      "max_seconds": 15.95245361328125
+    }
+  },
+  "audit": {},
+  "source_copy": {
+    "raw_sha256": "159ebffecb6c793f1b2f54163a678449ebc0a81ca2fb7ebadcde202bfcb95c5d",
+    "omitted_fields": [
+      "config.model"
+    ]
+  }
+}

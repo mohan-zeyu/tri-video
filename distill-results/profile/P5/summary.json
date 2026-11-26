@@ -1,0 +1,220 @@
+{
+ "done": {
+  "arm": "P5",
+  "gpus": [
+   6
+  ],
+  "gpu_uuids": [
+   "GPU-0249a4e6-0715-37a5-b8f9-6cf8cfc674d1"
+  ],
+  "exit_code": 0,
+  "allocated_seconds": 56.007121324539185,
+  "gpu_seconds": 56.007121324539185,
+  "out_of_memory": false,
+  "argv": [
+   "/dev/shm/tri-center-runtime/bin/python",
+   "-u",
+   "scripts/profile_forward_anatomy.py",
+   "--traj",
+   "/tmp/tri-distill-pilot.EG6asH/traj",
+   "--snapshot",
+   "/dev/shm/tri-wan-snapshot",
+   "--out",
+   "/mnt/data/liuzeyu/tri-video-profile-8b2502c/out/distill-profile/P5"
+  ]
+ },
+ "telemetry": {
+  "0": {
+   "leased": false,
+   "samples": 97,
+   "util_mean": 2.1237113402061856,
+   "power_w_mean": 59.78845360824742,
+   "power_w_max": 296.93,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 49.0,
+   "sm_clock_mhz_median": 2400.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 97
+   }
+  },
+  "1": {
+   "leased": false,
+   "samples": 97,
+   "util_mean": 0.23711340206185566,
+   "power_w_mean": 18.986907216494846,
+   "power_w_max": 54.22,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 36.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 180.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 97
+   }
+  },
+  "2": {
+   "leased": false,
+   "samples": 97,
+   "util_mean": 0.0,
+   "power_w_mean": 35.03061855670103,
+   "power_w_max": 36.9,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 34.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 97
+   }
+  },
+  "3": {
+   "leased": false,
+   "samples": 97,
+   "util_mean": 100.0,
+   "power_w_mean": 574.9915463917525,
+   "power_w_max": 575.17,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 70.0,
+   "sm_clock_mhz_median": 2760.0,
+   "sm_clock_mhz_min": 2745.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000004": 97
+   }
+  },
+  "4": {
+   "leased": false,
+   "samples": 97,
+   "util_mean": 100.0,
+   "power_w_mean": 574.9777319587629,
+   "power_w_max": 575.43,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 79.0,
+   "sm_clock_mhz_median": 2760.0,
+   "sm_clock_mhz_min": 2715.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000004": 97
+   }
+  },
+  "5": {
+   "leased": false,
+   "samples": 97,
+   "util_mean": 0.27835051546391754,
+   "power_w_mean": 32.96257731958763,
+   "power_w_max": 62.68,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 36.0,
+   "sm_clock_mhz_median": 180.0,
+   "sm_clock_mhz_min": 172.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 97
+   }
+  },
+  "6": {
+   "leased": true,
+   "samples": 97,
+   "util_mean": 67.82474226804123,
+   "power_w_mean": 255.77195876288658,
+   "power_w_max": 578.68,
+   "power_limit_w": 575.0,
+   "temperature_c_max": 61.0,
+   "sm_clock_mhz_median": 2002.0,
+   "sm_clock_mhz_min": 180.0,
+   "sm_clock_max_mhz": 3090.0,
+   "event_reasons_counts": {
+    "0x0000000000000000": 63,
+    "0x0000000000000004": 34
+   }
+  }
+ },
+ "anatomy": {
+  "scope": "teacher (bf16, frozen), one GPU, no gradient; 20 forwards after 2 discarded warm-ups, each one stored training state (trainer rank-0 sample stream, seed 20261114) with both CFG branches as a batch of 2, 10,800 video tokens; per-forward times summed over the 30 blocks; median and mean across forwards; synchronize at every hook",
+  "outputs_equal_uninstrumented": true,
+  "uninstrumented_forward_seconds": {
+   "median": 0.917675347533077,
+   "mean": 0.8952177285216749
+  },
+  "instrumented_forward_seconds": {
+   "median": 0.8836464146152139,
+   "mean": 0.866042511689011
+  },
+  "categories_sum_to_total_max_abs_error": 0.0,
+  "summary": {
+   "attn1_qkv_norms": {
+    "median_seconds": 0.06967995408922434,
+    "mean_seconds": 0.07298367657931522,
+    "share_of_median_total": 0.0788550181800564
+   },
+   "attn1_sdpa": {
+    "median_seconds": 0.30231143219862133,
+    "mean_seconds": 0.2920127847464755,
+    "share_of_median_total": 0.3421180997268728
+   },
+   "attn1_to_out": {
+    "median_seconds": 0.02256434119772166,
+    "mean_seconds": 0.021492047084029763,
+    "share_of_median_total": 0.025535486620570244
+   },
+   "attn1_rope_rest": {
+    "median_seconds": 0.058939349255524576,
+    "mean_seconds": 0.059224257804453374,
+    "share_of_median_total": 0.06670015096614167
+   },
+   "attn2": {
+    "median_seconds": 0.0598393848631531,
+    "mean_seconds": 0.05832334981532768,
+    "share_of_median_total": 0.06771869819582793
+   },
+   "ffn": {
+    "median_seconds": 0.24570045352447778,
+    "mean_seconds": 0.23648305168608202,
+    "share_of_median_total": 0.278052906072695
+   },
+   "block_rest": {
+    "median_seconds": 0.12250946555286646,
+    "mean_seconds": 0.12219119974179193,
+    "share_of_median_total": 0.1386408223092418
+   },
+   "patch_embedding": {
+    "median_seconds": 0.00041337707079946995,
+    "mean_seconds": 0.00041850871639326215,
+    "share_of_median_total": 0.000467808236374134
+   },
+   "condition_embedder": {
+    "median_seconds": 0.0006556659936904907,
+    "mean_seconds": 0.0007074072491377592,
+    "share_of_median_total": 0.0007420004006647864
+   },
+   "rope": {
+    "median_seconds": 0.00016918301116675138,
+    "mean_seconds": 0.00018475427059456707,
+    "share_of_median_total": 0.00019146007766061333
+   },
+   "output_rest": {
+    "median_seconds": 0.00197158835362643,
+    "mean_seconds": 0.0020214739954099057,
+    "share_of_median_total": 0.0022311960089658298
+   },
+   "forward_total": {
+    "median_seconds": 0.8836464146152139,
+    "mean_seconds": 0.866042511689011,
+    "share_of_median_total": 1.0
+   }
+  },
+  "sdpa": {
+   "input": "[2, 12, 10800, 128] bf16, no mask, no dropout, not causal",
+   "fused_sdp_choice": "FLASH_ATTENTION",
+   "kernels": [
+    "void pytorch_flash::flash_fwd_kernel<Flash_fwd_kernel_traits<128, 128, 64, 4, false, false, cutlass::bfloat16_t, Flash_kernel_traits<128, 128, 64, 4, cutlass::bfloat16_t> >, false, false, false, false, false, true, false, false>(pytorch_flash::Flash_fwd_params)"
+   ]
+  },
+  "peak_cuda_allocated_bytes": 3936601088,
+  "gpu": "NVIDIA GeForce RTX 5090"
+ },
+ "peak_memory": [],
+ "out_of_memory": []
+}
