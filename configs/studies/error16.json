@@ -14,7 +14,7 @@
   "wide": false
  },
  "bypass": {},
- "approved_gpu_hours": 14,
+ "approved_gpu_hours": 23,
  "train": {
   "steps": 2500,
   "lr": 1e-05,
