@@ -1,0 +1,86 @@
+{
+ "name": "error16",
+ "description": "Senior's criterion, 27 November: rank pairs by replacement error alone (no partner-energy factor), 16 lowest per cell, same set on Q and K, replaced by learned means after QK-RMSNorm; nothing exempt. Same recipe as s22_all / shared32. Arms: trained means, and the same 16 pairs zeroed at inference. Compare with damage16 (the energy-weighted criterion at the same budget).",
+ "selection": {
+  "policies": [
+   {
+    "criterion": "error",
+    "combine": "shared",
+    "pairs": 16,
+    "rank": "lowest",
+    "role": "mean"
+   }
+  ],
+  "wide": false
+ },
+ "bypass": {},
+ "approved_gpu_hours": 14,
+ "train": {
+  "steps": 2500,
+  "lr": 1e-05,
+  "lr_center": 0.0002,
+  "warmup": 250,
+  "ema": 0.999,
+  "seed": 20261114
+ },
+ "references": {
+  "mean": [
+   [
+    "dense_control",
+    "distill-results/dense-paired/summary.json"
+   ],
+   [
+    "shared22",
+    "distill-results/shared22/full100/summary.json"
+   ],
+   [
+    "s22_all_means",
+    "distill-results/noexempt/full100/s22_all_means/summary.json"
+   ],
+   [
+    "s32_means",
+    "distill-results/shared32/full100/s32_means/summary.json"
+   ],
+   [
+    "damage16_means",
+    "distill-results/damage16/full100/damage16_means/summary.json"
+   ],
+   [
+    "errnorm16_means",
+    "distill-results/errnorm16/full100/errnorm16_means/summary.json"
+   ]
+  ],
+  "delete": [
+   [
+    "s22_all_zeros",
+    "distill-results/noexempt/full100/s22_all_zeros/summary.json"
+   ],
+   [
+    "s32_zeros",
+    "distill-results/shared32/full100/s32_zeros/summary.json"
+   ],
+   [
+    "damage16_zeros",
+    "distill-results/damage16/full100/damage16_zeros/summary.json"
+   ],
+   [
+    "errnorm16_zeros",
+    "distill-results/errnorm16/full100/errnorm16_zeros/summary.json"
+   ]
+  ]
+ },
+ "curves": [
+  [
+   "shared22, nothing exempt (s22_all)",
+   "distill-results/noexempt/training/validation.jsonl"
+  ],
+  [
+   "shared32, nothing exempt",
+   "distill-results/shared32/training/validation.jsonl"
+  ]
+ ],
+ "arms": {
+  "mean": "error16_means",
+  "delete": "error16_zeros"
+ }
+}

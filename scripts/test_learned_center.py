@@ -401,6 +401,107 @@ def test_wide():
     print("test_wide OK")
 
 
+def test_selection_policies():
+    """pair_selection presets reproduce the historical variants computed with the original formulas; the new
+    criteria rank as defined; bypass rules leave the right cells and tokens native, survive a checkpoint, and
+    apply to mean/delete, NoPE and wide interventions."""
+    import pair_selection as PS
+    L, S, B, H, P = 2, STEPS, 2, 2, 5
+    torch.manual_seed(41)
+    means = {s_: torch.randn(P, L, S, B, H, 128).double() for s_ in ("q", "k")}
+    energy = {s_: (torch.rand(P, L, S, B, H, 64).double() * 3 + means[s_].view(P, L, S, B, H, 64, 2).square().sum(-1)) for s_ in ("q", "k")}
+    stats = PS.PooledStatistics(means, energy)
+    # original formulas, written out independently
+    pooled = {s_: means[s_].mean(0) for s_ in ("q", "k")}; pe = {s_: energy[s_].mean(0) for s_ in ("q", "k")}
+    dmg = {}
+    for s_, o in (("q", "k"), ("k", "q")):
+        mu = pooled[s_].view(L, S, B, H, 64, 2); xb = means[s_].view(P, L, S, B, H, 64, 2)
+        err = (energy[s_] - 2 * (mu * xb).sum(-1) + mu.square().sum(-1)).clamp_min(0)
+        dmg[s_] = err.mean(0) * pe[o]
+    def lowest(score, k):
+        idx = score.topk(k, dim=-1, largest=False).indices; m = torch.zeros_like(score, dtype=torch.bool); m.scatter_(-1, idx, True); return m
+    legacy = {"shared": lowest(dmg["q"] + dmg["k"], 22), "separate_q": lowest(dmg["q"], 22), "separate_k": lowest(dmg["k"], 22),
+              "pooled": lowest((dmg["q"] + dmg["k"]).sum((1, 2)), 22)[:, None, None].expand(L, S, B, H, 64),
+              "split": lowest(dmg["q"] + dmg["k"], 42), "wide_content": ~lowest(dmg["q"] + dmg["k"], 32)}
+    got = {n: PS.build_selection(stats, n) for n in PS.PRESETS}
+    assert torch.equal(got["shared"]["mask_q"], legacy["shared"]) and torch.equal(got["shared"]["mask_k"], legacy["shared"])
+    assert torch.equal(got["separate"]["mask_q"], legacy["separate_q"]) and torch.equal(got["separate"]["mask_k"], legacy["separate_k"])
+    assert torch.equal(got["pooled"]["mask_q"], legacy["pooled"])
+    assert torch.equal(got["split"]["mask_q"], legacy["split"]) and torch.equal(got["split"]["mask_nope"], ~legacy["split"])
+    assert got["wide"]["wide"] and got["wide"]["mask_q"].all() and torch.equal(got["wide"]["mask_nope"], legacy["wide_content"])
+    assert got["fixed_high"]["mask_q"][0, 0, 0, 0].nonzero().flatten().tolist() == sorted(set((HIGH_DIMS // 2).tolist()))
+    # the senior's criterion: replacement error alone, 16 lowest, shared
+    e16 = PS.build_selection(stats, {"policies": [{"criterion": "error", "combine": "shared", "pairs": 16, "role": "mean"}]})
+    err_sum = stats.mean_err["q"] + stats.mean_err["k"]
+    assert torch.equal(e16["mask_q"], lowest(err_sum, 16)) and (e16["mask_q"].sum(-1) == 16).all() and not e16["mask_nope"].any()
+    en = PS.build_selection(stats, {"policies": [{"criterion": "error_normalized", "combine": "separate", "pairs": 10, "rank": "highest", "role": "mean"}]})
+    ratio = stats.mean_err["q"] / pe["q"]
+    assert torch.equal(en["mask_q"], ~lowest(ratio, 54)) or (en["mask_q"].sum(-1) == 10).all()
+    assert PS.spec_hash("shared") == PS.spec_hash({"preset": "shared"}) and "16 lowest by error" in PS.describe(e16["spec"])
+    try:
+        PS.build_selection(stats, {"policies": [{"criterion": "damage", "pairs": 16, "role": "content_nope", "combine": "separate"}]}); raise AssertionError("separate content accepted")
+    except ValueError:
+        pass
+    # ---- bypass rules on the tiny model
+    model = build_tiny()
+    x = torch.randn(2, 16, 2, 4, 4); text = torch.randn(2, 8, 64); t = torch.tensor([500.0, 500.0])
+    sel = {"mask_q": got["shared"]["mask_q"], "mask_k": got["shared"]["mask_k"]}
+    calib = {"mean_q": torch.randn(L, S, B, H, 128), "mean_k": torch.randn(L, S, B, H, 128)}
+    def captured(center, ctx, inp=x):
+        """model output and, per (layer, side), the norm output before any replacement (module.forward, no hooks) and after."""
+        caps = {}
+        center.attach(model); center.set_context(*ctx)      # attach first: the test hooks must run after the replacement hooks
+        hs = [getattr(b_.attn1, "norm_" + sd).register_forward_hook(
+                  lambda m, i, o, key=(l, sd): caps.__setitem__(key, (m.forward(*i).detach().clone(), o.detach().clone())))
+              for l, b_ in enumerate(model.blocks) for sd in ("q", "k")]
+        with torch.no_grad():
+            y = model(hidden_states=inp, timestep=t, encoder_hidden_states=text, return_dict=False)[0]
+        [h.remove() for h in hs]; center.detach()
+        return y, caps
+    plain = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(), selection=sel); plain.init_from_calibration(calib)
+    y_plain, cap_plain = captured(plain, ([1, 2], [0, 1]))
+    off = LearnedCenter(layers=L, steps=S, heads=H, mode="off"); y_off, cap_off = captured(off, ([1, 2], [0, 1]))
+    # heads {layer 1: [0]} and branch 1 native
+    by = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(), selection=sel, bypass={"heads": {"1": [0]}, "branches": [1]}); by.init_from_calibration(calib)
+    assert by.bypass_spec["layers"] == [] and by.bypass_spec["branches"] == [1] and not by.cell_active[1, :, :, 0].any() and not by.cell_active[:, :, 1].any() and by.cell_active[0, :, 0, 1].all()
+    y_by, cap_by = captured(by, ([1, 2], [0, 1]))
+    pre1, post1 = (c_.view(2, 8, H, 128) for c_ in cap_by[(1, "q")])
+    torch.testing.assert_close(y_by[1], y_off[1], rtol=0, atol=0)                       # branch 1 element fully native
+    assert torch.equal(post1[0, :, 0], pre1[0, :, 0])                                     # head 0 of layer 1 native
+    assert not torch.equal(post1[0, :, 1], pre1[0, :, 1])                                 # head 1 replaced
+    assert torch.equal(post1[1], pre1[1])                                                 # branch-1 element untouched
+    # token rule: frame 0 native (grid 2x2x2 -> tokens 0..3 are frame 0)
+    tok = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(), selection=sel, bypass={"tokens": {"kind": "frames", "native": [0]}}); tok.init_from_calibration(calib)
+    y_tok, cap_tok = captured(tok, ([1, 2], [0, 1]))
+    assert tok.grid == (2, 2, 2)
+    pre0, post0 = cap_tok[(0, "q")]
+    assert torch.equal(post0[:, :4], pre0[:, :4]) and not torch.equal(post0[:, 4:], pre0[:, 4:])   # frame-0 tokens native, frame-1 replaced
+    assert torch.equal(post0[:, 4:], cap_plain[(0, "q")][1][:, 4:])                                 # and equal to the plain replacement
+    border = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(), selection=sel, bypass={"tokens": {"kind": "border", "width": 1}})
+    border.set_context([1, 1], [0, 1], grid=(2, 2, 2)); assert border.token_keep(8, torch.device("cpu")).all()   # 2x2 is all border
+    # round trip: bypass and selection spec persist through the checkpoint record
+    rec = by.checkpoint_record(); assert rec["bypass"]["heads"] == {"1": [0]} and rec["selection_spec"] is None
+    again = LearnedCenter.from_checkpoint(rec); assert torch.equal(again.cell_active, by.cell_active) and again.bypass_spec == by.bypass_spec
+    tok_again = LearnedCenter.from_checkpoint(tok.checkpoint_record()); assert tok_again.token_rule == {"kind": "frames", "native": [0]}
+    with_spec = LearnedCenter(layers=L, steps=S, heads=H, selection={**sel, "spec": got["shared"]["spec"]}); assert LearnedCenter.from_checkpoint(with_spec.checkpoint_record()).selection_spec == got["shared"]["spec"]
+    # bypass with NoPE and wide: bypassed head / tokens stay native
+    content = got["wide"]["mask_nope"]
+    wsel = {"mask_q": torch.ones_like(content), "mask_k": torch.ones_like(content), "mask_nope": content, "wide": True}
+    w_by = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(), selection=wsel, bypass={"heads": [0], "tokens": {"kind": "frames", "native": [1]}}); w_by.init_from_calibration(calib)
+    w_all = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(), selection=wsel); w_all.init_from_calibration(calib)
+    y_w_by, _ = captured(w_by, ([1, 1], [0, 1])); y_w_all, _ = captured(w_all, ([1, 1], [0, 1]))
+    assert (y_w_by - y_off).abs().max() > 1e-4 and (y_w_by - y_w_all).abs().max() > 1e-4
+    w_none = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(), selection=wsel, bypass={"heads": [0, 1]})
+    w_none.init_from_calibration(calib); y_w_none, _ = captured(w_none, ([1, 1], [0, 1]))
+    torch.testing.assert_close(y_w_none, y_off, rtol=0, atol=0)                        # every head bypassed -> native processor
+    n_sel = {"mask_q": got["split"]["mask_q"], "mask_k": got["split"]["mask_k"], "mask_nope": got["split"]["mask_nope"]}
+    n_by = LearnedCenter(layers=L, steps=S, heads=H, exempt_layers=(), exempt_steps=(), selection=n_sel, bypass={"branches": [0]}); n_by.init_from_calibration(calib)
+    y_n_by, _ = captured(n_by, ([1, 1], [0, 1]))
+    torch.testing.assert_close(y_n_by[0], y_off[0], rtol=0, atol=0)                     # branch 0 native incl. RoPE
+    assert (y_n_by[1] - y_off[1]).abs().max() > 1e-4
+    print("test_selection_policies OK")
+
+
 def write_fake_trajectories(root):
     from diffusers import UniPCMultistepScheduler
     sched = UniPCMultistepScheduler(num_train_timesteps=1000, prediction_type="flow_prediction", use_flow_sigmas=True, flow_shift=3.0, solver_order=2)
@@ -650,6 +751,7 @@ if __name__ == "__main__":
     test_narrow_selected()
     test_nope()
     test_wide()
+    test_selection_policies()
     test_masks_and_legacy_checkpoint()
     test_statistics_selection_screen()
     test_stage1_checkpoint_only_mu_differs()

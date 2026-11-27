@@ -80,6 +80,7 @@ def main():
     parser.add_argument("--val-prompts", type=int, default=32, help="first N validation prompts")
     parser.add_argument("--no-exempt", action="store_true", help="apply to layer 0 and step 1 too (reference scope)")
     parser.add_argument("--all-steps", action="store_true", help="keep layer 0 exempt but apply at every step (weight-removal scope)")
+    parser.add_argument("--bypass", help="bypass rules as JSON (file or inline) for the variant arms; replaces --no-exempt/--all-steps")
     parser.add_argument("--out", default="out/distill-selection/screen")
     parser.add_argument("--student", help="student directory (transformer/ + learned_center.pt): screen that student with its own masks and means")
     parser.add_argument("--max-prompts", type=int)
@@ -106,6 +107,7 @@ def main():
         ref = next(iter(arms.values()))
         meta = {"arms": list(arms), "val_prompts": ids, "student": str(student), "student_center_mode": saved.get("mode"),
                 "exempt_layers": [int(i) for i in torch.nonzero(~ref.layer_active).flatten()], "exempt_steps": [int(i) for i in torch.nonzero(~ref.step_active).flatten()],
+                "bypass": ref.bypass_spec, "selection_spec": ref.selection_spec,
                 "pairs_per_cell": float(ref.selected_pairs("q").sum(-1).float().mean()), "cell_invariant": ref.cell_invariant(),
                 "mu_norm_q": float(ref.mu_q.norm(dim=-1).mean()), "mu_norm_k": float(ref.mu_k.norm(dim=-1).mean())}
     else:
@@ -114,17 +116,23 @@ def main():
         statistics = torch.load(ROOT / args.statistics if not os.path.isabs(args.statistics) else args.statistics, map_location="cpu")
         L, H, D = len(model.blocks), model.config.num_attention_heads, model.config.attention_head_dim
         exempt_layers, exempt_steps = ((), ()) if args.no_exempt else ((0,), () if args.all_steps else (0,))
+        bypass = None
+        if args.bypass:
+            bypass = json.loads(Path(args.bypass).read_text()) if Path(args.bypass).exists() else json.loads(args.bypass)
+            exempt_layers, exempt_steps = (), ()
         for variant in args.variants:
             for mode in args.modes:
                 if mode not in ("mean", "delete", "narrow"):
                     raise ValueError(mode)
                 center = LearnedCenter(layers=L, steps=store.steps, heads=H, head_dim=D, exempt_layers=exempt_layers, exempt_steps=exempt_steps,
-                                       mode=mode, selection=selection["variants"][variant]).to(device)
+                                       mode=mode, selection=selection["variants"][variant], bypass=bypass).to(device)
                 if mode == "mean":
                     center.init_from_calibration(statistics)
                 arms[f"{variant}/{mode}"] = center
-        meta = {"arms": list(arms), "val_prompts": ids, "exempt_layers": list(exempt_layers), "exempt_steps": list(exempt_steps),
-                "selection": str(args.selection), "statistics": str(args.statistics), "pairs_per_side": selection.get("pairs")}
+        ref = next(iter(arms.values()))
+        meta = {"arms": list(arms), "val_prompts": ids, "exempt_layers": ref.bypass_spec["layers"], "exempt_steps": ref.bypass_spec["steps"],
+                "bypass": ref.bypass_spec, "selection": str(args.selection), "statistics": str(args.statistics), "pairs_per_side": selection.get("pairs"),
+                "variant_specs": {v: selection["variants"][v].get("spec") for v in args.variants}}
     write_json(out / "meta.json", meta)
     teacher = model if not args.student else WanTransformer3DModel.from_pretrained(args.snapshot, subfolder="transformer", torch_dtype=torch.bfloat16, local_files_only=True).to(device).eval()
     done = 0

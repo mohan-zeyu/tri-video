@@ -433,7 +433,7 @@ def save_student(student, center, out_dir, snapshot, rank, world, no_fsdp, ema=N
             save_file(tensors, str(pending), metadata={"format": "pt"})
             pending.replace(target / "diffusion_pytorch_model.safetensors")
             write_json(target / "config.json", json.loads((Path(snapshot) / "transformer" / "config.json").read_text()))
-            save_torch(target.parent / "learned_center.pt", {"state_dict": center.state_dict(), "mode": center.mode, "wide": center.is_wide})
+            save_torch(target.parent / "learned_center.pt", center.checkpoint_record())
     if world > 1:
         dist.barrier()
 
@@ -616,6 +616,8 @@ def main():
     parser.add_argument("--center-mode", choices=("mean", "delete", "narrow", "off"), default="mean")
     parser.add_argument("--include-layer0", action="store_true")
     parser.add_argument("--include-step1", action="store_true")
+    parser.add_argument("--bypass", help="bypass rules as JSON (file or inline): layers, steps, branches, heads, tokens; see learned_center.py. "
+                                         "Replaces the default layer 0 / step 1 exemptions when given.")
     parser.add_argument("--steps", type=int, default=5000, help="optimizer steps")
     parser.add_argument("--accum", type=int, default=1, help="samples per rank per optimizer step")
     parser.add_argument("--lr", type=float, default=1e-5)
@@ -709,9 +711,15 @@ def main():
     if args.selection:
         selection = torch.load(args.selection, map_location="cpu")["variants"][args.variant]
         log(rank, f"pair selection: {args.selection} variant {args.variant}")
+    bypass = None
+    if args.bypass:
+        from pathlib import Path as _P
+        bypass = json.loads(_P(args.bypass).read_text()) if _P(args.bypass).exists() else json.loads(args.bypass)
+        log(rank, f"bypass rules: {bypass}")
     center = LearnedCenter(layers=layers, steps=store.steps, heads=heads, head_dim=teacher.config.attention_head_dim,
-                           exempt_layers=() if args.include_layer0 else (0,), exempt_steps=() if args.include_step1 else (0,),
-                           mode=args.center_mode, selection=selection).to(device)
+                           exempt_layers=() if (args.include_layer0 or bypass is not None) else (0,),
+                           exempt_steps=() if (args.include_step1 or bypass is not None) else (0,),
+                           mode=args.center_mode, selection=selection, bypass=bypass).to(device)
     if args.init_student:
         init_dir = Path(args.init_student)
         weights_file = init_dir / "transformer" / "diffusion_pytorch_model.safetensors"
@@ -888,7 +896,7 @@ def main():
             if args.stage == 1:
                 if rank == 0:
                     (out / "student").mkdir(exist_ok=True)
-                    save_torch(out / "student" / "learned_center.pt", {"state_dict": center.state_dict(), "mode": center.mode, "wide": center.is_wide})
+                    save_torch(out / "student" / "learned_center.pt", center.checkpoint_record())
             else:
                 if last_step == args.steps or args.ema_checkpoints:
                     tag = "student" if last_step == args.steps else f"ema-checkpoints/step-{last_step:06d}"

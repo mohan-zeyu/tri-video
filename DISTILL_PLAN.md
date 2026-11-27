@@ -379,3 +379,13 @@ highest-damage pairs taken from the real projection without RoPE (a pure content
 appended rows are gathered from the projection output, which equals copying those rows of to_q/to_k); the `wide`
 selection variant picks the content pairs. Mode `delete` zeroes the position channel. Nothing exempt. The procedure
 is in `DISTILL_WIDE_PROMPT.md`.
+
+### Study specs, selection policies and bypass rules (27 November)
+
+Experiments are now data: `configs/studies/<name>.json` holds a `selection` (list of policies: criterion, combine,
+pool, pairs, rank, role; `scripts/pair_selection.py`, presets reproduce every earlier variant exactly), `bypass`
+rules (layers, steps, CFG branches, heads, tokens; `LearnedCenter(bypass=...)`), the recipe, the arms and the
+references; `scripts/center_study.py` runs the whole pipeline from it and every checkpoint and record carries the
+spec, its hash and the rules. First use: the senior's criterion test at 16 pairs, `error16` (replacement error
+alone) against `damage16` (error × partner energy) and optionally `errnorm16` (error / own energy); see
+`configs/studies/README.md`.

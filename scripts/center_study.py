@@ -6,11 +6,14 @@ selection -> training-free screen -> Stage 2 fine-tune -> 100-prompt means and z
     python scripts/center_study.py configs/studies/shared32.json --dry-run  # print the plan and commands only
     python scripts/center_study.py configs/studies/shared32.json --stage screen
 
-The study spec (JSON) is the interface. The pair choice is three fields:
-  "variant":     selection variant from scripts/select_pairs.py: shared | separate | pooled | split | wide | fixed_high
-  "means_pairs": pairs per head replaced by learned means (shared/separate/pooled: --pairs; split: --means-pairs;
-                 wide: 64 means pairs with this many unrotated content pairs, --content-pairs)
-  "exempt":      false = all 30 layers and all 20 denoising steps active; true = layer 0 / step 1 native
+The study spec (JSON) is the interface. The pair choice and the bypass rules are data:
+  "selection":   a selection spec (scripts/pair_selection.py): a preset name ("shared", "split", "wide", ...) or
+                 {"policies": [{"criterion": damage|error|error_normalized|energy|fixed_high|all, "combine": shared|separate,
+                                "pool": [steps|branches|heads...], "pairs": n, "rank": lowest|highest, "role": mean|content_nope}, ...],
+                  "wide": bool}
+  "bypass":      {"layers": [...], "steps": [...], "branches": [...], "heads": [...] | {"<layer>": [...]},
+                  "tokens": {"kind": "frames", "native": [0]} | {"kind": "border", "width": 1}}   ({} = nothing exempt)
+  legacy fields still accepted: "variant" + "means_pairs" (-> a preset) and "exempt" (-> layer 0 / step 1 bypass)
 Arms: "mean" uses the trained means; "delete" zeroes the same pairs at inference on the same weights (zeros swap).
 Everything else (recipe, budget, GPUs, references, lab paths, publishing) has defaults below; see
 configs/studies/shared32.json for a complete example.
@@ -39,6 +42,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DIMENSIONS = ['overall_consistency', 'aesthetic_quality', 'imaging_quality', 'dynamic_degree', 'subject_consistency',
               'background_consistency', 'motion_smoothness']
 DEFAULTS = {
+    'selection': None, 'bypass': None,
     'variant': 'shared', 'means_pairs': 22, 'exempt': False, 'approved_gpu_hours': None,
     'train': {'steps': 2500, 'accum': 2, 'lr': 1e-5, 'lr_center': 2e-4, 'warmup': 250, 'lambda_cfg': 1.0,
               'lambda_feat': 0.1, 'ema': 0.999, 'clip': 1.0, 'val_every': 250, 'val_prompts': 8, 'save_every': 500,
@@ -77,17 +81,39 @@ def merge(base, over):
 
 
 def load_spec(path):
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    from pair_selection import describe, normalize_spec, spec_hash
     spec = merge(DEFAULTS, json.loads(Path(path).read_text()))
     if not spec.get('name') or not spec['name'].replace('_', '').replace('-', '').isalnum():
         raise ValueError('spec needs a simple "name"')
-    if spec['variant'] not in ('shared', 'separate', 'pooled', 'split', 'wide', 'fixed_high'):
-        raise ValueError('unknown variant %r' % spec['variant'])
-    if spec['variant'] != 'fixed_high' and not 1 <= int(spec['means_pairs']) <= 64:
-        raise ValueError('means_pairs must be 1..64')
+    if spec['selection'] is None:                      # legacy three-field choice -> preset with the given size
+        if spec['variant'] not in ('shared', 'separate', 'pooled', 'split', 'wide', 'fixed_high'):
+            raise ValueError('unknown variant %r' % spec['variant'])
+        if spec['variant'] != 'fixed_high' and not 1 <= int(spec['means_pairs']) <= 64:
+            raise ValueError('means_pairs must be 1..64')
+        sel = normalize_spec(spec['variant'])
+        for p in sel['policies']:
+            if 'complement_of' not in p and p['criterion'] not in ('all', 'fixed_high'):
+                p['pairs'] = int(spec['means_pairs'])
+        spec['selection'] = sel
+        spec['variant_key'] = spec['variant']
+    else:
+        spec['selection'] = normalize_spec(spec['selection'])
+        spec['variant_key'] = 'policy'
+    if spec['bypass'] is None:
+        spec['bypass'] = {'layers': [0], 'steps': [0]} if spec['exempt'] else {}
+    spec['exempt'] = bool(spec['bypass'])
+    spec['selection_hash'] = spec_hash(spec['selection'])
+    spec['choice'] = describe(spec['selection'])
     if not spec['approved_gpu_hours']:
         raise ValueError('approved_gpu_hours is required (the user-approved allocation)')
     spec['arms'] = spec['arms'] or {'mean': spec['name'] + '_means', 'delete': spec['name'] + '_zeros'}
     return spec
+
+
+def bypass_text(spec):
+    b = spec['bypass']
+    return 'nothing exempt (all 30 layers, all 20 steps)' if not b else 'bypass ' + json.dumps(b, sort_keys=True)
 
 
 class Paths:
@@ -109,11 +135,12 @@ class Paths:
 
 
 def selection_args(spec, paths):
-    v, n = spec['variant'], str(spec['means_pairs'])
-    args = ['scripts/select_pairs.py', '--stats', spec['lab']['stats'], '--out', str(paths.selection)]
-    args += {'split': ['--means-pairs', n], 'wide': ['--content-pairs', n]}.get(v, ['--pairs', n])
-    if not spec['exempt']:
-        args += ['--include-layer0', '--include-step1']
+    args = ['scripts/select_pairs.py', '--stats', spec['lab']['stats'], '--out', str(paths.selection), '--bypass', json.dumps(spec['bypass'])]
+    if spec['variant_key'] == 'policy':
+        args += ['--spec', json.dumps(spec['selection'])]
+    else:                                              # legacy preset with its size
+        v, n = spec['variant'], str(spec['means_pairs'])
+        args += {'split': ['--means-pairs', n], 'wide': ['--content-pairs', n]}.get(v, ['--pairs', n])
     return args
 
 
@@ -122,8 +149,8 @@ def screen_args(spec, paths, student=False):
     if student:
         return a + ['--student', str(paths.student), '--modes', 'mean', 'delete', '--out', str(paths.screen_trained)]
     a += ['--selection', str(paths.selection / 'selection.pt'), '--statistics', str(paths.selection / 'pair-statistics.pt'),
-          '--variants', spec['variant'], '--modes', 'mean', 'delete', '--out', str(paths.screen)]
-    return a + (['--no-exempt'] if not spec['exempt'] else [])
+          '--variants', spec['variant_key'], '--modes', 'mean', 'delete', '--out', str(paths.screen), '--bypass', json.dumps(spec['bypass'])]
+    return a
 
 
 def train_args(spec, paths, resume=False, stop_after=None, budget_seconds=None):
@@ -135,11 +162,9 @@ def train_args(spec, paths, resume=False, stop_after=None, budget_seconds=None):
          '--clip', str(t['clip']), '--val-every', str(t['val_every']), '--val-prompts', str(t['val_prompts']),
          '--val-at-start', '--save-every', str(t['save_every']), '--ema-checkpoints', '--resume-state-with-ema',
          '--resume-state-every', str(t['resume_state_every']), '--seed', str(t['seed']),
-         '--selection', str(paths.selection / 'selection.pt'), '--variant', spec['variant'],
+         '--selection', str(paths.selection / 'selection.pt'), '--variant', spec['variant_key'],
          '--calibration', str(paths.selection / 'pair-statistics.pt'), '--center-mode', 'mean',
-         '--traj', lab['traj'], '--snapshot', lab['snapshot']]
-    if not spec['exempt']:
-        a += ['--include-layer0', '--include-step1']
+         '--traj', lab['traj'], '--snapshot', lab['snapshot'], '--bypass', json.dumps(spec['bypass'])]
     if resume:
         a.append('--resume')
     if stop_after:
@@ -149,9 +174,10 @@ def train_args(spec, paths, resume=False, stop_after=None, budget_seconds=None):
     return a
 
 
-def expected_calls(layers_active, steps_active, uses_nope):
-    """Per video: Q and K replacement calls for both CFG branches; one processor call per layer/branch/step if NoPE/wide."""
-    return {'intervention_calls': layers_active * 2 * 2 * steps_active, 'nope_calls': layers_active * 2 * steps_active if uses_nope else 0}
+def expected_calls(layers_active, steps_active, uses_nope, branches_active=2):
+    """Per video: Q and K replacement calls per active CFG branch; one processor call per layer/branch/step if NoPE/wide."""
+    return {'intervention_calls': layers_active * 2 * branches_active * steps_active,
+            'nope_calls': layers_active * branches_active * steps_active if uses_nope else 0}
 
 
 def check_record(rec, expect, arm, mode):
@@ -171,12 +197,13 @@ def check_record(rec, expect, arm, mode):
     need(not sel['default_high_masks'] or spec_is_fixed_high(expect), 'default masks')
     need(env['center_mode'] == mode and env['learned_center_sha256'] == expect['center_sha256'], 'center mode/hash')
     need(env['exempt'] == expect['exempt'], 'exemptions')
+    need(env.get('bypass', expect['bypass']) == expect['bypass'], 'bypass rules')
     need(rec['frames'] == [45, 480, 480, 3], 'frames')
     return problems
 
 
 def spec_is_fixed_high(expect):
-    return expect.get('variant') == 'fixed_high'
+    return expect.get('variant') == 'fixed_high' or 'fixed_high' in json.dumps(expect.get('selection_spec') or {})
 
 
 # ----------------------------------------------------------------------------------------------- runner
@@ -345,21 +372,27 @@ class Study:
         import torch
         sys.path.insert(0, str(self.p.root / 'scripts'))
         from learned_center import LearnedCenter
-        v, n = self.spec['variant'], int(self.spec['means_pairs'])
+        from pair_selection import spec_hash
+        v = self.spec['variant_key']
         masks = torch.load(self.p.selection / 'selection.pt', map_location='cpu')['variants'][v]
-        q, k = masks['mask_q'].sum(-1), masks['mask_k'].sum(-1)
-        want = 64 if v == 'wide' else (22 if v == 'fixed_high' else n)
-        assert (q == want).all() and (k == want).all(), 'selected pairs per cell differ from the spec'
-        if v in ('shared', 'pooled', 'split', 'wide'):
+        assert spec_hash(masks['spec']) == self.spec['selection_hash'], 'selection.pt was built from a different selection spec'
+        q, k, n = masks['mask_q'].sum(-1), masks['mask_k'].sum(-1), masks['mask_nope'].sum(-1)
+        for name, counts in (('mean_q', q), ('mean_k', k), ('content', n)):
+            assert (counts == counts.flatten()[0]).all(), 'the number of %s pairs differs between cells' % name
+        want_q, want_k, want_n = int(q.flatten()[0]), int(k.flatten()[0]), int(n.flatten()[0])
+        if all(p.get('combine', 'shared') == 'shared' for p in self.spec['selection']['policies']):
             assert torch.equal(masks['mask_q'], masks['mask_k'])
-        if v == 'wide':
-            assert (masks['mask_nope'].sum(-1) == n).all()
+        assert bool(masks['wide']) == bool(self.spec['selection']['wide'])
         static = LearnedCenter.from_checkpoint(torch.load(self.p.selection / ('static-' + v) / 'learned_center.pt', map_location='cpu'))
+        b = self.spec['bypass']
         active = (int(static.layer_active.sum()), int(static.step_active.sum()))
-        assert active == ((30, 20) if not self.spec['exempt'] else (29, 19)), active
-        return {'variant': v, 'means_pairs': n, 'pairs_per_cell_q': want, 'pairs_per_cell_k': want, 'cells': int(q.numel()),
-                'layers_active': active[0], 'steps_active': active[1],
-                'scope': 'Per layer-step-branch-head cell, pair-level masks over the 64 rotary pairs per head; damage pooled over the calibration prompts.'}
+        assert active == (static.layers - len(b.get('layers', [])), static.steps - len(b.get('steps', []))), active
+        assert static.bypass_spec['branches'] == [int(x) for x in b.get('branches', [])] and static.token_rule == (b.get('tokens') or None)
+        return {'variant': v, 'selection': self.spec['selection'], 'selection_hash': self.spec['selection_hash'], 'choice': self.spec['choice'],
+                'bypass': static.bypass_spec, 'pairs_per_cell_q': want_q, 'pairs_per_cell_k': want_k, 'content_pairs_per_cell': want_n,
+                'wide': bool(masks['wide']), 'cells': int(q.numel()), 'layers_active': active[0], 'steps_active': active[1],
+                'cells_active': int(static.cell_active.sum()),
+                'scope': 'Per layer-step-branch-head cell, pair-level masks over the 64 rotary pairs per head; statistics pooled over the calibration prompts; bypass rules as recorded.'}
 
     def stage_screen(self):
         if (self.p.screen / 'complete.json').exists():
@@ -447,13 +480,16 @@ class Study:
         sys.path.insert(0, str(self.p.root / 'scripts'))
         from learned_center import LearnedCenter
         c = LearnedCenter.from_checkpoint(torch.load(self.p.student / 'learned_center.pt', map_location='cpu'))
-        masks = torch.load(self.p.selection / 'selection.pt', map_location='cpu')['variants'][self.spec['variant']]
+        masks = torch.load(self.p.selection / 'selection.pt', map_location='cpu')['variants'][self.spec['variant_key']]
         for side in ('q', 'k'):
             assert torch.equal(c.selected_pairs(side), masks['mask_' + side]), 'trained masks differ from the selection'
         if masks.get('mask_nope') is not None:
             assert torch.equal(c.selected_pairs('nope'), masks['mask_nope'])
+        assert c.bypass_spec['branches'] == [int(x) for x in self.spec['bypass'].get('branches', [])] and c.token_rule == (self.spec['bypass'].get('tokens') or None), 'trained bypass rules differ from the spec'
         la, sa = int(c.layer_active.sum()), int(c.step_active.sum())
-        expect = {'variant': self.spec['variant'], 'center_sha256': sha256(self.p.student / 'learned_center.pt'),
+        ba = int(sum(bool(c.cell_active[:, :, b_].any()) for b_ in range(c.branches)))
+        expect = {'variant': self.spec['variant_key'], 'selection_spec': c.selection_spec, 'selection_hash': self.spec['selection_hash'],
+                  'bypass': c.bypass_spec, 'center_sha256': sha256(self.p.student / 'learned_center.pt'),
                   'exempt': {'layers': [int(i) for i in torch.nonzero(~c.layer_active).flatten()],
                              'steps': [int(i) for i in torch.nonzero(~c.step_active).flatten()]},
                   'selection': {'pairs_per_cell_q': float(c.selected_pairs('q').sum(-1).float().mean()),
@@ -461,7 +497,7 @@ class Study:
                                 'q_k_intersection_mean': float((c.selected_pairs('q') & c.selected_pairs('k')).sum(-1).float().mean()),
                                 'nope_pairs_per_cell': float(c.selected_pairs('nope').sum(-1).float().mean()),
                                 'wide_head': bool(c.is_wide)},
-                  'calls': expected_calls(la, sa, c.uses_nope), 'layers_active': la, 'steps_active': sa,
+                  'calls': expected_calls(la, sa, c.uses_nope, ba), 'layers_active': la, 'steps_active': sa, 'branches_active': ba,
                   'complete_resume_step': self.latest_step(),
                   'scope': 'Final EMA learned_center.pt, all layer-step-branch-head cells; masks over the 64 rotary pairs per head.'}
         if write:
@@ -477,9 +513,8 @@ class Study:
         expect = None if self.dry else self.audit_center()
         config = json.loads((self.p.root / self.lab['benchmark_config']).read_text())
         config['modes'] = ['baseline', arm]
-        config['center_policy'] = ('%s EMA (%s, %d means pairs per head%s): %s.' % (
-            self.spec['name'], self.spec['variant'], int(self.spec['means_pairs']),
-            '' if self.spec['exempt'] else ', nothing exempt',
+        config['center_policy'] = ('%s EMA (%s; %s): %s.' % (
+            self.spec['name'], self.spec['choice'], bypass_text(self.spec),
             'trained means on the selected pairs' if mode == 'mean' else 'the same selected pairs zeroed at inference (zeros swap)'))
         cfg = run / 'config.json'
         if not self.dry:
@@ -642,9 +677,10 @@ class Study:
 
     def report(self):
         s, r = self.spec, self.p.results
-        ex = 'layer 0 / step 1 exempt' if s['exempt'] else 'nothing exempt (all 30 layers, all 20 steps)'
-        lines = ['# Study %s: %s, %d means pairs per head, %s' % (s['name'], s['variant'], int(s['means_pairs']), ex), '',
+        ex = bypass_text(s)
+        lines = ['# Study %s: %s; %s' % (s['name'], s['choice'], ex), '',
                  s.get('description', ''), '',
+                 'Selection spec (`scripts/pair_selection.py`, hash %s): `%s`. Bypass: `%s`.' % (s['selection_hash'], json.dumps(s['selection'], sort_keys=True), json.dumps(s['bypass'], sort_keys=True)), '',
                  'Generated by `scripts/center_study.py` from `%s`. Budget: %.3f of %.1f approved GPU-hours (allocated wall time x GPUs).' % (
                      s.get('_spec_path', 'the study spec'), self.used() / 3600, self.budget / 3600), '']
         def screen_table(path, title, means_note):
@@ -748,9 +784,8 @@ class Study:
             if todo == stages:
                 self.state('complete')
                 self.publish('%s complete: means and zeros benchmarks' % name,
-                             'Study %s (%s, %d means pairs per head, %s) run by scripts/center_study.py. Results with scopes: distill-results/%s/README.md. %.3f of %.1f approved GPU-hours.' % (
-                                 name, self.spec['variant'], int(self.spec['means_pairs']), 'layer0/step1 exempt' if self.spec['exempt'] else 'nothing exempt',
-                                 name, self.used() / 3600, self.budget / 3600), terminal='done')
+                             'Study %s (%s; %s) run by scripts/center_study.py. Results with scopes: distill-results/%s/README.md. %.3f of %.1f approved GPU-hours.' % (
+                                 name, self.spec['choice'], bypass_text(self.spec), name, self.used() / 3600, self.budget / 3600), terminal='done')
         except Exception as e:
             self.state('needs-attention', error=str(e), traceback=traceback.format_exc())
             if not self.dry:

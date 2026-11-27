@@ -38,6 +38,13 @@ without a step/branch context. The step/branch context is set explicitly by the 
 inferred during pipeline rollouts (set_rollout + a transformer pre-hook that compares the text embeddings to the
 registered conditional/unconditional embeddings and counts conditional forwards).
 
+Bypass rules (LearnedCenter(bypass={...}), all optional, all data): "layers" and "steps" (native, as the old
+exempt_layers/exempt_steps), "branches" (CFG branch ids left native), "heads" (list for every layer, or
+{"<layer>": [heads]}), "tokens" ({"kind": "frames", "native": [0]} keeps those latent frames native;
+{"kind": "border", "width": w} keeps a spatial border of w patches native). Layer/step/branch/head rules make
+cells inactive (cell_active); token rules are applied per token inside every intervention. The latent grid is
+read from each transformer forward. checkpoint_record() stores the rules and the selection spec with the state.
+
 Checkpoint compatibility: state dicts written by the earlier 44-wide version (mu_* of shape [..., 44], no
 masks) load into this module and reproduce its behaviour exactly.
 """
@@ -65,7 +72,7 @@ def high_pair_mask():
 
 class LearnedCenter(nn.Module):
     def __init__(self, layers=30, steps=20, branches=2, heads=12, head_dim=128,
-                 exempt_layers=(0,), exempt_steps=(0,), mode="mean", selection=None, wide=None, content_pairs=None):
+                 exempt_layers=(0,), exempt_steps=(0,), mode="mean", selection=None, wide=None, content_pairs=None, bypass=None):
         """selection: optional dict with 'mask_q' and 'mask_k', bool tensors of shape
         [layers, steps, branches, heads, 64] (pairs) or [..., 128] (coordinates); optionally 'mask_nope' (content
         pairs without RoPE) and 'wide' (bool: widened head, see module docstring). wide/content_pairs may also be
@@ -107,12 +114,36 @@ class LearnedCenter(nn.Module):
             self.register_buffer("content_index", index)       # [L,S,B,H,2n] coordinate indices, sorted
         else:
             self.register_buffer("content_index", torch.zeros(*shape[:-1], 0, dtype=torch.long))
+        bypass = dict(bypass or {})
+        for key in bypass:
+            if key not in ("layers", "steps", "branches", "heads", "tokens"):
+                raise ValueError(f"unknown bypass rule {key!r}")
         layer_active = torch.ones(layers, dtype=torch.bool)
-        layer_active[list(exempt_layers)] = False
+        layer_active[list(exempt_layers) + [int(i) for i in bypass.get("layers", [])]] = False
         step_active = torch.ones(steps, dtype=torch.bool)
-        step_active[list(exempt_steps)] = False
+        step_active[list(exempt_steps) + [int(i) for i in bypass.get("steps", [])]] = False
         self.register_buffer("layer_active", layer_active)
         self.register_buffer("step_active", step_active)
+        cell_active = torch.ones(layers, steps, branches, heads, dtype=torch.bool)
+        for b in bypass.get("branches", []):
+            cell_active[:, :, int(b)] = False
+        heads_rule = bypass.get("heads", [])
+        if isinstance(heads_rule, dict):
+            for l, hs in heads_rule.items():
+                cell_active[int(l)][..., [int(h) for h in hs]] = False
+        else:
+            for h in heads_rule:
+                cell_active[..., int(h)] = False
+        self.register_buffer("cell_active", cell_active)
+        self.token_rule = bypass.get("tokens") or None
+        if self.token_rule is not None and self.token_rule.get("kind") not in ("frames", "border"):
+            raise ValueError(f"unknown token rule {self.token_rule}")
+        self.bypass_spec = {"layers": [int(i) for i in torch.nonzero(~layer_active).flatten()],
+                            "steps": [int(i) for i in torch.nonzero(~step_active).flatten()],
+                            "branches": [int(b) for b in bypass.get("branches", [])], "heads": heads_rule, "tokens": self.token_rule}
+        self.selection_spec = selection.get("spec") if isinstance(selection, dict) else None
+        self.grid = None            # (frames, height patches, width patches) of the current forward, from the pre-hook
+        self.patch = (1, 2, 2)
         self.register_buffer("high_dims", HIGH_DIMS.clone())
         self.mode = mode
         self.step = None      # LongTensor [B], zero-based denoising step per batch element
@@ -150,9 +181,45 @@ class LearnedCenter(nn.Module):
         return bool((self.mask_q == default).all()) and bool((self.mask_k == default).all())
 
     # ---- context -------------------------------------------------------------------------------------
-    def set_context(self, step, branch):
+    def set_context(self, step, branch, grid=None):
         self.step = torch.as_tensor(step).reshape(-1).long()
         self.branch = torch.as_tensor(branch).reshape(-1).long()
+        if grid is not None:
+            self.grid = tuple(int(g) for g in grid)
+
+    def token_keep(self, tokens, device):
+        """[T] bool of tokens left native by the token rule, or None when there is no rule."""
+        rule = self.token_rule
+        if rule is None:
+            return None
+        if self.grid is None or self.grid[0] * self.grid[1] * self.grid[2] != tokens:
+            raise RuntimeError(f"token rule needs the latent grid for {tokens} tokens (got {self.grid}); run through the transformer or call set_context(..., grid=)")
+        f, h, w = self.grid
+        keep = torch.zeros(f, h, w, dtype=torch.bool, device=device)
+        if rule["kind"] == "frames":
+            keep[[int(i) for i in rule["native"]]] = True
+        elif rule["kind"] == "border":
+            b = int(rule["width"])
+            keep[:, :b] = True; keep[:, h - b:] = True; keep[:, :, :b] = True; keep[:, :, w - b:] = True
+        return keep.flatten()
+
+    def active_for(self, layer, step, branch):
+        """[B, heads] bool: cells active for these batch elements (step, branch and head/branch rules)."""
+        return self.step_active.to(step.device)[step].view(-1, 1) & self.cell_active[layer][step, branch]
+
+    def checkpoint_record(self, extra=None):
+        rec = {"state_dict": self.state_dict(), "mode": self.mode, "wide": self.is_wide, "bypass": self.bypass_spec,
+               "selection_spec": self.selection_spec}
+        rec.update(extra or {})
+        return rec
+
+    def describe_bypass(self):
+        b = self.bypass_spec
+        parts = [f"layers {b['layers']} native" if b["layers"] else "", f"steps {b['steps']} native" if b["steps"] else "",
+                 f"branches {b['branches']} native" if b["branches"] else "", f"heads {b['heads']} native" if b["heads"] else "",
+                 f"tokens {b['tokens']} native" if b["tokens"] else ""]
+        parts = [p for p in parts if p]
+        return "; ".join(parts) if parts else "nothing exempt"
 
     def set_rollout(self, positive, negative):
         """Infer (step, branch) from the pipeline's forwards: conditional then unconditional per step."""
@@ -162,6 +229,10 @@ class LearnedCenter(nn.Module):
         self.rollout = None
 
     def _transformer_pre_hook(self, module, args, kwargs):
+        hs = kwargs.get("hidden_states", args[0] if args else None)
+        if hs is not None and hs.dim() == 5:
+            pt, ph, pw = self.patch
+            self.grid = (hs.shape[2] // pt, hs.shape[3] // ph, hs.shape[4] // pw)
         if self.rollout is None:
             return
         text = kwargs["encoder_hidden_states"].to(self.rollout["positive"].dtype)   # pipelines may cast to the model dtype
@@ -185,7 +256,7 @@ class LearnedCenter(nn.Module):
         if self.step is None or self.branch is None:
             # Context-free use is only defined for narrow with step/branch-invariant masks and no exempt step:
             # then the removal is a fixed property of the layer (equivalent to dropping projection rows).
-            if self.mode == "narrow" and bool(self.step_active.all()) and self.cell_invariant(layer):
+            if self.mode == "narrow" and bool(self.step_active.all()) and bool(self.cell_active.all()) and self.cell_invariant(layer):
                 mask = masks[layer, 0, 0].unsqueeze(0).expand(batch, -1, -1)      # [B, heads, 128]
                 step = branch = None
             else:
@@ -195,10 +266,10 @@ class LearnedCenter(nn.Module):
             branch = self.branch.to(x.device)
             if step.numel() != batch:
                 raise RuntimeError(f"context batch {step.numel()} != tensor batch {batch}")
-            active = self.step_active.to(x.device)[step]                      # [B]
+            active = self.active_for(layer, step, branch)                     # [B, heads]
             if not bool(active.any()):
                 return x
-            mask = masks[layer][step, branch] & active.view(batch, 1, 1)      # [B, heads, 128]
+            mask = masks[layer][step, branch] & active.unsqueeze(-1)          # [B, heads, 128]
         if self.mode == "mean":
             mu = self.mu_q if side == "q" else self.mu_k
             values = mu[layer][step, branch].to(x.dtype)                 # [B, heads, 128]
@@ -207,7 +278,11 @@ class LearnedCenter(nn.Module):
         else:
             raise ValueError(self.mode)
         shaped = x.view(batch, tokens, self.heads, self.head_dim)
-        out = torch.where(mask.unsqueeze(1), values.unsqueeze(1), shaped)
+        mask4 = mask.unsqueeze(1)                                              # [B, 1, heads, 128]
+        keep = self.token_keep(tokens, x.device)
+        if keep is not None:
+            mask4 = mask4 & (~keep).view(1, tokens, 1, 1)
+        out = torch.where(mask4, values.unsqueeze(1), shaped)
         self.calls += 1
         return out.reshape(batch, tokens, width)
 
@@ -216,6 +291,9 @@ class LearnedCenter(nn.Module):
         self.detach()
         if len(transformer.blocks) != self.layers:
             raise ValueError(f"model has {len(transformer.blocks)} blocks, module has {self.layers}")
+        ps = getattr(getattr(transformer, "config", None), "patch_size", None)
+        if ps is not None:
+            self.patch = tuple(int(p) for p in ps)
         if self.is_wide:
             if self.mode not in ("mean", "delete", "off"):
                 raise ValueError("wide head supports modes mean, delete and off")
@@ -272,10 +350,10 @@ class LearnedCenter(nn.Module):
         branch = self.branch.to(device)
         if step.numel() != batch:
             raise RuntimeError(f"context batch {step.numel()} != tensor batch {batch}")
-        active = self.step_active.to(device)[step]
+        active = self.active_for(layer, step, branch)                         # [B, heads]
         if not bool(active.any()):
             return None
-        return self.mask_nope[layer][step, branch] & active.view(batch, 1, 1)
+        return self.mask_nope[layer][step, branch] & active.unsqueeze(-1)
 
     def _hook(self, layer, side):
         def apply(module, inputs, output):
@@ -305,6 +383,13 @@ class LearnedCenter(nn.Module):
             else:
                 raise ValueError(f"{name} shape {tuple(value.shape)} incompatible with {tuple(param.shape)}")
 
+    def load_state_dict(self, *args, **kwargs):
+        result = super().load_state_dict(*args, **kwargs)
+        # layer/step exemptions live in the buffers; keep the human-readable spec in step with them
+        self.bypass_spec["layers"] = [int(i) for i in torch.nonzero(~self.layer_active).flatten()]
+        self.bypass_spec["steps"] = [int(i) for i in torch.nonzero(~self.step_active).flatten()]
+        return result
+
     def _load_from_state_dict(self, state_dict, prefix, *args, **kwargs):
         """Accept the earlier 44-wide layout (mu_* [..., 44], no masks)."""
         for name in ("mu_q", "mu_k"):
@@ -323,6 +408,8 @@ class LearnedCenter(nn.Module):
             state_dict[prefix + "wide"] = torch.tensor(False)
         if prefix + "content_index" not in state_dict:
             state_dict[prefix + "content_index"] = torch.zeros(*self.mu_q.shape[:-1], 0, dtype=torch.long)
+        if prefix + "cell_active" not in state_dict:
+            state_dict[prefix + "cell_active"] = torch.ones(*self.mu_q.shape[:-1], dtype=torch.bool)
         super()._load_from_state_dict(state_dict, prefix, *args, **kwargs)
 
     @classmethod
@@ -332,9 +419,16 @@ class LearnedCenter(nn.Module):
         layers, steps, branches, heads = state["mu_q"].shape[:4]
         wide = bool(state["wide"]) if "wide" in state else bool(saved.get("wide", False))
         content_pairs = int(state["content_index"].shape[-1] // 2) if wide and "content_index" in state else None
+        bypass = saved.get("bypass") or {}
+        rules = {k: v for k, v in bypass.items() if k in ("branches", "heads", "tokens") and v}
+        if "cell_active" not in state and bypass.get("layers"):
+            rules["layers"] = bypass["layers"]
+        if "cell_active" not in state and bypass.get("steps"):
+            rules["steps"] = bypass["steps"]
         module = cls(layers=layers, steps=steps, branches=branches, heads=heads, mode=mode or saved.get("mode", "mean"),
-                     wide=wide, content_pairs=content_pairs, **kwargs)
+                     wide=wide, content_pairs=content_pairs, bypass=rules or None, **kwargs)
         module.load_state_dict(state)
+        module.selection_spec = saved.get("selection_spec")
         return module
 
     def selected_pairs(self, side):
@@ -379,17 +473,19 @@ class NoPEProcessor:
             batch, tokens = hidden_states.shape[0], hidden_states.shape[1]
             nope = self.center.nope_mask_for(self.layer, batch, hidden_states.device)       # [B, H, 128] or None
             if nope is not None and bool(nope.any()):
-                rotary_emb = self.rewrite(rotary_emb, nope, batch, tokens)
+                rotary_emb = self.rewrite(rotary_emb, nope, batch, tokens, self.center.token_keep(tokens, hidden_states.device))
                 self.center.nope_calls += 1
         return self.original(attn, hidden_states, encoder_hidden_states, attention_mask, rotary_emb, **kwargs)
 
     @staticmethod
-    def rewrite(rotary_emb, nope, batch, tokens):
+    def rewrite(rotary_emb, nope, batch, tokens, keep=None):
         if isinstance(rotary_emb, (tuple, list)):
             cos, sin = rotary_emb
             if cos.dim() != 4 or cos.shape[1] != tokens:
                 raise RuntimeError(f"unexpected rotary layout {tuple(cos.shape)}")
             m = nope[:, None, :, :]                                                     # [B, 1, H, 128]
+            if keep is not None:
+                m = m & (~keep).view(1, tokens, 1, 1)
             cos = torch.where(m, torch.ones((), dtype=cos.dtype, device=cos.device), cos.to(nope.device))
             sin = torch.where(m, torch.zeros((), dtype=sin.dtype, device=sin.device), sin.to(nope.device))
             return (cos, sin)
@@ -397,6 +493,8 @@ class NoPEProcessor:
         if not torch.is_complex(freqs) or freqs.dim() != 4 or freqs.shape[2] != tokens:
             raise RuntimeError(f"unexpected rotary layout {tuple(freqs.shape)}")
         m = nope[..., 0::2][:, :, None, :]                                              # [B, H, 1, 64]
+        if keep is not None:
+            m = m & (~keep).view(1, 1, tokens, 1)
         return torch.where(m, torch.ones((), dtype=freqs.dtype, device=freqs.device), freqs)
 
 
@@ -439,8 +537,14 @@ class WideHeadProcessor:
         q = q.unflatten(2, (H, -1))
         k = k.unflatten(2, (H, -1))
         v = v.unflatten(2, (H, -1))
-        step, branch, active = c.context_for(B, q.device)
-        act = active.view(B, 1, 1, 1)
+        step, branch, _ = c.context_for(B, q.device)
+        cell = c.active_for(self.layer, step, branch)                          # [B, H]
+        if not bool(cell.any()):
+            return self.original(attn, hidden_states, encoder_hidden_states, attention_mask, rotary_emb, **kwargs)
+        act = cell.view(B, 1, H, 1)
+        keep = c.token_keep(T, q.device)
+        if keep is not None:
+            act = act & (~keep).view(1, T, 1, 1)                               # [B, T, H, 1]
         if c.mode == "mean":
             pos_q = c.mu_q[self.layer][step, branch].to(q.dtype)          # [B, H, D]
             pos_k = c.mu_k[self.layer][step, branch].to(k.dtype)

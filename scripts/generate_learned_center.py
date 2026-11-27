@@ -125,6 +125,7 @@ def main():
                                head_dim=transformer.config.attention_head_dim, mode=args.center_mode).to("cuda")
     center.attach(pipe.transformer)
     exempt = {"layers": [int(i) for i in torch.nonzero(~center.layer_active).flatten()], "steps": [int(i) for i in torch.nonzero(~center.step_active).flatten()]}
+    bypass = center.bypass_spec
     selection_info = {"default_high_masks": center.uses_default_masks, "cell_invariant_masks": center.cell_invariant(),
                       "pairs_per_cell_q": float(center.selected_pairs("q").sum(-1).float().mean()),
                       "pairs_per_cell_k": float(center.selected_pairs("k").sum(-1).float().mean()),
@@ -133,13 +134,16 @@ def main():
                       "wide_head": center.is_wide, "content_pairs": center.content_pairs if center.is_wide else 0}
     environment = {"torch": torch.__version__, "diffusers": diffusers.__version__, "transformers": transformers.__version__,
                    "snapshot": revision, "weights": weights_source, "learned_center_sha256": center_hash, "center_mode": args.center_mode,
-                   "exempt": exempt, "selection": selection_info, "gpu": torch.cuda.get_device_name(0), "hostname": socket.gethostname(), "pid": os.getpid(),
+                   "exempt": exempt, "bypass": bypass, "selection_spec": center.selection_spec, "selection": selection_info,
+                   "gpu": torch.cuda.get_device_name(0), "hostname": socket.gethostname(), "pid": os.getpid(),
                    "resident_text_encoder": args.resident_text_encoder,
                    "config_sha256": digest(config_path), "code_sha256": {n: digest(ROOT / "scripts" / n) for n in ("generate_learned_center.py", "learned_center.py")}}
     active_layers = int(center.layer_active.sum()) if args.center_mode != "off" else 0
     active_steps = int(center.step_active.sum()) if args.center_mode != "off" else 0
-    expected_calls = active_layers * 2 * 2 * active_steps if args.center_mode != "off" else 0   # layers x (q,k) x branches x steps
-    expected_nope_calls = active_layers * 2 * active_steps if (center.uses_nope and args.center_mode != "off") else 0   # one processor call per layer, branch, step
+    active_branches = int(sum(bool(center.cell_active[:, :, b].any()) for b in range(center.branches))) if args.center_mode != "off" else 0
+    # a hook/processor counts once per layer x branch forward x step where any head of that cell is active
+    expected_calls = active_layers * 2 * active_branches * active_steps if args.center_mode != "off" else 0   # layers x (q,k) x branches x steps
+    expected_nope_calls = active_layers * active_branches * active_steps if (center.uses_nope and args.center_mode != "off") else 0
     scope = {
         "mean": ("widened head: full 128-dim constant vector under RoPE plus %d unrotated content pairs appended to Q/K, per layer/step/branch/head" % center.content_pairs) if center.is_wide else
                 "constant vectors on selected Q/K pairs after RMSNorm, per layer/step/branch/head"
@@ -151,7 +155,7 @@ def main():
                   + ("; masks identical at every step and branch, equivalent to dropped projection rows"
                      if center.cell_invariant() and bool(center.step_active.all()) else ""),
         "off": "full Q/K with no replacements",
-    }[args.center_mode]
+    }[args.center_mode] + ("; bypass: " + center.describe_bypass() if args.center_mode != "off" else "")
 
     completed = 0
     for prompt in config["prompts"]:
