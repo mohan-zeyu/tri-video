@@ -1,0 +1,17 @@
+{
+    "calib": {
+        "count": 64,
+        "median_seconds": 21.085275650024414,
+        "sum_seconds": 1392.735408782959
+    },
+    "val": {
+        "count": 32,
+        "median_seconds": 20.847859978675842,
+        "sum_seconds": 698.6796369552612
+    },
+    "train": {
+        "count": 3545,
+        "median_seconds": 12.47986888885498,
+        "sum_seconds": 48793.27663850784
+    }
+}

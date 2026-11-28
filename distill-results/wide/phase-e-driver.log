@@ -1,0 +1,30 @@
+WAITING FOR IDLE GPU ['E-trained-screen']
+START E-trained-screen GPU=2 pid=2883878
+EXIT E-trained-screen GPU=2 seconds=1400.3 status=0
+WAITING FOR IDLE GPU ['E-encoder-False']
+START E-encoder-False GPU=2 pid=2935666
+EXIT E-encoder-False GPU=2 seconds=84.3 status=0
+WAITING FOR IDLE GPU ['E-encoder-True']
+START E-encoder-True GPU=2 pid=2938244
+EXIT E-encoder-True GPU=2 seconds=38.3 status=0
+WAITING FOR IDLE GPU ['E-render-0', 'E-render-1']
+START E-render-0 GPU=2 pid=2939890
+START E-render-1 GPU=3 pid=2970661
+EXIT E-render-0 GPU=2 seconds=1331.3 status=0
+EXIT E-render-1 GPU=3 seconds=576.3 status=0
+WAITING FOR IDLE GPU ['E-overall_consistency', 'E-aesthetic_quality', 'E-imaging_quality', 'E-dynamic_degree', 'E-subject_consistency', 'E-background_consistency', 'E-motion_smoothness']
+START E-overall_consistency GPU=2 pid=2990944
+START E-aesthetic_quality GPU=3 pid=2990951
+EXIT E-overall_consistency GPU=2 seconds=108.1 status=0
+START E-imaging_quality GPU=2 pid=2994860
+EXIT E-aesthetic_quality GPU=3 seconds=123.6 status=0
+START E-dynamic_degree GPU=3 pid=2995289
+EXIT E-imaging_quality GPU=2 seconds=116.1 status=0
+START E-subject_consistency GPU=2 pid=3011395
+EXIT E-dynamic_degree GPU=3 seconds=109.6 status=0
+START E-background_consistency GPU=3 pid=3012771
+EXIT E-background_consistency GPU=3 seconds=73.7 status=0
+START E-motion_smoothness GPU=3 pid=3014635
+EXIT E-subject_consistency GPU=2 seconds=91.2 status=0
+EXIT E-motion_smoothness GPU=3 seconds=62.2 status=0
+E COMPLETE 4114.98 GPU seconds

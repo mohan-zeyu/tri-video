@@ -1,0 +1,16 @@
+{
+  "training_gpu_seconds": 37956,
+  "benchmark_gpu_seconds": 3992,
+  "optimizer_update_median_seconds": 6.869782367080916,
+  "optimizer_update_timing_rows": 251,
+  "physical_training_gpus": [
+    3,
+    5
+  ],
+  "peak_pytorch_gib_by_rank": null,
+  "final_optimizer_save_timed_out": true,
+  "observed_device_memory_mib_by_rank": [
+    24487,
+    24483
+  ]
+}

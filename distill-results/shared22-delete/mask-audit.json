@@ -1,0 +1,41 @@
+{
+  "all_cells": 14400,
+  "active_cells": 13224,
+  "mask_scope": "30 layers, 20 steps, 2 CFG branches, 12 heads, 64 rotary pairs per side",
+  "mask_q_sha256": "d5c255c8b73c3ea93d551426c6ba55474c5ce0db07f2510d88a0a96acba780fc",
+  "mask_k_sha256": "d5c255c8b73c3ea93d551426c6ba55474c5ce0db07f2510d88a0a96acba780fc",
+  "durable_exports": [
+    "out/distill-shared22-delete/ema-checkpoints/step-000500",
+    "out/distill-shared22-delete/ema-checkpoints/step-001000",
+    "out/distill-shared22-delete/ema-checkpoints/step-001500",
+    "out/distill-shared22-delete/ema-checkpoints/step-002000",
+    "out/distill-shared22-delete/student"
+  ],
+  "training_runtime_arg_differences": {
+    "guided_gate": [
+      [
+        [
+          1000,
+          0
+        ],
+        [
+          1500,
+          500
+        ]
+      ],
+      []
+    ],
+    "budget_seconds": [
+      19050.0,
+      19155.0
+    ],
+    "center_mode": [
+      "mean",
+      "delete"
+    ],
+    "out": [
+      "out/distill-shared22",
+      "out/distill-shared22-delete"
+    ]
+  }
+}

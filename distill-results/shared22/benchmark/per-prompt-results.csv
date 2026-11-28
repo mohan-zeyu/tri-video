@@ -1,0 +1,211 @@
+dimension,prompt_id,category,prompt,seed,baseline,shared22,shared22_minus_baseline
+subject_consistency,v000,animal,lemur eating grass leaves,2026110900,0.9205445444042032,0.9608028368516401,0.04025829244743695
+subject_consistency,v013,architecture,a miniature house,2026110913,0.9977922825650736,0.9983378208496354,0.0005455382845618306
+subject_consistency,v026,food,a broccoli soup on wooden table,2026110926,0.9990251761945811,0.9995548284866593,0.000529652292078242
+subject_consistency,v039,human,a girl pushing the chair while her sister is on the chair,2026110939,0.9245662519877608,0.9381917342543602,0.013625482266599431
+subject_consistency,v052,lifestyle,modern office waiting room,2026110952,0.9991650114005263,0.9983631047335538,-0.0008019066669724406
+subject_consistency,v064,plant,a man holding leaves looking at the camera,2026110964,0.9901054189963774,0.9851641790433363,-0.004941239953041077
+subject_consistency,v076,scenery,fireworks display in the sky at night,2026110976,0.9564466720277612,0.9110198278318752,-0.04542684419588605
+subject_consistency,v088,vehicles,video of passengers riding a double decker bus during night,2026110988,0.8550103543834253,0.8360490981828083,-0.01896125620061706
+subject_consistency,v001,animal,chameleon eating ant,2026110901,0.772319669411941,0.8502977612343702,0.07797809182242921
+subject_consistency,v014,architecture,red paper lantern decorations hanging outside a building,2026110914,0.9983377795327794,0.9988789463585074,0.0005411668257280233
+subject_consistency,v027,food,a mother preparing food with her kids,2026110927,0.9859603988853368,0.9804927347735926,-0.005467664111744264
+subject_consistency,v040,human,cab driver talking to passenger,2026110940,0.9711371524767443,0.9836779846386476,0.012540832161903381
+subject_consistency,v053,lifestyle,woman painting at home,2026110953,0.986072613434358,0.9781456237489526,-0.007926989685405395
+subject_consistency,v065,plant,green moss in forest nature,2026110965,0.9968196864832531,0.9965232421051372,-0.00029644437811593427
+subject_consistency,v077,scenery,video of ocean during daytime,2026110977,0.9780217619104818,0.975844493643804,-0.0021772682666778564
+subject_consistency,v089,vehicles,cargo train traveling on the mountainside,2026110989,0.9085831818255511,0.8650884743441235,-0.043494707481427586
+subject_consistency,v002,animal,a raccoon climbing a tree,2026110902,0.9554466544227167,0.9485286277803507,-0.00691802664236596
+subject_consistency,v015,architecture,modern wooden house interior,2026110915,0.9988845403898846,0.9992090504277836,0.00032451003789901733
+subject_consistency,v028,food,boy getting a dumpling using chopsticks,2026110928,0.9194851456718012,0.9141852076758038,-0.0052999379959973725
+subject_consistency,v041,human,friends talking while on the basketball court,2026110941,0.9088831706480547,0.9181616414677013,0.009278470819646611
+subject_consistency,v054,lifestyle,woman and man in pajamas working from home,2026110954,0.9933164302598346,0.9958998289975253,0.0025833987376906453
+subject_consistency,v066,plant,a shadow of a swaying plant,2026110966,0.9686770811676979,0.9850060824643482,0.01632900129665027
+subject_consistency,v078,scenery,scenery of desert landscape,2026110978,0.9959501637653871,0.9937551407651468,-0.002195023000240326
+subject_consistency,v090,vehicles,video of blinking traffic lights,2026110990,0.9147767709060148,0.898565408858386,-0.016211362047628852
+subject_consistency,v003,animal,koala eating leaves from a branch,2026110903,0.9918735352429476,0.9905016117475249,-0.0013719234954227
+subject_consistency,v016,architecture,silhouette of a building,2026110916,0.999467593702403,0.9981178282336756,-0.0013497654687274485
+subject_consistency,v029,food,fresh dim sum set up on a bamboo steam tray for cooking,2026110929,0.9976279972629114,0.997118975628506,-0.00050902163440536
+subject_consistency,v042,human,brother and sister using hammock,2026110942,0.978300119665536,0.9683322059837255,-0.009967913681810492
+subject_consistency,v055,lifestyle,a toolbox and a paint roller beside a huge package in a room,2026110955,0.9950024248524145,0.9986373524774205,0.003634927625005946
+subject_consistency,v067,plant,tree with golden leaves,2026110967,0.9983419938520952,0.9954690194942735,-0.002872974357821745
+background_consistency,v000,animal,lemur eating grass leaves,2026110900,0.95306396484375,0.9793978604403409,0.02633389559659094
+background_consistency,v013,architecture,a miniature house,2026110913,0.9913163618607954,0.99652099609375,0.005204634232954586
+background_consistency,v026,food,a broccoli soup on wooden table,2026110926,0.998046875,0.9981301047585227,8.322975852270709e-05
+background_consistency,v039,human,a girl pushing the chair while her sister is on the chair,2026110939,0.9590176669034091,0.9683671431107954,0.009349476207386354
+background_consistency,v052,lifestyle,modern office waiting room,2026110952,0.9988847212357954,0.9934636896306818,-0.0054210316051136465
+background_consistency,v064,plant,a man holding leaves looking at the camera,2026110964,0.9803355823863636,0.9711192737926136,-0.00921630859375
+background_consistency,v076,scenery,fireworks display in the sky at night,2026110976,0.9802079634232954,0.9674738103693182,-0.012734153053977182
+background_consistency,v088,vehicles,video of passengers riding a double decker bus during night,2026110988,0.9162930575284091,0.9061445756392046,-0.010148481889204475
+background_consistency,v001,animal,chameleon eating ant,2026110901,0.9321677468039773,0.9575583718039773,0.025390625
+background_consistency,v014,architecture,red paper lantern decorations hanging outside a building,2026110914,0.9942127574573864,0.9969648881392046,0.0027521306818182323
+background_consistency,v027,food,a mother preparing food with her kids,2026110927,0.9930142489346591,0.9866000088778409,-0.006414240056818121
+background_consistency,v040,human,cab driver talking to passenger,2026110940,0.9652266068892046,0.9780051491477273,0.012778542258522707
+background_consistency,v053,lifestyle,woman painting at home,2026110953,0.9877485795454546,0.9933305220170454,0.005581942471590828
+background_consistency,v065,plant,green moss in forest nature,2026110965,0.9983354048295454,0.9979691938920454,-0.0003662109375
+background_consistency,v077,scenery,video of ocean during daytime,2026110977,0.9830044833096591,0.9898792613636364,0.006874778053977293
+background_consistency,v089,vehicles,cargo train traveling on the mountainside,2026110989,0.9463112571022727,0.900146484375,-0.04616477272727271
+background_consistency,v002,animal,a raccoon climbing a tree,2026110902,0.9756580699573864,0.9815118963068182,0.005853826349431879
+background_consistency,v015,architecture,modern wooden house interior,2026110915,0.9975086558948864,0.9973865855823864,-0.0001220703125
+background_consistency,v028,food,boy getting a dumpling using chopsticks,2026110928,0.9713190252130682,0.9629405628551136,-0.008378462357954586
+background_consistency,v041,human,friends talking while on the basketball court,2026110941,0.9263194691051136,0.91473388671875,-0.011585582386363646
+background_consistency,v054,lifestyle,woman and man in pajamas working from home,2026110954,0.9965265447443182,0.9942349520596591,-0.0022915926846591717
+background_consistency,v066,plant,a shadow of a swaying plant,2026110966,0.9841586026278409,0.9922263405539773,0.008067737926136354
+background_consistency,v078,scenery,scenery of desert landscape,2026110978,0.9837812943892046,0.9954112659801136,0.01162997159090906
+background_consistency,v090,vehicles,video of blinking traffic lights,2026110990,0.94140625,0.9316350763494318,-0.009771173650568232
+background_consistency,v003,animal,koala eating leaves from a branch,2026110903,0.98736572265625,0.9941572709517046,0.006791548295454586
+background_consistency,v016,architecture,silhouette of a building,2026110916,0.9946122602982954,0.9838534268465909,-0.010758833451704475
+background_consistency,v029,food,fresh dim sum set up on a bamboo steam tray for cooking,2026110929,0.9964544122869318,0.9942904385653409,-0.0021639737215908283
+background_consistency,v042,human,brother and sister using hammock,2026110942,0.9651933149857954,0.9675181995738636,0.0023248845880682323
+background_consistency,v055,lifestyle,a toolbox and a paint roller beside a huge package in a room,2026110955,0.9961492365056818,0.9964988014914773,0.0003495649857955252
+background_consistency,v067,plant,tree with golden leaves,2026110967,0.99871826171875,0.9973310990767046,-0.0013871626420454142
+motion_smoothness,v000,animal,lemur eating grass leaves,2026110900,0.9810146022108338,0.9826367935379118,0.0016221913270779709
+motion_smoothness,v013,architecture,a miniature house,2026110913,0.9924647096475375,0.9955723539521028,0.003107644304565227
+motion_smoothness,v026,food,a broccoli soup on wooden table,2026110926,0.9964502477285107,0.9969262057358718,0.00047595800736111027
+motion_smoothness,v039,human,a girl pushing the chair while her sister is on the chair,2026110939,0.9862373224173929,0.9807509946792269,-0.005486327738166041
+motion_smoothness,v052,lifestyle,modern office waiting room,2026110952,0.9971341947869216,0.99720260045306,6.840566613841581e-05
+motion_smoothness,v064,plant,a man holding leaves looking at the camera,2026110964,0.9935903688127188,0.9930514597568826,-0.0005389090558362009
+motion_smoothness,v076,scenery,fireworks display in the sky at night,2026110976,0.9658262514338648,0.954563680617449,-0.011262570816415796
+motion_smoothness,v088,vehicles,video of passengers riding a double decker bus during night,2026110988,0.9630592536888493,0.9614563037441408,-0.0016029499447084428
+motion_smoothness,v001,animal,chameleon eating ant,2026110901,0.9811320063378888,0.982581569885951,0.0014495635480622493
+motion_smoothness,v014,architecture,red paper lantern decorations hanging outside a building,2026110914,0.9954624688469664,0.9963694515106126,0.0009069826636461942
+motion_smoothness,v027,food,a mother preparing food with her kids,2026110927,0.9918461321239354,0.9904458746987853,-0.0014002574251500421
+motion_smoothness,v040,human,cab driver talking to passenger,2026110940,0.9890078101789959,0.9916963649464415,0.0026885547674456722
+motion_smoothness,v053,lifestyle,woman painting at home,2026110953,0.986470830651284,0.9890791165845547,0.002608285933270671
+motion_smoothness,v065,plant,green moss in forest nature,2026110965,0.995413324162788,0.9966029507183766,0.0011896265555885188
+motion_smoothness,v077,scenery,video of ocean during daytime,2026110977,0.9592888156998911,0.9719839861028586,0.012695170402967526
+motion_smoothness,v089,vehicles,cargo train traveling on the mountainside,2026110989,0.9242595676949231,0.9474685142891331,0.023208946594210023
+motion_smoothness,v002,animal,a raccoon climbing a tree,2026110902,0.9852661284000132,0.987361498203027,0.0020953698030138357
+motion_smoothness,v015,architecture,modern wooden house interior,2026110915,0.9965703467992837,0.9970427732698719,0.0004724264705882053
+motion_smoothness,v028,food,boy getting a dumpling using chopsticks,2026110928,0.9901742282403282,0.9848838283261537,-0.0052903999141744595
+motion_smoothness,v041,human,friends talking while on the basketball court,2026110941,0.9500224389524328,0.9560639129757543,0.006041474023321558
+motion_smoothness,v054,lifestyle,woman and man in pajamas working from home,2026110954,0.9957919542132931,0.9954927494408959,-0.0002992047723971991
+motion_smoothness,v066,plant,a shadow of a swaying plant,2026110966,0.9865650035898198,0.9893745809298046,0.00280957733998477
+motion_smoothness,v078,scenery,scenery of desert landscape,2026110978,0.9961999988652869,0.9963429090228263,0.00014291015753942204
+motion_smoothness,v090,vehicles,video of blinking traffic lights,2026110990,0.9014715919406483,0.9222911281937017,0.02081953625305344
+motion_smoothness,v003,animal,koala eating leaves from a branch,2026110903,0.9892340057024493,0.9876944483127847,-0.001539557389664603
+motion_smoothness,v016,architecture,silhouette of a building,2026110916,0.997206036570773,0.9966222514152967,-0.0005837851554763018
+motion_smoothness,v029,food,fresh dim sum set up on a bamboo steam tray for cooking,2026110929,0.9938255922686835,0.99379460995783,-3.098231085352232e-05
+motion_smoothness,v042,human,brother and sister using hammock,2026110942,0.9892556513872384,0.9890336566234238,-0.00022199476381457028
+motion_smoothness,v055,lifestyle,a toolbox and a paint roller beside a huge package in a room,2026110955,0.9961212551887337,0.997026431337476,0.0009051761487423038
+motion_smoothness,v067,plant,tree with golden leaves,2026110967,0.9954177242708953,0.9934402555477156,-0.0019774687231796095
+dynamic_degree,v000,animal,lemur eating grass leaves,2026110900,1.0,1.0,0.0
+dynamic_degree,v013,architecture,a miniature house,2026110913,0.0,0.0,0.0
+dynamic_degree,v026,food,a broccoli soup on wooden table,2026110926,0.0,0.0,0.0
+dynamic_degree,v039,human,a girl pushing the chair while her sister is on the chair,2026110939,1.0,1.0,0.0
+dynamic_degree,v052,lifestyle,modern office waiting room,2026110952,0.0,0.0,0.0
+dynamic_degree,v064,plant,a man holding leaves looking at the camera,2026110964,0.0,0.0,0.0
+dynamic_degree,v076,scenery,fireworks display in the sky at night,2026110976,0.0,0.0,0.0
+dynamic_degree,v088,vehicles,video of passengers riding a double decker bus during night,2026110988,1.0,1.0,0.0
+dynamic_degree,v001,animal,chameleon eating ant,2026110901,1.0,1.0,0.0
+dynamic_degree,v014,architecture,red paper lantern decorations hanging outside a building,2026110914,0.0,0.0,0.0
+dynamic_degree,v027,food,a mother preparing food with her kids,2026110927,0.0,0.0,0.0
+dynamic_degree,v040,human,cab driver talking to passenger,2026110940,1.0,0.0,-1.0
+dynamic_degree,v053,lifestyle,woman painting at home,2026110953,0.0,0.0,0.0
+dynamic_degree,v065,plant,green moss in forest nature,2026110965,0.0,0.0,0.0
+dynamic_degree,v077,scenery,video of ocean during daytime,2026110977,1.0,0.0,-1.0
+dynamic_degree,v089,vehicles,cargo train traveling on the mountainside,2026110989,1.0,1.0,0.0
+dynamic_degree,v002,animal,a raccoon climbing a tree,2026110902,1.0,1.0,0.0
+dynamic_degree,v015,architecture,modern wooden house interior,2026110915,0.0,0.0,0.0
+dynamic_degree,v028,food,boy getting a dumpling using chopsticks,2026110928,1.0,1.0,0.0
+dynamic_degree,v041,human,friends talking while on the basketball court,2026110941,1.0,1.0,0.0
+dynamic_degree,v054,lifestyle,woman and man in pajamas working from home,2026110954,0.0,0.0,0.0
+dynamic_degree,v066,plant,a shadow of a swaying plant,2026110966,0.0,0.0,0.0
+dynamic_degree,v078,scenery,scenery of desert landscape,2026110978,0.0,0.0,0.0
+dynamic_degree,v090,vehicles,video of blinking traffic lights,2026110990,0.0,0.0,0.0
+dynamic_degree,v003,animal,koala eating leaves from a branch,2026110903,0.0,0.0,0.0
+dynamic_degree,v016,architecture,silhouette of a building,2026110916,0.0,0.0,0.0
+dynamic_degree,v029,food,fresh dim sum set up on a bamboo steam tray for cooking,2026110929,0.0,0.0,0.0
+dynamic_degree,v042,human,brother and sister using hammock,2026110942,0.0,0.0,0.0
+dynamic_degree,v055,lifestyle,a toolbox and a paint roller beside a huge package in a room,2026110955,0.0,0.0,0.0
+dynamic_degree,v067,plant,tree with golden leaves,2026110967,0.0,0.0,0.0
+aesthetic_quality,v000,animal,lemur eating grass leaves,2026110900,0.6371126770973206,0.6237511038780212,-0.013361573219299316
+aesthetic_quality,v013,architecture,a miniature house,2026110913,0.7628036737442017,0.7482457756996155,-0.014557898044586182
+aesthetic_quality,v026,food,a broccoli soup on wooden table,2026110926,0.6459634900093079,0.6163219809532166,-0.02964150905609131
+aesthetic_quality,v039,human,a girl pushing the chair while her sister is on the chair,2026110939,0.45896896719932556,0.49129822850227356,0.032329261302948
+aesthetic_quality,v052,lifestyle,modern office waiting room,2026110952,0.5400715470314026,0.5020392537117004,-0.03803229331970215
+aesthetic_quality,v064,plant,a man holding leaves looking at the camera,2026110964,0.7560353875160217,0.6088197231292725,-0.14721566438674927
+aesthetic_quality,v076,scenery,fireworks display in the sky at night,2026110976,0.6442850232124329,0.639880895614624,-0.004404127597808838
+aesthetic_quality,v088,vehicles,video of passengers riding a double decker bus during night,2026110988,0.5568904876708984,0.5182886719703674,-0.038601815700531006
+aesthetic_quality,v001,animal,chameleon eating ant,2026110901,0.4724799394607544,0.5305811166763306,0.05810117721557617
+aesthetic_quality,v014,architecture,red paper lantern decorations hanging outside a building,2026110914,0.5748320817947388,0.5930631160736084,0.01823103427886963
+aesthetic_quality,v027,food,a mother preparing food with her kids,2026110927,0.6889857053756714,0.706876277923584,0.017890572547912598
+aesthetic_quality,v040,human,cab driver talking to passenger,2026110940,0.5570640563964844,0.47470974922180176,-0.08235430717468262
+aesthetic_quality,v053,lifestyle,woman painting at home,2026110953,0.5050181150436401,0.4735824167728424,-0.03143569827079773
+aesthetic_quality,v065,plant,green moss in forest nature,2026110965,0.5300874710083008,0.5017293095588684,-0.028358161449432373
+aesthetic_quality,v077,scenery,video of ocean during daytime,2026110977,0.5898115038871765,0.5994243621826172,0.009612858295440674
+aesthetic_quality,v089,vehicles,cargo train traveling on the mountainside,2026110989,0.5958626866340637,0.5887148976325989,-0.007147789001464844
+aesthetic_quality,v002,animal,a raccoon climbing a tree,2026110902,0.5827969908714294,0.6287310719490051,0.045934081077575684
+aesthetic_quality,v015,architecture,modern wooden house interior,2026110915,0.6643186807632446,0.6585953831672668,-0.005723297595977783
+aesthetic_quality,v028,food,boy getting a dumpling using chopsticks,2026110928,0.5806871056556702,0.587134063243866,0.006446957588195801
+aesthetic_quality,v041,human,friends talking while on the basketball court,2026110941,0.6074191927909851,0.4628377854824066,-0.1445814073085785
+aesthetic_quality,v054,lifestyle,woman and man in pajamas working from home,2026110954,0.4998842477798462,0.6051855683326721,0.10530132055282593
+aesthetic_quality,v066,plant,a shadow of a swaying plant,2026110966,0.5018438100814819,0.5256351828575134,0.023791372776031494
+aesthetic_quality,v078,scenery,scenery of desert landscape,2026110978,0.5516812205314636,0.5930061340332031,0.0413249135017395
+aesthetic_quality,v090,vehicles,video of blinking traffic lights,2026110990,0.4652537703514099,0.4735395014286041,0.008285731077194214
+aesthetic_quality,v003,animal,koala eating leaves from a branch,2026110903,0.6248767375946045,0.5957673192024231,-0.029109418392181396
+aesthetic_quality,v016,architecture,silhouette of a building,2026110916,0.4981733560562134,0.6107356548309326,0.11256229877471924
+aesthetic_quality,v029,food,fresh dim sum set up on a bamboo steam tray for cooking,2026110929,0.6596693396568298,0.5916600823402405,-0.06800925731658936
+aesthetic_quality,v042,human,brother and sister using hammock,2026110942,0.6533819437026978,0.5806897878646851,-0.0726921558380127
+aesthetic_quality,v055,lifestyle,a toolbox and a paint roller beside a huge package in a room,2026110955,0.354018896818161,0.30518782138824463,-0.04883107542991638
+aesthetic_quality,v067,plant,tree with golden leaves,2026110967,0.6550835371017456,0.6480399966239929,-0.0070435404777526855
+imaging_quality,v000,animal,lemur eating grass leaves,2026110900,0.5740763151380751,0.7178963419596355,0.14382002682156036
+imaging_quality,v013,architecture,a miniature house,2026110913,0.7887455291748047,0.709037355211046,-0.07970817396375862
+imaging_quality,v026,food,a broccoli soup on wooden table,2026110926,0.7521011047363281,0.7360087890625,-0.016092315673828073
+imaging_quality,v039,human,a girl pushing the chair while her sister is on the chair,2026110939,0.6979554977416993,0.7196218092176649,0.02166631147596565
+imaging_quality,v052,lifestyle,modern office waiting room,2026110952,0.7611365085177951,0.7439426099989148,-0.017193898518880313
+imaging_quality,v064,plant,a man holding leaves looking at the camera,2026110964,0.7782627919514974,0.7808653106689454,0.002602518717447988
+imaging_quality,v076,scenery,fireworks display in the sky at night,2026110976,0.5805375077989366,0.5451625866360135,-0.03537492116292318
+imaging_quality,v088,vehicles,video of passengers riding a double decker bus during night,2026110988,0.3554325273301866,0.29941422017415364,-0.056018307156032954
+imaging_quality,v001,animal,chameleon eating ant,2026110901,0.6582105026245116,0.7294025760226779,0.07119207339816624
+imaging_quality,v014,architecture,red paper lantern decorations hanging outside a building,2026110914,0.7929888305664062,0.8012606353759766,0.008271804809570349
+imaging_quality,v027,food,a mother preparing food with her kids,2026110927,0.7394124688042535,0.7600182766384549,0.020605807834201406
+imaging_quality,v040,human,cab driver talking to passenger,2026110940,0.7264369167751736,0.7652153625488282,0.038778445773654524
+imaging_quality,v053,lifestyle,woman painting at home,2026110953,0.6846372290717231,0.6303539123535156,-0.05428331671820752
+imaging_quality,v065,plant,green moss in forest nature,2026110965,0.7312756890190972,0.5986516011555989,-0.13262408786349833
+imaging_quality,v077,scenery,video of ocean during daytime,2026110977,0.42099322297838,0.7264563106960721,0.3054630877176921
+imaging_quality,v089,vehicles,cargo train traveling on the mountainside,2026110989,0.7747663048638238,0.7146176851060656,-0.060148619757758204
+imaging_quality,v002,animal,a raccoon climbing a tree,2026110902,0.7179565751817492,0.6959901275634767,-0.02196644761827249
+imaging_quality,v015,architecture,modern wooden house interior,2026110915,0.7731099294026693,0.7891500227186415,0.016040093315972226
+imaging_quality,v028,food,boy getting a dumpling using chopsticks,2026110928,0.5277773903740777,0.5421711535983615,0.014393763224283873
+imaging_quality,v041,human,friends talking while on the basketball court,2026110941,0.5832235421074761,0.6218589452107747,0.038635403103298604
+imaging_quality,v054,lifestyle,woman and man in pajamas working from home,2026110954,0.745178227742513,0.7234200134277344,-0.021758214314778535
+imaging_quality,v066,plant,a shadow of a swaying plant,2026110966,0.4126113967895508,0.6560020828247071,0.2433906860351563
+imaging_quality,v078,scenery,scenery of desert landscape,2026110978,0.3776018591986762,0.38632250044080946,0.008720641242133231
+imaging_quality,v090,vehicles,video of blinking traffic lights,2026110990,0.3866995951334636,0.5189541189405653,0.13225452380710173
+imaging_quality,v003,animal,koala eating leaves from a branch,2026110903,0.7406550632052951,0.7585188479953342,0.01786378479003914
+imaging_quality,v016,architecture,silhouette of a building,2026110916,0.7334254082573785,0.7712693583170572,0.03784395005967878
+imaging_quality,v029,food,fresh dim sum set up on a bamboo steam tray for cooking,2026110929,0.7436474083794488,0.7694426506890192,0.02579524230957042
+imaging_quality,v042,human,brother and sister using hammock,2026110942,0.7662393934461805,0.7594241756863065,-0.006815217759874037
+imaging_quality,v055,lifestyle,a toolbox and a paint roller beside a huge package in a room,2026110955,0.7915167592366537,0.7820111117892794,-0.009505647447374255
+imaging_quality,v067,plant,tree with golden leaves,2026110967,0.7606223008897569,0.7322120208740235,-0.028410280015733425
+overall_consistency,v000,animal,lemur eating grass leaves,2026110900,0.25151512026786804,0.28928112983703613,0.03776600956916809
+overall_consistency,v013,architecture,a miniature house,2026110913,0.2637780010700226,0.26006776094436646,-0.003710240125656128
+overall_consistency,v026,food,a broccoli soup on wooden table,2026110926,0.31376197934150696,0.2879912853240967,-0.02577069401741028
+overall_consistency,v039,human,a girl pushing the chair while her sister is on the chair,2026110939,0.20642198622226715,0.22586321830749512,0.019441232085227966
+overall_consistency,v052,lifestyle,modern office waiting room,2026110952,0.2417811006307602,0.1841907650232315,-0.057590335607528687
+overall_consistency,v064,plant,a man holding leaves looking at the camera,2026110964,0.2822622060775757,0.25227904319763184,-0.029983162879943848
+overall_consistency,v076,scenery,fireworks display in the sky at night,2026110976,0.2516976594924927,0.24698388576507568,-0.004713773727416992
+overall_consistency,v088,vehicles,video of passengers riding a double decker bus during night,2026110988,0.15850497782230377,0.2049572467803955,0.046452268958091736
+overall_consistency,v001,animal,chameleon eating ant,2026110901,0.22008483111858368,0.22714167833328247,0.0070568472146987915
+overall_consistency,v014,architecture,red paper lantern decorations hanging outside a building,2026110914,0.29863792657852173,0.23400886356830597,-0.06462906301021576
+overall_consistency,v027,food,a mother preparing food with her kids,2026110927,0.2437276393175125,0.22758197784423828,-0.01614566147327423
+overall_consistency,v040,human,cab driver talking to passenger,2026110940,0.12685124576091766,0.17424020171165466,0.047388955950737
+overall_consistency,v053,lifestyle,woman painting at home,2026110953,0.23221704363822937,0.23899517953395844,0.006778135895729065
+overall_consistency,v065,plant,green moss in forest nature,2026110965,0.27913975715637207,0.266783744096756,-0.012356013059616089
+overall_consistency,v077,scenery,video of ocean during daytime,2026110977,0.17525362968444824,0.19621214270591736,0.020958513021469116
+overall_consistency,v089,vehicles,cargo train traveling on the mountainside,2026110989,0.20762014389038086,0.21607141196727753,0.008451268076896667
+overall_consistency,v002,animal,a raccoon climbing a tree,2026110902,0.27822253108024597,0.282718688249588,0.004496157169342041
+overall_consistency,v015,architecture,modern wooden house interior,2026110915,0.22230882942676544,0.20937731862068176,-0.01293151080608368
+overall_consistency,v028,food,boy getting a dumpling using chopsticks,2026110928,0.20357972383499146,0.24575617909431458,0.04217645525932312
+overall_consistency,v041,human,friends talking while on the basketball court,2026110941,0.19779904186725616,0.18406137824058533,-0.013737663626670837
+overall_consistency,v054,lifestyle,woman and man in pajamas working from home,2026110954,0.15616658329963684,0.26096755266189575,0.10480096936225891
+overall_consistency,v066,plant,a shadow of a swaying plant,2026110966,0.21716350317001343,0.22549530863761902,0.00833180546760559
+overall_consistency,v078,scenery,scenery of desert landscape,2026110978,0.20432329177856445,0.2224092185497284,0.01808592677116394
+overall_consistency,v090,vehicles,video of blinking traffic lights,2026110990,0.1831740289926529,0.17381510138511658,-0.009358927607536316
+overall_consistency,v003,animal,koala eating leaves from a branch,2026110903,0.2962462902069092,0.28276556730270386,-0.013480722904205322
+overall_consistency,v016,architecture,silhouette of a building,2026110916,0.18180079758167267,0.16655045747756958,-0.015250340104103088
+overall_consistency,v029,food,fresh dim sum set up on a bamboo steam tray for cooking,2026110929,0.2827381491661072,0.3121279180049896,0.029389768838882446
+overall_consistency,v042,human,brother and sister using hammock,2026110942,0.19975945353507996,0.16950559616088867,-0.030253857374191284
+overall_consistency,v055,lifestyle,a toolbox and a paint roller beside a huge package in a room,2026110955,0.18391361832618713,0.18725156784057617,0.003337949514389038
+overall_consistency,v067,plant,tree with golden leaves,2026110967,0.28178671002388,0.25807318091392517,-0.023713529109954834

@@ -1,0 +1,51 @@
+[
+  {
+    "dimension": "subject_consistency",
+    "source_file": "/dev/shm/tri-vbench-source/vbench/subject_consistency.py",
+    "source_sha256": "55f5c9a3e5be543380a709b94712903fa67a76340c3c0cb2414ac090dbd1b78d",
+    "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+    "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student"
+  },
+  {
+    "dimension": "background_consistency",
+    "source_file": "/dev/shm/tri-vbench-source/vbench/background_consistency.py",
+    "source_sha256": "7def92057819df0dad01c857eecf3b39b8b555c8cdfe881a672cc2b19dc226b4",
+    "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+    "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student"
+  },
+  {
+    "dimension": "motion_smoothness",
+    "source_file": "/dev/shm/tri-vbench-source/vbench/motion_smoothness.py",
+    "source_sha256": "5ddc43f246b64e23d10540b8f9e6c302686e6a1ac9fa4e9942b5bd043d89e0b9",
+    "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+    "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student"
+  },
+  {
+    "dimension": "dynamic_degree",
+    "source_file": "/dev/shm/tri-vbench-source/vbench/dynamic_degree.py",
+    "source_sha256": "2e93d3a7af38bfbe459c19c9d127894f687424a0bc534dbf7e6571d17b24dff7",
+    "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+    "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student"
+  },
+  {
+    "dimension": "aesthetic_quality",
+    "source_file": "/dev/shm/tri-vbench-source/vbench/aesthetic_quality.py",
+    "source_sha256": "baa1894c2543483901a444af9aabe0701b1f937bf304141c53019a45b27abc57",
+    "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+    "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student"
+  },
+  {
+    "dimension": "imaging_quality",
+    "source_file": "/dev/shm/tri-vbench-source/vbench/imaging_quality.py",
+    "source_sha256": "ac6c648cb4d5e82cd29c63be04977e9288c3540558cf12f979e66bef3e1f9e3a",
+    "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+    "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student"
+  },
+  {
+    "dimension": "overall_consistency",
+    "source_file": "/dev/shm/tri-vbench-source/vbench/overall_consistency.py",
+    "source_sha256": "325beb4503699b08d441a467710240097c15c2267fe92dbed1ed8cdfaa96103e",
+    "vbench_commit": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+    "reused_baseline_from": "/mnt/data/liuzeyu/tri-video-distill-bf334ec/out/learned-center-wan-student"
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "approved_gpu_hours": 18,
+  "gpu_hours_used": 16.853779096277556,
+  "cap_history": "13 approved originally; raised to 18 by the user on 21 Nov 2026 after the external SIGTERM",
+  "accounting": "All allocated worker wall seconds times GPU count, including A, all B attempts and C screen/parity/generation/scorers; CPU-only work excluded."
+}

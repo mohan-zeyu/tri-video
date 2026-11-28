@@ -1,0 +1,12 @@
+{
+  "state": "failed",
+  "exit_code": 1,
+  "gpus": [
+    1,
+    6
+  ],
+  "started": 1795229024.093686,
+  "finished": 1795237388.0509868,
+  "wall_seconds": 8363.957275390625,
+  "gpu_seconds": 16727.91455078125
+}

@@ -1,0 +1,1 @@
+{"ema_update": 500, "variant": "pooled", "mode": "narrow", "masks_match_pooled_selection": true, "layer0_exempt": true, "step1_exempt": false, "tensor_entries": 825, "export_path": "out/distill-narrow-pooled/ema-checkpoints/step-000500", "optimizer_snapshot_present": false}

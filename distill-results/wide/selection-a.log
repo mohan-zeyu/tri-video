@@ -1,0 +1,212 @@
+{
+ "prompts": 64,
+ "pairs_per_side": 22,
+ "cells": 14400,
+ "scope": "per cell = (layer, step, branch, head); statistics over all 10,800 tokens per prompt; pooled over calibration prompts; exemptions are not applied here (masks cover every cell)",
+ "stability_q": {
+  "jaccard_prompt_vs_pooled_median": 0.76,
+  "jaccard_p10": 0.5714285714285714,
+  "jaccard_mean": 0.7486708117326331,
+  "spearman_damage_median": 0.9273351648351646,
+  "spearman_p10": 0.8234432234432233,
+  "scope": "each prompt's own-mean selection/damage vs the pooled selection/damage, per cell; median/p10 over prompts x cells"
+ },
+ "composition_q_separate": {
+  "t": [
+   0.1865,
+   0.1048,
+   0.0759
+  ],
+  "h": [
+   0.1007,
+   0.1046,
+   0.0776
+  ],
+  "w": [
+   0.1205,
+   0.1501,
+   0.0795
+  ]
+ },
+ "mrl_q_selected_mean": 0.4815609373559785,
+ "mrl_q_unselected_mean": 0.5647924763919899,
+ "mrl_q_fixed_high_mean": 0.7244456047050818,
+ "damage_q_selected_over_fixed_high": 0.0011209523345835613,
+ "stability_k": {
+  "jaccard_prompt_vs_pooled_median": 0.76,
+  "jaccard_p10": 0.5714285714285714,
+  "jaccard_mean": 0.7493746600855273,
+  "spearman_damage_median": 0.9311355311355309,
+  "spearman_p10": 0.8248626373626372,
+  "scope": "each prompt's own-mean selection/damage vs the pooled selection/damage, per cell; median/p10 over prompts x cells"
+ },
+ "composition_k_separate": {
+  "t": [
+   0.1937,
+   0.1024,
+   0.0734
+  ],
+  "h": [
+   0.1045,
+   0.1037,
+   0.0761
+  ],
+  "w": [
+   0.1245,
+   0.1472,
+   0.0745
+  ]
+ },
+ "mrl_k_selected_mean": 0.4886311169451938,
+ "mrl_k_unselected_mean": 0.5362276027301854,
+ "mrl_k_fixed_high_mean": 0.7392387595208463,
+ "damage_k_selected_over_fixed_high": 0.06921470627687341,
+ "separate_q_k_intersection": {
+  "mean_pairs": 17.571944444444444,
+  "median": 18.0,
+  "p10": 14.0,
+  "p90": 20.0,
+  "per_layer_mean": [
+   21.07,
+   19.01,
+   18.4,
+   16.62,
+   17.0,
+   16.97,
+   17.7,
+   17.31,
+   17.06,
+   16.14,
+   16.95,
+   17.56,
+   17.44,
+   18.37,
+   17.89,
+   18.99,
+   17.16,
+   17.15,
+   18.01,
+   16.95,
+   17.71,
+   16.49,
+   17.36,
+   18.06,
+   16.62,
+   17.43,
+   16.12,
+   17.21,
+   18.56,
+   17.86
+  ],
+  "scope": "number of pairs selected on both Q and K in the same cell, of the --pairs per side"
+ },
+ "composition_shared": {
+  "t": [
+   0.1894,
+   0.105,
+   0.0749
+  ],
+  "h": [
+   0.0986,
+   0.1065,
+   0.0762
+  ],
+  "w": [
+   0.1211,
+   0.1515,
+   0.0767
+  ]
+ },
+ "composition_pooled": {
+  "t": [
+   0.1929,
+   0.1049,
+   0.0746
+  ],
+  "h": [
+   0.0965,
+   0.1061,
+   0.0751
+  ],
+  "w": [
+   0.1212,
+   0.1518,
+   0.0769
+  ]
+ },
+ "wide": {
+  "content_pairs": 32,
+  "composition_content": {
+   "t": [
+    0.1046,
+    0.1002,
+    0.1307
+   ],
+   "h": [
+    0.1227,
+    0.0976,
+    0.1298
+   ],
+   "w": [
+    0.1153,
+    0.0691,
+    0.1301
+   ]
+  },
+  "fixed_high_in_content_fraction": 0.4982417821884155,
+  "content_vs_split_nope_intersection_mean": 22.0,
+  "scope": "per cell; content = the highest-damage pairs by damage_q + damage_k; means cover all 64 pairs"
+ },
+ "split": {
+  "means_pairs": 42,
+  "nope_pairs": 22,
+  "composition_means": {
+   "t": [
+    0.1225,
+    0.124,
+    0.1028
+   ],
+   "h": [
+    0.0882,
+    0.1259,
+    0.1032
+   ],
+   "w": [
+    0.0904,
+    0.1404,
+    0.1027
+   ]
+  },
+  "composition_nope": {
+   "t": [
+    0.1299,
+    0.0815,
+    0.1219
+   ],
+   "h": [
+    0.1499,
+    0.0779,
+    0.1211
+   ],
+   "w": [
+    0.1456,
+    0.0502,
+    0.1221
+   ]
+  },
+  "shared_in_split_means_fraction": 1.0,
+  "fixed_high_in_nope_fraction": 0.42528724670410156,
+  "scope": "per cell; the split means set is the lowest-damage superset of the shared set when means_pairs >= pairs"
+ },
+ "pooled_vs_shared_intersection": {
+  "mean_pairs": 20.00861111111111,
+  "p10": 18.0,
+  "scope": "pairs the step/branch-invariant pooled set shares with the per-cell shared set, per cell, of --pairs"
+ },
+ "shared_vs_removal_criterion_intersection": {
+  "mean_pairs": 18.861597222222223,
+  "scope": "per cell, pairs in common between the shared selection (pooled-mean replacement
+
+real	0m51.718s
+user	0m39.276s
+sys	0m22.244s

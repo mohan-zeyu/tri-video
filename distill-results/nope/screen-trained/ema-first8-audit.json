@@ -1,0 +1,17 @@
+{
+  "prompt_ids": [
+    "d0064",
+    "d0065",
+    "d0066",
+    "d0067",
+    "d0068",
+    "d0069",
+    "d0070",
+    "d0071"
+  ],
+  "guided_error": {
+    "student/mean": 0.05425717428443022,
+    "student/delete": 0.09897858904441818
+  },
+  "scope": "Final trained EMA, same first eight held-out prompts times all 20 teacher entering states, whole-latent relative squared velocity error, branches combined at CFG5; arithmetic average of the raw per-prompt screen rows. C validation used live weights, so these are a separate EMA comparison."
+}

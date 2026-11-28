@@ -1,0 +1,21 @@
+{
+  "arms": {
+    "static_shared22": {
+      "prompts": 30,
+      "frames": 1350,
+      "mean_final_latent_relative_l2": 0.5257822160919507,
+      "mean_finite_frame_psnr_db": 14.948818045439456,
+      "identical_frames": 0,
+      "mean_final_latent_l2": 467.27002410888673
+    },
+    "static_shared32": {
+      "prompts": 30,
+      "frames": 1350,
+      "mean_final_latent_relative_l2": 0.6144975264867146,
+      "mean_finite_frame_psnr_db": 13.653444329560381,
+      "identical_frames": 0,
+      "mean_final_latent_l2": 546.2652618408204
+    }
+  },
+  "scope": "Same prompt and seed in each arm vs frozen baseline. L2 ratio over all final post-step latent coordinates, then average over prompts. Frame PSNR is 10log10(255^2/RGB MSE) over all channels/pixels of each aligned decoded MP4 frame; average finite dB values over all frames/prompts, count infinite identical frames separately. Absolute final latent L2 takes the Euclidean norm over all final latent coordinates before averaging over prompts."
+}

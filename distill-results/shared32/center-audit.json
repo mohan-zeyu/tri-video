@@ -1,0 +1,23 @@
+{
+  "variant": "shared",
+  "center_sha256": "a2e2060833d8a624fbacccb81064bd880f5e26884fdaaaf1bbc318efcb352cf3",
+  "exempt": {
+    "layers": [],
+    "steps": []
+  },
+  "selection": {
+    "pairs_per_cell_q": 32.0,
+    "pairs_per_cell_k": 32.0,
+    "q_k_intersection_mean": 32.0,
+    "nope_pairs_per_cell": 0.0,
+    "wide_head": false
+  },
+  "calls": {
+    "intervention_calls": 2400,
+    "nope_calls": 0
+  },
+  "layers_active": 30,
+  "steps_active": 20,
+  "complete_resume_step": 2500,
+  "scope": "Final EMA learned_center.pt, all layer-step-branch-head cells; masks over the 64 rotary pairs per head."
+}

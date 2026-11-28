@@ -1,0 +1,1 @@
+{"optimizer_step":2500,"guided_error":0.03589788494209643,"high_current_mean_reference":0.3499369189084973,"gate_threshold":0.17496845945424866,"below_threshold":true,"scope":"held-out prompts, teacher-trajectory states, both CFG branches; columns cond, uncond, guided(w=5); relative squared error"}
